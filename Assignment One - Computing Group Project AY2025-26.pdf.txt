@@ -1,0 +1,90 @@
+--- TEXT FROM c:\project\kora-store\Assignment One - Computing Group Project AY2025-26.pdf ---
+2  
+Summative Assessment 1 
+ 
+Assessment title Assignment 1 - Software design and implementation (Group work) 
+Submission date and time Week 10 
+Word Count (or equivalent) 2000 
+Where to submit Blackboard 
+Feedback date 15 working days 
+Assessment Weighting 50% 
+PSRB requirements (if 
+applicable) 
+30% Threshold for BSc Computer Science only 
+Submitting, feedback & grades online using Blackboard 
+ 
+Main objectives of the Assessment 
+ 
+Assessment 1 is a group activity: students will be allocated into groups of 4 or 5 and given a case study 
+to work with throughout the first assessment of module. 
+For Assessment 1 you are required to complete: 
+• A software project 
+• A group report, to be submitted via Blackboard 
+Your group report should be written as a collaborative document with contributions from each group 
+member, and should provide documentation of the project and software produced by your group, 
+including: 
+• A literature review demonstrating you have done research on project management and software 
+methodologies, and justified the ones you have chosen for your project 
+• Evidence of detailed project planning, such as Gantt chart, Work Breakdown Structure, product 
+backlog and sprint backlogs, critical path analysis, risk analysis, etc. 
+• Requirements analysis for your software project, demonstrating evidence of appropriate 
+techniques such as use case diagrams, user stories, etc. 
+• Documentation of the design process for your software 
+• Evidence of completed software, such as labelled screenshots 
+• Evidence of software testing 
+• Evidence of teamwork, such as minutes of group meetings, allocation of team roles, evidence of 
+shared documents and discussions 
+• Evidence of the contribution of each group member to the final project deliverables, including the 
+report 
+• User documentation for your software, such as a brief user guide 
+• Reflection on the project process, what challenges were faced and how you addressed these 
+challenges as a group 
+• As part of the group-based development to discuss how the key characteristics of Equality 
+Diversity and Inclusion (EDI) been reflected on. 
+ 
+Further guidance on how to complete the group report will be provided in due course via teaching 
+sessions and/or Blackboard. 
+
+3  
+Criteria Details Marks 
+Available (%) 
+Learning 
+outcomes 
+assessed 
+Content Does the report contain the required information 
+as follows? 
+• A literature review demonstrating you 
+have done research on project 
+management and software 
+methodologies, and justified the ones you 
+have chosen for your project 
+(10%) 
+• Evidence of detailed project planning, 
+such as Gantt chart, Work Breakdown 
+Structure, product backlog and sprint 
+backlogs, critical path analysis, risk 
+analysis, etc. 
+(20%) 
+• Requirements analysis for your software 
+project, demonstrating evidence of 
+appropriate techniques such as user 
+stories, use case diagrams, etc. 
+(10%) 
+• An explanation of the design process for 
+your website, including justification of 
+technologies used 
+(20%) 
+• Evidence of completed software, such as 
+labelled screenshots, a link to the published 
+website, and labelled examples of code and 
+ER diagram if you coded the website 
+without use of an e- commerce platform 
+(20%) 
+• Evidence of software testing 
+(10%) 
+• To demonstrate how the key characteristics 
+of Equality Diversity and Inclusion been 
+reflected on 
+(10%) 
+100% LO1 – LO4 
+ 

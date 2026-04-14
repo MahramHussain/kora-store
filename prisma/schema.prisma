@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// We are telling Prisma to expect a PostgreSQL database
+datasource db {
+  provider = "postgresql"
+}
+
+// 1. THE USER MODEL (Linked to Clerk Auth)
+model User {
+  id        String   @id // We will use the Clerk User ID here so they match perfectly
+  email     String   @unique
+  firstName String?
+  lastName  String?
+  createdAt DateTime @default(now())
+  
+  // A user can have many orders
+  orders    Order[]
+  reviews Review[]
+}
+
+// 2. THE PRODUCT MODEL (The Vault Inventory)
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  category    String
+  team String? 
+  price       Decimal  // Decimal is better than Float for actual money
+  description String?
+  images      String[] // Array of image URLs
+  sizes       String[] // Array of available sizes (e.g., ["S", "M", "L"])
+  tag         String?  // e.g., "Trending", "Latest"
+  createdAt   DateTime @default(now())
+  
+  // Links to order history
+  orderItems  OrderItem[]
+  reviews Review[]
+}
+
+// 3. THE ORDER MODEL (The Secure Checkout result)
+model Order {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  status      String   @default("Processing") // Processing, Shipped, Delivered
+  total       Decimal
+  createdAt   DateTime @default(now())
+  
+  // An order can have multiple different shirts/boots inside it
+  items       OrderItem[]
+}
+
+// 4. THE ORDER ITEM MODEL (The specific items inside an order)
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  
+  size      String
+  quantity  Int
+  price     Decimal // We lock the price here so if the shirt goes on sale later, past orders don't change!
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      @default(5)
+  comment   String
+  createdAt DateTime @default(now())
+
+  // The Review belongs to one User
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  // The Review belongs to one Product
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+}

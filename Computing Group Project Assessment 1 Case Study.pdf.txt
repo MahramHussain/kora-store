@@ -1,0 +1,58 @@
+--- TEXT FROM c:\project\kora-store\Computing Group Project Assessment 1 Case Study.pdf ---
+Computing Group Project 
+Case study for Assessment 1 
+ 
+For the Computing Group Project module, you are required to work in groups for 
+Assessment 1. 
+Case Study: Online Retail System for an Independent Business 
+Your group has been approached by a hypothetical independent retail business that wishes 
+to establish a dedicated online sales system for its products. 
+The business already sells products through informal digital channels (e.g. social media or 
+messaging apps) and now requires a more structured, scalable, and inclusive web-based 
+system to support online sales and customer management. 
+The company has no predefined technical solution and expects your team to analyse its 
+needs and propose an appropriate design and implementation. 
+Your Task 
+Your group must design and implement a web-based retail system that meets the needs of 
+this business. 
+1. Define the business and users 
+- Decide what products the business sells. 
+- Identify and describe the target users of the system. 
+- Justify your choices and explain how they influenced your requirements and design 
+decisions. 
+2. Plan and manage the project 
+- Plan how your group will design and develop the system using appropriate project 
+management methods and tools. 
+- Allocate and justify team roles and responsibilities. 
+- Provide evidence of project planning and coordination (e.g. Gantt chart, backlog, risk 
+analysis, meeting records). 
+3. Design and implement the system 
+- Implement the system using custom development or an appropriate e-commerce or 
+prototyping platform (e.g. Figma, Wix, Shopify). 
+- Your choice of tools and technologies must be justified. 
+Core Functional Requirements 
+Your system must support the following minimum features: 
+- A product catalogue with a minimum of 20 products (guideline). 
+- Each product must include an image, description, and price. 
+- Users must be able to browse products, add products to a shopping cart, update quantities, 
+and remove items. An AI “search mode” is welcome but not compulsory.  
+- User account creation and login functionality. 
+- Checkout process including order review and entry of delivery or contact details. 
+ 
+Design Quality and Enhancement 
+To achieve higher marks, your group is expected to go beyond basic functionality by 
+demonstrating: 
+- Clear and justified information architecture. 
+- Meaningful filtering or sorting of products. 
+- Thoughtful user experience design. 
+- Consideration of Equality, Diversity and Inclusion (EDI) as part of system design. 
+Optional enhancements may include order tracking, promotional features, customer 
+support features, or basic admin functionality. 
+ 
+Critical Analysis and Reflection 
+Your report should demonstrate that your group has: 
+- Analysed existing online retail systems. 
+- Critically evaluated design features. 
+- Made conscious design decisions. 
+- Reflected on teamwork, planning, and EDI considerations. 
+ 
