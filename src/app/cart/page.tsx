@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { CURRENCY } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { FaTrash, FaArrowRight, FaLock } from "react-icons/fa6";
@@ -16,7 +17,7 @@ export default function CartPage() {
 
   // Smart Math: Convert string prices like "$120" into numbers to calculate the total
   const subtotal = cart.reduce((total, item) => {
-    const numericPrice = parseFloat(item.price.replace('$', ''));
+    const numericPrice = parseFloat(item.price.replace(CURRENCY.trim(), '').replace('$', ''));
     return total + (numericPrice * item.quantity);
   }, 0);
 
@@ -127,7 +128,7 @@ export default function CartPage() {
                 <div className="space-y-4 mb-6 text-slate-400">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span className="text-white">${subtotal.toFixed(2)}</span>
+                    <span className="text-white">{CURRENCY}{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>UAE Local Delivery</span>
@@ -137,76 +138,15 @@ export default function CartPage() {
 
                 <div className="flex justify-between items-center border-t border-white/10 pt-6 mb-8">
                   <span className="font-bold text-white">Total</span>
-                  <span className="text-3xl font-black text-white">${subtotal.toFixed(2)}</span>
+                  <span className="text-3xl font-black text-white">{CURRENCY}{subtotal.toFixed(2)}</span>
                 </div>
 
-                {/* THE NEW DYNAMIC PAYMENT SECTION */}
-                {!showCardForm ? (
-                  // Your original flawlessly styled button, repurposed as the trigger
-                  <button 
-                    onClick={() => setShowCardForm(true)}
-                    className="w-full bg-white text-black hover:bg-purple-500 hover:text-white font-black uppercase tracking-widest py-4 rounded-full transition-all flex justify-center items-center gap-3 group shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_20px_rgba(147,51,234,0.4)]"
-                  >
-                    Proceed to Payment <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
-                  </button>
-                ) : (
-                  // The Card Form using your exact aesthetic (bg-white/5, borders, etc.)
-                  <div className="border-t border-white/10 pt-6 animate-fade-in-up">
-                    <div className="flex items-center gap-2 mb-4">
-                      <FaLock className="text-emerald-500 text-sm" />
-                      <h3 className="text-sm font-bold text-slate-300 uppercase tracking-widest">Secure Payment</h3>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-bold text-slate-500 mb-1">Card Number</label>
-                        <input 
-                          type="text" 
-                          placeholder="0000 0000 0000 0000" 
-                          maxLength={19}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:border-purple-500 outline-none font-mono text-sm transition-colors focus:bg-white/10"
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-xs font-bold text-slate-500 mb-1">Expiry</label>
-                          <input 
-                            type="text" 
-                            placeholder="MM/YY" 
-                            maxLength={5}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:border-purple-500 outline-none font-mono text-sm transition-colors focus:bg-white/10"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-bold text-slate-500 mb-1">CVC</label>
-                          <input 
-                            type="text" 
-                            placeholder="123" 
-                            maxLength={4}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-white focus:border-purple-500 outline-none font-mono text-sm transition-colors focus:bg-white/10"
-                          />
-                        </div>
-                      </div>
-
-                      {/* The Final Submit Button */}
-                      <button 
-                        onClick={handleCheckout}
-                        disabled={isCheckingOut}
-                        className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase tracking-widest py-4 rounded-full transition-all flex justify-center items-center gap-3 shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {isCheckingOut ? "Authorizing..." : `Pay $${subtotal.toFixed(2)}`}
-                      </button>
-
-                      <button 
-                        onClick={() => setShowCardForm(false)}
-                        className="w-full text-xs font-bold text-slate-500 hover:text-white uppercase tracking-widest transition-colors py-2"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
+                <button 
+                  onClick={() => router.push('/checkout')}
+                  className="w-full bg-white text-black hover:bg-purple-500 hover:text-white font-black uppercase tracking-widest py-4 rounded-full transition-all flex justify-center items-center gap-3 group shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_20px_rgba(147,51,234,0.4)]"
+                >
+                  SECURE CHECKOUT <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+                </button>
 
                 <p className="text-center text-xs text-slate-500 mt-6">Taxes calculated at checkout. All UAE orders ship within 24 hours.</p>
               </div>

@@ -34,6 +34,8 @@ model Product {
   images      String[] // Array of image URLs
   sizes       String[] // Array of available sizes (e.g., ["S", "M", "L"])
   tag         String?  // e.g., "Trending", "Latest"
+  stock       Int      @default(0) // Inventory count for a full storefront
+  isFeatured  Boolean  @default(false)
   createdAt   DateTime @default(now())
   
   // Links to order history
@@ -46,7 +48,8 @@ model Order {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-  status      String   @default("Processing") // Processing, Shipped, Delivered
+  status      String   @default("PROCESSING") // PROCESSING, SHIPPED, DELIVERED
+  trackingId  String?  // Optional field for logistics tracking
   total       Decimal
   createdAt   DateTime @default(now())
   

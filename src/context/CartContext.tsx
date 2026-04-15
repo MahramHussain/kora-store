@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export type CartItem = {
   id: string | number;
@@ -23,6 +23,27 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // 1. Load the vault from local storage when the user boots the store
+  useEffect(() => {
+    try {
+      const storedCart = localStorage.getItem("kora_vault_cart");
+      if (storedCart) {
+        setCart(JSON.parse(storedCart));
+      }
+    } catch (error) {
+      console.error("Failed to load vault data:", error);
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // 2. Automatically sync whatever they add/remove directly into their local storage
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem("kora_vault_cart", JSON.stringify(cart));
+    }
+  }, [cart, isInitialized]);
 
   const addToCart = (newItem: CartItem) => {
     setCart((prevCart) => {

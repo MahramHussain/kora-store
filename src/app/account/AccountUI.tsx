@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SignIn, SignUp, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa6";
+import { CURRENCY } from "@/lib/constants";
 
 export default function AccountUI({ user, orders }: { user: any, orders: any[] }) {
   const [isLogin, setIsLogin] = useState(true);
@@ -72,7 +73,7 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
                     </div>
                     
                     <div className="flex flex-col sm:items-end gap-2">
-                      <div className="text-white font-black text-2xl">${order.total}</div>
+                      <div className="text-white font-black text-2xl">{CURRENCY}{order.total}</div>
                       <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
                         order.status === 'Processing' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' : 
                         order.status === 'Shipped' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 

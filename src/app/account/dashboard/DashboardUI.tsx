@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaBoxOpen, FaMapLocationDot, FaUserGear, FaArrowRightFromBracket, FaChevronRight } from "react-icons/fa6";
 import { useClerk } from "@clerk/nextjs";
+import { CURRENCY } from "@/lib/constants";
 
 export default function DashboardUI({ user, orders }: { user: any, orders: any[] }) {
   const router = useRouter();
@@ -91,7 +92,7 @@ export default function DashboardUI({ user, orders }: { user: any, orders: any[]
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
                 <div className="bg-[#0a0514] border border-white/10 rounded-2xl p-6 shadow-lg">
                   <p className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-2">Total Vault Value</p>
-                  <p className="text-4xl font-black text-white">${totalSpent}</p>
+                  <p className="text-4xl font-black text-white">{CURRENCY}{totalSpent}</p>
                 </div>
                 <div className="bg-[#0a0514] border border-white/10 rounded-2xl p-6 shadow-lg">
                   <p className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-2">Secured Drops</p>
@@ -157,7 +158,7 @@ export default function DashboardUI({ user, orders }: { user: any, orders: any[]
                     </div>
                     <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
                       <div className="text-left sm:text-right">
-                        <p className="font-black text-white text-lg">${order.total}</p>
+                        <p className="font-black text-white text-lg">{CURRENCY}{order.total}</p>
                         <p className={`text-xs font-bold uppercase tracking-wider ${order.status === 'Delivered' ? 'text-emerald-500' : 'text-purple-400'}`}>
                           {order.status}
                         </p>

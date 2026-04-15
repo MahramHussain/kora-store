@@ -2,23 +2,29 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
+import { getProducts } from "@/app/admin/actions";
 import { FaBars, FaXmark, FaBoxOpen } from "react-icons/fa6"; 
 import { SignInButton, UserButton, Show } from "@clerk/nextjs";
-
-const SUGGESTIONS = ["Predator", "Arsenal", "Real Madrid", "Boots", "Retro Kits", "Inter Miami", "Vapor 15", "Al Nassr"];
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { cartCount } = useCart();
 
-  const filteredSuggestions = SUGGESTIONS.filter(item => 
+  useEffect(() => {
+    getProducts().then(products => {
+      setSuggestions(products.map(p => p.name));
+    });
+  }, []);
+
+  const filteredSuggestions = suggestions.filter(item => 
     item.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -42,8 +48,7 @@ export default function Navbar() {
           <button className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Change</button>
         </div>
         <div className="flex gap-6 items-center">
-          <Link href="/track" className="hover:text-white transition-colors">Track Order</Link>
-          <Link href="/help" className="hover:text-white transition-colors">Help</Link>
+          <Link href="/faq" className="hover:text-white transition-colors">Help</Link>
           
           <Show when="signed-out">
             <SignInButton mode="modal">
@@ -141,9 +146,6 @@ export default function Navbar() {
             </Link>
             <Link href="/shop?tag=Trending" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-white/5 text-white font-bold hover:bg-white/5">
               Trending Gear
-            </Link>
-            <Link href="/track" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-white/5 text-slate-400 hover:bg-white/5">
-              Track Order
             </Link>
             
             <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">

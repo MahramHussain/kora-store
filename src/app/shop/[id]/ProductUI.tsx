@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CURRENCY } from "@/lib/constants";
 import Link from "next/link";
 import { FaChevronLeft, FaStar, FaTruckFast } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
@@ -113,7 +114,7 @@ export default function ProductUI({ product }: { product: any }) {
                 {product.name}
               </h1>
               <div className="flex items-center gap-4 mb-6">
-                <span className="text-3xl font-bold text-white">${product.price}</span>
+                <span className="text-3xl font-bold text-white">{CURRENCY}{product.price}</span>
                 <div className="flex items-center gap-1 text-yellow-500 text-sm">
                   <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
                   <span className="text-slate-400 ml-2">({product.reviews?.length || 0} Reviews)</span>
