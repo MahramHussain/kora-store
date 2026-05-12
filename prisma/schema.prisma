@@ -17,10 +17,11 @@ model User {
   firstName String?
   lastName  String?
   createdAt DateTime @default(now())
-  
-  // A user can have many orders
+
+  // A user can have many orders, reviews, and cart items
   orders    Order[]
   reviews Review[]
+  cartItems CartItem[]
 }
 
 // 2. THE PRODUCT MODEL (The Vault Inventory)
@@ -34,13 +35,12 @@ model Product {
   images      String[] // Array of image URLs
   sizes       String[] // Array of available sizes (e.g., ["S", "M", "L"])
   tag         String?  // e.g., "Trending", "Latest"
-  stock       Int      @default(0) // Inventory count for a full storefront
-  isFeatured  Boolean  @default(false)
   createdAt   DateTime @default(now())
   
-  // Links to order history
+  // Links to order history and carts
   orderItems  OrderItem[]
   reviews Review[]
+  cartItems   CartItem[]
 }
 
 // 3. THE ORDER MODEL (The Secure Checkout result)
@@ -48,8 +48,7 @@ model Order {
   id          String   @id @default(cuid())
   userId      String
   user        User     @relation(fields: [userId], references: [id])
-  status      String   @default("PROCESSING") // PROCESSING, SHIPPED, DELIVERED
-  trackingId  String?  // Optional field for logistics tracking
+  status      String   @default("Processing") // Processing, Shipped, Delivered
   total       Decimal
   createdAt   DateTime @default(now())
   
@@ -84,4 +83,22 @@ model Review {
   // The Review belongs to one Product
   productId String
   product   Product  @relation(fields: [productId], references: [id])
+}
+
+// 5. THE CART ITEM MODEL (Persistent User Carts)
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size      String
+  quantity  Int
+
+  @@unique([userId, productId, size])
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "./ERD.svg"
 }

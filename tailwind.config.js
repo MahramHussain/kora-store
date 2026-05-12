@@ -6,7 +6,14 @@ export default {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        kora: '#6B00FF',
+      },
+      fontFamily: {
+        pixel: ['var(--font-pixel)', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 };

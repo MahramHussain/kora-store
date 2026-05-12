@@ -5,7 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { getProducts } from "@/app/admin/actions";
-import { FaBars, FaXmark, FaBoxOpen } from "react-icons/fa6"; 
+import { FaBars, FaXmark, FaBoxOpen } from "react-icons/fa6";
+import { FaShoppingCart } from "react-icons/fa";
 import { SignInButton, UserButton, Show } from "@clerk/nextjs";
 
 export default function Navbar() {
@@ -42,24 +43,24 @@ export default function Navbar() {
   return (
     <>
       {/* TOP UTILITY BAR (Desktop Only) */}
-      <div className="hidden md:flex justify-between items-center px-6 py-2 text-xs font-medium bg-[#0a0514] text-slate-300 border-b border-white/5">
+      <div className="hidden md:flex justify-between items-center px-6 py-2 text-xs font-medium bg-slate-50 text-slate-600 border-b border-slate-200">
         <div className="flex gap-2">
-          <span className="text-slate-400">Shipping to: UAE</span>
-          <button className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Change</button>
+          <span className="text-slate-500">Shipping to: UAE</span>
+          <button className="text-kora hover:text-purple-700 underline underline-offset-2">Change</button>
         </div>
         <div className="flex gap-6 items-center">
-          <Link href="/faq" className="hover:text-white transition-colors">Help</Link>
+          <Link href="/faq" className="hover:text-slate-900 transition-colors">Help</Link>
           
           <Show when="signed-out">
             <SignInButton mode="modal">
-              <button className="text-purple-400 font-bold hover:text-purple-300 transition-colors">
+              <button className="text-kora font-bold hover:text-purple-700 transition-colors">
                 Sign In / Register
               </button>
             </SignInButton>
           </Show>
           <Show when="signed-in">
             <div className="flex items-center gap-2">
-              <Link href="/account/dashboard" className="text-slate-400 hover:text-purple-400 transition-colors">
+              <Link href="/account/dashboard" className="text-slate-600 hover:text-kora transition-colors">
                 Vault Access
               </Link>
               
@@ -78,19 +79,19 @@ export default function Navbar() {
       </div>
 
       {/* MAIN HEADER - Fixed Layout */}
-      <header className="px-6 py-4 flex flex-wrap md:flex-nowrap items-center justify-between gap-4 border-b border-white/5 bg-[#05010F] sticky top-0 z-50 shadow-md">
+      <header className="px-6 py-4 flex flex-wrap md:flex-nowrap items-center justify-between gap-4 border-b border-slate-200 bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         
         {/* 1. Hamburger & Logo (Left Side) */}
         <div className="flex items-center gap-4 order-1 shrink-0">
           <button 
-            className="md:hidden text-white text-2xl hover:text-purple-400 transition-colors"
+            className="md:hidden text-slate-900 text-2xl hover:text-kora transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? <FaXmark /> : <FaBars />}
           </button>
 
-          <Link href="/" className="text-3xl font-black tracking-tighter uppercase">
-            <span className="text-white">KORA</span><span className="text-purple-500">STORE</span>
+          <Link href="/" className="font-pixel text-4xl tracking-tight uppercase hover:scale-105 transition-transform">
+            <span className="text-slate-900">KORA</span><span className="text-kora drop-shadow-[0_0_10px_rgba(107,0,255,0.4)]">STORE</span>
           </Link>
         </div>
         
@@ -105,20 +106,20 @@ export default function Navbar() {
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setTimeout(() => setIsFocused(false), 200)}
                 placeholder="What can we help you find?" 
-                className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-6 pr-12 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all relative z-20"
+                className="w-full bg-slate-100 border border-slate-200 rounded-full py-3 pl-6 pr-12 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all relative z-20 font-sans"
               />
-              <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-purple-400 transition-colors z-20">
+              <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-kora transition-colors z-20 hover:scale-110">
                 &#128269;
               </button>
             </form>
 
             {isFocused && searchTerm && filteredSuggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-[#0a0514] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-10 pt-2 pb-2">
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden z-10 pt-2 pb-2">
                 {filteredSuggestions.map((suggestion, idx) => (
                   <div 
                     key={idx}
                     onClick={(e) => handleSearch(e as any, suggestion)}
-                    className="px-6 py-3 hover:bg-white/5 cursor-pointer text-slate-300 hover:text-purple-400 transition-colors flex items-center gap-3"
+                    className="px-6 py-3 hover:bg-slate-50 cursor-pointer text-slate-700 hover:text-kora transition-colors flex items-center gap-3 font-sans"
                   >
                     <span className="text-xs">&#128269;</span> {suggestion}
                   </div>
@@ -132,33 +133,33 @@ export default function Navbar() {
 
         {/* 3. Cart Button (Right Side) */}
         <div className="flex items-center order-2 md:order-3 shrink-0">
-          <Link href="/cart" className="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-full flex items-center gap-2 transition-colors shadow-[0_0_15px_rgba(147,51,234,0.3)]">
-            <span className="hidden sm:inline">Cart</span>
-            <span className="bg-white text-purple-700 px-2 py-0.5 rounded-full text-xs">{cartCount}</span>
+          <Link href="/cart" className="bg-kora hover:bg-purple-700 text-white font-pixel text-sm md:text-base py-2 md:py-3 px-4 md:px-6 rounded-full flex items-center gap-2 transition-all hover:scale-105 shadow-md shadow-kora/30">
+            <FaShoppingCart className="text-lg md:text-xl" />
+            <span className="bg-white text-kora px-2 py-0.5 rounded-full text-xs shadow-inner pt-0.5 ml-1">{cartCount}</span>
           </Link>
         </div>
 
         {/* --- MOBILE SLIDE-DOWN MENU --- */}
         {isMobileMenuOpen && (
-          <div className="absolute top-full left-0 w-full bg-[#0a0514] border-b border-white/10 flex flex-col md:hidden z-40 shadow-2xl animate-fade-in-up">
-            <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-white/5 text-white font-bold hover:bg-white/5 flex items-center justify-between">
-              Shop The Vault <span className="text-purple-500">→</span>
+          <div className="absolute top-full left-0 w-full bg-white border-b border-slate-200 flex flex-col md:hidden z-40 shadow-xl animate-fade-in-up">
+            <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-slate-100 text-slate-900 font-pixel hover:bg-slate-50 flex items-center justify-between">
+              Shop The Vault <span className="text-kora">→</span>
             </Link>
-            <Link href="/shop?tag=Trending" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-white/5 text-white font-bold hover:bg-white/5">
+            <Link href="/shop?tag=Trending" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-slate-100 text-slate-900 font-pixel hover:bg-slate-50">
               Trending Gear
             </Link>
             
-            <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between font-pixel">
               <Show when="signed-out">
                 <SignInButton mode="modal">
-                  <button className="text-purple-400 font-bold hover:text-purple-300">
+                  <button className="text-kora hover:text-purple-700">
                     Sign In / Register
                   </button>
                 </SignInButton>
               </Show>
               <Show when="signed-in">
                 <div className="flex items-center gap-3">
-                  <Link href="/account/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-purple-400 font-bold hover:text-purple-300">
+                  <Link href="/account/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-kora hover:text-purple-700">
                     My Account
                   </Link>
                   

@@ -40,14 +40,14 @@ export default function FAQPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#05010F] text-slate-200 font-sans selection:bg-purple-500 selection:text-white pt-20 pb-20 px-6">
+    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-20 pb-20 px-6">
       
       {/* Header Section */}
       <section className="max-w-3xl mx-auto text-center mb-16 mt-12">
-        <h1 className="text-4xl md:text-6xl font-black mb-6 tracking-tighter">
-          INTEL & <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-fuchsia-500">ANSWERS.</span>
+        <h1 className="text-4xl md:text-6xl font-pixel mb-6 tracking-tight uppercase">
+          INTEL & <span className="text-transparent bg-clip-text bg-gradient-to-r from-kora to-purple-400">ANSWERS.</span>
         </h1>
-        <p className="text-slate-400 text-lg">
+        <p className="text-slate-600 text-lg font-sans">
           Everything you need to know about how we operate, our premium gear, and UAE shipping.
         </p>
       </section>
@@ -61,8 +61,8 @@ export default function FAQPage() {
             return (
               <div 
                 key={index} 
-                className={`border rounded-2xl overflow-hidden transition-colors duration-300 ${
-                  isOpen ? "border-purple-500/50 bg-white/5" : "border-white/10 bg-[#0a0514] hover:border-white/30"
+                className={`border rounded-2xl overflow-hidden transition-colors duration-300 shadow-sm ${
+                  isOpen ? "border-kora/50 bg-purple-50/50" : "border-slate-200 bg-slate-50 hover:border-slate-300"
                 }`}
               >
                 {/* The Clickable Question Header */}
@@ -70,23 +70,23 @@ export default function FAQPage() {
                   onClick={() => toggleFAQ(index)}
                   className="w-full flex justify-between items-center text-left p-6 focus:outline-none"
                 >
-                  <span className={`font-bold text-lg md:text-xl transition-colors ${isOpen ? "text-purple-300" : "text-white"}`}>
+                  <span className={`font-pixel text-lg md:text-xl uppercase tracking-wider transition-colors ${isOpen ? "text-kora" : "text-slate-900"}`}>
                     {faq.question}
                   </span>
                   
                   {/* Plus/Minus Icon */}
-                  <span className="ml-4 shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 text-purple-400 font-black text-xl">
+                  <span className="ml-4 shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white text-kora font-bold text-xl border border-slate-200 shadow-sm">
                     {isOpen ? "−" : "+"}
                   </span>
                 </button>
 
                 {/* The Expandable Answer */}
                 <div 
-                  className={`transition-all duration-500 ease-in-out ${
+                  className={`transition-all duration-500 ease-in-out font-sans ${
                     isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
                   }`}
                 >
-                  <div className="p-6 pt-0 text-slate-400 leading-relaxed">
+                  <div className="p-6 pt-0 text-slate-600 leading-relaxed">
                     {faq.answer}
                   </div>
                 </div>
@@ -97,10 +97,10 @@ export default function FAQPage() {
       </section>
 
       {/* Support Contact Box */}
-      <section className="max-w-3xl mx-auto mt-16 bg-gradient-to-br from-purple-900/20 to-fuchsia-900/10 border border-purple-500/20 rounded-2xl p-8 text-center">
-        <h3 className="text-xl font-bold text-white mb-2">Still have questions?</h3>
-        <p className="text-slate-400 mb-6">Hit up Adnan directly on WhatsApp for sizing help or special requests.</p>
-        <button className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-full transition-colors">
+      <section className="max-w-3xl mx-auto mt-16 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-8 text-center shadow-sm">
+        <h3 className="text-xl font-pixel uppercase tracking-wider text-slate-900 mb-2">Still have questions?</h3>
+        <p className="text-slate-600 mb-6 font-sans">Hit up Adnan directly on WhatsApp for sizing help or special requests.</p>
+        <button className="bg-emerald-500 hover:bg-emerald-600 text-white font-pixel text-xs tracking-widest uppercase py-3 px-8 rounded-full transition-colors shadow-md hover:shadow-emerald-500/30">
           Message the Plug
         </button>
       </section>

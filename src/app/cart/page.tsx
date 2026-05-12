@@ -56,19 +56,19 @@ export default function CartPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#05010F] text-slate-200 font-sans selection:bg-purple-500 selection:text-white pt-24 pb-24 px-6">
+    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-24 pb-24 px-6">
       <div className="max-w-6xl mx-auto">
         
-        <h1 className="text-4xl md:text-6xl font-black mb-10 tracking-tighter">
-          YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-fuchsia-500">VAULT.</span>
+        <h1 className="text-4xl md:text-6xl font-pixel mb-10 tracking-tight uppercase">
+          YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-kora to-purple-400">VAULT.</span>
         </h1>
 
         {cart.length === 0 ? (
           // EMPTY CART STATE
-          <div className="bg-[#0a0514] border border-white/10 rounded-3xl p-16 text-center shadow-2xl">
-            <h2 className="text-2xl font-bold text-white mb-4">Your vault is completely empty.</h2>
-            <p className="text-slate-400 mb-8 max-w-md mx-auto">You haven't secured any gear yet. Head back to the shop to browse the latest drops.</p>
-            <Link href="/shop" className="inline-block bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 px-10 rounded-full transition-all shadow-[0_0_20px_rgba(147,51,234,0.4)]">
+          <div className="bg-slate-50 border border-slate-200 rounded-3xl p-16 text-center shadow-sm">
+            <h2 className="text-2xl font-pixel text-slate-900 mb-4">Your vault is completely empty.</h2>
+            <p className="text-slate-600 mb-8 max-w-md mx-auto font-sans">You haven't secured any gear yet. Head back to the shop to browse the latest drops.</p>
+            <Link href="/shop" className="inline-block bg-kora hover:bg-purple-700 text-white font-pixel py-4 px-10 rounded-full transition-all shadow-md shadow-kora/30 text-sm">
               Explore The Vault
             </Link>
           </div>
@@ -79,30 +79,30 @@ export default function CartPage() {
             {/* Left: Cart Items List */}
             <div className="flex-1 space-y-6">
               {cart.map((item, index) => (
-                <div key={`${item.id}-${item.size}-${index}`} className="flex gap-6 bg-[#0a0514] border border-white/10 rounded-2xl p-4 relative group">
+                <div key={`${item.id}-${item.size}-${index}`} className="flex gap-6 bg-slate-50 border border-slate-200 rounded-2xl p-4 relative group shadow-sm hover:shadow-md transition-shadow">
                   {/* Image */}
-                  <div className="w-24 h-24 shrink-0 bg-white/5 rounded-xl p-2 flex items-center justify-center">
+                  <div className="w-24 h-24 shrink-0 bg-white border border-slate-100 rounded-xl p-2 flex items-center justify-center shadow-sm">
                     <img src={item.image} alt={item.name} className="w-full h-full object-contain drop-shadow-md" />
                   </div>
                   
                   {/* Details */}
-                  <div className="flex-1 flex flex-col justify-center py-2">
-                    <h3 className="font-bold text-white text-lg leading-tight">{item.name}</h3>
-                    <p className="text-sm text-slate-400 mt-1">Size: <span className="font-bold text-white">{item.size}</span></p>
-                    <p className="font-black text-purple-400 mt-1">{item.price}</p>
+                  <div className="flex-1 flex flex-col justify-center py-2 font-sans">
+                    <h3 className="font-bold text-slate-900 text-lg leading-tight">{item.name}</h3>
+                    <p className="text-sm text-slate-500 mt-1">Size: <span className="font-bold text-slate-900">{item.size}</span></p>
+                    <p className="font-bold text-kora mt-1">{item.price}</p>
                     
                     {/* CART QUANTITY ADJUSTER */}
-                    <div className="flex items-center gap-3 mt-3 bg-white/5 w-max rounded-full p-1 border border-white/10">
+                    <div className="flex items-center gap-3 mt-3 bg-white w-max rounded-full p-1 border border-slate-200 shadow-sm">
                       <button 
                         onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)} 
-                        className="w-7 h-7 flex items-center justify-center rounded-full text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+                        className="w-7 h-7 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
                         −
                       </button>
-                      <span className="font-bold text-white text-sm w-4 text-center">{item.quantity}</span>
+                      <span className="font-bold text-slate-900 text-sm w-4 text-center">{item.quantity}</span>
                       <button 
                         onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)} 
-                        className="w-7 h-7 flex items-center justify-center rounded-full text-slate-400 hover:bg-white/10 hover:text-white transition-colors"
+                        className="w-7 h-7 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
                         +
                       </button>
@@ -112,7 +112,7 @@ export default function CartPage() {
                   {/* Remove Button */}
                   <button 
                     onClick={() => removeFromCart(item.id, item.size)}
-                    className="absolute top-4 right-4 text-slate-600 hover:text-rose-500 transition-colors p-2"
+                    className="absolute top-4 right-4 text-slate-400 hover:text-rose-600 transition-colors p-2"
                   >
                     <FaTrash />
                   </button>
@@ -122,33 +122,33 @@ export default function CartPage() {
 
             {/* Right: Checkout Summary */}
             <div className="w-full lg:w-[400px] shrink-0">
-              <div className="bg-[#0a0514] border border-white/10 rounded-3xl p-8 sticky top-32 transition-all duration-500">
-                <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Order Summary</h3>
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 sticky top-32 transition-all duration-500 shadow-sm">
+                <h3 className="text-xl font-pixel text-slate-900 mb-6 border-b border-slate-200 pb-4 uppercase">Order Summary</h3>
                 
-                <div className="space-y-4 mb-6 text-slate-400">
+                <div className="space-y-4 mb-6 text-slate-600 font-sans">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span className="text-white">{CURRENCY}{subtotal.toFixed(2)}</span>
+                    <span className="text-slate-900 font-bold">{CURRENCY}{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>UAE Local Delivery</span>
-                    <span className="text-emerald-400">FREE</span>
+                    <span className="text-emerald-600 font-bold">FREE</span>
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center border-t border-white/10 pt-6 mb-8">
-                  <span className="font-bold text-white">Total</span>
-                  <span className="text-3xl font-black text-white">{CURRENCY}{subtotal.toFixed(2)}</span>
+                <div className="flex justify-between items-center border-t border-slate-200 pt-6 mb-8 font-sans">
+                  <span className="font-pixel text-slate-900 uppercase">Total</span>
+                  <span className="text-3xl font-bold text-slate-900">{CURRENCY}{subtotal.toFixed(2)}</span>
                 </div>
 
                 <button 
                   onClick={() => router.push('/checkout')}
-                  className="w-full bg-white text-black hover:bg-purple-500 hover:text-white font-black uppercase tracking-widest py-4 rounded-full transition-all flex justify-center items-center gap-3 group shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_20px_rgba(147,51,234,0.4)]"
+                  className="w-full bg-slate-900 text-white hover:bg-kora font-pixel text-xs uppercase tracking-widest py-4 rounded-full transition-all flex justify-center items-center gap-3 group shadow-md hover:shadow-kora/30 hover:scale-105"
                 >
                   SECURE CHECKOUT <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
                 </button>
 
-                <p className="text-center text-xs text-slate-500 mt-6">Taxes calculated at checkout. All UAE orders ship within 24 hours.</p>
+                <p className="text-center text-xs text-slate-500 mt-6 font-sans">Taxes calculated at checkout. All UAE orders ship within 24 hours.</p>
               </div>
             </div>
 
