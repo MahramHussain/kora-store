@@ -97,8 +97,3 @@ model CartItem {
 
   @@unique([userId, productId, size])
 }
-
-generator erd {
-  provider = "prisma-erd-generator"
-  output   = "./ERD.svg"
-}
