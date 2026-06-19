@@ -59,16 +59,16 @@ export default function CartPage() {
     <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-24 pb-24 px-6">
       <div className="max-w-6xl mx-auto">
         
-        <h1 className="text-4xl md:text-6xl font-pixel mb-10 tracking-tight uppercase">
+        <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-10 uppercase font-sans">
           YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-kora to-purple-400">VAULT.</span>
         </h1>
 
         {cart.length === 0 ? (
           // EMPTY CART STATE
           <div className="bg-slate-50 border border-slate-200 rounded-3xl p-16 text-center shadow-sm">
-            <h2 className="text-2xl font-pixel text-slate-900 mb-4">Your vault is completely empty.</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4 font-sans">Your vault is completely empty.</h2>
             <p className="text-slate-600 mb-8 max-w-md mx-auto font-sans">You haven't secured any gear yet. Head back to the shop to browse the latest drops.</p>
-            <Link href="/shop" className="inline-block bg-kora hover:bg-purple-700 text-white font-pixel py-4 px-10 rounded-full transition-all shadow-md shadow-kora/30 text-sm">
+            <Link href="/shop" className="inline-block bg-kora hover:bg-purple-700 text-white font-bold py-4 px-10 rounded-full transition-all shadow-md shadow-kora/30 text-sm">
               Explore The Vault
             </Link>
           </div>
@@ -94,14 +94,14 @@ export default function CartPage() {
                     {/* CART QUANTITY ADJUSTER */}
                     <div className="flex items-center gap-3 mt-3 bg-white w-max rounded-full p-1 border border-slate-200 shadow-sm">
                       <button 
-                        onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)} 
+                        onClick={() => updateQuantity(item.id, item.size, item.image, item.quantity - 1)} 
                         className="w-7 h-7 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
                         −
                       </button>
                       <span className="font-bold text-slate-900 text-sm w-4 text-center">{item.quantity}</span>
                       <button 
-                        onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)} 
+                        onClick={() => updateQuantity(item.id, item.size, item.image, item.quantity + 1)} 
                         className="w-7 h-7 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
                         +
@@ -111,7 +111,7 @@ export default function CartPage() {
 
                   {/* Remove Button */}
                   <button 
-                    onClick={() => removeFromCart(item.id, item.size)}
+                    onClick={() => removeFromCart(item.id, item.size, item.image)}
                     className="absolute top-4 right-4 text-slate-400 hover:text-rose-600 transition-colors p-2"
                   >
                     <FaTrash />
@@ -123,7 +123,7 @@ export default function CartPage() {
             {/* Right: Checkout Summary */}
             <div className="w-full lg:w-[400px] shrink-0">
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 sticky top-32 transition-all duration-500 shadow-sm">
-                <h3 className="text-xl font-pixel text-slate-900 mb-6 border-b border-slate-200 pb-4 uppercase">Order Summary</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4 uppercase font-sans">Order Summary</h3>
                 
                 <div className="space-y-4 mb-6 text-slate-600 font-sans">
                   <div className="flex justify-between">
@@ -137,13 +137,13 @@ export default function CartPage() {
                 </div>
 
                 <div className="flex justify-between items-center border-t border-slate-200 pt-6 mb-8 font-sans">
-                  <span className="font-pixel text-slate-900 uppercase">Total</span>
+                  <span className="font-bold text-slate-900 uppercase">Total</span>
                   <span className="text-3xl font-bold text-slate-900">{CURRENCY}{subtotal.toFixed(2)}</span>
                 </div>
 
                 <button 
                   onClick={() => router.push('/checkout')}
-                  className="w-full bg-slate-900 text-white hover:bg-kora font-pixel text-xs uppercase tracking-widest py-4 rounded-full transition-all flex justify-center items-center gap-3 group shadow-md hover:shadow-kora/30 hover:scale-105"
+                  className="w-full bg-slate-900 text-white hover:bg-kora font-bold text-sm uppercase tracking-wider py-4 rounded-full transition-all flex justify-center items-center gap-3 group shadow-md hover:shadow-kora/30 hover:scale-105"
                 >
                   SECURE CHECKOUT <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
                 </button>

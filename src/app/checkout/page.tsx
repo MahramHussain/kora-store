@@ -4,15 +4,30 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { CURRENCY } from "@/lib/constants";
+import { useAuth, SignIn, SignUp } from "@clerk/nextjs";
 import { FaLock, FaCreditCard, FaPaypal, FaMoneyBillWave } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa"; 
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, cartCount } = useCart();
+  const { cart, cartCount, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal" | "cod">("card");
   
+  // Auth state from Clerk
+  const { isSignedIn, isLoaded } = useAuth();
+  const [isLogin, setIsLogin] = useState(true);
+
+  // Shipping details state
+  const [shippingFirstName, setShippingFirstName] = useState("");
+  const [shippingLastName, setShippingLastName] = useState("");
+  const [shippingStreetAddress, setShippingStreetAddress] = useState("");
+  const [shippingCity, setShippingCity] = useState("Dubai");
+  const [shippingPhone, setShippingPhone] = useState("");
+
+  // Error Banner State
+  const [error, setError] = useState("");
+
   // Promo State
   const [promoCode, setPromoCode] = useState("");
   const [discountPercent, setDiscountPercent] = useState(0);
@@ -22,6 +37,7 @@ export default function CheckoutPage() {
   const [cardNumber, setCardNumber] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
   const [cvc, setCvc] = useState("");
+  const [cardName, setCardName] = useState("");
 
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Strip all non-numbers, then add a space every 4 digits. Max 19 chars (16 digits + 3 spaces)
@@ -65,12 +81,82 @@ export default function CheckoutPage() {
   const shippingCharge = discountPercent > 0 ? 0 : 10;
   const finalTotal = subtotal - discountAmount + shippingCharge;
 
+  // Render Vault Sign-in Wall if not authenticated
+  if (isLoaded && !isSignedIn) {
+    return (
+      <main className="min-h-screen bg-[#05010F] text-slate-200 font-sans selection:bg-purple-500 selection:text-white pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div className="max-w-md w-full relative z-10">
+          <div className="text-center mb-10">
+            <h1 className="text-4xl font-black text-white tracking-tighter mb-2 uppercase font-sans">
+              SECURE <span className="text-purple-500">VAULT.</span>
+            </h1>
+            <p className="text-slate-400 font-medium">
+              {isLogin ? "Authenticate to secure your priority checkout." : "Register to join the ultimate football community."}
+            </p>
+          </div>
+
+          <div className="bg-[#0a0514] border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden flex justify-center min-h-[400px]">
+            {isLogin ? (
+              <SignIn fallbackRedirectUrl="/checkout" appearance={{
+                elements: {
+                  rootBox: "w-full",
+                  card: "bg-transparent shadow-none p-0 m-0",
+                  header: "hidden", 
+                  footer: "hidden", 
+                  formButtonPrimary: "bg-purple-600 hover:bg-purple-500 text-white font-black uppercase tracking-widest py-3 rounded-xl transition-all",
+                  formFieldInput: "bg-white/5 border border-white/10 text-white py-3 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500",
+                  formFieldLabel: "text-slate-400 font-bold",
+                  dividerText: "text-slate-500 font-bold uppercase tracking-wider",
+                  socialButtonsBlockButton: "border border-white/10 text-white hover:bg-white/5 py-3 rounded-xl font-bold transition-all",
+                  socialButtonsBlockButtonText: "font-bold",
+                  identityPreviewText: "text-purple-400",
+                  identityPreviewEditButton: "text-slate-400 hover:text-white"
+                }
+              }} />
+            ) : (
+              <SignUp fallbackRedirectUrl="/checkout" appearance={{
+                elements: {
+                  rootBox: "w-full",
+                  card: "bg-transparent shadow-none p-0 m-0",
+                  header: "hidden",
+                  footer: "hidden",
+                  formButtonPrimary: "bg-purple-600 hover:bg-purple-500 text-white font-black uppercase tracking-widest py-3 rounded-xl transition-all",
+                  formFieldInput: "bg-white/5 border border-white/10 text-white py-3 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500",
+                  formFieldLabel: "text-slate-400 font-bold",
+                  dividerText: "text-slate-500 font-bold uppercase tracking-wider",
+                  socialButtonsBlockButton: "border border-white/10 text-white hover:bg-white/5 py-3 rounded-xl font-bold transition-all",
+                  socialButtonsBlockButtonText: "font-bold",
+                }
+              }} />
+            )}
+          </div>
+
+          <div className="text-center mt-8 relative z-10 font-sans">
+            <p className="text-slate-400">
+              {isLogin ? "Need a Vault account?" : "Already secured your spot?"}
+              <button 
+                onClick={() => setIsLogin(!isLogin)} 
+                className="ml-2 text-white font-bold hover:text-purple-400 transition-colors underline underline-offset-4"
+              >
+                {isLogin ? "Sign Up" : "Sign In"}
+              </button>
+            </p>
+          </div>
+
+        </div>
+      </main>
+    );
+  }
+
+  // Redirect to cart if empty
   if (cartCount === 0 && !isProcessing) {
     router.push("/cart");
     return null;
   }
 
-  const handlePlaceOrder = (e: React.FormEvent) => {
+  const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (paymentMethod === "paypal") {
       alert("PayPal integration is a work in progress and not yet implemented.");
@@ -78,10 +164,50 @@ export default function CheckoutPage() {
     }
     
     setIsProcessing(true);
+    setError("");
 
-    setTimeout(() => {
-      router.push("/success");
-    }, 2000);
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cart,
+          cartTotal: finalTotal,
+          shippingDetails: {
+            firstName: shippingFirstName,
+            lastName: shippingLastName,
+            streetAddress: shippingStreetAddress,
+            city: shippingCity,
+            phone: shippingPhone
+          },
+          paymentMethod: paymentMethod,
+          promoCode: promoCode || null,
+          discountAmount: discountAmount,
+          shippingFee: shippingCharge,
+          tax: 0
+        })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Checkout failed. Please inspect your cart.");
+      }
+
+      const orderData = await response.json();
+      
+      // Wipe the local cart state
+      clearCart();
+
+      // Redirect to success page with dynamic ref code
+      router.push(`/success?ref=${orderData.referenceNumber}`);
+    } catch (err: any) {
+      console.error("[CHECKOUT_SUBMIT_ERROR]", err);
+      setError(err.message || "An unexpected error occurred. Please try again.");
+      setIsProcessing(false);
+      
+      // Smoothly scroll to the top of the form so the error banner is visible
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   return (
@@ -91,8 +217,18 @@ export default function CheckoutPage() {
         {/* Header */}
         <div className="flex items-center gap-3 mb-10 border-b border-slate-200 pb-6">
           <FaLock className="text-2xl text-kora" />
-          <h1 className="text-3xl md:text-4xl font-pixel uppercase tracking-widest">SECURE CHECKOUT</h1>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase">SECURE CHECKOUT</h1>
         </div>
+
+        {/* Error Banner */}
+        {error && (
+          <div className="mb-8 p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3 text-rose-800 animate-fade-in shadow-sm font-sans">
+            <div className="text-xl">⚠️</div>
+            <div className="flex-1 text-sm font-bold uppercase tracking-wide">
+              {error}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col-reverse lg:flex-row gap-12">
           
@@ -103,7 +239,7 @@ export default function CheckoutPage() {
               
               {/* 1. Payment Method (Moved to Top) */}
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
-                <h2 className="text-xl font-pixel text-slate-900 mb-6 uppercase tracking-wider">Payment Method</h2>
+                <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider">Payment Method</h2>
                 
                 {/* Payment Tabs */}
                 <div className="grid grid-cols-3 gap-3 mb-6">
@@ -175,7 +311,14 @@ export default function CheckoutPage() {
                         className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors font-mono tracking-wider shadow-sm" 
                       />
                     </div>
-                    <input type="text" required placeholder="Name on Card" className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" />
+                    <input 
+                      type="text" 
+                      required 
+                      placeholder="Name on Card" 
+                      value={cardName}
+                      onChange={(e) => setCardName(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" 
+                    />
                   </div>
                 )}
 
@@ -188,33 +331,59 @@ export default function CheckoutPage() {
                 )}
 
                 {paymentMethod === "cod" && (
-                  <div className="text-center py-6 border border-white/10 rounded-xl bg-white/5 animate-fade-in-up">
+                  <div className="text-center py-6 border border-white/10 rounded-xl bg-[#05010F]/5 rounded-2xl animate-fade-in-up">
                     <FaMoneyBillWave className="text-4xl text-emerald-500/50 mx-auto mb-3" />
-                    <h3 className="text-white font-bold mb-1">Cash on Delivery</h3>
-                    <p className="text-slate-400 text-sm">Pay seamlessly with cash when your secure drop arrives at your location.</p>
+                    <h3 className="text-slate-900 font-bold mb-1 uppercase">Cash on Delivery</h3>
+                    <p className="text-slate-500 text-sm">Pay seamlessly with cash when your secure drop arrives at your location.</p>
                   </div>
                 )}
               </div>
 
               {/* 2. Shipping Information (Moved to Bottom) */}
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
-                <h2 className="text-xl font-pixel text-slate-900 mb-6 uppercase tracking-wider">Shipping Location & Details</h2>
+                <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider">Shipping Location & Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">First Name</label>
-                    <input type="text" required className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" placeholder="First Name" />
+                    <input 
+                      type="text" 
+                      required 
+                      value={shippingFirstName}
+                      onChange={(e) => setShippingFirstName(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" 
+                      placeholder="First Name" 
+                    />
                   </div>
                   <div>
                     <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Last Name</label>
-                    <input type="text" required className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" placeholder="Last Name" />
+                    <input 
+                      type="text" 
+                      required 
+                      value={shippingLastName}
+                      onChange={(e) => setShippingLastName(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" 
+                      placeholder="Last Name" 
+                    />
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Street Address</label>
-                    <input type="text" required className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" placeholder="Villa/Apartment, Street Name" />
+                    <input 
+                      type="text" 
+                      required 
+                      value={shippingStreetAddress}
+                      onChange={(e) => setShippingStreetAddress(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" 
+                      placeholder="Villa/Apartment, Street Name" 
+                    />
                   </div>
                   <div>
                     <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">City / Location</label>
-                    <select required className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors appearance-none shadow-sm cursor-pointer">
+                    <select 
+                      required 
+                      value={shippingCity}
+                      onChange={(e) => setShippingCity(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors appearance-none shadow-sm cursor-pointer"
+                    >
                       <option className="bg-white">Dubai</option>
                       <option className="bg-white">Abu Dhabi</option>
                       <option className="bg-white">Sharjah</option>
@@ -225,7 +394,14 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Phone Number</label>
-                    <input type="tel" required className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" placeholder="+971 50 000 0000" />
+                    <input 
+                      type="tel" 
+                      required 
+                      value={shippingPhone}
+                      onChange={(e) => setShippingPhone(e.target.value)}
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" 
+                      placeholder="+971 50 000 0000" 
+                    />
                   </div>
                 </div>
               </div>
@@ -235,7 +411,7 @@ export default function CheckoutPage() {
           {/* --- RIGHT SIDE: ORDER SUMMARY --- */}
           <div className="w-full lg:w-[450px] shrink-0">
             <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 sticky top-32 shadow-sm">
-              <h2 className="text-xl font-pixel text-slate-900 mb-6 border-b border-slate-200 pb-4 uppercase tracking-wider">In Your Vault</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4 uppercase tracking-wider">In Your Vault</h2>
               
               <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
                 {cart.map((item, index) => (
@@ -268,7 +444,7 @@ export default function CheckoutPage() {
                   <button 
                     onClick={handleApplyPromo}
                     type="button"
-                    className="bg-kora hover:bg-purple-700 text-white font-pixel text-xs py-2 px-4 rounded-xl transition-colors shadow-md shadow-kora/30"
+                    className="bg-kora hover:bg-purple-700 text-white font-bold text-xs py-2 px-4 rounded-xl transition-colors shadow-md shadow-kora/30"
                   >
                     Apply
                   </button>
@@ -304,7 +480,7 @@ export default function CheckoutPage() {
               </div>
 
               <div className="flex justify-between items-center border-t border-slate-200 pt-6 mb-8">
-                <span className="font-pixel text-slate-900 text-lg uppercase tracking-wider">Total</span>
+                <span className="font-bold text-slate-900 text-lg uppercase tracking-wider">Total</span>
                 <span className="text-4xl font-black text-slate-900 font-sans">{CURRENCY}{finalTotal.toFixed(2)}</span>
               </div>
 
@@ -312,7 +488,7 @@ export default function CheckoutPage() {
                 form="checkout-form"
                 type="submit"
                 disabled={isProcessing}
-                className={`w-full font-pixel text-sm uppercase tracking-widest py-4 rounded-full transition-all flex justify-center items-center gap-3 shadow-lg ${
+                className={`w-full font-bold text-sm uppercase tracking-widest py-4 rounded-full transition-all flex justify-center items-center gap-3 shadow-lg ${
                   isProcessing 
                     ? "bg-slate-300 text-slate-500 cursor-not-allowed" 
                     : "bg-kora hover:bg-purple-700 text-white hover:scale-[1.02] shadow-[0_0_20px_rgba(107,0,255,0.4)]"

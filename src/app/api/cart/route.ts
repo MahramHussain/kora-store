@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
       id: item.productId,
       name: item.product.name,
       price: `$${item.product.price.toString()}`,
-      image: item.product.images[0],
+      image: item.image || item.product.images[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png",
       size: item.size,
       quantity: item.quantity
     }));
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
             userId,
             productId: item.id,
             size: item.size,
+            image: item.image || "",
             quantity: item.quantity
           }))
         });

@@ -1,19 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FaCopy, FaBoxOpen, FaArrowRight } from "react-icons/fa6";
-import { FaCheckCircle } from "react-icons/fa"; // <-- Grabbed from the classic 'fa' library!
-import confetti from "canvas-confetti"; // Optional: We won't install this to keep it simple, but we'll simulate the vibe visually!
+import { FaCheckCircle } from "react-icons/fa"; 
 
-export default function SuccessPage() {
+function SuccessContent() {
   const [copied, setCopied] = useState(false);
-  const trackingNumber = "KORA-TRK-9827345";
-
-  // Fire a little confetti effect on load (using standard DOM elements to avoid needing npm installs)
-  useEffect(() => {
-    // Just a clean fade-in effect happens via Tailwind classes below
-  }, []);
+  const searchParams = useSearchParams();
+  
+  // Extract reference number from URL parameters
+  const rawRef = searchParams.get("ref");
+  const referenceNumber = rawRef ? `#${rawRef.toUpperCase()}` : "#VAULT-8829";
+  const trackingNumber = rawRef ? `KORA-TRK-${rawRef.split('-')[1] || '9827345'}` : "KORA-TRK-9827345";
 
   const handleCopy = () => {
     navigator.clipboard.writeText(trackingNumber);
@@ -54,8 +54,8 @@ export default function SuccessPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Order Number</p>
-              <p className="text-lg font-black text-white">#VAULT-8829</p>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Order Reference</p>
+              <p className="text-lg font-black text-white">{referenceNumber}</p>
             </div>
             <div>
               <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Est. Delivery</p>
@@ -90,5 +90,17 @@ export default function SuccessPage() {
 
       </div>
     </main>
+  );
+}
+
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-[#05010F] text-slate-200 font-sans pt-32 pb-24 px-6 flex items-center justify-center">
+        <div className="text-center font-bold uppercase tracking-widest text-slate-500 animate-pulse">Loading Transmission Details...</div>
+      </main>
+    }>
+      <SuccessContent />
+    </Suspense>
   );
 }

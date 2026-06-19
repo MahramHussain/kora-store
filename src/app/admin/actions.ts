@@ -1,9 +1,21 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { currentUser } from "@clerk/nextjs/server";
+import { resolveImageFilename } from "@/lib/resolveImage";
+
+// Helper to guarantee only the admin can call protected operations
+async function ensureAdmin() {
+  const user = await currentUser();
+  const email = user?.emailAddresses[0]?.emailAddress;
+  if (!email || email !== "mahramh40@gmail.com") {
+    throw new Error("Access Denied: Unauthorized");
+  }
+}
 
 export async function getOrders() {
   try {
+    await ensureAdmin();
     const orders = await prisma.order.findMany({
       orderBy: { createdAt: "desc" },
       include: {
@@ -16,9 +28,6 @@ export async function getOrders() {
       }
     });
 
-    // Next.js Server Actions typically need plain objects, returning it as is.
-    // If Decimal serialization issues occur, we might need to map it to strings.
-    // But let's hope it transfers smoothly or map Decimal to string.
     return orders.map(order => ({
       ...order,
       total: order.total.toString(),
@@ -35,6 +44,7 @@ export async function getOrders() {
 
 export async function updateOrderFulfillment(orderId: string, status: string, trackingId: string | null) {
   try {
+    await ensureAdmin();
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: {
@@ -55,7 +65,6 @@ export async function getProducts() {
       orderBy: { createdAt: "desc" },
     });
     
-    // Convert decimal to string to pass to Client Component safely
     return products.map(product => ({
       ...product,
       price: product.price.toString()
@@ -68,14 +77,13 @@ export async function getProducts() {
 
 export async function deleteProduct(productId: string) {
   try {
-    // Attempt to delete it from the DB
+    await ensureAdmin();
     await prisma.product.delete({
       where: { id: productId },
     });
     return { success: true };
   } catch (error: any) {
     console.error("Failed to delete product:", error);
-    // If it's a foreign key constraint error from Prisma
     if (error.code === 'P2003') {
       return { success: false, error: "Cannot delete this product because it has already been ordered by customers. Archiving options must be used instead." };
     }
@@ -83,14 +91,38 @@ export async function deleteProduct(productId: string) {
   }
 }
 
-export async function updateProduct(productId: string, data: { name: string, price: number, images: string[] }) {
+export async function updateProduct(
+  productId: string, 
+  data: { 
+    name: string; 
+    price: number; 
+    category: string; 
+    team: string | null; 
+    tag: string | null; 
+    sizes: string[]; 
+    description: string; 
+    images: string[]; 
+  }
+) {
   try {
+    await ensureAdmin();
+    
+    // Resolve short filenames to exact paths recursively on the server
+    const resolvedImages = data.images
+      .map((img: string) => resolveImageFilename(img))
+      .filter(Boolean);
+
     const updatedProduct = await prisma.product.update({
       where: { id: productId },
       data: {
         name: data.name,
         price: data.price,
-        images: data.images
+        category: data.category,
+        team: data.team || null,
+        tag: data.tag || null,
+        sizes: data.sizes,
+        description: data.description,
+        images: resolvedImages,
       },
     });
     return { success: true, product: { ...updatedProduct, price: updatedProduct.price.toString() } };

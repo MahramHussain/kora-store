@@ -44,7 +44,7 @@ export default function FAQPage() {
       
       {/* Header Section */}
       <section className="max-w-3xl mx-auto text-center mb-16 mt-12">
-        <h1 className="text-4xl md:text-6xl font-pixel mb-6 tracking-tight uppercase">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight uppercase">
           INTEL & <span className="text-transparent bg-clip-text bg-gradient-to-r from-kora to-purple-400">ANSWERS.</span>
         </h1>
         <p className="text-slate-600 text-lg font-sans">
@@ -70,7 +70,7 @@ export default function FAQPage() {
                   onClick={() => toggleFAQ(index)}
                   className="w-full flex justify-between items-center text-left p-6 focus:outline-none"
                 >
-                  <span className={`font-pixel text-lg md:text-xl uppercase tracking-wider transition-colors ${isOpen ? "text-kora" : "text-slate-900"}`}>
+                  <span className={`font-bold text-lg md:text-xl uppercase tracking-wider transition-colors ${isOpen ? "text-kora" : "text-slate-900"}`}>
                     {faq.question}
                   </span>
                   
@@ -98,9 +98,9 @@ export default function FAQPage() {
 
       {/* Support Contact Box */}
       <section className="max-w-3xl mx-auto mt-16 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-8 text-center shadow-sm">
-        <h3 className="text-xl font-pixel uppercase tracking-wider text-slate-900 mb-2">Still have questions?</h3>
+        <h3 className="text-xl font-bold uppercase tracking-wider text-slate-900 mb-2">Still have questions?</h3>
         <p className="text-slate-600 mb-6 font-sans">Hit up Adnan directly on WhatsApp for sizing help or special requests.</p>
-        <button className="bg-emerald-500 hover:bg-emerald-600 text-white font-pixel text-xs tracking-widest uppercase py-3 px-8 rounded-full transition-colors shadow-md hover:shadow-emerald-500/30">
+        <button className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs tracking-widest uppercase py-3 px-8 rounded-full transition-colors shadow-md hover:shadow-emerald-500/30">
           Message the Plug
         </button>
       </section>

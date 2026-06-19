@@ -1,23 +1,37 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { currentUser } from "@clerk/nextjs/server";
+import { resolveImageFilename } from "@/lib/resolveImage";
 
 export async function POST(req: Request) {
   try {
+    // 1. Verify user is the admin
+    const user = await currentUser();
+    const email = user?.emailAddresses[0]?.emailAddress;
+    if (!email || email !== "mahramh40@gmail.com") {
+      return NextResponse.json({ success: false, error: "Forbidden: Unauthorized access" }, { status: 403 });
+    }
+
     const body = await req.json();
     
-    // 1. Grab all the data sent from your Admin Dashboard
+    // 2. Grab all the data sent from your Admin Dashboard
     const { name, category, team, price, description, tag, images, sizes } = body;
 
-    // 2. Safely create the product (Notice we let Prisma handle the ID completely!)
+    // 3. Resolve images recursively in the public directory on the server
+    const resolvedImages = (Array.isArray(images) ? images : [])
+      .map((img: string) => resolveImageFilename(img))
+      .filter(Boolean);
+
+    // 4. Safely create the product
     const newProduct = await prisma.product.create({
       data: {
         name,
         category,
-        team,
-        price: parseFloat(price), // Converts the text price to a real number
+        team: team || null,
+        price: parseFloat(price),
         description,
-        tag,
-        images,
+        tag: tag || null,
+        images: resolvedImages,
         sizes
       }
     });

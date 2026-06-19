@@ -13,7 +13,7 @@ export default function ShippingReturnsPage() {
       
       {/* Hero Section */}
       <section className="max-w-4xl mx-auto text-center mb-16 mt-12">
-        <h1 className="text-4xl md:text-6xl font-pixel mb-6 tracking-tight uppercase">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight uppercase">
           LOGISTICS & <span className="text-transparent bg-clip-text bg-gradient-to-r from-kora to-purple-400">GUARANTEES.</span>
         </h1>
         <p className="text-slate-600 text-lg max-w-2xl mx-auto font-sans">
@@ -26,7 +26,7 @@ export default function ShippingReturnsPage() {
         <div className="flex p-1 bg-slate-50 border border-slate-200 rounded-2xl relative shadow-sm">
           <button
             onClick={() => setActiveTab("shipping")}
-            className={`flex-1 py-4 text-sm md:text-base font-pixel uppercase tracking-widest rounded-xl transition-all duration-300 z-10 flex items-center justify-center gap-3 ${
+            className={`flex-1 py-4 text-sm md:text-base font-bold uppercase tracking-widest rounded-xl transition-all duration-300 z-10 flex items-center justify-center gap-3 ${
               activeTab === "shipping" ? "text-white shadow-md" : "text-slate-500 hover:text-kora"
             }`}
           >
@@ -36,7 +36,7 @@ export default function ShippingReturnsPage() {
           
           <button
             onClick={() => setActiveTab("returns")}
-            className={`flex-1 py-4 text-sm md:text-base font-pixel uppercase tracking-widest rounded-xl transition-all duration-300 z-10 flex items-center justify-center gap-3 ${
+            className={`flex-1 py-4 text-sm md:text-base font-bold uppercase tracking-widest rounded-xl transition-all duration-300 z-10 flex items-center justify-center gap-3 ${
               activeTab === "returns" ? "text-white shadow-md" : "text-slate-500 hover:text-kora"
             }`}
           >
@@ -65,7 +65,7 @@ export default function ShippingReturnsPage() {
                   <FaTruckFast />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-pixel uppercase tracking-wider text-slate-900 mb-2">UAE Standard Delivery</h3>
+                  <h3 className="text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">UAE Standard Delivery</h3>
                   <p className="text-slate-600 leading-relaxed font-sans">
                     Because we stock our inventory locally in the UAE, we bypass the month-long waits of overseas dropshipping. Once your order is verified, it is processed and handed off to our local couriers. You can expect your gear at your door within <strong className="text-slate-900">1 to 3 business days</strong>.
                   </p>
@@ -77,7 +77,7 @@ export default function ShippingReturnsPage() {
                   <FaBoxOpen />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-pixel uppercase tracking-wider text-slate-900 mb-2">Order Tracking</h3>
+                  <h3 className="text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">Order Tracking</h3>
                   <p className="text-slate-600 leading-relaxed font-sans">
                     As soon as your package leaves The Vault, you will receive a WhatsApp message and email containing your live tracking link. Our couriers will contact you directly on the day of delivery to confirm your drop-off window.
                   </p>
@@ -102,7 +102,7 @@ export default function ShippingReturnsPage() {
                   <FaShieldAlt />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-pixel uppercase tracking-wider text-slate-900 mb-2">The 7-Day Guarantee</h3>
+                  <h3 className="text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">The 7-Day Guarantee</h3>
                   <p className="text-slate-600 leading-relaxed font-sans">
                     We stand by the premium grade of our gear. If you need a different size or aren't entirely satisfied, you have <strong className="text-slate-900">7 days</strong> from the date of delivery to request an exchange or return. 
                   </p>
@@ -114,11 +114,11 @@ export default function ShippingReturnsPage() {
                   <FaArrowRotateLeft />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-pixel uppercase tracking-wider text-slate-900 mb-2">Strict Conditions</h3>
+                  <h3 className="text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">Strict Conditions</h3>
                   <ul className="space-y-3 text-slate-600 list-disc list-inside font-sans">
                     <li>Items must be <strong className="text-slate-900">unworn and unwashed</strong>.</li>
                     <li>All original tags must still be attached to the garments.</li>
-                    <li>Boots must be returned in their original, undamaged box.</li>
+                    <li>Shoes must be returned in their original, undamaged box.</li>
                     <li>Player Issue kits cannot be returned if they have custom name/number printing.</li>
                   </ul>
                 </div>
@@ -128,7 +128,7 @@ export default function ShippingReturnsPage() {
             {/* Return Action CTA */}
             <div className="text-center mt-8">
               <p className="text-slate-600 mb-4 font-sans">Need to initiate a return or swap a size?</p>
-              <Link href="mailto:support@korastore.com" className="inline-block bg-slate-900 text-white px-8 py-3 rounded-full font-pixel uppercase tracking-widest text-sm hover:scale-105 hover:bg-kora transition-all shadow-md hover:shadow-kora/30">
+              <Link href="mailto:support@korastore.com" className="inline-block bg-slate-900 text-white px-8 py-3 rounded-full font-bold uppercase tracking-widest text-sm hover:scale-105 hover:bg-kora transition-all shadow-md hover:shadow-kora/30">
                 Email Support
               </Link>
             </div>

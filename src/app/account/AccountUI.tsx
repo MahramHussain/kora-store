@@ -8,33 +8,33 @@ import { CURRENCY } from "@/lib/constants";
 
 export default function AccountUI({ user, orders }: { user: any, orders: any[] }) {
   const [isLogin, setIsLogin] = useState(true);
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   // ==========================================
-  // STATE 1: LOGGED IN (SHOW SECURE DASHBOARD)
+  // STATE 1: LOGGED IN (FALLBACK/LEGACY DASHBOARD VIEW - NOW LIGHT THEME)
   // ==========================================
   if (user) {
     return (
       <main className="max-w-6xl mx-auto px-6 py-16 min-h-[70vh] animate-fade-in-up">
         {/* Dashboard Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 border-b border-slate-200 pb-8">
           <div className="flex items-center gap-6">
             <img 
               src={user.imageUrl} 
               alt="Profile" 
-              className="w-20 h-20 rounded-full border-2 border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+              className="w-20 h-20 rounded-full border-2 border-kora shadow-md shadow-kora/15"
             />
             <div>
-              <h1 className="text-4xl font-black text-white tracking-tight">
-                Welcome back, <span className="text-purple-400">{user.firstName || 'Boss'}</span>
+              <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+                Welcome back, <span className="text-kora">{user.firstName || 'Member'}</span>
               </h1>
-              <p className="text-slate-400 font-medium">
+              <p className="text-slate-500 font-medium">
                 {user.email}
               </p>
             </div>
           </div>
           
-          {/* Clerk's Native Profile Manager Button */}
-          <div className="bg-white/5 border border-white/10 p-2 rounded-full flex items-center justify-center">
+          <div className="bg-white border border-slate-200 p-2 rounded-full flex items-center justify-center shadow-sm">
             <UserButton appearance={{ elements: { userButtonAvatarBox: "w-12 h-12" } }} />
           </div>
         </div>
@@ -42,53 +42,104 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
-          {/* Order History Card (NOW DYNAMIC!) */}
-          <div className="md:col-span-2 bg-[#0a0514] border border-white/10 rounded-2xl p-8 shadow-xl">
-            <h2 className="text-2xl font-bold text-white mb-6 border-b border-white/5 pb-4">Order History</h2>
+          {/* Order History Card */}
+          <div className="md:col-span-2 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
+            <h2 className="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Order History</h2>
             
             {orders.length > 0 ? (
               <div className="space-y-4">
-                {orders.map((order: any) => (
-                  <div key={order.id} className="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-purple-500/50 transition-colors">
-                    <div>
-                      <div className="text-purple-400 text-xs font-bold uppercase tracking-widest mb-1">
-                        Order #{order.id.slice(-6).toUpperCase()}
-                      </div>
-                      <div className="text-white font-bold mb-2">
-                        {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      </div>
-                      <div className="flex -space-x-3">
-                        {/* Show tiny images of the actual gear they bought! */}
-                        {order.items.slice(0, 3).map((item: any, idx: number) => (
-                          <div key={idx} className="w-10 h-10 rounded-full bg-[#0a0514] border-2 border-[#1a1524] overflow-hidden flex items-center justify-center p-1">
-                            <img src={item.product?.images?.[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png"} alt="Gear" className="w-full h-full object-contain" />
+                {orders.map((order: any) => {
+                  const isExpanded = expandedOrderId === order.id;
+                  return (
+                    <div 
+                      key={order.id} 
+                      onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
+                      className="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col hover:border-kora/50 transition-all duration-300 cursor-pointer group"
+                    >
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                          <div className="text-kora text-xs font-bold uppercase tracking-widest mb-1">
+                            Order #{order.referenceNumber || order.id.slice(-6).toUpperCase()}
                           </div>
-                        ))}
-                        {order.items.length > 3 && (
-                          <div className="w-10 h-10 rounded-full bg-purple-600 border-2 border-[#1a1524] flex items-center justify-center text-xs font-bold text-white">
-                            +{order.items.length - 3}
+                          <div className="text-slate-800 font-bold mb-2">
+                            {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </div>
-                        )}
+                          <div className="flex -space-x-3">
+                            {order.items.slice(0, 3).map((item: any, idx: number) => (
+                              <div key={idx} className="w-10 h-10 rounded-full bg-white border border-slate-200 overflow-hidden flex items-center justify-center p-1 shadow-sm">
+                                <img src={item.product?.images?.[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png"} alt="Gear" referrerPolicy="no-referrer" className="w-full h-full object-contain" />
+                              </div>
+                            ))}
+                            {order.items.length > 3 && (
+                              <div className="w-10 h-10 rounded-full bg-kora border border-white flex items-center justify-center text-xs font-bold text-white shadow-sm">
+                                +{order.items.length - 3}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-col sm:items-end gap-2 shrink-0">
+                          <div className="text-slate-900 font-black text-2xl">{CURRENCY}{parseFloat(order.total).toFixed(2)}</div>
+                          <div className="flex items-center gap-3">
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                              order.status === 'Processing' ? 'bg-yellow-50 text-yellow-600 border border-yellow-200' : 
+                              order.status === 'Shipped' ? 'bg-blue-50 text-blue-600 border border-blue-200' : 
+                              'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                            }`}>
+                              {order.status}
+                            </span>
+                            <span className="text-xs text-slate-400 group-hover:text-kora transition-colors">
+                              {isExpanded ? "▲" : "▼"}
+                            </span>
+                          </div>
+                        </div>
                       </div>
+
+                      {/* Expandable Order Details */}
+                      {isExpanded && (
+                        <div className="mt-6 pt-6 border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-sans animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
+                          {/* Left: Shipping Intel */}
+                          <div className="space-y-3">
+                            <h4 className="text-kora text-xs font-bold uppercase tracking-wider mb-2">Shipping Intel</h4>
+                            <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Recipient:</span> <span className="text-slate-800 font-bold">{order.shippingName || "Vault Shopper"}</span></p>
+                            <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Phone:</span> <span className="text-slate-800 font-bold">{order.shippingPhone || "N/A"}</span></p>
+                            <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Address:</span> <span className="text-slate-800 font-bold">{order.shippingStreet || "N/A"}, {order.shippingCity || "N/A"}</span></p>
+                            <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Payment:</span> <span className="text-slate-800 font-bold uppercase">{order.paymentMethod || "Card"}</span></p>
+                          </div>
+
+                          {/* Right: Invoice Summary */}
+                          <div className="space-y-3 bg-slate-50 rounded-2xl p-5 border border-slate-200 relative overflow-hidden">
+                            <h4 className="text-kora text-xs font-bold uppercase tracking-wider mb-2">Invoice Breakdown</h4>
+                            <div className="flex justify-between text-xs text-slate-500">
+                              <span>Items Subtotal</span>
+                              <span>{CURRENCY}{(parseFloat(order.total) - parseFloat(order.shippingFee || "10") + parseFloat(order.discountAmount || "0")).toFixed(2)}</span>
+                            </div>
+                            {order.promoCode && (
+                              <div className="flex justify-between text-xs text-emerald-600 font-semibold">
+                                <span>Promo Discount ({order.promoCode})</span>
+                                <span>-{CURRENCY}{parseFloat(order.discountAmount || "0").toFixed(2)}</span>
+                              </div>
+                            )}
+                            <div className="flex justify-between text-xs text-slate-500">
+                              <span>Priority Delivery</span>
+                              <span>{CURRENCY}{parseFloat(order.shippingFee || "10").toFixed(2)}</span>
+                            </div>
+                            <div className="h-px bg-slate-200 my-2"></div>
+                            <div className="flex justify-between items-center text-base font-bold text-slate-800">
+                              <span className="font-bold text-xs uppercase tracking-wider text-slate-500">Total AED</span>
+                              <span className="text-2xl font-black text-kora">{CURRENCY}{parseFloat(order.total).toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    
-                    <div className="flex flex-col sm:items-end gap-2">
-                      <div className="text-white font-black text-2xl">{CURRENCY}{order.total}</div>
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                        order.status === 'Processing' ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30' : 
-                        order.status === 'Shipped' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 
-                        'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                      }`}>
-                        {order.status}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-slate-500 mb-4">No recent orders found in the Vault.</p>
-                <Link href="/shop" className="inline-block bg-purple-600 hover:bg-purple-500 text-white font-bold py-2 px-6 rounded-full transition-colors">
+                <p className="text-slate-400 mb-4">No recent orders found in the Vault.</p>
+                <Link href="/shop" className="inline-block bg-kora hover:bg-purple-700 text-white font-bold py-2 px-6 rounded-full transition-colors shadow-md shadow-kora/15">
                   Start Shopping
                 </Link>
               </div>
@@ -96,24 +147,32 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
           </div>
 
           {/* Account Settings Card */}
-          <div className="bg-[#0a0514] border border-white/10 rounded-2xl p-8 shadow-xl h-max">
-            <h2 className="text-xl font-bold text-white mb-6 border-b border-white/5 pb-4">Vault Settings</h2>
+          <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm h-max">
+            <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Vault Settings</h2>
             <div className="space-y-4 text-sm font-medium">
-              <button className="w-full text-left flex items-center justify-between text-slate-300 hover:text-purple-400 transition-colors group">
+              <button className="w-full text-left flex items-center justify-between text-slate-600 hover:text-kora transition-colors group">
                 <div className="flex flex-col gap-1">
                   <span>Shipping Address</span>
-                  <span className="text-xs text-slate-500">Default: Dibba Al-Fujairah, UAE</span>
+                  <span className="text-xs text-slate-400">Default: Dibba Al-Fujairah, UAE</span>
                 </div>
                 <FaArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
-              <div className="h-px bg-white/5 w-full"></div>
-              <button className="w-full text-left flex items-center justify-between text-slate-300 hover:text-purple-400 transition-colors group">
+              <div className="h-px bg-slate-100 w-full"></div>
+              <button className="w-full text-left flex items-center justify-between text-slate-600 hover:text-kora transition-colors group">
                 Payment Methods <FaArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
-              <div className="h-px bg-white/5 w-full"></div>
-              <button className="w-full text-left flex items-center justify-between text-slate-300 hover:text-purple-400 transition-colors group">
+              <div className="h-px bg-slate-100 w-full"></div>
+              <button className="w-full text-left flex items-center justify-between text-slate-600 hover:text-kora transition-colors group">
                 Notification Preferences <FaArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
+              {user?.email === "mahramh40@gmail.com" && (
+                <>
+                  <div className="h-px bg-slate-100 w-full"></div>
+                  <Link href="/admin" className="w-full text-left flex items-center justify-between text-kora hover:text-purple-700 transition-colors group font-bold">
+                    Command Center <FaArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
@@ -123,23 +182,23 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
   }
 
   // ==========================================
-  // STATE 2: LOGGED OUT (SHOW CUSTOM LOGIN UI)
+  // STATE 2: LOGGED OUT (SHOW CUSTOM LOGIN UI - LIGHT THEME OVERHAUL)
   // ==========================================
   return (
-    <main className="min-h-screen bg-[#05010F] text-slate-200 font-sans selection:bg-purple-500 selection:text-white pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <main className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-kora selection:text-white pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-kora/5 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-black text-white tracking-tighter mb-2">
-            THE <span className="text-purple-500">VAULT.</span>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tighter mb-2">
+            THE <span className="text-kora drop-shadow-[0_0_8px_rgba(107,0,255,0.25)]">VAULT.</span>
           </h1>
-          <p className="text-slate-400">
+          <p className="text-slate-500 font-medium">
             {isLogin ? "Enter your credentials to access your gear." : "Join the ultimate premium football community."}
           </p>
         </div>
 
-        <div className="bg-[#0a0514] border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden flex justify-center min-h-[400px]">
+        <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl relative overflow-hidden flex justify-center min-h-[400px]">
           {isLogin ? (
             <SignIn fallbackRedirectUrl="/account" appearance={{
               elements: {
@@ -147,14 +206,14 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
                 card: "bg-transparent shadow-none p-0 m-0",
                 header: "hidden", 
                 footer: "hidden", 
-                formButtonPrimary: "bg-purple-600 hover:bg-purple-500 text-white font-black uppercase tracking-widest py-3 rounded-xl transition-all",
-                formFieldInput: "bg-white/5 border border-white/10 text-white py-3 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500",
-                formFieldLabel: "text-slate-400 font-bold",
-                dividerText: "text-slate-500 font-bold uppercase tracking-wider",
-                socialButtonsBlockButton: "border border-white/10 text-white hover:bg-white/5 py-3 rounded-xl font-bold transition-all",
+                formButtonPrimary: "bg-kora hover:bg-purple-700 text-white font-black uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md shadow-kora/15",
+                formFieldInput: "bg-white border border-slate-200 text-slate-900 py-3 rounded-xl focus:border-kora focus:ring-1 focus:ring-kora",
+                formFieldLabel: "text-slate-500 font-bold",
+                dividerText: "text-slate-400 font-bold uppercase tracking-wider",
+                socialButtonsBlockButton: "border border-slate-200 text-slate-700 hover:bg-slate-50 py-3 rounded-xl font-bold transition-all shadow-sm",
                 socialButtonsBlockButtonText: "font-bold",
-                identityPreviewText: "text-purple-400",
-                identityPreviewEditButton: "text-slate-400 hover:text-white"
+                identityPreviewText: "text-kora",
+                identityPreviewEditButton: "text-slate-400 hover:text-slate-950"
               }
             }} />
           ) : (
@@ -164,23 +223,23 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
                 card: "bg-transparent shadow-none p-0 m-0",
                 header: "hidden",
                 footer: "hidden",
-                formButtonPrimary: "bg-purple-600 hover:bg-purple-500 text-white font-black uppercase tracking-widest py-3 rounded-xl transition-all",
-                formFieldInput: "bg-white/5 border border-white/10 text-white py-3 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500",
-                formFieldLabel: "text-slate-400 font-bold",
-                dividerText: "text-slate-500 font-bold uppercase tracking-wider",
-                socialButtonsBlockButton: "border border-white/10 text-white hover:bg-white/5 py-3 rounded-xl font-bold transition-all",
+                formButtonPrimary: "bg-kora hover:bg-purple-700 text-white font-black uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md shadow-kora/15",
+                formFieldInput: "bg-white border border-slate-200 text-slate-900 py-3 rounded-xl focus:border-kora focus:ring-1 focus:ring-kora",
+                formFieldLabel: "text-slate-500 font-bold",
+                dividerText: "text-slate-400 font-bold uppercase tracking-wider",
+                socialButtonsBlockButton: "border border-slate-200 text-slate-700 hover:bg-slate-50 py-3 rounded-xl font-bold transition-all shadow-sm",
                 socialButtonsBlockButtonText: "font-bold",
               }
             }} />
           )}
         </div>
 
-        <div className="text-center mt-8 relative z-10">
-          <p className="text-slate-400">
+        <div className="text-center mt-8 relative z-10 font-sans">
+          <p className="text-slate-500 font-semibold">
             {isLogin ? "Don't have an account?" : "Already secured your spot?"}
             <button 
               onClick={() => setIsLogin(!isLogin)} 
-              className="ml-2 text-white font-bold hover:text-purple-400 transition-colors underline underline-offset-4"
+              className="ml-2 text-slate-800 font-bold hover:text-kora transition-colors underline underline-offset-4"
             >
               {isLogin ? "Sign Up" : "Sign In"}
             </button>

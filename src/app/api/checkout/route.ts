@@ -1,30 +1,43 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 
 export async function POST(req: Request) {
   try {
-    // 1. Check the bouncer: Who is trying to checkout?
+    // 1. Authenticate user
     const { userId } = await auth();
-    const clerkUser = await currentUser(); // <--- Added this to get your email/name!
+    const clerkUser = await currentUser();
 
     if (!userId || !clerkUser) {
       return new NextResponse("Unauthorized. Please log in.", { status: 401 });
     }
 
-    // 2. Grab the cart items and the total price they sent us
+    // 2. Parse checkout data from request body
     const body = await req.json();
-    const { items, cartTotal } = body;
+    const {
+      items,
+      cartTotal,
+      shippingDetails,
+      paymentMethod,
+      promoCode,
+      discountAmount,
+      shippingFee,
+      tax
+    } = body;
 
     if (!items || items.length === 0) {
       return new NextResponse("Cart is empty", { status: 400 });
     }
 
-    // 🔥 THE FIX: THE AUTO-SYNC BOUNCER 🔥
-    // This forces your local database to register the Clerk user before they buy!
+    if (!shippingDetails || !shippingDetails.firstName || !shippingDetails.lastName || !shippingDetails.streetAddress || !shippingDetails.city || !shippingDetails.phone) {
+      return new NextResponse("Missing shipping details", { status: 400 });
+    }
+
+    // Ensure Clerk user is registered locally in DB
     await prisma.user.upsert({
       where: { id: userId },
-      update: {}, // If they already exist, do nothing
+      update: {},
       create: {
         id: userId,
         email: clerkUser.emailAddresses[0].emailAddress,
@@ -33,28 +46,109 @@ export async function POST(req: Request) {
       }
     });
 
-    // 3. Write the Order to the Database!
-    // We use Prisma's nested create to make the Order AND the OrderItems at the exact same time
-    const order = await prisma.order.create({
-      data: {
-        userId: userId,
-        total: cartTotal,
-        status: "Processing",
-        items: {
-          create: items.map((item: any) => ({
-            productId: item.id,
-            size: item.size,
-            quantity: item.quantity,
-            // We strip the "$" out if it's there so the database stores pure numbers
-            price: parseFloat(item.price.replace('$', '')), 
-          })),
+    // 3. Process checkout inside a robust transaction
+    const order = await prisma.$transaction(async (tx) => {
+      
+      // A. Inventory Check & Lock
+      for (const item of items) {
+        const dbProduct = await tx.product.findUnique({
+          where: { id: item.id }
+        });
+
+        if (!dbProduct) {
+          throw new Error(`Product not found: ${item.name}`);
+        }
+
+        if (dbProduct.stock < item.quantity) {
+          throw new Error(`Insufficient stock for product ${dbProduct.name}`);
+        }
+
+        // B. Decrement Product Stock
+        await tx.product.update({
+          where: { id: item.id },
+          data: {
+            stock: {
+              decrement: item.quantity
+            }
+          }
+        });
+      }
+
+      // C. Generate Unique Reference Number (KORA-XXXX)
+      let referenceNumber = "";
+      let isUnique = false;
+      let attempts = 0;
+      while (!isUnique && attempts < 10) {
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        referenceNumber = `KORA-${rand}`;
+        const existingOrder = await tx.order.findUnique({
+          where: { referenceNumber }
+        });
+        if (!existingOrder) {
+          isUnique = true;
+        }
+        attempts++;
+      }
+
+      if (!isUnique) {
+        // Fallback to timestamp prefix if randomly generating fails
+        referenceNumber = `KORA-${Date.now().toString().slice(-4)}`;
+      }
+
+      // D. Create the Order
+      const newOrder = await tx.order.create({
+        data: {
+          userId: userId,
+          total: new Prisma.Decimal(cartTotal),
+          status: "Processing",
+          shippingStreet: shippingDetails.streetAddress,
+          shippingCity: shippingDetails.city,
+          shippingPhone: shippingDetails.phone,
+          shippingName: `${shippingDetails.firstName} ${shippingDetails.lastName}`,
+          paymentMethod: paymentMethod,
+          promoCode: promoCode || null,
+          discountAmount: new Prisma.Decimal(discountAmount || 0),
+          shippingFee: new Prisma.Decimal(shippingFee || 10),
+          tax: new Prisma.Decimal(tax || 0),
+          referenceNumber: referenceNumber,
+          items: {
+            create: items.map((item: any) => ({
+              productId: item.id,
+              size: item.size,
+              image: item.image || "",
+              quantity: item.quantity,
+              price: new Prisma.Decimal(parseFloat(item.price.replace('$', ''))),
+            })),
+          },
         },
-      },
+      });
+
+      // E. Clear Database Synced Cart Items
+      await tx.cartItem.deleteMany({
+        where: { userId }
+      });
+
+      return newOrder;
     });
 
+    // 4. Log confirmation receipt transmission (Dev mode mock email service)
+    console.log(`\n======================================================`);
+    console.log(`📬 [MOCK EMAIL TRANSMISSION] - Kora Order Confirmation`);
+    console.log(`======================================================`);
+    console.log(`To: ${clerkUser.emailAddresses[0].emailAddress}`);
+    console.log(`Subject: Your Gear is Secured! (Order #${order.referenceNumber})`);
+    console.log(`Shipping To: ${order.shippingName}`);
+    console.log(`Address: ${order.shippingStreet}, ${order.shippingCity}`);
+    console.log(`Payment Method: ${order.paymentMethod?.toUpperCase()}`);
+    console.log(`Subtotal Price: AED ${order.total.toString()}`);
+    console.log(`Unique Ref: ${order.referenceNumber}`);
+    console.log(`Status: ${order.status}`);
+    console.log(`======================================================\n`);
+
     return NextResponse.json(order);
-  } catch (error) {
+  } catch (error: any) {
     console.error("[CHECKOUT_ERROR]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Internal Error";
+    return new NextResponse(errorMessage, { status: 400 });
   }
 }

@@ -25,8 +25,8 @@ export default function ProductUI({ product }: { product: any }) {
       id: product.id,
       name: product.name,
       price: product.price,
-      // Fallback to a default image if the database array is empty
-      image: product.images?.[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png", 
+      // Pass the selected variation image!
+      image: product.images?.[activeImageIndex] || product.images?.[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png", 
       size: selectedSize,
       quantity: quantity
     });
@@ -66,7 +66,7 @@ export default function ProductUI({ product }: { product: any }) {
     <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-24 pb-24 px-6">
       <div className="max-w-7xl mx-auto">
         
-        <Link href="/shop" className="inline-flex items-center gap-2 text-slate-500 hover:text-kora transition-colors mb-8 font-pixel text-sm uppercase tracking-widest">
+        <Link href="/shop" className="inline-flex items-center gap-2 text-slate-500 hover:text-kora transition-colors mb-8 font-bold text-xs uppercase tracking-wider">
           <FaChevronLeft /> Back to Vault
         </Link>
 
@@ -74,32 +74,34 @@ export default function ProductUI({ product }: { product: any }) {
           
           {/* LEFT: Image Gallery */}
           <div className="flex-1 w-full flex flex-col gap-4">
-            <div className="w-full h-[400px] md:h-[600px] bg-slate-50 rounded-3xl border border-slate-200 flex items-center justify-center p-12 relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-full h-[400px] md:h-[600px] bg-slate-50 rounded-3xl border border-slate-200 flex items-center justify-center relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow p-4">
               <div className="absolute inset-0 bg-gradient-to-br from-kora/5 to-transparent z-0"></div>
               {product.images && product.images.length > 0 ? (
                 <img 
                   src={product.images[activeImageIndex] || product.images[0]} 
                   alt="Product View" 
-                  className="relative z-10 w-full h-full object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.1)] group-hover:scale-105 transition-transform duration-500"
+                  className="relative z-10 w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                 />
               ) : (
                 <div className="relative z-10 text-slate-400 font-sans">No Image Available</div>
               )}
             </div>
 
-            {product.images && product.images.length > 1 && (
-              <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
-                {product.images.map((img: string, i: number) => (
-                  <button 
-                    key={i}
-                    onClick={() => setActiveImageIndex(i)}
-                    className={`shrink-0 w-24 h-24 rounded-xl border flex items-center justify-center bg-white overflow-hidden transition-all duration-300 shadow-sm ${
-                      activeImageIndex === i ? "border-kora shadow-md shadow-kora/20" : "border-slate-200 hover:border-slate-300"
-                    }`}
-                  >
-                    <img src={img} alt={`Thumbnail ${i + 1}`} className="w-16 h-16 object-contain opacity-70 hover:opacity-100 transition-opacity" />
-                  </button>
-                ))}
+            {product.category !== "Boots" && product.images && product.images.length > 0 && (
+              <div className="flex flex-col gap-2 w-full">
+                <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
+                  {product.images.map((img: string, i: number) => (
+                    <button 
+                      key={i}
+                      onClick={() => setActiveImageIndex(i)}
+                      className={`shrink-0 w-24 h-24 rounded-xl border flex items-center justify-center bg-white overflow-hidden transition-all duration-300 shadow-sm ${
+                        activeImageIndex === i ? "border-kora border-2 shadow-md shadow-kora/30 scale-102" : "border-slate-200 hover:border-slate-300"
+                      }`}
+                    >
+                      <img src={img} alt={`Thumbnail ${i + 1}`} className="w-16 h-16 object-contain opacity-70 hover:opacity-100 transition-opacity" />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -107,28 +109,74 @@ export default function ProductUI({ product }: { product: any }) {
           {/* RIGHT: Product Details & Cart logic */}
           <div className="flex-1 w-full flex flex-col justify-center">
             <div className="mb-8">
-              <span className="text-kora font-pixel tracking-widest uppercase text-xs mb-2 block">
-                {product.category}
+              <span className="text-kora font-bold tracking-widest uppercase text-xs mb-2 block">
+                {product.category === "Boots" ? "Shoes" : product.category}
               </span>
-              <h1 className="text-4xl md:text-5xl font-pixel text-slate-900 mb-4 leading-tight uppercase">
+              <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-4 leading-tight uppercase">
                 {product.name}
               </h1>
-              <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center gap-4 mb-4">
                 <span className="text-3xl font-bold font-sans text-slate-900">{CURRENCY}{product.price}</span>
                 <div className="flex items-center gap-1 text-yellow-500 text-sm">
                   <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
                   <span className="text-slate-500 ml-2 font-sans">({product.reviews?.length || 0} Reviews)</span>
                 </div>
               </div>
+
+              {/* Premium Inventory Stock Level Badging */}
+              <div className="mb-6">
+                {product.stock === 0 ? (
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-bold uppercase tracking-wider font-sans">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+                    Sold Out - Restocking Soon
+                  </span>
+                ) : product.stock <= 3 ? (
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl text-xs font-bold uppercase tracking-wider font-sans animate-pulse">
+                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+                    Priority Alert: Only {product.stock} items left in The Vault!
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-xs font-bold uppercase tracking-wider font-sans">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                    Secured: In Stock ({product.stock} kits ready for priority shipping)
+                  </span>
+                )}
+              </div>
+
               <p className="text-slate-600 leading-relaxed text-lg font-sans">
                 {product.description || "Premium gear sourced directly from Kora Store's exclusive vault."}
               </p>
             </div>
 
+            {/* Style Variation Selector for Shoes */}
+            {product.category === "Boots" && product.images && product.images.length > 0 && (
+              <div className="mb-8 font-sans">
+                <h3 className="text-slate-900 font-bold uppercase tracking-wider text-xs mb-3">
+                  Select Style / Variation
+                </h3>
+                <div className="flex flex-wrap gap-3">
+                  {product.images.map((img: string, i: number) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveImageIndex(i)}
+                      className={`w-16 h-16 rounded-xl border-2 flex items-center justify-center p-1 bg-slate-50 overflow-hidden transition-all ${
+                        activeImageIndex === i 
+                          ? "border-kora shadow-md shadow-kora/20 scale-105 animate-pulse" 
+                          : "border-slate-200 hover:border-slate-300"
+                      }`}
+                      style={{ transition: 'all 0.3s ease' }}
+                    >
+                      <img src={img} alt={`Style ${i + 1}`} className="w-full h-full object-contain" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Size Selector */}
             <div className="mb-10 font-sans">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-slate-900 font-pixel uppercase tracking-wider text-sm">Select Size</h3>
+                <h3 className="text-slate-900 font-bold uppercase tracking-wider text-xs">Select Size</h3>
                 <Link href="/faq" className="text-kora hover:text-purple-700 text-sm underline underline-offset-4 font-sans">Size Guide</Link>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -136,7 +184,9 @@ export default function ProductUI({ product }: { product: any }) {
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
+                    disabled={product.stock === 0}
                     className={`w-14 h-14 rounded-xl font-bold text-lg border transition-all duration-300 ${
+                      product.stock === 0 ? "bg-slate-50 border-slate-200 text-slate-300 cursor-not-allowed" :
                       selectedSize === size 
                         ? "bg-kora border-kora text-white shadow-md shadow-kora/30 scale-105" 
                         : "bg-white border-slate-200 text-slate-500 hover:border-kora/50 hover:text-slate-900 shadow-sm"
@@ -152,17 +202,19 @@ export default function ProductUI({ product }: { product: any }) {
 
             {/* Add to Cart Action with Quantity Selector */}
             <div className="flex gap-4 mb-8 h-14 font-sans">
-              <div className="flex items-center justify-between bg-white border border-slate-200 rounded-full px-2 w-32 shrink-0 shadow-sm">
+              <div className={`flex items-center justify-between bg-white border border-slate-200 rounded-full px-2 w-32 shrink-0 shadow-sm ${product.stock === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}>
                 <button 
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors text-xl"
+                  disabled={product.stock === 0}
+                  className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors text-xl disabled:cursor-not-allowed"
                 >
                   −
                 </button>
-                <span className="font-bold text-slate-900 text-lg">{quantity}</span>
+                <span className="font-bold text-slate-900 text-lg">{product.stock === 0 ? 0 : quantity}</span>
                 <button 
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors text-xl"
+                  onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
+                  disabled={product.stock === 0 || quantity >= product.stock}
+                  className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors text-xl disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   +
                 </button>
@@ -170,15 +222,16 @@ export default function ProductUI({ product }: { product: any }) {
 
               <button 
                 onClick={handleAddToCart}
-                disabled={(!selectedSize && product.sizes?.length > 0) || isAdded}
-                className={`flex-1 rounded-full font-pixel text-sm uppercase tracking-widest transition-all shadow-md h-full flex items-center justify-center ${
+                disabled={product.stock === 0 || (!selectedSize && product.sizes?.length > 0) || isAdded}
+                className={`flex-1 rounded-full font-bold text-sm uppercase tracking-widest transition-all shadow-md h-full flex items-center justify-center ${
+                  product.stock === 0 ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none" :
                   isAdded ? "bg-emerald-500 text-white scale-[1.02]" :
                   (selectedSize || !product.sizes?.length)
                     ? "bg-slate-900 text-white hover:bg-kora hover:text-white hover:scale-[1.02] hover:shadow-kora/30" 
                     : "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none"
                 }`}
               >
-                {(!selectedSize && product.sizes?.length > 0) ? "Select a Size" : isAdded ? "Added to Vault!" : "Add to Vault"}
+                {product.stock === 0 ? "Sold Out" : (!selectedSize && product.sizes?.length > 0) ? "Select a Size" : isAdded ? "Added to Vault!" : "Add to Vault"}
               </button>
             </div>
 
@@ -198,7 +251,7 @@ export default function ProductUI({ product }: { product: any }) {
 
         {/* --- BOTTOM SECTION: DETAILS & REVIEWS TABS --- */}
         <div className="max-w-4xl mx-auto mt-24">
-          <div className="flex gap-8 border-b border-slate-200 mb-8 font-pixel uppercase">
+          <div className="flex gap-8 border-b border-slate-200 mb-8 font-bold uppercase">
             <button 
               onClick={() => setActiveTab("details")}
               className={`pb-4 text-lg transition-all border-b-2 ${
@@ -234,7 +287,7 @@ export default function ProductUI({ product }: { product: any }) {
             {activeTab === "reviews" && (
               <div className="animate-fade-in-up space-y-10 font-sans">
                 <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl shadow-sm">
-                  <h3 className="text-xl font-pixel uppercase text-slate-900 mb-4">Drop a Review</h3>
+                  <h3 className="text-xl font-bold uppercase text-slate-900 mb-4">Drop a Review</h3>
                   <p className="text-xs text-slate-500 mb-4 uppercase tracking-widest font-sans">Only verified vault members can leave intel.</p>
                   <div className="flex gap-2 text-yellow-500 mb-4 text-xl cursor-pointer">
                     <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
@@ -250,7 +303,7 @@ export default function ProductUI({ product }: { product: any }) {
                   <button 
                     onClick={handleSubmitReview}
                     disabled={isSubmitting || !reviewText.trim()}
-                    className="bg-slate-900 hover:bg-kora text-white font-pixel text-xs uppercase tracking-widest py-3 px-8 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-kora/30"
+                    className="bg-slate-900 hover:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3 px-8 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-kora/30"
                   >
                     {isSubmitting ? "Dropping Intel..." : "Submit Review"}
                   </button>

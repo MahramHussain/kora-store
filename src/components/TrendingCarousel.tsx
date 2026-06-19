@@ -34,7 +34,7 @@ export function TrendingCarousel({ products }: { products: any[] }) {
   return (
     <section className="px-6 mb-16">
       <div className="flex justify-between items-end mb-6">
-        <h2 className="text-2xl font-pixel uppercase flex items-center gap-2">
+        <h2 className="text-2xl font-bold flex items-center gap-2">
           Trending 
           <img 
             src="/fire.gif" 
@@ -63,7 +63,7 @@ export function TrendingCarousel({ products }: { products: any[] }) {
               <div className="flex-1 text-center md:text-left flex flex-col justify-center h-full">
                 <div className="inline-flex items-center justify-center md:justify-start gap-2 mb-4">
                   <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></span>
-                  <span className="text-orange-600 font-pixel uppercase tracking-widest text-xs md:text-sm">
+                  <span className="text-orange-600 font-black uppercase tracking-widest text-xs md:text-sm">
                     {item.category}
                   </span>
                 </div>
@@ -77,7 +77,7 @@ export function TrendingCarousel({ products }: { products: any[] }) {
                 </p>
                 
                 <div>
-                  <Link href={`/shop/${item.id}`} className="inline-block bg-slate-900 text-white hover:bg-orange-500 hover:text-white px-10 py-4 rounded-full font-pixel text-xs tracking-wider transition-all duration-300 shadow-[0_5px_15px_rgba(0,0,0,0.1)] hover:shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:scale-105">
+                  <Link href={`/shop/${item.id}`} className="inline-block bg-slate-900 text-white hover:bg-orange-500 hover:text-white px-10 py-4 rounded-full font-black text-sm uppercase tracking-wider transition-all duration-300 shadow-[0_5px_15px_rgba(0,0,0,0.1)] hover:shadow-[0_0_20px_rgba(249,115,22,0.4)] hover:scale-105">
                     Secure Now
                   </Link>
                 </div>

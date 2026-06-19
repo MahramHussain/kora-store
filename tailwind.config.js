@@ -10,9 +10,6 @@ export default {
       colors: {
         kora: '#6B00FF',
       },
-      fontFamily: {
-        pixel: ['var(--font-pixel)', 'sans-serif'],
-      },
     },
   },
   plugins: [],

@@ -15,8 +15,9 @@ export type CartItem = {
 type CartContextType = {
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
-  removeFromCart: (id: string | number, size: string) => void;
-  updateQuantity: (id: string | number, size: string, newQuantity: number) => void; // <-- NEW POWER
+  removeFromCart: (id: string | number, size: string, image: string) => void;
+  updateQuantity: (id: string | number, size: string, image: string, newQuantity: number) => void; // <-- UPDATED POWER
+  clearCart: () => void;
   cartCount: number;
 };
 
@@ -54,7 +55,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             setCart((prevLocalCart) => {
               const mergedCart = [...dbCart];
               prevLocalCart.forEach(localItem => {
-                const existing = mergedCart.find(i => i.id === localItem.id && i.size === localItem.size);
+                const existing = mergedCart.find(i => i.id === localItem.id && i.size === localItem.size && i.image === localItem.image);
                 if (!existing) {
                   mergedCart.push(localItem);
                 }
@@ -88,12 +89,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addToCart = (newItem: CartItem) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find(
-        (item) => item.id === newItem.id && item.size === newItem.size
+        (item) => item.id === newItem.id && item.size === newItem.size && item.image === newItem.image
       );
 
       if (existingItem) {
         return prevCart.map((item) =>
-          item.id === newItem.id && item.size === newItem.size
+          item.id === newItem.id && item.size === newItem.size && item.image === newItem.image
             ? { ...item, quantity: item.quantity + newItem.quantity }
             : item
         );
@@ -102,28 +103,33 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const removeFromCart = (id: string | number, size: string) => {
-    setCart((prevCart) => prevCart.filter((item) => !(item.id === id && item.size === size)));
+  const removeFromCart = (id: string | number, size: string, image: string) => {
+    setCart((prevCart) => prevCart.filter((item) => !(item.id === id && item.size === size && item.image === image)));
   };
 
   // THE NEW QUANTITY ENGINE
-  const updateQuantity = (id: string | number, size: string, newQuantity: number) => {
+  const updateQuantity = (id: string | number, size: string, image: string, newQuantity: number) => {
     if (newQuantity <= 0) {
       // If they drop the quantity to 0, just remove it entirely
-      removeFromCart(id, size);
+      removeFromCart(id, size, image);
       return;
     }
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item.id === id && item.size === size ? { ...item, quantity: newQuantity } : item
+        item.id === id && item.size === size && item.image === image ? { ...item, quantity: newQuantity } : item
       )
     );
+  };
+
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem("kora_vault_cart");
   };
 
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, cartCount }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount }}>
       {children}
     </CartContext.Provider>
   );

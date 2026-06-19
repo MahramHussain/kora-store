@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Pixelify_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer"; // <-- 1. IMPORT THE FOOTER
@@ -7,7 +7,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { CartProvider } from "@/context/CartContext"; 
 
 const inter = Inter({ subsets: ["latin"] });
-const pixelFont = Pixelify_Sans({ weight: '700', subsets: ['latin'], variable: '--font-pixel' });
 
 export const metadata: Metadata = {
   title: "Kora Store",
@@ -23,7 +22,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         {/* Added flexbox magic here to push the footer to the bottom */}
-        <body className={`${inter.className} ${pixelFont.variable} bg-white text-slate-900 antialiased flex flex-col min-h-screen selection:bg-kora selection:text-white`}>
+        <body className={`${inter.className} bg-white text-slate-900 antialiased flex flex-col min-h-screen selection:bg-kora selection:text-white`}>
           <CartProvider>
             <Navbar />
             

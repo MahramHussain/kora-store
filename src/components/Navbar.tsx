@@ -43,14 +43,8 @@ export default function Navbar() {
   return (
     <>
       {/* TOP UTILITY BAR (Desktop Only) */}
-      <div className="hidden md:flex justify-between items-center px-6 py-2 text-xs font-medium bg-slate-50 text-slate-600 border-b border-slate-200">
-        <div className="flex gap-2">
-          <span className="text-slate-500">Shipping to: UAE</span>
-          <button className="text-kora hover:text-purple-700 underline underline-offset-2">Change</button>
-        </div>
+      <div className="hidden md:flex justify-end items-center px-6 py-2 text-xs font-medium bg-slate-50 text-slate-600 border-b border-slate-200">
         <div className="flex gap-6 items-center">
-          <Link href="/faq" className="hover:text-slate-900 transition-colors">Help</Link>
-          
           <Show when="signed-out">
             <SignInButton mode="modal">
               <button className="text-kora font-bold hover:text-purple-700 transition-colors">
@@ -90,7 +84,7 @@ export default function Navbar() {
             {isMobileMenuOpen ? <FaXmark /> : <FaBars />}
           </button>
 
-          <Link href="/" className="font-pixel text-4xl tracking-tight uppercase hover:scale-105 transition-transform">
+          <Link href="/" className="text-3xl font-black tracking-tighter uppercase hover:scale-105 transition-transform">
             <span className="text-slate-900">KORA</span><span className="text-kora drop-shadow-[0_0_10px_rgba(107,0,255,0.4)]">STORE</span>
           </Link>
         </div>
@@ -133,7 +127,7 @@ export default function Navbar() {
 
         {/* 3. Cart Button (Right Side) */}
         <div className="flex items-center order-2 md:order-3 shrink-0">
-          <Link href="/cart" className="bg-kora hover:bg-purple-700 text-white font-pixel text-sm md:text-base py-2 md:py-3 px-4 md:px-6 rounded-full flex items-center gap-2 transition-all hover:scale-105 shadow-md shadow-kora/30">
+          <Link href="/cart" className="bg-kora hover:bg-purple-700 text-white font-bold text-sm md:text-base py-2 md:py-3 px-4 md:px-6 rounded-full flex items-center gap-2 transition-all hover:scale-105 shadow-md shadow-kora/30">
             <FaShoppingCart className="text-lg md:text-xl" />
             <span className="bg-white text-kora px-2 py-0.5 rounded-full text-xs shadow-inner pt-0.5 ml-1">{cartCount}</span>
           </Link>
@@ -142,14 +136,14 @@ export default function Navbar() {
         {/* --- MOBILE SLIDE-DOWN MENU --- */}
         {isMobileMenuOpen && (
           <div className="absolute top-full left-0 w-full bg-white border-b border-slate-200 flex flex-col md:hidden z-40 shadow-xl animate-fade-in-up">
-            <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-slate-100 text-slate-900 font-pixel hover:bg-slate-50 flex items-center justify-between">
+            <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-slate-100 text-slate-900 font-bold hover:bg-slate-50 flex items-center justify-between">
               Shop The Vault <span className="text-kora">→</span>
             </Link>
-            <Link href="/shop?tag=Trending" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-slate-100 text-slate-900 font-pixel hover:bg-slate-50">
+            <Link href="/shop?tag=Trending" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-slate-100 text-slate-900 font-bold hover:bg-slate-50">
               Trending Gear
             </Link>
             
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between font-pixel">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between font-bold">
               <Show when="signed-out">
                 <SignInButton mode="modal">
                   <button className="text-kora hover:text-purple-700">

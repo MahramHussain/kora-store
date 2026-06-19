@@ -29,12 +29,15 @@ model Product {
   id          String   @id @default(cuid())
   name        String
   category    String
-  team String? 
+  team        String? 
   price       Decimal  // Decimal is better than Float for actual money
   description String?
   images      String[] // Array of image URLs
   sizes       String[] // Array of available sizes (e.g., ["S", "M", "L"])
   tag         String?  // e.g., "Trending", "Latest"
+  stock       Int      @default(10)
+  isWorldCup  Boolean  @default(false)
+  gender      String   @default("Unisex")
   createdAt   DateTime @default(now())
   
   // Links to order history and carts
@@ -45,12 +48,22 @@ model Product {
 
 // 3. THE ORDER MODEL (The Secure Checkout result)
 model Order {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id])
-  status      String   @default("Processing") // Processing, Shipped, Delivered
-  total       Decimal
-  createdAt   DateTime @default(now())
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  status          String   @default("Processing") // Processing, Shipped, Delivered
+  total           Decimal
+  shippingStreet  String?
+  shippingCity    String?
+  shippingPhone   String?
+  shippingName    String?
+  paymentMethod   String?      // "card", "paypal", "cod"
+  promoCode       String?
+  discountAmount  Decimal  @default(0)
+  shippingFee     Decimal  @default(10)
+  tax             Decimal  @default(0)
+  referenceNumber String?  @unique
+  createdAt       DateTime @default(now())
   
   // An order can have multiple different shirts/boots inside it
   items       OrderItem[]
@@ -66,6 +79,7 @@ model OrderItem {
   product   Product @relation(fields: [productId], references: [id])
   
   size      String
+  image     String  @default("")
   quantity  Int
   price     Decimal // We lock the price here so if the shirt goes on sale later, past orders don't change!
 }
@@ -93,7 +107,8 @@ model CartItem {
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   size      String
+  image     String   @default("")
   quantity  Int
 
-  @@unique([userId, productId, size])
+  @@unique([userId, productId, size, image])
 }

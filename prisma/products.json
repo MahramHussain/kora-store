@@ -1,0 +1,387 @@
+[
+  {
+    "id": "argentina-away-kit",
+    "name": "Argentina Away Kit",
+    "category": "Shirts",
+    "team": "Argentina",
+    "price": 85.00,
+    "description": "The official Argentina away kit featuring modern accents, built for high-performance and absolute match comfort.",
+    "images": [
+      "/assets/wc26 jerseys/Argentina Away Kit/ea464494.jpg",
+      "/assets/wc26 jerseys/Argentina Away Kit/fc01d085-600x600.jpg",
+      "/assets/wc26 jerseys/Argentina Away Kit/wmremove-transformed-10.webp",
+      "/assets/wc26 jerseys/Argentina Away Kit/wmremove-transformed-11.webp"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Trending",
+    "stock": 12,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "argentina-home-kit",
+    "name": "Argentina Home Kit",
+    "category": "Shirts",
+    "team": "Argentina",
+    "price": 90.00,
+    "description": "The iconic Albiceleste light blue and white stripes. Features woven gold champion details and advanced breathability.",
+    "images": [
+      "/assets/wc26 jerseys/Argentina Home Kit/31033b73.jpg",
+      "/assets/wc26 jerseys/Argentina Home Kit/284340dd-600x600.jpg"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Latest",
+    "stock": 15,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "brazil-away-kit",
+    "name": "Brazil Away Kit",
+    "category": "Shirts",
+    "team": "Brazil",
+    "price": 85.00,
+    "description": "The official Brazil away kit. Vibrant blue combined with traditional green-yellow trim representing high energy play.",
+    "images": [
+      "/assets/wc26 jerseys/Brazil Away Kit/6e830f83.webp",
+      "/assets/wc26 jerseys/Brazil Away Kit/aca9bd18.webp",
+      "/assets/wc26 jerseys/Brazil Away Kit/ztd1f4p9dnrmr0cv6vg99s6ttm.webp"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Trending",
+    "stock": 10,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "brazil-home-kit",
+    "name": "Brazil Home Kit",
+    "category": "Shirts",
+    "team": "Brazil",
+    "price": 90.00,
+    "description": "The classic yellow and green home kit of Seleção. Crafted from ultra-lightweight performance fibers.",
+    "images": [
+      "/assets/wc26 jerseys/Brazil Home Kit/9fd33626.jpg",
+      "/assets/wc26 jerseys/Brazil Home Kit/cac6704b-600x600.jpg"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Latest",
+    "stock": 8,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "france-away-kit",
+    "name": "France Away Kit",
+    "category": "Shirts",
+    "team": "France",
+    "price": 85.00,
+    "description": "Sleek light blue-green design with signature French details. Breathable and comfortable for daily wear and peak pitch activities.",
+    "images": [
+      "/assets/wc26 jerseys/France Away/08401f29.jpg",
+      "/assets/wc26 jerseys/France Away/70fb383b-600x600.jpg",
+      "/assets/wc26 jerseys/France Away/96e26282.webp"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Trending",
+    "stock": 14,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "france-home-kit",
+    "name": "France Home Kit",
+    "category": "Shirts",
+    "team": "France",
+    "price": 90.00,
+    "description": "Deep blue French home kit. Features gold details and elegant tricolor accents on the collar.",
+    "images": [
+      "/assets/wc26 jerseys/France Home Kit/3e50e368.webp",
+      "/assets/wc26 jerseys/France Home Kit/1775045999-11d31d1c.webp",
+      "/assets/wc26 jerseys/France Home Kit/6ecc8076.webp"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Latest",
+    "stock": 11,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "germany-home-kit",
+    "name": "Germany Home Kit",
+    "category": "Shirts",
+    "team": "Germany",
+    "price": 90.00,
+    "description": "Traditional white kit with striking black and national-color accents. Woven team crest for authentic pitch style.",
+    "images": [
+      "/assets/wc26 jerseys/German Home Kit/6713d2dc.jpg",
+      "/assets/wc26 jerseys/German Home Kit/c20e9c6f-600x600.jpg"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Latest",
+    "stock": 9,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "portugal-away-kit",
+    "name": "Portugal Away Kit",
+    "category": "Shirts",
+    "team": "Portugal",
+    "price": 85.00,
+    "description": "The official Portugal away jersey. Modern clean white design with striking accents for the Portuguese national side.",
+    "images": [
+      "/assets/wc26 jerseys/Portugal Away Kit/18d0f347.webp",
+      "/assets/wc26 jerseys/Portugal Away Kit/8c9078f3.webp",
+      "/assets/wc26 jerseys/Portugal Away Kit/31ad5f42-1.webp"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Trending",
+    "stock": 13,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "portugal-home-kit",
+    "name": "Portugal Home Kit",
+    "category": "Shirts",
+    "team": "Portugal",
+    "price": 90.00,
+    "description": "Vibrant red and green home kit. Represents Portuguese national identity, engineered with sweat-wicking dry technology.",
+    "images": [
+      "/assets/wc26 jerseys/Portugal Home Kit/3qh91k4pb5rmt0cv6vjta2bw1r.webp",
+      "/assets/wc26 jerseys/Portugal Home Kit/6d945c1f.webp",
+      "/assets/wc26 jerseys/Portugal Home Kit/47586682.webp",
+      "/assets/wc26 jerseys/Portugal Home Kit/hjm0tmxyxdrmy0cv6vmatb3d00.webp"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Latest",
+    "stock": 12,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "spain-away-kit",
+    "name": "Spain Away Kit",
+    "category": "Shirts",
+    "team": "Spain",
+    "price": 85.00,
+    "description": "The official Spain away jersey. Modern yellow base with soft details, representing the bright energy of the La Roja side.",
+    "images": [
+      "/assets/wc26 jerseys/Spain Away/945596eb-1.webp",
+      "/assets/wc26 jerseys/Spain Away/9b952123.webp",
+      "/assets/wc26 jerseys/Spain Away/c258491d.webp",
+      "/assets/wc26 jerseys/Spain Away/e107010e.webp"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Trending",
+    "stock": 7,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "spain-home-kit",
+    "name": "Spain Home Kit",
+    "category": "Shirts",
+    "team": "Spain",
+    "price": 90.00,
+    "description": "Classic bold red and yellow home kit of Spain. Showcases La Roja pride, built with lightweight stretch knit.",
+    "images": [
+      "/assets/wc26 jerseys/Spain Home Kit/b177d676.jpg",
+      "/assets/wc26 jerseys/Spain Home Kit/167c4aa9-600x600.jpg"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Latest",
+    "stock": 10,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "uruguay-away-kit",
+    "name": "Uruguay Away Kit",
+    "category": "Shirts",
+    "team": "Uruguay",
+    "price": 85.00,
+    "description": "The official Uruguay away kit. Standard white shirt with gold and sky blue accents celebrating their historic football legacy.",
+    "images": [
+      "/assets/wc26 jerseys/Uruguay away kit/1774926328610690.jpg",
+      "/assets/wc26 jerseys/Uruguay away kit/385f79d96a597fd393d6f2e78212ec3a.webp",
+      "/assets/wc26 jerseys/Uruguay away kit/64c5e61b20e252da599a1306a28947c1.webp"
+    ],
+    "sizes": ["S", "M", "L", "XL"],
+    "tag": "Latest",
+    "stock": 6,
+    "isWorldCup": true,
+    "gender": "Unisex"
+  },
+  {
+    "id": "nike-lv-airforce",
+    "name": "Nike LV Airforce",
+    "category": "Boots",
+    "team": null,
+    "price": 350.00,
+    "description": "Exclusive streetwear collaboration. Combining classic Air Force silhouette with luxury craftsmanship and custom leather finishes.",
+    "images": [
+      "/assets/Casual Shoes/Nike/LV airforce/a10b4981-0930-447a-abb7-c41b70db4528.jpg",
+      "/assets/Casual Shoes/Nike/LV airforce/ddc86f25-8ac1-4af2-bb83-28b82393eeba.jpg",
+      "/assets/Casual Shoes/Nike/LV airforce/d1e43ecd-a710-4d9c-b220-f8d2d09e9450.jpg",
+      "/assets/Casual Shoes/Nike/LV airforce/271357dd-e21b-4de8-ad2f-9f43a63bd2ae.jpg",
+      "/assets/Casual Shoes/Nike/LV airforce/d6c736b7-1006-4779-9a13-b9332950d56e.jpg"
+    ],
+    "sizes": ["40", "41", "42", "43", "44"],
+    "tag": "Latest",
+    "stock": 5,
+    "isWorldCup": false,
+    "gender": "Unisex"
+  },
+  {
+    "id": "nike-womens-casual",
+    "name": "Nike Womens Casual",
+    "category": "Boots",
+    "team": null,
+    "price": 110.00,
+    "description": "Modern casual comfort for daily lifestyle wear. Cushioned footbed and iconic styling crafted specifically for her.",
+    "images": [
+      "/assets/Casual Shoes/Nike/Womens/254027e0-ec57-4c79-8e6e-1b8fe2135e6a.jpg",
+      "/assets/Casual Shoes/Nike/Womens/a2c96122-125a-453f-8935-babc9f1db71b.jpg",
+      "/assets/Casual Shoes/Nike/Womens/d09def37-5a15-4710-93e0-0e80bb5d7004.jpg",
+      "/assets/Casual Shoes/Nike/Womens/36e53e9d-7b38-46c8-a191-02e18cbc23d0.jpg",
+      "/assets/Casual Shoes/Nike/Womens/487099639_1215727337220669_7902355354617712488_n.jpg"
+    ],
+    "sizes": ["36", "37", "38", "39", "40"],
+    "tag": "Latest",
+    "stock": 8,
+    "isWorldCup": false,
+    "gender": "Women"
+  },
+  {
+    "id": "nike-airforce1-highcut",
+    "name": "Nike Air Force 1 Highcut",
+    "category": "Boots",
+    "team": null,
+    "price": 150.00,
+    "description": "The classic high-top hoops icon. Iconic strap closure, premium leather overlays, and durable rubber traction.",
+    "images": [
+      "/assets/Casual Shoes/Nike/airforce1 highcut/ewffe.png",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/WhatsAppImage2021-10-19at20.54.12.webp",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/aa71262a-24e1-4f3e-a583-0196ed379d6f.webp",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/e20720ca-a65c-4427-962a-19b72e3150e7.webp",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/5c09859a-44ef-4457-9431-42c6926c04d4.webp",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/f20e1558-336e-4c11-9ef5-3b739803da9a.webp",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/55f876ad-3a6a-4796-8b9d-31864f67b695.webp",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/6bf99620-9889-471c-8fe7-85440e5b12e1.webp",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/142132_59c945132a91d9.47327894_314195113_4_large_f5e1d975-638b-459e-baa2-acbe039240fd.webp",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/142132_59c944f67ecb89.60269394_314195113_1_large_3d850062-790a-4717-9295-31009d3da710.webp",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/142132_59c944ff810598.56580483_314195113_2_large_899fbc08-9049-4bde-b763-2c6c8b13208f.webp",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/77_1.webp",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/486668104_122167308716305967_6873504328877778581_n.jpg",
+      "/assets/Casual Shoes/Nike/airforce1 highcut/514327379_122189719628322182_1233105404942145650_n.jpg"
+    ],
+    "sizes": ["40", "41", "42", "43", "44", "45"],
+    "tag": "Latest",
+    "stock": 15,
+    "isWorldCup": false,
+    "gender": "Unisex"
+  },
+  {
+    "id": "grip-socks",
+    "name": "Non-Slip Elite Grip Socks",
+    "category": "Accessories",
+    "team": null,
+    "price": 15.00,
+    "description": "Designed with internal and external grip pads to eliminate heel slippage, enhance agility, and lock down foot security inside boots.",
+    "images": [
+      "/assets/accessories/Grip socks/gripsocksW2.png",
+      "/assets/accessories/Grip socks/gripsockB2.png"
+    ],
+    "sizes": ["M", "L"],
+    "tag": "Trending",
+    "stock": 30,
+    "isWorldCup": false,
+    "gender": "Unisex"
+  },
+  {
+    "id": "nike-everyday-socks",
+    "name": "Nike Everyday Performance Socks",
+    "category": "Accessories",
+    "team": null,
+    "price": 12.00,
+    "description": "Classic dry fit crew socks providing arch band compression support and extra cushioning in key areas.",
+    "images": [
+      "/assets/accessories/Nike Socks/nikesocksW1.png",
+      "/assets/accessories/Nike Socks/nikesocksW2.png",
+      "/assets/accessories/Nike Socks/nikesocksB1.png",
+      "/assets/accessories/Nike Socks/nikesocksB2.png",
+      "/assets/accessories/Nike Socks/nikesocksWB.png"
+    ],
+    "sizes": ["M", "L"],
+    "tag": "Latest",
+    "stock": 25,
+    "isWorldCup": false,
+    "gender": "Unisex"
+  },
+  {
+    "id": "fc-barcelona-flag",
+    "name": "FC Barcelona Official Club Flag",
+    "category": "Flags",
+    "team": "Barcelona",
+    "price": 25.00,
+    "description": "Show your Blaugrana pride! Standard 3x5 ft flag featuring the iconic crest and colors of FC Barcelona.",
+    "images": [
+      "/assets/flags/IMG_9926.jpg"
+    ],
+    "sizes": ["One Size"],
+    "tag": "Latest",
+    "stock": 10,
+    "isWorldCup": false,
+    "gender": "Unisex"
+  },
+  {
+    "id": "real-madrid-flag",
+    "name": "Real Madrid Official Club Flag",
+    "category": "Flags",
+    "team": "Real Madrid",
+    "price": 25.00,
+    "description": "Show your Madridista pride! High-quality flag featuring the legendary crest and colors of Real Madrid.",
+    "images": [
+      "/assets/flags/IMG_9929.jpg"
+    ],
+    "sizes": ["One Size"],
+    "tag": "Latest",
+    "stock": 12,
+    "isWorldCup": false,
+    "gender": "Unisex"
+  },
+  {
+    "id": "manchester-united-flag",
+    "name": "Manchester United Official Flag",
+    "category": "Flags",
+    "team": "Manchester United",
+    "price": 25.00,
+    "description": "Official Red Devils flag. Premium quality with the classic club crest for home matchdays and room decoration.",
+    "images": [
+      "/assets/flags/IMG_9931.jpg"
+    ],
+    "sizes": ["One Size"],
+    "tag": "Latest",
+    "stock": 7,
+    "isWorldCup": false,
+    "gender": "Unisex"
+  },
+  {
+    "id": "manchester-city-flag",
+    "name": "Manchester City Official Fan Flag",
+    "category": "Flags",
+    "team": "Man City",
+    "price": 25.00,
+    "description": "Celebrate the sky blue champions! Durable fabric flag displaying the official Man City crest.",
+    "images": [
+      "/assets/flags/IMG_9933.jpg"
+    ],
+    "sizes": ["One Size"],
+    "tag": "Latest",
+    "stock": 11,
+    "isWorldCup": false,
+    "gender": "Unisex"
+  }
+]
