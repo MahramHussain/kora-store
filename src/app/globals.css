@@ -13,3 +13,124 @@
     scrollbar-width: none;  /* Firefox */
   }
 }
+
+/* ==========================================================================
+   Premium Clerk Styling & Branding Mask overrides for KoraStore
+   ========================================================================== */
+
+/* 1. Complete branding and logo hiding */
+.cl-logoBox,
+.cl-logoImage,
+.cl-internal-b382cd,
+.cl-internal-191q739,
+.cl-footer,
+.cl-footerAction__poweredBy,
+.cl-userButtonPopoverFooter,
+.cl-footerActionText,
+.cl-footerActionLink {
+  display: none !important;
+}
+
+/* 2. Global Clerk element layout overrides to match KoraStore theme */
+.cl-rootBox {
+  font-family: inherit !important;
+}
+
+.cl-card {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important; /* border-slate-200 */
+  border-radius: 1.5rem !important; /* rounded-3xl */
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1) !important; /* shadow-xl */
+}
+
+/* 3. Headers and Titles */
+.cl-headerTitle {
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: -0.025em !important;
+  color: #0f172a !important; /* text-slate-900 */
+}
+
+.cl-headerSubtitle {
+  color: #64748b !important; /* text-slate-500 */
+  font-weight: 500 !important;
+}
+
+/* 4. Form Controls & Primary Action Button */
+.cl-formButtonPrimary {
+  background-color: #6b00ff !important; /* bg-kora */
+  text-transform: uppercase !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.1em !important;
+  border-radius: 0.75rem !important; /* rounded-xl */
+  padding-top: 0.875rem !important;
+  padding-bottom: 0.875rem !important;
+  transition: all 0.2s ease-in-out !important;
+  box-shadow: 0 4px 6px -1px rgba(107, 0, 255, 0.15), 0 2px 4px -2px rgba(107, 0, 255, 0.15) !important;
+}
+
+.cl-formButtonPrimary:hover {
+  background-color: #5800d4 !important;
+  transform: translateY(-1px) !important;
+}
+
+.cl-formFieldInput {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 0.75rem !important;
+  color: #0f172a !important;
+  padding: 0.75rem 1rem !important;
+}
+
+.cl-formFieldInput:focus {
+  border-color: #6b00ff !important;
+  box-shadow: 0 0 0 1px #6b00ff !important;
+}
+
+.cl-formFieldLabel {
+  color: #64748b !important; /* text-slate-500 */
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* 5. Divider Line */
+.cl-dividerText {
+  color: #94a3b8 !important; /* text-slate-400 */
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* 6. Social Sign-In Buttons */
+.cl-socialButtonsBlockButton {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 0.75rem !important;
+  color: #334155 !important; /* text-slate-700 */
+  font-weight: 700 !important;
+  transition: all 0.2s !important;
+  background-color: #ffffff !important;
+}
+
+.cl-socialButtonsBlockButton:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+.cl-socialButtonsBlockButtonText {
+  font-weight: 700 !important;
+}
+
+/* 7. Modal Popover Overrides for User Buttons */
+.cl-userButtonPopoverCard {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 1.25rem !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  overflow: hidden !important;
+}
+
+/* Hide branding under the main popover menu */
+.cl-userButtonPopoverFooter {
+  display: none !important;
+}

@@ -2,6 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
   try {
@@ -23,7 +24,8 @@ export async function POST(req: Request) {
       promoCode,
       discountAmount,
       shippingFee,
-      tax
+      tax,
+      coordinates
     } = body;
 
     if (!items || items.length === 0) {
@@ -131,19 +133,52 @@ export async function POST(req: Request) {
       return newOrder;
     });
 
-    // 4. Log confirmation receipt transmission (Dev mode mock email service)
-    console.log(`\n======================================================`);
-    console.log(`📬 [MOCK EMAIL TRANSMISSION] - Kora Order Confirmation`);
-    console.log(`======================================================`);
-    console.log(`To: ${clerkUser.emailAddresses[0].emailAddress}`);
-    console.log(`Subject: Your Gear is Secured! (Order #${order.referenceNumber})`);
-    console.log(`Shipping To: ${order.shippingName}`);
-    console.log(`Address: ${order.shippingStreet}, ${order.shippingCity}`);
-    console.log(`Payment Method: ${order.paymentMethod?.toUpperCase()}`);
-    console.log(`Subtotal Price: AED ${order.total.toString()}`);
-    console.log(`Unique Ref: ${order.referenceNumber}`);
-    console.log(`Status: ${order.status}`);
-    console.log(`======================================================\n`);
+    // 4. Trigger Email Notifications using Resend API
+    try {
+      const calculatedSubtotal = items.reduce((total: number, item: any) => {
+        const numericPrice = parseFloat(item.price.replace(/[^0-9.]/g, ""));
+        return total + (numericPrice * item.quantity);
+      }, 0);
+
+      const emailParams = {
+        customerName: `${shippingDetails.firstName} ${shippingDetails.lastName}`,
+        referenceNumber: order.referenceNumber || "",
+        items: items.map((item: any) => ({
+          name: item.name,
+          size: item.size,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        subtotal: `AED ${calculatedSubtotal.toFixed(2)}`,
+        shippingFee: `AED ${parseFloat(order.shippingFee.toString()).toFixed(2)}`,
+        discount: `AED ${parseFloat(order.discountAmount.toString()).toFixed(2)}`,
+        total: `AED ${parseFloat(order.total.toString()).toFixed(2)}`,
+        shippingAddress: `${shippingDetails.streetAddress}, ${shippingDetails.city}, UAE`,
+      };
+
+      // A. Send confirmation to customer (no coordinates map link)
+      await sendOrderConfirmationEmail({
+        ...emailParams,
+        toEmail: clerkUser.emailAddresses[0].emailAddress,
+      });
+
+      // B. Build map pinpoint link only for store admin notification
+      let adminShippingAddress = `${shippingDetails.streetAddress}, ${shippingDetails.city}, UAE`;
+      if (coordinates && typeof coordinates.lat === "number" && typeof coordinates.lng === "number") {
+        adminShippingAddress += `<br/><br/>📍 <strong>Google Maps Location Pinpoint</strong>:<br/><a href="https://www.google.com/maps?q=${coordinates.lat},${coordinates.lng}" style="color: #6b00ff; font-weight: bold; text-decoration: underline;">Open Google Maps Link</a><br/>(Coords: ${coordinates.lat.toFixed(6)}, ${coordinates.lng.toFixed(6)})`;
+      }
+
+      // C. Send notification alert to store admin (mahramh40@gmail.com)
+      await sendOrderConfirmationEmail({
+        ...emailParams,
+        shippingAddress: adminShippingAddress,
+        toEmail: "mahramh40@gmail.com",
+      });
+
+      console.log(`📬 [EMAIL SUCCESS] - Order emails sent to customer and admin for KORA-${order.referenceNumber}`);
+    } catch (emailErr) {
+      console.error("⚠️ Order confirmation emails failed to transmit:", emailErr);
+    }
 
     return NextResponse.json(order);
   } catch (error: any) {

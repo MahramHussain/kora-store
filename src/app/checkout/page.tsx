@@ -7,6 +7,7 @@ import { CURRENCY } from "@/lib/constants";
 import { useAuth, SignIn, SignUp } from "@clerk/nextjs";
 import { FaLock, FaCreditCard, FaPaypal, FaMoneyBillWave } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa"; 
+import MapPicker from "@/components/MapPicker";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -38,6 +39,7 @@ export default function CheckoutPage() {
   const [expiryDate, setExpiryDate] = useState("");
   const [cvc, setCvc] = useState("");
   const [cardName, setCardName] = useState("");
+  const [locationCoords, setLocationCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Strip all non-numbers, then add a space every 4 digits. Max 19 chars (16 digits + 3 spaces)
@@ -84,20 +86,21 @@ export default function CheckoutPage() {
   // Render Vault Sign-in Wall if not authenticated
   if (isLoaded && !isSignedIn) {
     return (
-      <main className="min-h-screen bg-[#05010F] text-slate-200 font-sans selection:bg-purple-500 selection:text-white pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <main className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-kora selection:text-white pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden">
+        {/* Background radial accent */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-kora/5 rounded-full blur-[120px] pointer-events-none"></div>
 
         <div className="max-w-md w-full relative z-10">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-black text-white tracking-tighter mb-2 uppercase font-sans">
-              SECURE <span className="text-purple-500">VAULT.</span>
+            <h1 className="text-4xl font-black text-slate-900 tracking-tighter mb-2 uppercase font-sans">
+              SECURE <span className="text-kora">VAULT.</span>
             </h1>
-            <p className="text-slate-400 font-medium">
+            <p className="text-slate-500 font-medium font-sans">
               {isLogin ? "Authenticate to secure your priority checkout." : "Register to join the ultimate football community."}
             </p>
           </div>
 
-          <div className="bg-[#0a0514] border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden flex justify-center min-h-[400px]">
+          <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl relative overflow-hidden flex justify-center min-h-[400px]">
             {isLogin ? (
               <SignIn fallbackRedirectUrl="/checkout" appearance={{
                 elements: {
@@ -105,14 +108,14 @@ export default function CheckoutPage() {
                   card: "bg-transparent shadow-none p-0 m-0",
                   header: "hidden", 
                   footer: "hidden", 
-                  formButtonPrimary: "bg-purple-600 hover:bg-purple-500 text-white font-black uppercase tracking-widest py-3 rounded-xl transition-all",
-                  formFieldInput: "bg-white/5 border border-white/10 text-white py-3 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500",
-                  formFieldLabel: "text-slate-400 font-bold",
-                  dividerText: "text-slate-500 font-bold uppercase tracking-wider",
-                  socialButtonsBlockButton: "border border-white/10 text-white hover:bg-white/5 py-3 rounded-xl font-bold transition-all",
+                  formButtonPrimary: "bg-kora hover:bg-purple-700 text-white font-black uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md shadow-kora/15",
+                  formFieldInput: "bg-white border border-slate-200 text-slate-900 py-3 rounded-xl focus:border-kora focus:ring-1 focus:ring-kora",
+                  formFieldLabel: "text-slate-500 font-bold",
+                  dividerText: "text-slate-400 font-bold uppercase tracking-wider",
+                  socialButtonsBlockButton: "border border-slate-200 text-slate-700 hover:bg-slate-50 py-3 rounded-xl font-bold transition-all shadow-sm",
                   socialButtonsBlockButtonText: "font-bold",
-                  identityPreviewText: "text-purple-400",
-                  identityPreviewEditButton: "text-slate-400 hover:text-white"
+                  identityPreviewText: "text-kora",
+                  identityPreviewEditButton: "text-slate-400 hover:text-slate-950"
                 }
               }} />
             ) : (
@@ -122,11 +125,11 @@ export default function CheckoutPage() {
                   card: "bg-transparent shadow-none p-0 m-0",
                   header: "hidden",
                   footer: "hidden",
-                  formButtonPrimary: "bg-purple-600 hover:bg-purple-500 text-white font-black uppercase tracking-widest py-3 rounded-xl transition-all",
-                  formFieldInput: "bg-white/5 border border-white/10 text-white py-3 rounded-xl focus:border-purple-500 focus:ring-1 focus:ring-purple-500",
-                  formFieldLabel: "text-slate-400 font-bold",
-                  dividerText: "text-slate-500 font-bold uppercase tracking-wider",
-                  socialButtonsBlockButton: "border border-white/10 text-white hover:bg-white/5 py-3 rounded-xl font-bold transition-all",
+                  formButtonPrimary: "bg-kora hover:bg-purple-700 text-white font-black uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md shadow-kora/15",
+                  formFieldInput: "bg-white border border-slate-200 text-slate-900 py-3 rounded-xl focus:border-kora focus:ring-1 focus:ring-kora",
+                  formFieldLabel: "text-slate-500 font-bold",
+                  dividerText: "text-slate-400 font-bold uppercase tracking-wider",
+                  socialButtonsBlockButton: "border border-slate-200 text-slate-700 hover:bg-slate-50 py-3 rounded-xl font-bold transition-all shadow-sm",
                   socialButtonsBlockButtonText: "font-bold",
                 }
               }} />
@@ -134,11 +137,11 @@ export default function CheckoutPage() {
           </div>
 
           <div className="text-center mt-8 relative z-10 font-sans">
-            <p className="text-slate-400">
+            <p className="text-slate-500 font-semibold">
               {isLogin ? "Need a Vault account?" : "Already secured your spot?"}
               <button 
                 onClick={() => setIsLogin(!isLogin)} 
-                className="ml-2 text-white font-bold hover:text-purple-400 transition-colors underline underline-offset-4"
+                className="ml-2 text-slate-800 font-bold hover:text-kora transition-colors underline underline-offset-4"
               >
                 {isLogin ? "Sign Up" : "Sign In"}
               </button>
@@ -184,7 +187,8 @@ export default function CheckoutPage() {
           promoCode: promoCode || null,
           discountAmount: discountAmount,
           shippingFee: shippingCharge,
-          tax: 0
+          tax: 0,
+          coordinates: locationCoords
         })
       });
 
@@ -402,6 +406,9 @@ export default function CheckoutPage() {
                       className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" 
                       placeholder="+971 50 000 0000" 
                     />
+                  </div>
+                  <div className="md:col-span-2">
+                    <MapPicker onLocationSelected={(lat, lng) => setLocationCoords({ lat, lng })} />
                   </div>
                 </div>
               </div>
