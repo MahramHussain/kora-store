@@ -2,6 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import { FaFilter, FaSearch } from "react-icons/fa";
 import { ProductCard } from "@/components/ProductCard";
+import Link from "next/link";
+import { CURRENCY } from "@/lib/constants";
 
 const CATEGORIES = ["All", "World Cup", "Shoes", "Shirts", "Retro Kits", "Accessories", "Flags"];
 const TEAMS = ["All Teams", "Argentina", "Brazil", "France", "Germany", "Portugal", "Spain", "Uruguay", "Arsenal", "Barcelona", "Real Madrid", "Man City", "PSG", "Manchester United"];
@@ -11,6 +13,7 @@ export default function ShopUI({ products }: { products: any[] }) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeTeam, setActiveTeam] = useState("All Teams");
   const [activeTag, setActiveTag] = useState("All");
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -115,11 +118,23 @@ export default function ShopUI({ products }: { products: any[] }) {
       <div className="max-w-7xl mx-auto">
         
 
+        {/* Toggle Button for mobile filters */}
+        <div className="w-full lg:hidden flex gap-3 mb-6">
+          <button 
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            className="flex-1 flex items-center justify-center gap-2 bg-slate-50 border border-slate-200 rounded-xl py-3 text-sm font-bold text-slate-800 active:bg-slate-100 transition-colors shadow-sm"
+          >
+            <FaFilter className="text-kora text-xs" /> {isFiltersOpen ? "Hide Filters & Search" : "Show Filters & Search"}
+          </button>
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Filters Sidebar (Confined scroll: scrolling here doesn't affect page) */}
           <aside 
             ref={sidebarRef}
-            className="w-full lg:w-64 xl:w-72 shrink-0 lg:sticky lg:top-28 z-20 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto scrollbar-hide overscroll-contain"
+            className={`w-full lg:w-64 xl:w-72 shrink-0 lg:sticky lg:top-28 z-20 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto scrollbar-hide overscroll-contain ${
+              isFiltersOpen ? "block" : "hidden lg:block"
+            }`}
           >
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
               
@@ -184,9 +199,74 @@ export default function ShopUI({ products }: { products: any[] }) {
             </div>
           </aside>
 
-          {/* Products Grid Pane */}
+          {/* Products Grid/List Pane */}
           <div className="flex-1 w-full">
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {/* Mobile View: Amazon-style List Layout */}
+            <div className="block sm:hidden space-y-4">
+              {displayProducts.map((product) => {
+                const images = product.images && product.images.length > 0
+                  ? product.images
+                  : product.image
+                    ? [product.image]
+                    : [];
+                const imageUrl = images[0] || "";
+                return (
+                  <Link 
+                    href={`/shop/${product.id}`} 
+                    key={product.id}
+                    className="flex gap-4 p-3 bg-white border border-slate-200 active:border-kora rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.99] overflow-hidden"
+                  >
+                    {/* Left: Product Image */}
+                    <div className="w-28 h-28 shrink-0 bg-slate-50 border border-slate-100 rounded-xl overflow-hidden flex items-center justify-center relative">
+                      {product.stock === 0 ? (
+                        <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest z-10 bg-rose-100 text-rose-800 border border-rose-200">
+                          Sold Out
+                        </div>
+                      ) : product.tag ? (
+                        <div className={`absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest z-10 ${
+                          product.tag === 'Latest' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'
+                        }`}>
+                          {product.tag}
+                        </div>
+                      ) : null}
+                      <img 
+                        src={imageUrl} 
+                        alt={product.name} 
+                        referrerPolicy="no-referrer"
+                        className={`w-full h-full object-cover ${product.stock === 0 ? 'opacity-40 grayscale' : 'opacity-100'}`} 
+                      />
+                    </div>
+
+                    {/* Right: Product Info */}
+                    <div className="flex-1 flex flex-col justify-between py-1 font-sans">
+                      <div>
+                        <p className="text-kora text-[9px] font-bold uppercase tracking-widest mb-1">{product.category}</p>
+                        <h3 className="text-sm font-bold text-slate-900 leading-tight line-clamp-2">{product.name}</h3>
+                      </div>
+                      
+                      <div className="flex items-end justify-between mt-2">
+                        <div>
+                          <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wide">Price</span>
+                          <span className="text-base font-black text-slate-900 leading-none">
+                            {CURRENCY}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
+                          </span>
+                        </div>
+                        <div className={`text-[10px] font-bold px-3 py-1.5 rounded-lg border ${
+                          product.stock === 0 
+                            ? "bg-slate-100 text-slate-400 border-slate-200" 
+                            : "bg-kora text-white border-kora shadow-sm"
+                        }`}>
+                          {product.stock === 0 ? "Sold Out" : "View"}
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Desktop View: Grid Layout */}
+            <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
               {displayProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

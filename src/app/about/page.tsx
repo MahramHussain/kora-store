@@ -3,14 +3,14 @@ import { FaMapMarkerAlt, FaStar, FaHandshake } from "react-icons/fa";
 
 export default function AboutPage() {
   return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-20 pb-20 px-6">
+    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-16 pb-16 px-4 sm:px-6 md:pt-20 md:pb-20">
       
       {/* Cinematic Hero Section */}
-      <section className="max-w-4xl mx-auto text-center mb-24 mt-12">
+      <section className="max-w-4xl mx-auto text-center mb-12 sm:mb-24 mt-8 sm:mt-12">
         <div className="inline-block mb-6 px-4 py-1.5 rounded-full border border-kora/30 bg-purple-50 text-kora text-xs font-semibold tracking-widest uppercase">
           The Founder's Story
         </div>
-        <h1 className="text-5xl md:text-7xl font-black mb-8 tracking-tighter leading-tight uppercase">
+        <h1 className="text-3xl sm:text-5xl md:text-7xl font-black mb-6 sm:mb-8 tracking-tighter leading-tight uppercase">
           THE GLOBAL <span className="text-transparent bg-clip-text bg-gradient-to-r from-kora to-purple-400">ARCHIVE.</span><br />
           UNLOCKED IN THE <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-500">UAE.</span>
         </h1>
@@ -20,10 +20,10 @@ export default function AboutPage() {
       </section>
 
       {/* The Manifesto / Values Grid */}
-      <section className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+      <section className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-24">
         
         {/* Value 1: Quality */}
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-10 hover:border-kora transition-colors group shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(107,0,255,0.3)]">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-10 hover:border-kora transition-colors group shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(107,0,255,0.3)]">
           <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6 text-kora text-2xl group-hover:scale-110 group-hover:bg-kora group-hover:text-white transition-all shadow-sm">
             <FaStar />
           </div>
@@ -34,7 +34,7 @@ export default function AboutPage() {
         </div>
 
         {/* Value 2: The Sourcing */}
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-10 hover:border-fuchsia-500 transition-colors group shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(217,70,239,0.3)]">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-10 hover:border-fuchsia-500 transition-colors group shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(217,70,239,0.3)]">
           <div className="w-14 h-14 bg-fuchsia-100 rounded-xl flex items-center justify-center mb-6 text-fuchsia-600 text-2xl group-hover:scale-110 group-hover:bg-fuchsia-500 group-hover:text-white transition-all shadow-sm">
             <FaHandshake />
           </div>
@@ -45,7 +45,7 @@ export default function AboutPage() {
         </div>
 
         {/* Value 3: Local Focus */}
-        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-10 hover:border-pink-500 transition-colors group shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(236,72,153,0.3)]">
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 sm:p-10 hover:border-pink-500 transition-colors group shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(236,72,153,0.3)]">
           <div className="w-14 h-14 bg-pink-100 rounded-xl flex items-center justify-center mb-6 text-pink-600 text-2xl group-hover:scale-110 group-hover:bg-pink-500 group-hover:text-white transition-all shadow-sm">
             <FaMapMarkerAlt />
           </div>

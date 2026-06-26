@@ -40,7 +40,7 @@ export default function FAQPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-20 pb-20 px-6">
+    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-16 pb-16 px-4 sm:px-6 md:pt-20 md:pb-20">
       
       {/* Header Section */}
       <section className="max-w-3xl mx-auto text-center mb-16 mt-12">
@@ -68,9 +68,9 @@ export default function FAQPage() {
                 {/* The Clickable Question Header */}
                 <button
                   onClick={() => toggleFAQ(index)}
-                  className="w-full flex justify-between items-center text-left p-6 focus:outline-none"
+                  className="w-full flex justify-between items-center text-left p-4 sm:p-6 focus:outline-none"
                 >
-                  <span className={`font-bold text-lg md:text-xl uppercase tracking-wider transition-colors ${isOpen ? "text-kora" : "text-slate-900"}`}>
+                  <span className={`font-bold text-sm sm:text-lg md:text-xl uppercase tracking-wider transition-colors ${isOpen ? "text-kora" : "text-slate-900"}`}>
                     {faq.question}
                   </span>
                   
@@ -86,7 +86,7 @@ export default function FAQPage() {
                     isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
                   }`}
                 >
-                  <div className="p-6 pt-0 text-slate-600 leading-relaxed">
+                  <div className="p-4 sm:p-6 pt-0 text-slate-600 leading-relaxed text-xs sm:text-sm">
                     {faq.answer}
                   </div>
                 </div>
@@ -97,7 +97,7 @@ export default function FAQPage() {
       </section>
 
       {/* Support Contact Box */}
-      <section className="max-w-3xl mx-auto mt-16 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-8 text-center shadow-sm">
+      <section className="max-w-3xl mx-auto mt-16 bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-2xl p-6 sm:p-8 text-center shadow-sm">
         <h3 className="text-xl font-bold uppercase tracking-wider text-slate-900 mb-2">Still have questions?</h3>
         <p className="text-slate-600 mb-6 font-sans">Hit up Adnan directly on WhatsApp for sizing help or special requests.</p>
         <button className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs tracking-widest uppercase py-3 px-8 rounded-full transition-colors shadow-md hover:shadow-emerald-500/30">

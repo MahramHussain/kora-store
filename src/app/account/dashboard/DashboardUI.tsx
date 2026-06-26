@@ -43,12 +43,12 @@ export default function DashboardUI({ user, orders }: { user: any, orders: any[]
   const totalSpent = orders.reduce((sum, order) => sum + parseFloat(order.total), 0).toFixed(2);
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-kora selection:text-white pt-24 pb-24 px-6">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8 lg:gap-12">
+    <main className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-kora selection:text-white pt-20 pb-16 px-4 sm:px-6 md:pt-24 md:pb-24">
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-6 md:gap-8 lg:gap-12">
         
         {/* --- LEFT SIDEBAR --- */}
         <div className="w-full md:w-72 shrink-0">
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 sticky top-32 shadow-md">
+          <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 sticky top-32 shadow-md">
             
             {/* User Profile Snippet */}
             <div className="flex items-center gap-4 mb-8 border-b border-slate-200 pb-6">
@@ -123,11 +123,11 @@ export default function DashboardUI({ user, orders }: { user: any, orders: any[]
               
               {/* Stat Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm">
                   <p className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-2">Total Vault Value</p>
                   <p className="text-4xl font-black text-slate-900">{CURRENCY}{totalSpent}</p>
                 </div>
-                <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm">
                   <p className="text-slate-400 text-sm font-bold uppercase tracking-wider mb-2">Secured Drops</p>
                   <p className="text-4xl font-black text-slate-900">{orders.length}</p>
                 </div>
@@ -136,7 +136,7 @@ export default function DashboardUI({ user, orders }: { user: any, orders: any[]
               {/* Latest Order Mini-View */}
               <h2 className="text-xl font-bold text-slate-900 mb-4">Latest Mission</h2>
               {orders.length > 0 ? (
-                <div className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col sm:flex-row items-center gap-6 shadow-sm group hover:border-kora/40 transition-colors">
+                <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 shadow-sm group hover:border-kora/40 transition-colors">
                   <div className="w-24 h-24 shrink-0 bg-slate-50 rounded-2xl p-3 flex items-center justify-center border border-slate-100">
                     <img 
                       src={orders[0].items[0]?.product?.images?.[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png"} 
@@ -179,10 +179,10 @@ export default function DashboardUI({ user, orders }: { user: any, orders: any[]
                     <div 
                       key={order.id} 
                       onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
-                      className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col hover:border-kora/40 transition-all duration-300 cursor-pointer shadow-sm group"
+                      className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 flex flex-col hover:border-kora/40 transition-all duration-300 cursor-pointer shadow-sm group"
                     >
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 w-full">
-                        <div className="flex items-center gap-6 self-start sm:self-center">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 w-full">
+                        <div className="flex items-center gap-4 sm:gap-6 self-start sm:self-center">
                           <div className="w-16 h-16 shrink-0 bg-slate-50 rounded-2xl p-2 flex items-center justify-center border border-slate-100">
                             <img 
                               src={order.items[0]?.product?.images?.[0] || order.items[0]?.image || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png"} 
@@ -198,7 +198,7 @@ export default function DashboardUI({ user, orders }: { user: any, orders: any[]
                             </p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
+                        <div className="flex items-center gap-4 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end">
                           <div className="text-left sm:text-right font-sans">
                             <p className="font-black text-slate-900 text-lg">{CURRENCY}{parseFloat(order.total).toFixed(2)}</p>
                             <p className={`text-xs font-bold uppercase tracking-wider ${order.status === 'Delivered' ? 'text-emerald-600' : 'text-kora'}`}>
@@ -296,7 +296,7 @@ export default function DashboardUI({ user, orders }: { user: any, orders: any[]
           {activeTab === "settings" && (
             <div className="animate-fade-in-up">
               <h1 className="text-3xl font-black text-slate-900 mb-8">Account Settings</h1>
-              <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm max-w-2xl">
+              <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-8 shadow-sm max-w-2xl">
                 <form onSubmit={handleSave} className="space-y-6">
                   <div>
                     <label className="block text-slate-500 text-sm font-bold mb-2">First Name</label>

@@ -80,7 +80,7 @@ export default function ProductUI({ product }: { product: any }) {
           
           {/* LEFT: Image Gallery */}
           <div className="flex-1 w-full flex flex-col gap-4">
-            <div className="w-full h-[400px] md:h-[600px] bg-slate-50 rounded-3xl border border-slate-200 flex items-center justify-center relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow p-4">
+            <div className="w-full h-[320px] sm:h-[450px] md:h-[600px] bg-slate-50 rounded-3xl border border-slate-200 flex items-center justify-center relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow p-4">
               <div className="absolute inset-0 bg-gradient-to-br from-kora/5 to-transparent z-0"></div>
               {product.images && product.images.length > 0 ? (
                 <img 

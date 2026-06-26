@@ -45,7 +45,7 @@ export function ProductCard({ product }: { product: Product }) {
       href={`/shop/${product.id}`} 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative bg-white rounded-2xl border border-slate-200 hover:border-kora transition-all duration-300 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(107,0,255,0.3)] hover:-translate-y-1 overflow-hidden flex flex-col h-[380px]"
+      className="group relative bg-white rounded-2xl border border-slate-200 hover:border-kora transition-all duration-300 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(107,0,255,0.3)] hover:-translate-y-1 overflow-hidden flex flex-col sm:h-[380px] h-[330px]"
     >
       <div className="relative flex-1 bg-slate-50 flex items-center justify-center overflow-hidden">
         {product.stock === 0 ? (
@@ -84,7 +84,7 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="p-5 border-t border-slate-100 relative z-20 bg-white">
+      <div className="p-4 sm:p-5 border-t border-slate-100 relative z-20 bg-white">
         <div className="flex justify-between items-start mb-4">
           <div>
             <p className="text-kora text-[10px] font-bold uppercase tracking-widest mb-2">{product.category}</p>
@@ -108,11 +108,11 @@ export function ProductCard({ product }: { product: Product }) {
 
 export function ProductSkeletonCard() {
   return (
-    <div className="group relative bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[380px] animate-pulse">
+    <div className="group relative bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col sm:h-[380px] h-[330px] animate-pulse">
       <div className="relative flex-1 bg-slate-50 flex items-center justify-center p-8">
         <div className="w-32 h-32 bg-slate-200 rounded-full blur-xl"></div>
       </div>
-      <div className="p-5 border-t border-slate-100 relative z-20 bg-white">
+      <div className="p-4 sm:p-5 border-t border-slate-100 relative z-20 bg-white">
         <div className="flex justify-between items-start mb-4">
           <div className="space-y-2 flex-1">
             <div className="h-3 bg-slate-200 rounded w-16"></div>

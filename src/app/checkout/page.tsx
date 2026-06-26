@@ -6,8 +6,17 @@ import { useCart } from "@/context/CartContext";
 import { CURRENCY } from "@/lib/constants";
 import { useAuth, SignIn, SignUp } from "@clerk/nextjs";
 import { FaLock, FaCreditCard, FaPaypal, FaMoneyBillWave } from "react-icons/fa6";
-import { FaShieldAlt } from "react-icons/fa"; 
-import MapPicker from "@/components/MapPicker";
+import { FaShieldAlt } from "react-icons/fa";
+import dynamic from "next/dynamic";
+
+const MapPicker = dynamic(() => import("@/components/MapPicker"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-48 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-center text-xs font-bold uppercase text-slate-400 tracking-wider">
+      Loading Delivery Map...
+    </div>
+  )
+});
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -147,13 +156,17 @@ export default function CheckoutPage() {
     if (!nameRegex.test(shippingFirstName.trim())) {
       setError("First Name can only contain letters, spaces, hyphens, or apostrophes.");
       setIsProcessing(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       return;
     }
     if (!nameRegex.test(shippingLastName.trim())) {
       setError("Last Name can only contain letters, spaces, hyphens, or apostrophes.");
       setIsProcessing(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       return;
     }
 
@@ -165,7 +178,9 @@ export default function CheckoutPage() {
     if (!uaePhoneRegex.test(cleanPhone) && !localUaePhoneRegex.test(cleanPhone)) {
       setError("Please enter a valid UAE phone number (e.g. +971 50 123 4567 or 050 123 4567).");
       setIsProcessing(false);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       return;
     }
 
@@ -201,7 +216,9 @@ export default function CheckoutPage() {
       
       if (orderData.redirectUrl) {
         // Redirection-based payment (Ziina checkout) - do not clear cart locally yet
-        window.location.href = orderData.redirectUrl;
+        if (typeof window !== "undefined") {
+          window.location.href = orderData.redirectUrl;
+        }
       } else {
         // Direct checkout (e.g. Cash on Delivery)
         clearCart();
@@ -213,12 +230,14 @@ export default function CheckoutPage() {
       setIsProcessing(false);
       
       // Smoothly scroll to the top of the form so the error banner is visible
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
   };
 
   return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-24 pb-24 px-6">
+    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-20 pb-16 px-4 sm:px-6 md:pt-24 md:pb-24">
       <div className="max-w-6xl mx-auto">
         
         {/* Header */}
@@ -237,7 +256,7 @@ export default function CheckoutPage() {
           </div>
         )}
 
-        <div className="flex flex-col-reverse lg:flex-row gap-12">
+        <div className="flex flex-col lg:flex-row gap-12">
           
           {/* --- LEFT SIDE: THE FORMS --- */}
           <div className="flex-1 space-y-10">

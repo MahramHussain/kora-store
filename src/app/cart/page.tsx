@@ -56,7 +56,7 @@ export default function CartPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-24 pb-24 px-6">
+    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-20 pb-16 px-4 sm:px-6 md:pt-24 md:pb-24">
       <div className="max-w-6xl mx-auto">
         
         <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-10 uppercase font-sans">
@@ -79,25 +79,25 @@ export default function CartPage() {
             {/* Left: Cart Items List */}
             <div className="flex-1 space-y-6">
               {cart.map((item, index) => (
-                <div key={`${item.id}-${item.size}-${index}`} className="flex gap-6 bg-slate-50 border border-slate-200 rounded-2xl p-4 relative group shadow-sm hover:shadow-md transition-shadow">
+                <div key={`${item.id}-${item.size}-${index}`} className="flex gap-4 sm:gap-6 bg-slate-50 border border-slate-200 rounded-2xl p-3 sm:p-4 relative group shadow-sm hover:shadow-md transition-shadow">
                   {/* Image */}
-                  <div className="w-24 h-24 shrink-0 bg-white border border-slate-100 rounded-xl p-2 flex items-center justify-center shadow-sm">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 bg-white border border-slate-100 rounded-xl p-2 flex items-center justify-center shadow-sm">
                     <img src={item.image} alt={item.name} className="w-full h-full object-contain drop-shadow-md" />
                   </div>
                   
                   {/* Details */}
-                  <div className="flex-1 flex flex-col justify-center py-2 font-sans">
-                    <h3 className="font-bold text-slate-900 text-lg leading-tight">{item.name}</h3>
-                    <p className="text-sm text-slate-500 mt-1">
+                  <div className="flex-1 flex flex-col justify-center py-1 sm:py-2 font-sans pr-6">
+                    <h3 className="font-bold text-slate-900 text-sm sm:text-lg leading-tight line-clamp-2">{item.name}</h3>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
                       Size: <span className="font-bold text-slate-900">{item.size}</span>
                       {(item.customName || item.customNumber) && (
                         <>
-                          <span className="mx-2 text-slate-300">•</span>
+                          <span className="mx-1 sm:mx-2 text-slate-300">•</span>
                           Print: <span className="font-bold text-kora">{item.customName || "—"} {item.customNumber ? `#${item.customNumber}` : ""}</span>
                         </>
                       )}
                     </p>
-                    <p className="font-bold text-kora mt-1">{item.price}</p>
+                    <p className="text-sm sm:text-base font-bold text-kora mt-1">{item.price}</p>
                     
                     {/* CART QUANTITY ADJUSTER */}
                     <div className="flex items-center gap-3 mt-3 bg-white w-max rounded-full p-1 border border-slate-200 shadow-sm">
@@ -120,7 +120,7 @@ export default function CartPage() {
                   {/* Remove Button */}
                   <button 
                     onClick={() => removeFromCart(item.id, item.size, item.image, item.customName, item.customNumber)}
-                    className="absolute top-4 right-4 text-slate-400 hover:text-rose-600 transition-colors p-2"
+                    className="absolute top-2 right-2 sm:top-4 sm:right-4 text-slate-400 hover:text-rose-600 transition-colors p-2"
                   >
                     <FaTrash />
                   </button>
@@ -130,7 +130,7 @@ export default function CartPage() {
 
             {/* Right: Checkout Summary */}
             <div className="w-full lg:w-[400px] shrink-0">
-              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-8 sticky top-32 transition-all duration-500 shadow-sm">
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-5 sm:p-8 sticky top-32 transition-all duration-500 shadow-sm">
                 <h3 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4 uppercase font-sans">Order Summary</h3>
                 
                 <div className="space-y-4 mb-6 text-slate-600 font-sans">

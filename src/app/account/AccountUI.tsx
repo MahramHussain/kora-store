@@ -15,20 +15,20 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
   // ==========================================
   if (user) {
     return (
-      <main className="max-w-6xl mx-auto px-6 py-16 min-h-[70vh] animate-fade-in-up">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-16 min-h-[70vh] animate-fade-in-up">
         {/* Dashboard Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 border-b border-slate-200 pb-8">
-          <div className="flex items-center gap-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 mb-8 md:mb-12 border-b border-slate-200 pb-6 md:pb-8">
+          <div className="flex items-center gap-4 sm:gap-6">
             <img 
               src={user.imageUrl} 
               alt="Profile" 
-              className="w-20 h-20 rounded-full border-2 border-kora shadow-md shadow-kora/15"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-kora shadow-md shadow-kora/15"
             />
             <div>
-              <h1 className="text-4xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
                 Welcome back, <span className="text-kora">{user.firstName || 'Member'}</span>
               </h1>
-              <p className="text-slate-500 font-medium">
+              <p className="text-sm sm:text-base text-slate-500 font-medium">
                 {user.email}
               </p>
             </div>
@@ -43,8 +43,8 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           
           {/* Order History Card */}
-          <div className="md:col-span-2 bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Order History</h2>
+          <div className="md:col-span-2 bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Order History</h2>
             
             {orders.length > 0 ? (
               <div className="space-y-4">
@@ -54,7 +54,7 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
                     <div 
                       key={order.id} 
                       onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
-                      className="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col hover:border-kora/50 transition-all duration-300 cursor-pointer group"
+                      className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-6 flex flex-col hover:border-kora/50 transition-all duration-300 cursor-pointer group"
                     >
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
@@ -182,7 +182,7 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
           </div>
 
           {/* Account Settings Card */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm h-max">
+          <div className="bg-white border border-slate-200 rounded-3xl p-4 sm:p-6 md:p-8 shadow-sm h-max">
             <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-100 pb-4">Vault Settings</h2>
             <div className="space-y-4 text-sm font-medium">
               <button className="w-full text-left flex items-center justify-between text-slate-600 hover:text-kora transition-colors group">
@@ -220,7 +220,7 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
   // STATE 2: LOGGED OUT (SHOW CUSTOM LOGIN UI - LIGHT THEME OVERHAUL)
   // ==========================================
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-kora selection:text-white pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden">
+    <main className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-kora selection:text-white pt-24 pb-16 px-4 sm:px-6 md:pt-32 md:pb-24 flex items-center justify-center relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-kora/5 rounded-full blur-[120px] pointer-events-none"></div>
 
       <div className="max-w-md w-full relative z-10">
@@ -233,7 +233,7 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
           </p>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl relative overflow-hidden flex justify-center min-h-[400px]">
+        <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-8 shadow-xl relative overflow-hidden flex justify-center min-h-[400px]">
           {isLogin ? (
             <SignIn fallbackRedirectUrl="/account" appearance={{
               elements: {
