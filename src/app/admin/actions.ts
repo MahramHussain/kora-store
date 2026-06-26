@@ -8,7 +8,7 @@ import { resolveImageFilename } from "@/lib/resolveImage";
 async function ensureAdmin() {
   const user = await currentUser();
   const email = user?.emailAddresses[0]?.emailAddress;
-  if (!email || email !== "mahramh40@gmail.com") {
+  if (!email || (email !== "mahramh40@gmail.com" && email !== "korastore.ae@gmail.com")) {
     throw new Error("Access Denied: Unauthorized");
   }
 }

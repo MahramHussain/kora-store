@@ -5,21 +5,100 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FaCopy, FaBoxOpen, FaArrowRight } from "react-icons/fa6";
 import { FaCheckCircle } from "react-icons/fa"; 
+import { useCart } from "@/context/CartContext";
+import { CURRENCY } from "@/lib/constants";
 
 function SuccessContent() {
   const [copied, setCopied] = useState(false);
   const searchParams = useSearchParams();
+  const { clearCart } = useCart();
   
-  // Extract reference number from URL parameters
+  // Extract reference number and payment intent from URL parameters
   const rawRef = searchParams.get("ref");
   const referenceNumber = rawRef ? `#${rawRef.toUpperCase()}` : "#VAULT-8829";
   const trackingNumber = rawRef ? `KORA-TRK-${rawRef.split('-')[1] || '9827345'}` : "KORA-TRK-9827345";
+  const paymentIntentId = searchParams.get("payment_intent_id");
+
+  const [loading, setLoading] = useState(!!paymentIntentId);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!paymentIntentId || !rawRef) return;
+
+    const verifyPayment = async () => {
+      try {
+        const res = await fetch("/api/checkout/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            referenceNumber: rawRef,
+            paymentIntentId
+          })
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(errText || "Verification failed");
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          clearCart();
+        } else {
+          throw new Error(data.error || "Payment was not completed");
+        }
+      } catch (err: any) {
+        console.error("Payment verification error:", err);
+        setError(err.message || "Something went wrong verifying your transaction.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    verifyPayment();
+  }, [paymentIntentId, rawRef, clearCart]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(trackingNumber);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-slate-50 text-slate-900 font-sans pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-kora/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
+        <div className="max-w-md w-full text-center relative z-10">
+          <div className="w-16 h-16 border-4 border-kora border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+          <h1 className="text-2xl font-black uppercase text-slate-900 mb-2">Verifying Payment</h1>
+          <p className="text-slate-500 font-semibold text-sm">We are confirming your transaction with Ziina. Please do not close or refresh this tab.</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (error) {
+    return (
+      <main className="min-h-screen bg-slate-50 text-slate-900 font-sans pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-rose-500/5 rounded-full blur-[120px] pointer-events-none z-0"></div>
+        <div className="max-w-md w-full text-center relative z-10 bg-white border border-slate-200 rounded-3xl p-8 shadow-xl">
+          <div className="w-16 h-16 bg-rose-50 border border-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-rose-500 text-3xl font-black">!</span>
+          </div>
+          <h1 className="text-2xl font-black uppercase text-slate-900 mb-2">Payment Failed</h1>
+          <p className="text-slate-500 font-semibold text-sm mb-6">{error}</p>
+          <div className="flex flex-col gap-3">
+            <Link href="/checkout" className="bg-kora hover:bg-purple-700 text-white font-black uppercase tracking-widest py-3.5 px-6 rounded-full text-xs transition-all shadow-md hover:scale-[1.02] flex items-center justify-center">
+              Retry Checkout
+            </Link>
+            <Link href="/faq" className="text-slate-500 hover:text-slate-950 text-xs font-bold underline underline-offset-4">
+              Get Help & Support
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-kora selection:text-white pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden">
@@ -39,7 +118,7 @@ function SuccessContent() {
         <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter mb-4 uppercase">
           Order <span className="text-kora">Secured.</span>
         </h1>
-        <p className="text-slate-500 font-medium mb-10 max-w-lg font-sans">
+        <p className="text-slate-500 font-semibold mb-10 max-w-lg font-sans">
           Your gear is officially locked in. We are prepping your items for priority shipping to the UAE.
         </p>
  

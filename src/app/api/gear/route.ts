@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     // 1. Verify user is the admin
     const user = await currentUser();
     const email = user?.emailAddresses[0]?.emailAddress;
-    if (!email || email !== "mahramh40@gmail.com") {
+    if (!email || (email !== "mahramh40@gmail.com" && email !== "korastore.ae@gmail.com")) {
       return NextResponse.json({ success: false, error: "Forbidden: Unauthorized access" }, { status: 403 });
     }
 

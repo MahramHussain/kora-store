@@ -7,6 +7,8 @@ interface EmailItem {
   size: string;
   quantity: number;
   price: string;
+  customName?: string;
+  customNumber?: string;
 }
 
 interface SendOrderEmailParams {
@@ -33,7 +35,11 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
       <tr>
         <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 14px;">
           <strong>${item.name}</strong><br/>
-          <span style="color: #64748b; font-size: 12px;">Size: ${item.size}</span>
+          <span style="color: #64748b; font-size: 12px;">Size: ${item.size}</span>${
+            item.customName || item.customNumber
+              ? `<br/><span style="color: #6b00ff; font-weight: bold; font-size: 12px;">Print: ${item.customName || "—"} ${item.customNumber ? `#${item.customNumber}` : ""}</span>`
+              : ""
+          }
         </td>
         <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; color: #0f172a; font-size: 14px;">
           ${item.quantity}
@@ -46,7 +52,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
     )
     .join("");
 
-  const isAdmin = params.toEmail === "mahramh40@gmail.com";
+  const isAdmin = params.toEmail === "mahramh40@gmail.com" || params.toEmail === "korastore.ae@gmail.com";
 
   const emailHtml = `
     <div style="font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; padding: 32px 16px; color: #334155; line-height: 1.5;">

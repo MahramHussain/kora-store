@@ -88,20 +88,28 @@ export default function CartPage() {
                   {/* Details */}
                   <div className="flex-1 flex flex-col justify-center py-2 font-sans">
                     <h3 className="font-bold text-slate-900 text-lg leading-tight">{item.name}</h3>
-                    <p className="text-sm text-slate-500 mt-1">Size: <span className="font-bold text-slate-900">{item.size}</span></p>
+                    <p className="text-sm text-slate-500 mt-1">
+                      Size: <span className="font-bold text-slate-900">{item.size}</span>
+                      {(item.customName || item.customNumber) && (
+                        <>
+                          <span className="mx-2 text-slate-300">•</span>
+                          Print: <span className="font-bold text-kora">{item.customName || "—"} {item.customNumber ? `#${item.customNumber}` : ""}</span>
+                        </>
+                      )}
+                    </p>
                     <p className="font-bold text-kora mt-1">{item.price}</p>
                     
                     {/* CART QUANTITY ADJUSTER */}
                     <div className="flex items-center gap-3 mt-3 bg-white w-max rounded-full p-1 border border-slate-200 shadow-sm">
                       <button 
-                        onClick={() => updateQuantity(item.id, item.size, item.image, item.quantity - 1)} 
+                        onClick={() => updateQuantity(item.id, item.size, item.image, item.customName, item.customNumber, item.quantity - 1)} 
                         className="w-7 h-7 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
                         −
                       </button>
                       <span className="font-bold text-slate-900 text-sm w-4 text-center">{item.quantity}</span>
                       <button 
-                        onClick={() => updateQuantity(item.id, item.size, item.image, item.quantity + 1)} 
+                        onClick={() => updateQuantity(item.id, item.size, item.image, item.customName, item.customNumber, item.quantity + 1)} 
                         className="w-7 h-7 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
                         +
@@ -111,7 +119,7 @@ export default function CartPage() {
 
                   {/* Remove Button */}
                   <button 
-                    onClick={() => removeFromCart(item.id, item.size, item.image)}
+                    onClick={() => removeFromCart(item.id, item.size, item.image, item.customName, item.customNumber)}
                     className="absolute top-4 right-4 text-slate-400 hover:text-rose-600 transition-colors p-2"
                   >
                     <FaTrash />

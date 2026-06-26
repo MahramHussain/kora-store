@@ -34,34 +34,7 @@ export default function CheckoutPage() {
   const [discountPercent, setDiscountPercent] = useState(0);
   const [promoMessage, setPromoMessage] = useState("");
 
-  // --- PREMIUM CARD FORMATTING STATE ---
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvc, setCvc] = useState("");
-  const [cardName, setCardName] = useState("");
   const [locationCoords, setLocationCoords] = useState<{ lat: number; lng: number } | null>(null);
-
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Strip all non-numbers, then add a space every 4 digits. Max 19 chars (16 digits + 3 spaces)
-    const rawText = e.target.value.replace(/\D/g, "");
-    const formatted = rawText.match(/.{1,4}/g)?.join(" ") || rawText;
-    setCardNumber(formatted.substring(0, 19));
-  };
-
-  const handleExpiryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Strip all non-numbers. Automatically insert the slash after the second digit. Max 5 chars.
-    const rawText = e.target.value.replace(/\D/g, "");
-    if (rawText.length >= 3) {
-      setExpiryDate(`${rawText.substring(0, 2)}/${rawText.substring(2, 4)}`);
-    } else {
-      setExpiryDate(rawText);
-    }
-  };
-
-  const handleCvcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Strip all non-numbers. Standard CVCs are 3 digits, Amex is 4. Max 4 chars.
-    setCvc(e.target.value.replace(/\D/g, "").substring(0, 4));
-  };
 
   // --- MATH & LOGIC ---
   const subtotal = cart.reduce((total, item) => {
@@ -169,6 +142,33 @@ export default function CheckoutPage() {
     setIsProcessing(true);
     setError("");
 
+    // 1. Validate First Name and Last Name (Only letters, spaces, hyphens, and apostrophes)
+    const nameRegex = /^[a-zA-Z\s'-]+$/;
+    if (!nameRegex.test(shippingFirstName.trim())) {
+      setError("First Name can only contain letters, spaces, hyphens, or apostrophes.");
+      setIsProcessing(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    if (!nameRegex.test(shippingLastName.trim())) {
+      setError("Last Name can only contain letters, spaces, hyphens, or apostrophes.");
+      setIsProcessing(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    // 2. Validate UAE Phone Number
+    const cleanPhone = shippingPhone.replace(/[^\d+]/g, "");
+    const uaePhoneRegex = /^(?:\+971|00971|971)?(?:5[024568]\d{7}|[234679]\d{7})$/;
+    const localUaePhoneRegex = /^0(?:5[024568]\d{7}|[234679]\d{7})$/;
+
+    if (!uaePhoneRegex.test(cleanPhone) && !localUaePhoneRegex.test(cleanPhone)) {
+      setError("Please enter a valid UAE phone number (e.g. +971 50 123 4567 or 050 123 4567).");
+      setIsProcessing(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
     try {
       const response = await fetch("/api/checkout", {
         method: "POST",
@@ -177,11 +177,11 @@ export default function CheckoutPage() {
           items: cart,
           cartTotal: finalTotal,
           shippingDetails: {
-            firstName: shippingFirstName,
-            lastName: shippingLastName,
-            streetAddress: shippingStreetAddress,
+            firstName: shippingFirstName.trim(),
+            lastName: shippingLastName.trim(),
+            streetAddress: shippingStreetAddress.trim(),
             city: shippingCity,
-            phone: shippingPhone
+            phone: cleanPhone
           },
           paymentMethod: paymentMethod,
           promoCode: promoCode || null,
@@ -199,11 +199,14 @@ export default function CheckoutPage() {
 
       const orderData = await response.json();
       
-      // Wipe the local cart state
-      clearCart();
-
-      // Redirect to success page with dynamic ref code
-      router.push(`/success?ref=${orderData.referenceNumber}`);
+      if (orderData.redirectUrl) {
+        // Redirection-based payment (Ziina checkout) - do not clear cart locally yet
+        window.location.href = orderData.redirectUrl;
+      } else {
+        // Direct checkout (e.g. Cash on Delivery)
+        clearCart();
+        router.push(`/success?ref=${orderData.referenceNumber}`);
+      }
     } catch (err: any) {
       console.error("[CHECKOUT_SUBMIT_ERROR]", err);
       setError(err.message || "An unexpected error occurred. Please try again.");
@@ -273,56 +276,23 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
-                {/* Conditional Payment UI */}
                 {paymentMethod === "card" && (
-                  <div className="space-y-4 relative animate-fade-in-up">
-                    <div className="absolute -top-3 right-0 flex items-center gap-1 text-[10px] text-emerald-400 uppercase font-bold tracking-widest bg-emerald-500/10 px-2 py-1 rounded-full z-10">
-                      <FaShieldAlt /> 256-Bit Encrypted
+                  <div className="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm space-y-4 animate-fade-in-up">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-kora">
+                        <FaShieldAlt className="text-xl" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-slate-900 uppercase text-xs tracking-wider">Secured via Ziina</h3>
+                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Encrypted Gateway</p>
+                      </div>
                     </div>
-                    <div className="relative">
-                      <FaCreditCard className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
-                      <input 
-                        type="text" 
-                        inputMode="numeric"
-                        pattern="[0-9\s]{13,19}"
-                        maxLength={19}
-                        required 
-                        placeholder="0000 0000 0000 0000" 
-                        value={cardNumber}
-                        onChange={handleCardNumberChange}
-                        className="w-full bg-white border border-slate-200 rounded-xl py-3 pl-12 pr-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors font-mono tracking-wider shadow-sm" 
-                      />
+                    <p className="text-slate-600 text-sm leading-relaxed font-medium">
+                      You will be securely redirected to **Ziina** (authorized by the Central Bank of the UAE) to complete your card, Apple Pay, or Google Pay transaction.
+                    </p>
+                    <div className="flex items-center gap-2 pt-2 border-t border-slate-100 justify-center">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Visa / Mastercard / Apple Pay / Google Pay</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <input 
-                        type="text" 
-                        inputMode="numeric"
-                        maxLength={5}
-                        required 
-                        placeholder="MM/YY" 
-                        value={expiryDate}
-                        onChange={handleExpiryChange}
-                        className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors font-mono tracking-wider shadow-sm" 
-                      />
-                      <input 
-                        type="text" 
-                        inputMode="numeric"
-                        maxLength={4}
-                        required 
-                        placeholder="CVC" 
-                        value={cvc}
-                        onChange={handleCvcChange}
-                        className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors font-mono tracking-wider shadow-sm" 
-                      />
-                    </div>
-                    <input 
-                      type="text" 
-                      required 
-                      placeholder="Name on Card" 
-                      value={cardName}
-                      onChange={(e) => setCardName(e.target.value)}
-                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" 
-                    />
                   </div>
                 )}
 

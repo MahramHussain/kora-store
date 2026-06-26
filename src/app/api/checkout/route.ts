@@ -36,6 +36,21 @@ export async function POST(req: Request) {
       return new NextResponse("Missing shipping details", { status: 400 });
     }
 
+    // A. Validate First and Last Name (Only letters, spaces, hyphens, and apostrophes)
+    const nameRegex = /^[a-zA-Z\s'-]+$/;
+    if (!nameRegex.test(shippingDetails.firstName.trim()) || !nameRegex.test(shippingDetails.lastName.trim())) {
+      return new NextResponse("Names can only contain letters, spaces, hyphens, or apostrophes.", { status: 400 });
+    }
+
+    // B. Validate UAE Phone Number
+    const cleanPhone = shippingDetails.phone.replace(/[^\d+]/g, "");
+    const uaePhoneRegex = /^(?:\+971|00971|971)?(?:5[024568]\d{7}|[234679]\d{7})$/;
+    const localUaePhoneRegex = /^0(?:5[024568]\d{7}|[234679]\d{7})$/;
+
+    if (!uaePhoneRegex.test(cleanPhone) && !localUaePhoneRegex.test(cleanPhone)) {
+      return new NextResponse("Please enter a valid UAE phone number.", { status: 400 });
+    }
+
     // Ensure Clerk user is registered locally in DB
     await prisma.user.upsert({
       where: { id: userId },
@@ -102,11 +117,11 @@ export async function POST(req: Request) {
         data: {
           userId: userId,
           total: new Prisma.Decimal(cartTotal),
-          status: "Processing",
+          status: paymentMethod === "card" ? "Pending" : "Processing",
           shippingStreet: shippingDetails.streetAddress,
           shippingCity: shippingDetails.city,
-          shippingPhone: shippingDetails.phone,
-          shippingName: `${shippingDetails.firstName} ${shippingDetails.lastName}`,
+          shippingPhone: cleanPhone,
+          shippingName: `${shippingDetails.firstName.trim()} ${shippingDetails.lastName.trim()}`,
           paymentMethod: paymentMethod,
           promoCode: promoCode || null,
           discountAmount: new Prisma.Decimal(discountAmount || 0),
@@ -120,20 +135,70 @@ export async function POST(req: Request) {
               image: item.image || "",
               quantity: item.quantity,
               price: new Prisma.Decimal(parseFloat(item.price.replace('$', ''))),
+              customName: item.customName || "",
+              customNumber: item.customNumber || "",
             })),
           },
         },
       });
 
-      // E. Clear Database Synced Cart Items
-      await tx.cartItem.deleteMany({
-        where: { userId }
-      });
+      // E. Clear Database Synced Cart Items (Only if NOT card payment!)
+      if (paymentMethod !== "card") {
+        await tx.cartItem.deleteMany({
+          where: { userId }
+        });
+      }
 
       return newOrder;
     });
 
-    // 4. Trigger Email Notifications using Resend API
+    // 4. Handle Redirection-based Payments (Card/Ziina)
+    if (paymentMethod === "card") {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+      const isMock = !process.env.ZIINA_API_KEY || process.env.ZIINA_API_KEY.includes("your_");
+
+      if (isMock) {
+        const mockPaymentIntentId = "mock_pi_" + Math.random().toString(36).slice(2, 11);
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { paymentIntentId: mockPaymentIntentId }
+        });
+        const redirectUrl = `${baseUrl}/success?ref=${order.referenceNumber}&payment_intent_id=${mockPaymentIntentId}`;
+        return NextResponse.json({ redirectUrl });
+      } else {
+        const filsAmount = Math.round(parseFloat(cartTotal) * 100);
+        const response = await fetch("https://api-v2.ziina.com/api/payment_intent", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${process.env.ZIINA_API_KEY}`,
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+          },
+          body: JSON.stringify({
+            amount: filsAmount,
+            currency_code: "AED",
+            success_url: `${baseUrl}/success?ref=${order.referenceNumber}&payment_intent_id={PAYMENT_INTENT_ID}`,
+            cancel_url: `${baseUrl}/checkout`,
+            failure_url: `${baseUrl}/checkout?error=payment_failed`
+          })
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          throw new Error(`Ziina API error: ${errText}`);
+        }
+
+        const data = await response.json();
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { paymentIntentId: data.id }
+        });
+
+        return NextResponse.json({ redirectUrl: data.redirect_url });
+      }
+    }
+
+    // 5. Trigger Immediate Email Notifications for direct COD orders
     try {
       const calculatedSubtotal = items.reduce((total: number, item: any) => {
         const numericPrice = parseFloat(item.price.replace(/[^0-9.]/g, ""));
@@ -148,6 +213,8 @@ export async function POST(req: Request) {
           size: item.size,
           quantity: item.quantity,
           price: item.price,
+          customName: item.customName || "",
+          customNumber: item.customNumber || "",
         })),
         subtotal: `AED ${calculatedSubtotal.toFixed(2)}`,
         shippingFee: `AED ${parseFloat(order.shippingFee.toString()).toFixed(2)}`,
@@ -156,7 +223,7 @@ export async function POST(req: Request) {
         shippingAddress: `${shippingDetails.streetAddress}, ${shippingDetails.city}, UAE`,
       };
 
-      // A. Send confirmation to customer (no coordinates map link)
+      // A. Send confirmation to customer
       await sendOrderConfirmationEmail({
         ...emailParams,
         toEmail: clerkUser.emailAddresses[0].emailAddress,
@@ -168,14 +235,14 @@ export async function POST(req: Request) {
         adminShippingAddress += `<br/><br/>📍 <strong>Google Maps Location Pinpoint</strong>:<br/><a href="https://www.google.com/maps?q=${coordinates.lat},${coordinates.lng}" style="color: #6b00ff; font-weight: bold; text-decoration: underline;">Open Google Maps Link</a><br/>(Coords: ${coordinates.lat.toFixed(6)}, ${coordinates.lng.toFixed(6)})`;
       }
 
-      // C. Send notification alert to store admin (mahramh40@gmail.com)
+      // C. Send notification alert to store admin
       await sendOrderConfirmationEmail({
         ...emailParams,
         shippingAddress: adminShippingAddress,
-        toEmail: "mahramh40@gmail.com",
+        toEmail: "korastore.ae@gmail.com",
       });
 
-      console.log(`📬 [EMAIL SUCCESS] - Order emails sent to customer and admin for KORA-${order.referenceNumber}`);
+      console.log(`📬 [EMAIL SUCCESS] - Direct COD Order emails sent to customer and admin for KORA-${order.referenceNumber}`);
     } catch (emailErr) {
       console.error("⚠️ Order confirmation emails failed to transmit:", emailErr);
     }

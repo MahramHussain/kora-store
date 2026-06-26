@@ -12,6 +12,7 @@ export default function DashboardUI({ user, orders }: { user: any, orders: any[]
   const { signOut } = useClerk();
   const { user: clerkUser } = useUser();
   const [activeTab, setActiveTab] = useState<"overview" | "orders" | "settings">("overview");
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
 
   // Local state for profile update
   const [nameInput, setNameInput] = useState(user.name);
@@ -92,7 +93,7 @@ export default function DashboardUI({ user, orders }: { user: any, orders: any[]
               </button>
 
               {/* Admin command center quick link */}
-              {user.email === "mahramh40@gmail.com" && (
+              {(user.email === "mahramh40@gmail.com" || user.email === "korastore.ae@gmail.com") && (
                 <Link 
                   href="/admin"
                   className="flex items-center gap-4 w-full px-4 py-3 rounded-xl font-bold text-kora hover:bg-kora/10 hover:text-purple-700 transition-all border border-kora/20 mt-2"
@@ -172,35 +173,119 @@ export default function DashboardUI({ user, orders }: { user: any, orders: any[]
             <div className="animate-fade-in-up">
               <h1 className="text-3xl font-black text-slate-900 mb-8">Order History</h1>
               <div className="space-y-4">
-                {orders.length > 0 ? orders.map((order, i) => (
-                  <div key={i} className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-6 hover:border-kora/40 transition-colors shadow-sm">
-                    <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 shrink-0 bg-slate-50 rounded-2xl p-2 flex items-center justify-center border border-slate-100">
-                        <img 
-                          src={order.items[0]?.product?.images?.[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png"} 
-                          alt="Thumbnail" 
-                          referrerPolicy="no-referrer"
-                          className="w-full h-full object-contain" 
-                        />
+                {orders.length > 0 ? orders.map((order, i) => {
+                  const isExpanded = expandedOrderId === order.id;
+                  return (
+                    <div 
+                      key={order.id} 
+                      onClick={() => setExpandedOrderId(isExpanded ? null : order.id)}
+                      className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col hover:border-kora/40 transition-all duration-300 cursor-pointer shadow-sm group"
+                    >
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 w-full">
+                        <div className="flex items-center gap-6 self-start sm:self-center">
+                          <div className="w-16 h-16 shrink-0 bg-slate-50 rounded-2xl p-2 flex items-center justify-center border border-slate-100">
+                            <img 
+                              src={order.items[0]?.product?.images?.[0] || order.items[0]?.image || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png"} 
+                              alt="Thumbnail" 
+                              referrerPolicy="no-referrer"
+                              className="w-full h-full object-contain" 
+                            />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-slate-900">#VAULT-{order.referenceNumber || order.id.slice(-6).toUpperCase()}</h3>
+                            <p className="text-slate-500 text-sm">
+                              {new Date(order.createdAt).toLocaleDateString()} • {order.items.reduce((acc: number, item: any) => acc + item.quantity, 0)} Items
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
+                          <div className="text-left sm:text-right font-sans">
+                            <p className="font-black text-slate-900 text-lg">{CURRENCY}{parseFloat(order.total).toFixed(2)}</p>
+                            <p className={`text-xs font-bold uppercase tracking-wider ${order.status === 'Delivered' ? 'text-emerald-600' : 'text-kora'}`}>
+                              {order.status}
+                            </p>
+                          </div>
+                          <span className="text-kora hover:text-purple-700 text-sm font-bold underline underline-offset-4">
+                            {isExpanded ? "Collapse" : "Details"}
+                          </span>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-bold text-slate-900">#VAULT-{order.id.slice(-6).toUpperCase()}</h3>
-                        <p className="text-slate-500 text-sm">
-                          {new Date(order.createdAt).toLocaleDateString()} • {order.items.reduce((acc: number, item: any) => acc + item.quantity, 0)} Items
-                        </p>
-                      </div>
+
+                      {/* Expandable Order Details */}
+                      {isExpanded && (
+                        <div className="mt-6 pt-6 border-t border-slate-200 text-sm font-sans animate-fade-in-up w-full text-left" onClick={(e) => e.stopPropagation()}>
+                          
+                          {/* Order Items List */}
+                          <div className="mb-6 pb-6 border-b border-slate-200">
+                            <h4 className="text-kora text-xs font-bold uppercase tracking-wider mb-3">Secured Items</h4>
+                            <div className="space-y-3">
+                              {order.items.map((item: any, idx: number) => (
+                                <div key={idx} className="flex justify-between items-center gap-4 bg-slate-50 border border-slate-200 rounded-xl p-3 shadow-xs">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-white border border-slate-200 rounded-lg p-1 flex items-center justify-center shrink-0">
+                                      <img src={item.product?.images?.[0] || item.image || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png"} alt="Gear" className="w-full h-full object-contain" />
+                                    </div>
+                                    <div>
+                                      <p className="font-bold text-slate-900 text-xs sm:text-sm">{item.product?.name || "Premium Gear"}</p>
+                                      <p className="text-[11px] text-slate-500 mt-0.5 font-sans">
+                                        Size: <span className="font-bold text-slate-700">{item.size}</span>
+                                        {(item.customName || item.customNumber) && (
+                                          <>
+                                            <span className="mx-1.5">•</span>
+                                            Print: <span className="font-bold text-kora">{item.customName || "—"} {item.customNumber ? `#${item.customNumber}` : ""}</span>
+                                          </>
+                                        )}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="text-right font-sans">
+                                    <p className="font-bold text-slate-800 text-xs sm:text-sm">{CURRENCY}{parseFloat(item.price).toFixed(2)}</p>
+                                    <p className="text-[10px] text-slate-400">Qty: {item.quantity}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                            {/* Left: Shipping Intel */}
+                            <div className="space-y-3">
+                              <h4 className="text-kora text-xs font-bold uppercase tracking-wider mb-2">Shipping Intel</h4>
+                              <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Recipient:</span> <span className="text-slate-800 font-bold">{order.shippingName || "Vault Shopper"}</span></p>
+                              <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Phone:</span> <span className="text-slate-800 font-bold">{order.shippingPhone || "N/A"}</span></p>
+                              <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Address:</span> <span className="text-slate-800 font-bold">{order.shippingStreet || "N/A"}, {order.shippingCity || "N/A"}</span></p>
+                              <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Payment:</span> <span className="text-slate-800 font-bold uppercase">{order.paymentMethod || "Card"}</span></p>
+                            </div>
+
+                            {/* Right: Invoice Summary */}
+                            <div className="space-y-3 bg-slate-50 rounded-2xl p-5 border border-slate-200 relative overflow-hidden h-max">
+                              <h4 className="text-kora text-xs font-bold uppercase tracking-wider mb-2">Invoice Breakdown</h4>
+                              <div className="flex justify-between text-xs text-slate-500">
+                                <span>Items Subtotal</span>
+                                <span>{CURRENCY}{(parseFloat(order.total) - parseFloat(order.shippingFee || "10") + parseFloat(order.discountAmount || "0")).toFixed(2)}</span>
+                              </div>
+                              {order.promoCode && (
+                                <div className="flex justify-between text-xs text-emerald-600 font-semibold">
+                                  <span>Promo Discount ({order.promoCode})</span>
+                                  <span>-{CURRENCY}{parseFloat(order.discountAmount || "0").toFixed(2)}</span>
+                                </div>
+                              )}
+                              <div className="flex justify-between text-xs text-slate-500">
+                                <span>Priority Delivery</span>
+                                <span>{CURRENCY}{parseFloat(order.shippingFee || "10").toFixed(2)}</span>
+                              </div>
+                              <div className="h-px bg-slate-200 my-2"></div>
+                              <div className="flex justify-between items-center text-base font-bold text-slate-800">
+                                <span className="font-bold text-xs uppercase tracking-wider text-slate-500">Total AED</span>
+                                <span className="text-2xl font-black text-kora">{CURRENCY}{parseFloat(order.total).toFixed(2)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
-                      <div className="text-left sm:text-right">
-                        <p className="font-black text-slate-900 text-lg">{CURRENCY}{order.total}</p>
-                        <p className={`text-xs font-bold uppercase tracking-wider ${order.status === 'Delivered' ? 'text-emerald-600' : 'text-kora'}`}>
-                          {order.status}
-                        </p>
-                      </div>
-                      <button className="text-kora hover:text-purple-700 text-sm font-bold underline underline-offset-4">Details</button>
-                    </div>
-                  </div>
-                )) : (
+                  );
+                }) : (
                    <p className="text-slate-500 italic">No orders found.</p>
                 )}
               </div>

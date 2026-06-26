@@ -16,7 +16,7 @@ export default clerkMiddleware(async (auth, req) => {
     return; 
   }
 
-  // 1. Admin route protection (Strict checks for mahramh40@gmail.com)
+  // 1. Admin route protection (Strict checks for mahramh40@gmail.com and korastore.ae@gmail.com)
   if (isAdminRoute(req)) {
     const { userId } = await auth();
     if (!userId) {
@@ -27,7 +27,7 @@ export default clerkMiddleware(async (auth, req) => {
       const client = await clerkClient();
       const user = await client.users.getUser(userId);
       const email = user.emailAddresses[0]?.emailAddress;
-      if (email !== "mahramh40@gmail.com") {
+      if (email !== "mahramh40@gmail.com" && email !== "korastore.ae@gmail.com") {
         return NextResponse.redirect(new URL('/', req.url));
       }
     } catch (err) {

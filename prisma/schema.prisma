@@ -63,6 +63,7 @@ model Order {
   shippingFee     Decimal  @default(10)
   tax             Decimal  @default(0)
   referenceNumber String?  @unique
+  paymentIntentId String?  @unique
   createdAt       DateTime @default(now())
   
   // An order can have multiple different shirts/boots inside it
@@ -71,17 +72,19 @@ model Order {
 
 // 4. THE ORDER ITEM MODEL (The specific items inside an order)
 model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
+  id           String  @id @default(cuid())
+  orderId      String
+  order        Order   @relation(fields: [orderId], references: [id])
   
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
+  productId    String
+  product      Product @relation(fields: [productId], references: [id])
   
-  size      String
-  image     String  @default("")
-  quantity  Int
-  price     Decimal // We lock the price here so if the shirt goes on sale later, past orders don't change!
+  size         String
+  image        String  @default("")
+  quantity     Int
+  price        Decimal // We lock the price here so if the shirt goes on sale later, past orders don't change!
+  customName   String  @default("")
+  customNumber String  @default("")
 }
 
 model Review {
@@ -101,14 +104,16 @@ model Review {
 
 // 5. THE CART ITEM MODEL (Persistent User Carts)
 model CartItem {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  size      String
-  image     String   @default("")
-  quantity  Int
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size         String
+  image        String   @default("")
+  quantity     Int
+  customName   String   @default("")
+  customNumber String   @default("")
 
-  @@unique([userId, productId, size, image])
+  @@unique([userId, productId, size, image, customName, customNumber])
 }

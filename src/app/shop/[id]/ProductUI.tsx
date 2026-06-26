@@ -13,6 +13,8 @@ export default function ProductUI({ product }: { product: any }) {
   const [selectedSize, setSelectedSize] = useState("");
   const [activeTab, setActiveTab] = useState<"details" | "reviews">("details");
   const [reviewText, setReviewText] = useState("");
+  const [customName, setCustomName] = useState("");
+  const [customNumber, setCustomNumber] = useState("");
   
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
@@ -28,10 +30,14 @@ export default function ProductUI({ product }: { product: any }) {
       // Pass the selected variation image!
       image: product.images?.[activeImageIndex] || product.images?.[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png", 
       size: selectedSize,
-      quantity: quantity
+      quantity: quantity,
+      customName: customName.trim(),
+      customNumber: customNumber.trim()
     });
 
     setIsAdded(true);
+    setCustomName("");
+    setCustomNumber("");
     setTimeout(() => setIsAdded(false), 2000);
   };
 
@@ -199,6 +205,47 @@ export default function ProductUI({ product }: { product: any }) {
                 )}
               </div>
             </div>
+
+            {/* Custom Printing Inputs (Only for shirts!) */}
+            {product.category === "Shirts" && (
+              <div className="mb-10 font-sans animate-fade-in-up">
+                <h3 className="text-slate-900 font-bold uppercase tracking-wider text-xs mb-4">
+                  Custom Jersey Printing (Optional)
+                </h3>
+                <div className="flex gap-4">
+                  <div className="flex-1">
+                    <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1.5 tracking-wider">
+                      Name on Shirt
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={15}
+                      value={customName}
+                      onChange={(e) => setCustomName(e.target.value.toUpperCase())}
+                      placeholder="e.g. MESSI"
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm text-sm font-bold tracking-wider"
+                    />
+                  </div>
+                  <div className="w-28">
+                    <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1.5 tracking-wider">
+                      Number
+                    </label>
+                    <input
+                      type="text"
+                      maxLength={3}
+                      value={customNumber}
+                      onChange={(e) => {
+                        // Allow only numbers
+                        const val = e.target.value.replace(/[^0-9]/g, "");
+                        setCustomNumber(val);
+                      }}
+                      placeholder="10"
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm text-sm font-bold text-center"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Add to Cart Action with Quantity Selector */}
             <div className="flex gap-4 mb-8 h-14 font-sans">

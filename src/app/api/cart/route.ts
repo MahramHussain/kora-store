@@ -20,7 +20,9 @@ export async function GET(req: NextRequest) {
       price: `$${item.product.price.toString()}`,
       image: item.image || item.product.images[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png",
       size: item.size,
-      quantity: item.quantity
+      quantity: item.quantity,
+      customName: item.customName,
+      customNumber: item.customNumber
     }));
 
     return NextResponse.json(formattedCart);
@@ -52,7 +54,9 @@ export async function POST(req: NextRequest) {
             productId: item.id,
             size: item.size,
             image: item.image || "",
-            quantity: item.quantity
+            quantity: item.quantity,
+            customName: item.customName || "",
+            customNumber: item.customNumber || ""
           }))
         });
       }

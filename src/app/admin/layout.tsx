@@ -20,7 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   // 2. Light-themed Access Denied screen
-  if (!isSignedIn || userEmail !== "mahramh40@gmail.com") {
+  if (!isSignedIn || (userEmail !== "mahramh40@gmail.com" && userEmail !== "korastore.ae@gmail.com")) {
     return (
       <main className="min-h-screen bg-slate-50 text-slate-800 font-sans flex items-center justify-center px-6 relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-red-500/5 rounded-full blur-[100px] pointer-events-none"></div>

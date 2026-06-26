@@ -97,15 +97,49 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
 
                       {/* Expandable Order Details */}
                       {isExpanded && (
-                        <div className="mt-6 pt-6 border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-6 text-sm font-sans animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
-                          {/* Left: Shipping Intel */}
-                          <div className="space-y-3">
-                            <h4 className="text-kora text-xs font-bold uppercase tracking-wider mb-2">Shipping Intel</h4>
-                            <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Recipient:</span> <span className="text-slate-800 font-bold">{order.shippingName || "Vault Shopper"}</span></p>
-                            <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Phone:</span> <span className="text-slate-800 font-bold">{order.shippingPhone || "N/A"}</span></p>
-                            <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Address:</span> <span className="text-slate-800 font-bold">{order.shippingStreet || "N/A"}, {order.shippingCity || "N/A"}</span></p>
-                            <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Payment:</span> <span className="text-slate-800 font-bold uppercase">{order.paymentMethod || "Card"}</span></p>
+                        <div className="mt-6 pt-6 border-t border-slate-200 text-sm font-sans animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
+                          
+                          {/* Order Items List */}
+                          <div className="mb-6 pb-6 border-b border-slate-200">
+                            <h4 className="text-kora text-xs font-bold uppercase tracking-wider mb-3">Secured Items</h4>
+                            <div className="space-y-3">
+                              {order.items.map((item: any, idx: number) => (
+                                <div key={idx} className="flex justify-between items-center gap-4 bg-slate-50/50 border border-slate-200/60 rounded-xl p-3 shadow-xs">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-white border border-slate-200 rounded-lg p-1 flex items-center justify-center shrink-0">
+                                      <img src={item.product?.images?.[0] || item.image || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png"} alt="Gear" className="w-full h-full object-contain" />
+                                    </div>
+                                    <div>
+                                      <p className="font-bold text-slate-900 text-xs sm:text-sm">{item.product?.name || "Premium Gear"}</p>
+                                      <p className="text-[11px] text-slate-500 mt-0.5 font-sans">
+                                        Size: <span className="font-bold text-slate-700">{item.size}</span>
+                                        {(item.customName || item.customNumber) && (
+                                          <>
+                                            <span className="mx-1.5">•</span>
+                                            Print: <span className="font-bold text-kora">{item.customName || "—"} {item.customNumber ? `#${item.customNumber}` : ""}</span>
+                                          </>
+                                        )}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="text-right font-sans">
+                                    <p className="font-bold text-slate-800 text-xs sm:text-sm">{CURRENCY}{parseFloat(item.price).toFixed(2)}</p>
+                                    <p className="text-[10px] text-slate-400">Qty: {item.quantity}</p>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
                           </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Left: Shipping Intel */}
+                            <div className="space-y-3">
+                              <h4 className="text-kora text-xs font-bold uppercase tracking-wider mb-2">Shipping Intel</h4>
+                              <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Recipient:</span> <span className="text-slate-800 font-bold">{order.shippingName || "Vault Shopper"}</span></p>
+                              <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Phone:</span> <span className="text-slate-800 font-bold">{order.shippingPhone || "N/A"}</span></p>
+                              <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Address:</span> <span className="text-slate-800 font-bold">{order.shippingStreet || "N/A"}, {order.shippingCity || "N/A"}</span></p>
+                              <p className="flex justify-between md:justify-start md:gap-4"><span className="text-slate-500 min-w-[80px]">Payment:</span> <span className="text-slate-800 font-bold uppercase">{order.paymentMethod || "Card"}</span></p>
+                            </div>
 
                           {/* Right: Invoice Summary */}
                           <div className="space-y-3 bg-slate-50 rounded-2xl p-5 border border-slate-200 relative overflow-hidden">
@@ -131,7 +165,8 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
                             </div>
                           </div>
                         </div>
-                      )}
+                      </div>
+                    )}
                     </div>
                   );
                 })}
@@ -165,7 +200,7 @@ export default function AccountUI({ user, orders }: { user: any, orders: any[] }
               <button className="w-full text-left flex items-center justify-between text-slate-600 hover:text-kora transition-colors group">
                 Notification Preferences <FaArrowRight className="opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
-              {user?.email === "mahramh40@gmail.com" && (
+              {(user?.email === "mahramh40@gmail.com" || user?.email === "korastore.ae@gmail.com") && (
                 <>
                   <div className="h-px bg-slate-100 w-full"></div>
                   <Link href="/admin" className="w-full text-left flex items-center justify-between text-kora hover:text-purple-700 transition-colors group font-bold">

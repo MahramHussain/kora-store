@@ -10,13 +10,15 @@ export type CartItem = {
   image: string;
   size: string;
   quantity: number;
+  customName?: string;
+  customNumber?: string;
 };
 
 type CartContextType = {
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
-  removeFromCart: (id: string | number, size: string, image: string) => void;
-  updateQuantity: (id: string | number, size: string, image: string, newQuantity: number) => void; // <-- UPDATED POWER
+  removeFromCart: (id: string | number, size: string, image: string, customName?: string, customNumber?: string) => void;
+  updateQuantity: (id: string | number, size: string, image: string, customName: string | undefined, customNumber: string | undefined, newQuantity: number) => void; // <-- UPDATED POWER
   clearCart: () => void;
   cartCount: number;
 };
@@ -55,7 +57,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
             setCart((prevLocalCart) => {
               const mergedCart = [...dbCart];
               prevLocalCart.forEach(localItem => {
-                const existing = mergedCart.find(i => i.id === localItem.id && i.size === localItem.size && i.image === localItem.image);
+                const existing = mergedCart.find(i => 
+                  i.id === localItem.id && 
+                  i.size === localItem.size && 
+                  i.image === localItem.image &&
+                  (i.customName || "") === (localItem.customName || "") &&
+                  (i.customNumber || "") === (localItem.customNumber || "")
+                );
                 if (!existing) {
                   mergedCart.push(localItem);
                 }
@@ -89,12 +97,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addToCart = (newItem: CartItem) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find(
-        (item) => item.id === newItem.id && item.size === newItem.size && item.image === newItem.image
+        (item) => 
+          item.id === newItem.id && 
+          item.size === newItem.size && 
+          item.image === newItem.image &&
+          (item.customName || "") === (newItem.customName || "") &&
+          (item.customNumber || "") === (newItem.customNumber || "")
       );
 
       if (existingItem) {
         return prevCart.map((item) =>
-          item.id === newItem.id && item.size === newItem.size && item.image === newItem.image
+          item.id === newItem.id && 
+          item.size === newItem.size && 
+          item.image === newItem.image &&
+          (item.customName || "") === (newItem.customName || "") &&
+          (item.customNumber || "") === (newItem.customNumber || "")
             ? { ...item, quantity: item.quantity + newItem.quantity }
             : item
         );
@@ -103,20 +120,33 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const removeFromCart = (id: string | number, size: string, image: string) => {
-    setCart((prevCart) => prevCart.filter((item) => !(item.id === id && item.size === size && item.image === image)));
+  const removeFromCart = (id: string | number, size: string, image: string, customName?: string, customNumber?: string) => {
+    setCart((prevCart) => prevCart.filter((item) => 
+      !(item.id === id && 
+        item.size === size && 
+        item.image === image && 
+        (item.customName || "") === (customName || "") &&
+        (item.customNumber || "") === (customNumber || "")
+      )
+    ));
   };
 
   // THE NEW QUANTITY ENGINE
-  const updateQuantity = (id: string | number, size: string, image: string, newQuantity: number) => {
+  const updateQuantity = (id: string | number, size: string, image: string, customName: string | undefined, customNumber: string | undefined, newQuantity: number) => {
     if (newQuantity <= 0) {
       // If they drop the quantity to 0, just remove it entirely
-      removeFromCart(id, size, image);
+      removeFromCart(id, size, image, customName, customNumber);
       return;
     }
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item.id === id && item.size === size && item.image === image ? { ...item, quantity: newQuantity } : item
+        item.id === id && 
+        item.size === size && 
+        item.image === image &&
+        (item.customName || "") === (customName || "") &&
+        (item.customNumber || "") === (customNumber || "")
+          ? { ...item, quantity: newQuantity } 
+          : item
       )
     );
   };
