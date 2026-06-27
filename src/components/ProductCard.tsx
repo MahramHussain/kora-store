@@ -4,15 +4,18 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { CURRENCY } from "@/lib/constants";
 
+import { FaStar } from "react-icons/fa";
+
 interface Product {
   id: string;
   name: string;
   category: string;
   price: string | number;
   images?: string[];
-  image?: string; // Support for the legacy hardcoded Trending format
+  image?: string;
   tag?: string | null;
   stock?: number;
+  reviews?: { rating: number }[];
 }
 
 export function ProductCard({ product }: { product: Product }) {
@@ -106,10 +109,21 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
 
       <div className="p-3 sm:p-5 border-t border-slate-100 relative z-20 bg-white">
-        <div className="flex justify-between items-start mb-3 md:mb-4">
-          <div>
-            <p className="text-kora text-[10px] font-bold uppercase tracking-widest mb-1.5 md:mb-2">{product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}</p>
+        <div className="flex justify-between items-start mb-2 md:mb-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-kora text-[10px] font-bold uppercase tracking-widest mb-1">{product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}</p>
             <h3 className="text-sm md:text-base font-bold text-slate-900 leading-tight line-clamp-1 font-sans">{product.name}</h3>
+            {product.reviews && product.reviews.length > 0 && (() => {
+              const avg = product.reviews.reduce((s, r) => s + r.rating, 0) / product.reviews.length;
+              return (
+                <div className="flex items-center gap-1 mt-1">
+                  {[1,2,3,4,5].map(s => (
+                    <FaStar key={s} className={`text-[9px] ${s <= Math.round(avg) ? 'text-yellow-400' : 'text-slate-200'}`} />
+                  ))}
+                  <span className="text-[9px] text-slate-400 font-bold ml-0.5">{avg.toFixed(1)}</span>
+                </div>
+              );
+            })()}
           </div>
           <span className="text-base md:text-lg font-bold text-slate-900 ml-2 shrink-0 whitespace-nowrap font-sans">
             {CURRENCY}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}

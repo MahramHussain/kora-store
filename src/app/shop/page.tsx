@@ -8,7 +8,12 @@ export default async function ShopPage() {
   
   // 1. Fetch the fresh gear from the Vault
   const rawProducts = await prisma.product.findMany({
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "desc" },
+    include: {
+      reviews: {
+        select: { rating: true }
+      }
+    }
   });
 
   // 2. Clean the data for the Client UI
@@ -18,6 +23,7 @@ export default async function ShopPage() {
     price: product.price.toString(),
     createdAt: product.createdAt.toISOString(),
   }));
+
 
   // 3. Pass the data to the UI
   return <ShopUI products={safeProducts} />;

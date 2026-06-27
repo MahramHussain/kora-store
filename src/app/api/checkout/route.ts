@@ -172,7 +172,7 @@ export async function POST(req: Request) {
 
     // 4. Handle Redirection-based Payments (Card/Ziina)
     if (paymentMethod === "card") {
-      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+      const baseUrl = new URL(req.url).origin;
       const isMock = !process.env.ZIINA_API_KEY || process.env.ZIINA_API_KEY.includes("your_");
 
       if (isMock) {
