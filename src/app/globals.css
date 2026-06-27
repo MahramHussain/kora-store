@@ -694,4 +694,19 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 12px;
     border: 1px solid #e2e8f0;
   }
+
+  /* ── Mega menu slide animation ── */
+  @keyframes fadeInSlide {
+    0% {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .animate-fade-in-slide {
+    animation: fadeInSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
 }

@@ -73,141 +73,14 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pb-12 md:pb-20">
-      {/* 3. CATEGORY NAVIGATION — Hidden on mobile (in burger menu), visible on desktop */}
-      <nav className="hidden md:flex items-center gap-8 px-6 py-4 overflow-x-auto text-sm font-semibold tracking-wider uppercase whitespace-nowrap border-b border-slate-200 bg-slate-50 scrollbar-hide shadow-sm">
-        <Link href="/shop" className="text-kora hover:text-purple-700 transition-colors">Featured</Link>
-        <Link href="/shop" className="text-slate-600 hover:text-kora transition-colors">Shop All</Link>
-        <Link href="/shop?category=Shirts" className="text-slate-600 hover:text-emerald-600 transition-colors">Jerseys</Link>
-        <Link href="/shop?category=Boots" className="text-slate-600 hover:text-rose-600 transition-colors">Shoes</Link>
-        <Link href="/shop?category=Flags" className="text-slate-600 hover:text-blue-600 transition-colors">Accessories</Link>
-      </nav>
-
       {/* 4. PROMO BANNER — Scannable on mobile */}
-      <div className="bg-purple-100 border-b border-purple-200 py-3 md:py-2.5 text-center text-xs md:text-sm font-bold text-purple-900 px-4">
-        <span className="block md:inline">🏆 <span className="text-purple-700 font-black">WORLD CUP 2026 DEBUT</span></span>
-        <span className="block md:inline md:ml-1 mt-0.5 md:mt-0">Use code <span className="font-bold text-kora">WORLD26</span> for free shipping</span>
-      </div>
-
-      <div className="max-w-7xl mx-auto w-full">
-        {/* 5. SHOP YOUR TEAM & NATION SECTION */}
-        <section className="px-4 md:px-6 pt-8 md:pt-12 pb-0">
-          {/* Mobile: centered header. Desktop: side-by-side layout preserved */}
-          <div className="flex flex-col lg:flex-row items-center lg:items-center gap-4 md:gap-8 mb-1">
-            <div className="flex flex-col items-center md:items-start shrink-0">
-              <h2 className="text-lg md:text-2xl font-black tracking-tighter uppercase text-center md:text-left">Support Your Side</h2>
-              <p className="text-[11px] md:text-xs text-slate-500 mt-1 max-w-[200px] text-center md:text-left">National teams & world-class clubs.</p>
-              <Link href="/shop" className="hidden md:inline-flex mt-4 text-xs font-bold border border-slate-300 rounded-full py-2 px-4 hover:bg-slate-100 text-slate-600 transition-colors w-max text-center">
-                See All Teams
-              </Link>
-            </div>
-            
-            {/* Scroll Container of Teams & Nations */}
-            <div className="flex-1 min-w-0 w-full">
-              <ScrollSlider>
-                {[
-                  // National Teams (First/Spotlighted)
-                  { 
-                    name: 'Argentina', 
-                    logo: 'https://flagcdn.com/w160/ar.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(56,189,248,0.6)] group-hover:border-sky-400/50',
-                    text: 'group-hover:text-sky-600 font-bold'
-                  },
-                  { 
-                    name: 'Brazil', 
-                    logo: 'https://flagcdn.com/w160/br.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(234,179,8,0.6)] group-hover:border-yellow-400/50',
-                    text: 'group-hover:text-yellow-600 font-bold'
-                  },
-                  { 
-                    name: 'France', 
-                    logo: 'https://flagcdn.com/w160/fr.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(37,99,235,0.6)] group-hover:border-blue-500/50',
-                    text: 'group-hover:text-blue-700 font-bold'
-                  },
-                  { 
-                    name: 'Germany', 
-                    logo: 'https://flagcdn.com/w160/de.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(0,0,0,0.2)] group-hover:border-slate-400',
-                    text: 'group-hover:text-slate-900 font-bold'
-                  },
-                  { 
-                    name: 'Portugal', 
-                    logo: 'https://flagcdn.com/w160/pt.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(220,38,38,0.6)] group-hover:border-red-500/50',
-                    text: 'group-hover:text-red-700 font-bold'
-                  },
-                  { 
-                    name: 'Spain', 
-                    logo: 'https://flagcdn.com/w160/es.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(220,38,38,0.6)] group-hover:border-yellow-500/50',
-                    text: 'group-hover:text-yellow-700 font-bold'
-                  },
-                  { 
-                    name: 'Uruguay', 
-                    logo: 'https://flagcdn.com/w160/uy.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(56,189,248,0.6)] group-hover:border-sky-400/50',
-                    text: 'group-hover:text-sky-600 font-bold'
-                  },
-                  // Clubs
-                  { 
-                    name: 'Real Madrid', 
-                    logo: 'https://a.espncdn.com/i/teamlogos/soccer/500/86.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(0,0,0,0.1)] group-hover:border-slate-300',
-                    text: 'group-hover:text-slate-800'
-                  },
-                  { 
-                    name: 'Barcelona', 
-                    logo: 'https://a.espncdn.com/i/teamlogos/soccer/500/83.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(37,99,235,0.6)] group-hover:border-blue-500/50',
-                    text: 'group-hover:text-blue-700'
-                  },
-                  { 
-                    name: 'Man City', 
-                    logo: 'https://a.espncdn.com/i/teamlogos/soccer/500/382.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(56,189,248,0.6)] group-hover:border-sky-400/50',
-                    text: 'group-hover:text-sky-500'
-                  },
-                  { 
-                    name: 'PSG', 
-                    logo: 'https://a.espncdn.com/i/teamlogos/soccer/500/160.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(37,99,235,0.6)] group-hover:border-blue-600/50',
-                    text: 'group-hover:text-blue-700'
-                  },
-                  { 
-                    name: 'Manchester United', 
-                    logo: 'https://a.espncdn.com/i/teamlogos/soccer/500/360.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(239,68,68,0.6)] group-hover:border-red-500/50',
-                    text: 'group-hover:text-red-600'
-                  },
-                  { 
-                    name: 'Arsenal', 
-                    logo: 'https://a.espncdn.com/i/teamlogos/soccer/500/359.png',
-                    glow: 'group-hover:shadow-[0_0_15px_rgba(239,68,68,0.6)] group-hover:border-red-500/50',
-                    text: 'group-hover:text-red-500'
-                  }
-                ].map((team, i) => (
-                  <Link href={`/shop?team=${team.name}`} key={i} className="flex flex-col items-center gap-2 md:gap-3 shrink-0 cursor-pointer group px-1.5 md:px-2 snap-start mobile-tap-feedback">
-                    <div className={`relative w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center p-2.5 md:p-3 bg-white border border-slate-200 transition-all duration-500 z-10 shadow-sm ${team.glow}`}>
-                      <img 
-                        src={team.logo} 
-                        alt={`${team.name} Logo`} 
-                        referrerPolicy="no-referrer"
-                        className="relative z-20 w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                      />
-                    </div>
-                    <span className={`text-[10px] md:text-xs font-semibold text-slate-500 text-center max-w-[64px] md:max-w-[80px] transition-colors duration-500 uppercase leading-tight ${team.text}`}>
-                      {team.name}
-                    </span>
-                  </Link>
-                ))}
-              </ScrollSlider>
-            </div>
-          </div>
-        </section>
+      <div className="bg-neutral-100 border-b border-neutral-200 py-3 md:py-2.5 text-center text-xs md:text-sm font-bold text-neutral-800 px-4">
+        <span className="block md:inline">🏆 <span className="text-neutral-900 font-black">WORLD CUP 2026 DEBUT</span></span>
+        <span className="block md:inline md:ml-1 mt-0.5 md:mt-0">Use code <span className="font-bold text-emerald-600">WORLD26</span> for free shipping</span>
       </div>
 
       {/* 6. WORLD CUP HERO BANNER */}
-      <section className="w-full mb-8 md:mb-12">
+      <section className="w-full mb-0">
         <div className="relative w-full h-[480px] md:h-[600px] rounded-none overflow-hidden group">
           <img 
             src="/assets/worldcup_banner.jpg" 
@@ -226,6 +99,81 @@ export default async function Home() {
               Shop Now
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* 6.5 BRANDED KITS SHOWCASE ROW */}
+      <section className="w-full bg-white border-b border-neutral-100 py-12 md:py-16 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          
+          {/* Croatia */}
+          <Link href="/shop?q=Croatia" className="group flex flex-col items-center text-center">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white hover:shadow-md transition-shadow duration-300">
+              <img 
+                src="/assets/croatia_jersey.png" 
+                alt="Croatia" 
+                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-[#6B00FF] transition-colors">
+              Croatia
+            </h3>
+            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
+              Nike Croatia with Luca Modrić official World Cup printing
+            </p>
+          </Link>
+
+          {/* Germany */}
+          <Link href="/shop?q=Germany" className="group flex flex-col items-center text-center">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white hover:shadow-md transition-shadow duration-300">
+              <img 
+                src="/assets/germany_jersey.png" 
+                alt="Germany" 
+                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-[#6B00FF] transition-colors">
+              Germany
+            </h3>
+            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
+              adidas Germany World Cup shirts with full squad personalisation available
+            </p>
+          </Link>
+
+          {/* Portugal */}
+          <Link href="/shop?q=Portugal" className="group flex flex-col items-center text-center">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white hover:shadow-md transition-shadow duration-300">
+              <img 
+                src="/assets/portugal_jersey.png" 
+                alt="Portugal" 
+                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-[#6B00FF] transition-colors">
+              Portugal
+            </h3>
+            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
+              Puma Portugal Cristiano Ronaldo official home and away shirts
+            </p>
+          </Link>
+
+          {/* Argentina */}
+          <Link href="/shop?q=Argentina" className="group flex flex-col items-center text-center">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white hover:shadow-md transition-shadow duration-300">
+              <img 
+                src="/assets/argentina_jersey.png" 
+                alt="Argentina" 
+                className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-[#6B00FF] transition-colors">
+              Argentina
+            </h3>
+            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
+              adidas Argentina kits with official kit printing available for every player
+            </p>
+          </Link>
+
         </div>
       </section>
 

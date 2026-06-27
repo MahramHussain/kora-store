@@ -5,6 +5,7 @@ import { FaXmark } from "react-icons/fa6";
 import { ProductCard } from "@/components/ProductCard";
 import Link from "next/link";
 import { CURRENCY } from "@/lib/constants";
+import { useSearchParams } from "next/navigation";
 
 const CATEGORIES = ["All", "World Cup", "Shoes", "Shirts", "Retro Kits", "Accessories"];
 const TEAMS = ["All Teams", "Argentina", "Brazil", "France", "Germany", "Portugal", "Spain", "Uruguay", "Arsenal", "Barcelona", "Real Madrid", "Man City", "PSG", "Manchester United"];
@@ -77,14 +78,14 @@ export default function ShopUI({ products }: { products: any[] }) {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("q")) setSearchQuery(params.get("q")!);
-    if (params.get("tag")) setActiveTag(params.get("tag")!);
-    if (params.get("team")) setActiveTeam(params.get("team")!);
-    if (params.get("category")) setActiveCategory(params.get("category")!);
-  }, []);
+    setSearchQuery(searchParams.get("q") || "");
+    setActiveTag(searchParams.get("tag") || "All");
+    setActiveTeam(searchParams.get("team") || "All Teams");
+    setActiveCategory(searchParams.get("category") || "All");
+  }, [searchParams]);
 
   // Lock scroll inside the sidebar so it doesn't affect the body/product grid
   useEffect(() => {
@@ -371,6 +372,7 @@ export default function ShopUI({ products }: { products: any[] }) {
                     setSearchQuery("");
                     setActiveCategory("All");
                     setActiveTeam("All Teams");
+                    setActiveTag("All");
                   }}
                   className="mt-6 px-6 py-3 bg-kora hover:bg-purple-700 text-white rounded-full font-bold text-xs transition-colors shadow-md shadow-kora/30"
                 >

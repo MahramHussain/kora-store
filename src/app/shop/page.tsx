@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import ShopUI from "./ShopUI";
+import { Suspense } from "react";
 
 // Keeps the cache-buster so new Admin drops show up instantly!
 export const dynamic = 'force-dynamic';
@@ -26,5 +27,9 @@ export default async function ShopPage() {
 
 
   // 3. Pass the data to the UI
-  return <ShopUI products={safeProducts} />;
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white text-slate-500 flex items-center justify-center font-sans text-sm">Loading the Vault...</div>}>
+      <ShopUI products={safeProducts} />
+    </Suspense>
+  );
 }

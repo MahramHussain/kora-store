@@ -6,8 +6,157 @@ import { useState, useRef, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { getProducts } from "@/app/admin/actions";
 import { FaBars, FaXmark, FaBoxOpen } from "react-icons/fa6";
-import { FaShoppingCart } from "react-icons/fa";
+import { FiUser, FiShoppingBag, FiSearch, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { SignInButton, UserButton, Show } from "@clerk/nextjs";
+
+const clubCategories = [
+  {
+    title: "Premier League",
+    teams: [
+      { name: "Arsenal", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/359.png" },
+      { name: "Chelsea", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/363.png" },
+      { name: "Crystal Palace", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/384.png" },
+      { name: "Liverpool", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/364.png" },
+      { name: "Manchester City", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/382.png" },
+      { name: "Manchester United", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/360.png" },
+      { name: "Tottenham Hotspur", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/367.png" }
+    ]
+  },
+  {
+    title: "Bundesliga",
+    teams: [
+      { name: "1. FC Union Berlin", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/598.png" },
+      { name: "Bayern Munich", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/132.png" },
+      { name: "Borussia Dortmund", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/124.png" },
+      { name: "Eintracht Frankfurt", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/125.png" },
+      { name: "Hamburger SV", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/131.png" },
+      { name: "St. Pauli", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/2840.png" },
+      { name: "VfB Stuttgart", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/134.png" }
+    ]
+  },
+  {
+    title: "La Liga",
+    teams: [
+      { name: "Athletic Bilbao", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/93.png" },
+      { name: "Atletico Madrid", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/1068.png" },
+      { name: "Barcelona", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/83.png" },
+      { name: "Real Madrid", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/86.png" },
+      { name: "Sevilla", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/243.png" },
+      { name: "Valencia", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/95.png" },
+      { name: "Villarreal", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/97.png" }
+    ]
+  },
+  {
+    title: "Serie A",
+    teams: [
+      { name: "AC Milan", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/103.png" },
+      { name: "AS Roma", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/104.png" },
+      { name: "Inter Milan", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/110.png" },
+      { name: "Juventus", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/111.png" },
+      { name: "Lazio", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/112.png" },
+      { name: "Napoli", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/114.png" },
+      { name: "Parma", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/115.png" }
+    ]
+  },
+  {
+    title: "Featured Clubs",
+    teams: [
+      { name: "Boca Juniors", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/5.png" },
+      { name: "Captain Tsubasa", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/default.png", isCustom: true },
+      { name: "Corinthians", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/87.png" },
+      { name: "Galatasaray", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/374.png" },
+      { name: "Gremio", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/15.png" },
+      { name: "Paris Saint-Germain", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/160.png" },
+      { name: "Santos FC", logo: "https://a.espncdn.com/i/teamlogos/soccer/500/9.png" }
+    ]
+  }
+];
+
+const nationalCategories = [
+  {
+    title: "Europe",
+    teams: [
+      { name: "Belgium", code: "be" },
+      { name: "Croatia", code: "hr" },
+      { name: "England", code: "gb" },
+      { name: "France", code: "fr" },
+      { name: "Germany", code: "de" },
+      { name: "Greece", code: "gr" },
+      { name: "Holland", code: "nl" },
+      { name: "Hungary", code: "hu" },
+      { name: "Italy", code: "it" },
+      { name: "Norway", code: "no" },
+      { name: "Poland", code: "pl" },
+      { name: "Portugal", code: "pt" },
+      { name: "Spain", code: "es" }
+    ]
+  },
+  {
+    title: "South America",
+    teams: [
+      { name: "Argentina", code: "ar" },
+      { name: "Bolivia", code: "bo" },
+      { name: "Brazil", code: "br" },
+      { name: "Chile", code: "cl" },
+      { name: "Colombia", code: "co" },
+      { name: "Ecuador", code: "ec" },
+      { name: "Paraguay", code: "py" },
+      { name: "Peru", code: "pe" },
+      { name: "Suriname", code: "sr" },
+      { name: "Uruguay", code: "uy" },
+      { name: "Venezuela", code: "ve" }
+    ]
+  },
+  {
+    title: "Africa",
+    teams: [
+      { name: "Algeria", code: "dz" },
+      { name: "Angola", code: "ao" },
+      { name: "Cameroon", code: "cm" },
+      { name: "Cape Verde", code: "cv" },
+      { name: "Egypt", code: "eg" },
+      { name: "Ethiopia", code: "et" },
+      { name: "Ghana", code: "gh" },
+      { name: "Ivory Coast", code: "ci" },
+      { name: "Morocco", code: "ma" },
+      { name: "Nigeria", code: "ng" },
+      { name: "Senegal", code: "sn" },
+      { name: "South Africa", code: "za" },
+      { name: "Tunisia", code: "tn" }
+    ]
+  },
+  {
+    title: "N. & C. America",
+    teams: [
+      { name: "Barbados", code: "bb" },
+      { name: "Canada", code: "ca" },
+      { name: "Costa Rica", code: "cr" },
+      { name: "Cuba", code: "cu" },
+      { name: "El Salvador", code: "sv" },
+      { name: "Haiti", code: "ht" },
+      { name: "Honduras", code: "hn" },
+      { name: "Jamaica", code: "jm" },
+      { name: "Mexico", code: "mx" },
+      { name: "Panama", code: "pa" },
+      { name: "Trinidad & Tobago", code: "tt" },
+      { name: "USA", code: "us" }
+    ]
+  },
+  {
+    title: "Asia & Oceania",
+    teams: [
+      { name: "Australia", code: "au" },
+      { name: "Bangladesh", code: "bd" },
+      { name: "Bhutan", code: "bt" },
+      { name: "China", code: "cn" },
+      { name: "Japan", code: "jp" },
+      { name: "New Zealand", code: "nz" },
+      { name: "Palestine", code: "ps" },
+      { name: "Saudi Arabia", code: "sa" },
+      { name: "South Korea", code: "kr" }
+    ]
+  }
+];
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -16,6 +165,14 @@ export default function Navbar() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); 
+  
+  // Mobile accordion states
+  const [isMobileClubsOpen, setIsMobileClubsOpen] = useState(false);
+  const [isMobileNationalOpen, setIsMobileNationalOpen] = useState(false);
+  
+  // Patch banner state
+  const [isBannerVisible, setIsBannerVisible] = useState(true);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { cartCount } = useCart();
 
@@ -42,145 +199,98 @@ export default function Navbar() {
 
   return (
     <>
-      {/* TOP UTILITY BAR (Desktop Only) */}
-      <div className="hidden md:flex justify-end items-center px-6 py-2 text-xs font-medium bg-slate-50 text-slate-600 border-b border-slate-200">
-        <div className="flex gap-6 items-center">
-          <Show when="signed-out">
-            <SignInButton mode="modal">
-              <button className="text-kora font-bold hover:text-purple-700 transition-colors">
-                Sign In / Register
-              </button>
-            </SignInButton>
-          </Show>
-          <Show when="signed-in">
-            <div className="flex items-center gap-2">
-              <Link href="/account/dashboard" className="text-slate-600 hover:text-kora transition-colors">
-                Vault Access
-              </Link>
-              
-              <UserButton>
-                <UserButton.MenuItems>
-                  <UserButton.Link
-                    label="Vault Dashboard"
-                    labelIcon={<FaBoxOpen className="text-sm" />}
-                    href="/account/dashboard"
-                  />
-                </UserButton.MenuItems>
-              </UserButton>
-            </div>
-          </Show>
+      {/* 1. FLOWING TICKER BANNER (Desktop & Mobile) */}
+      <div className="relative w-full overflow-hidden bg-neutral-100 text-neutral-800 border-b border-neutral-200 py-2.5 text-xs md:text-[13px] font-bold select-none z-50">
+        <div className="flex w-max animate-marquee whitespace-nowrap">
+          <span className="mx-2">Pay in 3 with Klarna • No-hassle returns • Free UK Shipping when you spend £100+ • 100% OFFICIAL from Nike, adidas, Puma • Ultra fast international shipping via DHL/EMS •</span>
+          <span className="mx-2">Pay in 3 with Klarna • No-hassle returns • Free UK Shipping when you spend £100+ • 100% OFFICIAL from Nike, adidas, Puma • Ultra fast international shipping via DHL/EMS •</span>
         </div>
       </div>
 
-      {/* MAIN HEADER - Fixed Layout */}
-      <header className="px-4 md:px-6 py-3 md:py-4 flex flex-wrap md:flex-nowrap items-center justify-between gap-3 md:gap-4 border-b border-slate-200 bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+      {/* 2. MAIN HEADER (White Theme) */}
+      <header className="relative w-full bg-white text-neutral-900 border-b border-neutral-200 sticky top-0 z-40 shadow-sm">
         
-        {/* 1. Hamburger & Logo (Left Side) */}
-        <div className="flex items-center gap-4 order-1 shrink-0">
-          <button 
-            className="md:hidden text-slate-900 text-2xl hover:text-kora transition-colors"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <FaXmark /> : <FaBars />}
-          </button>
+        {/* ROW 1: Main Bar (Logo, Search, Profile, Basket) */}
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-4">
+          
+          {/* Logo & Mobile Menu Hamburger */}
+          <div className="flex items-center gap-4 shrink-0">
+            <button 
+              className="md:hidden text-neutral-900 text-2xl hover:text-[#6B00FF] transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <FaXmark /> : <FaBars />}
+            </button>
 
-          <Link href="/" className="text-2xl md:text-3xl font-black tracking-tighter uppercase hover:scale-105 transition-transform">
-            <span className="text-slate-900">KORA</span><span className="text-kora drop-shadow-[0_0_10px_rgba(107,0,255,0.4)]">STORE</span>
-          </Link>
-        </div>
-        
-        {/* 2. SEARCH BAR (Center Desktop, Bottom Mobile) */}
-        {pathname !== '/shop' ? (
-          <div className="w-full md:flex-1 md:max-w-2xl relative order-3 md:order-2 md:mx-4" ref={dropdownRef}>
-            <form onSubmit={(e) => handleSearch(e)} className="relative group z-20">
-              <input 
-                type="text" 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-                placeholder="What can we help you find?" 
-                className="w-full bg-slate-100 border border-slate-200 rounded-full py-2.5 md:py-3 pl-5 md:pl-6 pr-10 md:pr-12 text-sm md:text-base text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all relative z-20 font-sans"
-              />
-              <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-kora transition-colors z-20 hover:scale-110">
-                &#128269;
-              </button>
-            </form>
-
-            {isFocused && searchTerm && filteredSuggestions.length > 0 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden z-10 pt-2 pb-2">
-                {filteredSuggestions.map((suggestion, idx) => (
-                  <div 
-                    key={idx}
-                    onClick={(e) => handleSearch(e as any, suggestion)}
-                    className="px-6 py-3 hover:bg-slate-50 cursor-pointer text-slate-700 hover:text-kora transition-colors flex items-center gap-3 font-sans"
-                  >
-                    <span className="text-xs">&#128269;</span> {suggestion}
-                  </div>
-                ))}
-              </div>
-            )}
+            <Link href="/" className="text-2xl md:text-3xl font-black tracking-tighter uppercase hover:scale-105 transition-transform">
+              <span className="text-slate-900">KORA</span><span className="text-kora drop-shadow-[0_0_10px_rgba(107,0,255,0.4)]">STORE</span>
+            </Link>
           </div>
-        ) : (
-          <div className="hidden md:block w-full md:flex-1 md:max-w-2xl order-3 md:order-2 md:mx-4"></div>
-        )}
+          
+          {/* Centralized Search Bar */}
+          {pathname !== '/shop' ? (
+            <div className="hidden md:block flex-1 max-w-xl relative" ref={dropdownRef}>
+              <form onSubmit={(e) => handleSearch(e)} className="relative group z-20">
+                <input 
+                  type="text" 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setTimeout(() => setIsFocused(false), 200)}
+                  placeholder="Search entire store here..." 
+                  className="w-full bg-neutral-50 border border-neutral-200 rounded-none py-2.5 px-4 pr-10 text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] transition-all font-sans"
+                />
+                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-[#6B00FF] transition-colors z-20">
+                  <FiSearch className="text-lg" />
+                </button>
+              </form>
 
-        {/* 3. Cart Button (Right Side) */}
-        <div className="flex items-center order-2 md:order-3 shrink-0">
-          <Link href="/cart" className="bg-kora hover:bg-purple-700 text-white font-bold text-sm md:text-base py-2 md:py-3 px-4 md:px-6 rounded-full flex items-center gap-2 transition-all hover:scale-105 shadow-md shadow-kora/30">
-            <FaShoppingCart className="text-lg md:text-xl" />
-            <span className="bg-white text-kora px-2 py-0.5 rounded-full text-xs shadow-inner pt-0.5 ml-1">{cartCount}</span>
-          </Link>
-        </div>
-
-        {/* --- MOBILE SLIDE-DOWN MENU --- */}
-        {isMobileMenuOpen && (
-          <div className="absolute top-full left-0 w-full bg-white border-b border-slate-200 flex flex-col md:hidden z-40 shadow-xl" style={{ animation: 'mobileSlideUp 0.25s ease-out' }}>
-            <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-slate-100 text-slate-900 font-bold hover:bg-slate-50 flex items-center justify-between">
-              Shop The Vault <span className="text-kora">→</span>
-            </Link>
-            <Link href="/shop?tag=Trending" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-slate-100 text-slate-900 font-bold hover:bg-slate-50">
-              Trending Gear
-            </Link>
-
-            {/* Category Quick Links */}
-            <div className="px-6 py-4 border-b border-slate-100">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Browse</p>
-              <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-                <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-kora text-white border border-kora shadow-sm">
-                  Featured
-                </Link>
-                <Link href="/shop?category=Shirts" onClick={() => setIsMobileMenuOpen(false)} className="shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-slate-700 border border-slate-200 active:bg-slate-50">
-                  Jerseys
-                </Link>
-                <Link href="/shop?category=Boots" onClick={() => setIsMobileMenuOpen(false)} className="shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-slate-700 border border-slate-200 active:bg-slate-50">
-                  Shoes
-                </Link>
-                <Link href="/shop?category=Flags" onClick={() => setIsMobileMenuOpen(false)} className="shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-slate-700 border border-slate-200 active:bg-slate-50">
-                  Accessories
-                </Link>
-              </div>
+              {isFocused && searchTerm && filteredSuggestions.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-neutral-200 rounded-none shadow-xl overflow-hidden z-40 py-1">
+                  {filteredSuggestions.map((suggestion, idx) => (
+                    <div 
+                      key={idx}
+                      onClick={(e) => handleSearch(e as any, suggestion)}
+                      className="px-4 py-2 hover:bg-neutral-50 cursor-pointer text-neutral-700 hover:text-[#6B00FF] transition-colors flex items-center gap-2 font-sans text-xs"
+                    >
+                      <FiSearch className="text-[10px] text-neutral-400" /> {suggestion}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between font-bold">
+          ) : (
+            <div className="hidden md:block flex-1 max-w-xl"></div>
+          )}
+
+          {/* Right Side Icons */}
+          <div className="flex items-center gap-4 md:gap-5 shrink-0">
+            {/* Cart/Basket */}
+            <Link href="/cart" className="relative text-neutral-800 hover:text-[#6B00FF] transition-colors p-1" title="Shopping Cart">
+              <FiShoppingBag className="text-xl md:text-2xl" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[#6B00FF] text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-white leading-none">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Profile Button (Clerk integration) */}
+            <div className="flex items-center">
               <Show when="signed-out">
                 <SignInButton mode="modal">
-                  <button className="text-kora hover:text-purple-700">
-                    Sign In / Register
+                  <button className="text-neutral-800 hover:text-[#6B00FF] transition-colors p-1" title="Sign In / Register">
+                    <FiUser className="text-xl md:text-2xl" />
                   </button>
                 </SignInButton>
               </Show>
               <Show when="signed-in">
-                <div className="flex items-center gap-3">
-                  <Link href="/account/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-kora hover:text-purple-700">
-                    My Account
-                  </Link>
-                  
+                <div className="flex items-center">
                   <UserButton>
                     <UserButton.MenuItems>
                       <UserButton.Link
                         label="Vault Dashboard"
-                        labelIcon={<FaBoxOpen className="text-sm" />}
+                        labelIcon={<FaBoxOpen className="text-sm text-slate-500" />}
                         href="/account/dashboard"
                       />
                     </UserButton.MenuItems>
@@ -188,10 +298,287 @@ export default function Navbar() {
                 </div>
               </Show>
             </div>
-            
+          </div>
+        </div>
+
+        {/* Mobile Search Row */}
+        {pathname !== '/shop' && (
+          <div className="md:hidden px-4 pb-3">
+            <form onSubmit={(e) => handleSearch(e)} className="relative">
+              <input 
+                type="text" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search entire store here..." 
+                className="w-full bg-neutral-50 border border-neutral-200 rounded-none py-2 px-4 pr-10 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none"
+              />
+              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">
+                <FiSearch className="text-md" />
+              </button>
+            </form>
           </div>
         )}
+
+        {/* ROW 2: Categories Navigation Row (Desktop Only - White Theme) */}
+        <div className="hidden md:block bg-white border-t border-neutral-100 py-3 relative z-30">
+          <div className="max-w-7xl mx-auto px-6 relative flex justify-center items-center gap-8 text-xs font-bold uppercase tracking-wider text-neutral-600">
+            
+            <Link href="/shop" className="hover:text-[#6B00FF] transition-colors">Shop</Link>
+            <Link href="/shop?category=World Cup" className="hover:text-[#6B00FF] transition-colors">World Cup</Link>
+            
+            {/* Clubs Dropdown Menu */}
+            <div className="group static">
+              <button className="flex items-center gap-1 hover:text-[#6B00FF] transition-colors uppercase font-bold py-1">
+                Club <FiChevronDown className="text-xs text-neutral-400 group-hover:text-[#6B00FF]" />
+              </button>
+              
+              {/* Mega Dropdown */}
+              <div className="absolute top-full left-6 right-6 bg-white border border-neutral-200 shadow-2xl rounded-none z-50 text-neutral-900 py-8 px-10 grid grid-cols-7 gap-6 transition-all duration-300 opacity-0 -translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto animate-fade-in-slide">
+                {clubCategories.map((cat, i) => (
+                  <div key={i} className="flex flex-col">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3 pb-1 border-b border-neutral-100">
+                      {cat.title}
+                    </h4>
+                    <div className="flex flex-col gap-1.5">
+                      {cat.teams.map((team, idx) => (
+                        <Link 
+                          key={idx} 
+                          href={`/shop?team=${team.name}`} 
+                          className="flex items-center gap-2 text-xs font-bold text-neutral-600 hover:text-[#6B00FF] hover:translate-x-1 transition-all duration-200 group/item"
+                        >
+                          <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center bg-neutral-50 border border-neutral-100 shrink-0">
+                            <img 
+                              src={team.logo} 
+                              alt={team.name} 
+                              className="w-3.5 h-3.5 object-contain group-hover/item:scale-110 transition-transform duration-200" 
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <span className="truncate">{team.name}</span>
+                        </Link>
+                      ))}
+                      <Link href="/shop" className="text-[9px] font-black uppercase text-neutral-400 hover:text-[#6B00FF] mt-1 flex items-center gap-0.5">
+                        View All <span>→</span>
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+                
+                {/* A-Z Club Teams Card */}
+                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-neutral-50 border border-neutral-200 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(107,0,255,0.06),transparent)]" />
+                  <div className="text-[9px] font-black text-neutral-500 uppercase tracking-widest relative z-10">A-Z Club Teams</div>
+                  <div className="relative z-10 my-auto text-center">
+                    <span className="text-3xl font-black text-neutral-900 tracking-tighter uppercase block">A <span className="text-kora">TO</span> Z</span>
+                  </div>
+                  <div className="text-[9px] font-bold text-neutral-600 group-hover/card:text-kora transition-colors flex items-center gap-1 relative z-10">
+                    Browse All <span>→</span>
+                  </div>
+                </Link>
+
+                {/* World Leagues Card */}
+                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-neutral-50 border border-neutral-200 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(107,0,255,0.06),transparent)]" />
+                  <div className="text-[9px] font-black text-neutral-500 uppercase tracking-widest relative z-10">World Leagues</div>
+                  <div className="relative z-10 grid grid-cols-3 gap-1 opacity-75 group-hover/card:opacity-95 transition-opacity">
+                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">EPL</span>
+                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">LIGA</span>
+                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">SERIE</span>
+                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">BUND</span>
+                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">MLS</span>
+                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">LIGUE</span>
+                  </div>
+                  <div className="text-[9px] font-bold text-neutral-600 group-hover/card:text-kora transition-colors flex items-center gap-1 relative z-10">
+                    Shop Leagues <span>→</span>
+                  </div>
+                </Link>
+
+              </div>
+            </div>
+
+            {/* National Dropdown Menu */}
+            <div className="group static">
+              <button className="flex items-center gap-1 hover:text-[#6B00FF] transition-colors uppercase font-bold py-1">
+                National <FiChevronDown className="text-xs text-neutral-400 group-hover:text-[#6B00FF]" />
+              </button>
+              
+              {/* Mega Dropdown */}
+              <div className="absolute top-full left-6 right-6 bg-white border border-neutral-200 shadow-2xl rounded-none z-50 text-neutral-900 py-8 px-10 grid grid-cols-6 gap-6 transition-all duration-300 opacity-0 -translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto animate-fade-in-slide">
+                {nationalCategories.map((cat, i) => (
+                  <div key={i} className="flex flex-col">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3 pb-1 border-b border-neutral-100">
+                      {cat.title}
+                    </h4>
+                    <div className="flex flex-col gap-1.5">
+                      {cat.teams.slice(0, 10).map((team, idx) => (
+                        <Link 
+                          key={idx} 
+                          href={`/shop?team=${team.name}`} 
+                          className="flex items-center gap-2 text-xs font-bold text-neutral-600 hover:text-[#6B00FF] hover:translate-x-1 transition-all duration-200 group/item"
+                        >
+                          <div className="w-5 h-3.5 rounded-none overflow-hidden flex items-center justify-center bg-neutral-50 border border-neutral-100 shrink-0">
+                            <img 
+                              src={`https://flagcdn.com/w40/${team.code}.png`} 
+                              alt={team.name} 
+                              className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-200" 
+                              referrerPolicy="no-referrer"
+                            />
+                          </div>
+                          <span className="truncate">{team.name}</span>
+                        </Link>
+                      ))}
+                      {cat.teams.length > 10 && (
+                        <Link href="/shop" className="text-[9px] font-black uppercase text-neutral-400 hover:text-[#6B00FF] mt-1 flex items-center gap-0.5">
+                          + {cat.teams.length - 10} More <span>→</span>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                
+                {/* A-Z National Teams Card */}
+                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-neutral-50 border border-neutral-200 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(107,0,255,0.06),transparent)]" />
+                  <div className="text-[9px] font-black text-neutral-500 uppercase tracking-widest relative z-10">A-Z National Teams</div>
+                  <div className="relative z-10 my-auto text-center">
+                    <span className="text-3xl font-black text-neutral-900 tracking-tighter uppercase block">A <span className="text-kora">TO</span> Z</span>
+                  </div>
+                  <div className="text-[9px] font-bold text-neutral-600 group-hover/card:text-kora transition-colors flex items-center gap-1 relative z-10">
+                    Browse All <span>→</span>
+                  </div>
+                </Link>
+
+              </div>
+            </div>
+
+            <Link href="/shop?category=Accessories" className="hover:text-[#6B00FF] transition-colors">Accessories</Link>
+            <Link href="/shop?category=Retro Kits" className="hover:text-[#6B00FF] transition-colors">Retro</Link>
+          </div>
+        </div>
       </header>
+
+      {/* 3. DISMISSIBLE PROMO BANNER (Vibrant Purple) */}
+      {isBannerVisible && (
+        <div className="w-full bg-[#6B00FF] text-white py-2.5 px-4 text-center text-xs font-black uppercase tracking-wider flex items-center justify-center relative z-20">
+          <span>AVAILABLE NOW! adidas x FIFA World Cup Patches</span>
+          <button 
+            onClick={() => setIsBannerVisible(false)}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:opacity-70 p-1 text-sm font-black focus:outline-none"
+            title="Dismiss Banner"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      {/* 4. MOBILE DRAWER NAVIGATION */}
+      {isMobileMenuOpen && (
+        <div className="absolute top-full left-0 w-full bg-white border-b border-neutral-200 flex flex-col md:hidden z-50 shadow-2xl" style={{ animation: 'mobileSlideUp 0.25s ease-out' }}>
+          <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 border-b border-neutral-100 text-neutral-900 font-black hover:bg-neutral-50 flex items-center justify-between text-sm uppercase">
+            Shop The Vault <span className="text-[#6B00FF]">→</span>
+          </Link>
+          
+          <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 border-b border-neutral-100 text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase">
+            Shop
+          </Link>
+          <Link href="/shop?category=World Cup" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 border-b border-neutral-100 text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase">
+            World Cup 2026
+          </Link>
+
+          {/* Mobile Clubs Accordion */}
+          <div className="border-b border-neutral-100">
+            <button 
+              onClick={() => setIsMobileClubsOpen(!isMobileClubsOpen)} 
+              className="w-full px-6 py-3 text-left text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase flex justify-between items-center"
+            >
+              <span>Clubs</span>
+              <FiChevronRight className={`text-sm text-neutral-400 transition-transform ${isMobileClubsOpen ? 'rotate-90' : ''}`} />
+            </button>
+            {isMobileClubsOpen && (
+              <div className="bg-neutral-50 py-2 px-6 flex flex-col gap-2 max-h-60 overflow-y-auto">
+                {clubCategories.map((cat, i) => (
+                  <div key={i} className="mb-2">
+                    <p className="text-[9px] font-black uppercase text-neutral-400 tracking-wider mb-1">{cat.title}</p>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {cat.teams.map((t, idx) => (
+                        <Link 
+                          key={idx} 
+                          href={`/shop?team=${t.name}`} 
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-1.5 text-xs text-neutral-700 hover:text-[#6B00FF] py-0.5"
+                        >
+                          <img src={t.logo} alt="" className="w-3.5 h-3.5 object-contain shrink-0" referrerPolicy="no-referrer" />
+                          <span className="truncate">{t.name}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Mobile National Accordion */}
+          <div className="border-b border-neutral-100">
+            <button 
+              onClick={() => setIsMobileNationalOpen(!isMobileNationalOpen)} 
+              className="w-full px-6 py-3 text-left text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase flex justify-between items-center"
+            >
+              <span>National Teams</span>
+              <FiChevronRight className={`text-sm text-neutral-400 transition-transform ${isMobileNationalOpen ? 'rotate-90' : ''}`} />
+            </button>
+            {isMobileNationalOpen && (
+              <div className="bg-neutral-50 py-2 px-6 flex flex-col gap-2 max-h-60 overflow-y-auto">
+                {nationalCategories.map((cat, i) => (
+                  <div key={i} className="mb-2">
+                    <p className="text-[9px] font-black uppercase text-neutral-400 tracking-wider mb-1">{cat.title}</p>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {cat.teams.map((t, idx) => (
+                        <Link 
+                          key={idx} 
+                          href={`/shop?team=${t.name}`} 
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center gap-1.5 text-xs text-neutral-700 hover:text-[#6B00FF] py-0.5"
+                        >
+                          <img src={`https://flagcdn.com/w40/${t.code}.png`} alt="" className="w-4 h-3 object-cover shrink-0" referrerPolicy="no-referrer" />
+                          <span className="truncate">{t.name}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <Link href="/shop?category=Accessories" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 border-b border-neutral-100 text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase">
+            Accessories
+          </Link>
+          <Link href="/shop?category=Retro Kits" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 border-b border-neutral-100 text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase">
+            Retro Jerseys
+          </Link>
+
+          {/* User Sign In on Mobile */}
+          <div className="px-6 py-4 flex items-center justify-between font-bold text-xs uppercase">
+            <Show when="signed-out">
+              <SignInButton mode="modal">
+                <button className="text-[#6B00FF] hover:text-purple-600">
+                  Sign In / Register
+                </button>
+              </SignInButton>
+            </Show>
+            <Show when="signed-in">
+              <div className="flex items-center gap-3">
+                <Link href="/account/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-[#6B00FF] hover:text-purple-600">
+                  My Vault Account
+                </Link>
+                <UserButton />
+              </div>
+            </Show>
+          </div>
+          
+        </div>
+      )}
     </>
   );
 }
