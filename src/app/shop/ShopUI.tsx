@@ -316,7 +316,7 @@ export default function ShopUI({ products }: { products: any[] }) {
                         </div>
                       ) : product.tag ? (
                         <div className={`absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest z-10 ${
-                          product.tag === 'Latest' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'
+                          product.tag === 'Latest' ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-rose-100 text-rose-800 border border-rose-200'
                         }`}>
                           {product.tag}
                         </div>

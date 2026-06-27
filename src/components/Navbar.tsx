@@ -169,6 +169,8 @@ export default function Navbar() {
   // Mobile accordion states
   const [isMobileClubsOpen, setIsMobileClubsOpen] = useState(false);
   const [isMobileNationalOpen, setIsMobileNationalOpen] = useState(false);
+  const [activeMobileClubCategory, setActiveMobileClubCategory] = useState<string | null>(null);
+  const [activeMobileNationalCategory, setActiveMobileNationalCategory] = useState<string | null>(null);
   
   // Patch banner state
   const [isBannerVisible, setIsBannerVisible] = useState(true);
@@ -181,6 +183,21 @@ export default function Navbar() {
       setSuggestions(products.map(p => p.name));
     });
   }, []);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isMobileMenuOpen]);
+
+  // Close mobile menu on path changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   const filteredSuggestions = suggestions.filter(item => 
     item.toLowerCase().includes(searchTerm.toLowerCase())
@@ -303,19 +320,35 @@ export default function Navbar() {
 
         {/* Mobile Search Row */}
         {pathname !== '/shop' && (
-          <div className="md:hidden px-4 pb-3">
-            <form onSubmit={(e) => handleSearch(e)} className="relative">
+          <div className="md:hidden px-4 pb-3 relative" ref={dropdownRef}>
+            <form onSubmit={(e) => handleSearch(e)} className="relative group z-20">
               <input 
                 type="text" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setTimeout(() => setIsFocused(false), 200)}
                 placeholder="Search entire store here..." 
-                className="w-full bg-neutral-50 border border-neutral-200 rounded-none py-2 px-4 pr-10 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none"
+                className="w-full bg-neutral-50 border border-neutral-200 rounded-none py-2 px-4 pr-10 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] transition-all font-sans"
               />
-              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500">
+              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-[#6B00FF] transition-colors z-20">
                 <FiSearch className="text-md" />
               </button>
             </form>
+
+            {isFocused && searchTerm && filteredSuggestions.length > 0 && (
+              <div className="absolute top-full left-4 right-4 mt-1 bg-white border border-neutral-200 rounded-none shadow-xl overflow-hidden z-40 py-1">
+                {filteredSuggestions.map((suggestion, idx) => (
+                  <div 
+                    key={idx}
+                    onClick={(e) => handleSearch(e as any, suggestion)}
+                    className="px-4 py-2 hover:bg-neutral-50 cursor-pointer text-neutral-700 hover:text-[#6B00FF] transition-colors flex items-center gap-2 font-sans text-xs"
+                  >
+                    <FiSearch className="text-[10px] text-neutral-400" /> {suggestion}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -471,114 +504,217 @@ export default function Navbar() {
         </div>
       )}
 
-      {/* 4. MOBILE DRAWER NAVIGATION */}
+      {/* Slide-over backdrop */}
       {isMobileMenuOpen && (
-        <div className="absolute top-full left-0 w-full bg-white border-b border-neutral-200 flex flex-col md:hidden z-50 shadow-2xl" style={{ animation: 'mobileSlideUp 0.25s ease-out' }}>
-          <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 border-b border-neutral-100 text-neutral-900 font-black hover:bg-neutral-50 flex items-center justify-between text-sm uppercase">
-            Shop The Vault <span className="text-[#6B00FF]">→</span>
+        <div 
+          className="fixed inset-0 bg-slate-950/65 backdrop-blur-xs z-50 md:hidden transition-opacity duration-300 animate-fade-in"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Slide-over panel */}
+      <div 
+        className={`fixed top-0 bottom-0 left-0 w-[300px] max-w-[85vw] bg-white z-50 md:hidden shadow-2xl flex flex-col transition-transform duration-300 ease-in-out transform ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Drawer Header */}
+        <div className="p-4 border-b border-neutral-200 flex justify-between items-center bg-white shrink-0">
+          <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-2xl font-black tracking-tighter uppercase hover:scale-105 transition-transform">
+            <span className="text-slate-900">KORA</span><span className="text-kora drop-shadow-[0_0_10px_rgba(107,0,255,0.4)]">STORE</span>
           </Link>
-          
-          <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 border-b border-neutral-100 text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase">
+          <button 
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-neutral-500 hover:text-neutral-800 focus:outline-none"
+          >
+            <FaXmark className="text-lg" />
+          </button>
+        </div>
+
+        {/* Drawer Scrollable Content */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Shop */}
+          <Link 
+            href="/shop" 
+            onClick={() => setIsMobileMenuOpen(false)} 
+            className="px-6 py-4 border-b border-neutral-200 text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex items-center justify-between tracking-wide"
+          >
             Shop
           </Link>
-          <Link href="/shop?category=World Cup" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 border-b border-neutral-100 text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase">
-            World Cup 2026
+          
+          {/* World Cup */}
+          <Link 
+            href="/shop?category=World Cup" 
+            onClick={() => setIsMobileMenuOpen(false)} 
+            className="px-6 py-4 border-b border-neutral-200 text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex items-center justify-between tracking-wide"
+          >
+            World Cup
           </Link>
 
-          {/* Mobile Clubs Accordion */}
-          <div className="border-b border-neutral-100">
+          {/* Club Accordion */}
+          <div className="border-b border-neutral-200">
             <button 
               onClick={() => setIsMobileClubsOpen(!isMobileClubsOpen)} 
-              className="w-full px-6 py-3 text-left text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase flex justify-between items-center"
+              className="w-full px-6 py-4 text-left text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex justify-between items-center tracking-wide"
             >
-              <span>Clubs</span>
-              <FiChevronRight className={`text-sm text-neutral-400 transition-transform ${isMobileClubsOpen ? 'rotate-90' : ''}`} />
+              <span>Club</span>
+              {isMobileClubsOpen ? (
+                <FiChevronDown className="text-sm text-neutral-500 rotate-180 transition-transform duration-200" />
+              ) : (
+                <FiChevronDown className="text-sm text-neutral-500 transition-transform duration-200" />
+              )}
             </button>
             {isMobileClubsOpen && (
-              <div className="bg-neutral-50 py-2 px-6 flex flex-col gap-2 max-h-60 overflow-y-auto">
-                {clubCategories.map((cat, i) => (
-                  <div key={i} className="mb-2">
-                    <p className="text-[9px] font-black uppercase text-neutral-400 tracking-wider mb-1">{cat.title}</p>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {cat.teams.map((t, idx) => (
-                        <Link 
-                          key={idx} 
-                          href={`/shop?team=${t.name}`} 
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="flex items-center gap-1.5 text-xs text-neutral-700 hover:text-[#6B00FF] py-0.5"
-                        >
-                          <img src={t.logo} alt="" className="w-3.5 h-3.5 object-contain shrink-0" referrerPolicy="no-referrer" />
-                          <span className="truncate">{t.name}</span>
-                        </Link>
-                      ))}
+              <div className="bg-white">
+                {clubCategories.map((cat, i) => {
+                  const isExpanded = activeMobileClubCategory === cat.title;
+                  return (
+                    <div key={i} className="border-b border-neutral-100 last:border-0">
+                      <button
+                        onClick={() => setActiveMobileClubCategory(isExpanded ? null : cat.title)}
+                        className={`w-full px-8 py-3.5 text-left text-xs font-bold uppercase tracking-wider flex justify-between items-center transition-colors ${
+                          isExpanded ? "bg-neutral-50 text-kora" : "bg-white text-neutral-700"
+                        }`}
+                      >
+                        <span>{cat.title}</span>
+                        {isExpanded ? (
+                          <FiChevronDown className="text-xs text-neutral-400 rotate-180 transition-transform duration-200" />
+                        ) : (
+                          <FiChevronDown className="text-xs text-neutral-400 transition-transform duration-200" />
+                        )}
+                      </button>
+                      {isExpanded && (
+                        <div className="bg-neutral-50/80 py-2 border-t border-neutral-100/50">
+                          {cat.teams.map((team, idx) => (
+                            <Link
+                              key={idx}
+                              href={`/shop?team=${team.name}`}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="px-12 py-2.5 flex items-center gap-3 text-xs font-bold text-neutral-700 hover:text-kora transition-colors"
+                            >
+                              <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center bg-white border border-neutral-100 shrink-0">
+                                <img src={team.logo} alt="" className="w-3.5 h-3.5 object-contain" referrerPolicy="no-referrer" />
+                              </div>
+                              <span className="truncate">{team.name}</span>
+                            </Link>
+                          ))}
+                          <Link
+                            href="/shop"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="px-12 py-2 flex items-center gap-1 text-[10px] font-black uppercase text-neutral-400 hover:text-kora"
+                          >
+                            View All <span>→</span>
+                          </Link>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
 
-          {/* Mobile National Accordion */}
-          <div className="border-b border-neutral-100">
+          {/* National Accordion */}
+          <div className="border-b border-neutral-200">
             <button 
               onClick={() => setIsMobileNationalOpen(!isMobileNationalOpen)} 
-              className="w-full px-6 py-3 text-left text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase flex justify-between items-center"
+              className="w-full px-6 py-4 text-left text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex justify-between items-center tracking-wide"
             >
-              <span>National Teams</span>
-              <FiChevronRight className={`text-sm text-neutral-400 transition-transform ${isMobileNationalOpen ? 'rotate-90' : ''}`} />
+              <span>National</span>
+              {isMobileNationalOpen ? (
+                <FiChevronDown className="text-sm text-neutral-500 rotate-180 transition-transform duration-200" />
+              ) : (
+                <FiChevronDown className="text-sm text-neutral-500 transition-transform duration-200" />
+              )}
             </button>
             {isMobileNationalOpen && (
-              <div className="bg-neutral-50 py-2 px-6 flex flex-col gap-2 max-h-60 overflow-y-auto">
-                {nationalCategories.map((cat, i) => (
-                  <div key={i} className="mb-2">
-                    <p className="text-[9px] font-black uppercase text-neutral-400 tracking-wider mb-1">{cat.title}</p>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {cat.teams.map((t, idx) => (
-                        <Link 
-                          key={idx} 
-                          href={`/shop?team=${t.name}`} 
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="flex items-center gap-1.5 text-xs text-neutral-700 hover:text-[#6B00FF] py-0.5"
-                        >
-                          <img src={`https://flagcdn.com/w40/${t.code}.png`} alt="" className="w-4 h-3 object-cover shrink-0" referrerPolicy="no-referrer" />
-                          <span className="truncate">{t.name}</span>
-                        </Link>
-                      ))}
+              <div className="bg-white">
+                {nationalCategories.map((cat, i) => {
+                  const isExpanded = activeMobileNationalCategory === cat.title;
+                  return (
+                    <div key={i} className="border-b border-neutral-100 last:border-0">
+                      <button
+                        onClick={() => setActiveMobileNationalCategory(isExpanded ? null : cat.title)}
+                        className={`w-full px-8 py-3.5 text-left text-xs font-bold uppercase tracking-wider flex justify-between items-center transition-colors ${
+                          isExpanded ? "bg-neutral-50 text-kora" : "bg-white text-neutral-700"
+                        }`}
+                      >
+                        <span>{cat.title}</span>
+                        {isExpanded ? (
+                          <FiChevronDown className="text-xs text-neutral-400 rotate-180 transition-transform duration-200" />
+                        ) : (
+                          <FiChevronDown className="text-xs text-neutral-400 transition-transform duration-200" />
+                        )}
+                      </button>
+                      {isExpanded && (
+                        <div className="bg-neutral-50/80 py-2 border-t border-neutral-100/50">
+                          {cat.teams.slice(0, 10).map((team, idx) => (
+                            <Link
+                              key={idx}
+                              href={`/shop?team=${team.name}`}
+                              onClick={() => setIsMobileMenuOpen(false)}
+                              className="px-12 py-2.5 flex items-center gap-3 text-xs font-bold text-neutral-700 hover:text-kora transition-colors"
+                            >
+                              <div className="w-5 h-3.5 rounded-none overflow-hidden flex items-center justify-center bg-white border border-neutral-100 shrink-0">
+                                <img src={`https://flagcdn.com/w40/${team.code}.png`} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                              </div>
+                              <span className="truncate">{team.name}</span>
+                            </Link>
+                          ))}
+                          <Link
+                            href="/shop"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="px-12 py-2 flex items-center gap-1 text-[10px] font-black uppercase text-neutral-400 hover:text-kora"
+                          >
+                            View All <span>→</span>
+                          </Link>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
 
-          <Link href="/shop?category=Accessories" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 border-b border-neutral-100 text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase">
+          {/* Accessories */}
+          <Link 
+            href="/shop?category=Accessories" 
+            onClick={() => setIsMobileMenuOpen(false)} 
+            className="px-6 py-4 border-b border-neutral-200 text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex items-center justify-between tracking-wide"
+          >
             Accessories
           </Link>
-          <Link href="/shop?category=Retro Kits" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-3 border-b border-neutral-100 text-neutral-800 font-bold hover:bg-neutral-50 text-xs uppercase">
-            Retro Jerseys
-          </Link>
 
-          {/* User Sign In on Mobile */}
-          <div className="px-6 py-4 flex items-center justify-between font-bold text-xs uppercase">
-            <Show when="signed-out">
-              <SignInButton mode="modal">
-                <button className="text-[#6B00FF] hover:text-purple-600">
-                  Sign In / Register
-                </button>
-              </SignInButton>
-            </Show>
-            <Show when="signed-in">
-              <div className="flex items-center gap-3">
-                <Link href="/account/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-[#6B00FF] hover:text-purple-600">
-                  My Vault Account
-                </Link>
-                <UserButton />
-              </div>
-            </Show>
-          </div>
-          
+          {/* Retro */}
+          <Link 
+            href="/shop?category=Retro Kits" 
+            onClick={() => setIsMobileMenuOpen(false)} 
+            className="px-6 py-4 border-b border-neutral-200 text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex items-center justify-between tracking-wide"
+          >
+            Retro
+          </Link>
         </div>
-      )}
+
+        {/* Drawer Footer (Sign In / Register) */}
+        <div className="p-5 border-t border-neutral-200 bg-neutral-50 flex items-center justify-between font-bold text-xs uppercase tracking-wider shrink-0">
+          <Show when="signed-out">
+            <SignInButton mode="modal">
+              <button className="text-[#6B00FF] hover:text-purple-600 flex items-center gap-2">
+                <FiUser className="text-sm" /> Sign In / Register
+              </button>
+            </SignInButton>
+          </Show>
+          <Show when="signed-in">
+            <div className="flex items-center gap-3">
+              <Link href="/account/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-[#6B00FF] hover:text-purple-600">
+                My Vault Account
+              </Link>
+              <UserButton />
+            </div>
+          </Show>
+        </div>
+      </div>
     </>
   );
 }
