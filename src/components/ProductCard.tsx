@@ -18,12 +18,21 @@ interface Product {
 export function ProductCard({ product }: { product: Product }) {
   const [activeIdx, setActiveIdx] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const images = product.images && product.images.length > 0
     ? product.images
     : product.image
       ? [product.image]
       : [];
+
+  // Detect mobile on mount
+  useEffect(() => {
+    const check = () => setIsMobile(window.matchMedia("(max-width: 767px)").matches);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     if (!isHovered || images.length <= 1) {
@@ -38,40 +47,52 @@ export function ProductCard({ product }: { product: Product }) {
     return () => clearInterval(interval);
   }, [isHovered, images.length]);
 
+  // Mobile tap to cycle images
+  const handleImageTap = (e: React.MouseEvent) => {
+    if (!isMobile || images.length <= 1) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setActiveIdx((prev) => (prev + 1) % images.length);
+  };
+
   const imageUrl = images[activeIdx] || "";
+
+  // Show dots: on mobile always (if multiple images), on desktop only on hover
+  const showDots = images.length > 1 && (isMobile || isHovered);
 
   return (
     <Link 
       href={`/shop/${product.id}`} 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative bg-white rounded-2xl border border-slate-200 hover:border-kora transition-all duration-300 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(107,0,255,0.3)] hover:-translate-y-1 overflow-hidden flex flex-col sm:h-[380px] h-[330px]"
+      className="group relative bg-white rounded-2xl border border-slate-200 hover:border-kora transition-all duration-300 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(107,0,255,0.3)] hover:-translate-y-1 overflow-hidden flex flex-col h-[300px] sm:h-[380px] active:scale-[0.98] md:active:scale-100"
     >
       <div className="relative flex-1 bg-slate-50 flex items-center justify-center overflow-hidden">
         {product.stock === 0 ? (
-          <div className="absolute top-4 left-4 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest z-20 shadow-sm bg-rose-100 text-rose-800 border border-rose-200">
+          <div className="absolute top-3 left-3 md:top-4 md:left-4 px-2.5 md:px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest z-20 shadow-sm bg-rose-100 text-rose-800 border border-rose-200">
             Sold Out
           </div>
         ) : product.tag ? (
-          <div className={`absolute top-4 left-4 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest z-20 shadow-sm ${
+          <div className={`absolute top-3 left-3 md:top-4 md:left-4 px-2.5 md:px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest z-20 shadow-sm ${
             product.tag === 'Latest' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'
           }`}>
             {product.tag}
           </div>
         ) : null}
         
-        {/* Dynamic Image with smooth micro-animation on swap */}
+        {/* Dynamic Image — tap to cycle on mobile, hover slideshow on desktop */}
         <img 
           key={activeIdx}
           src={imageUrl} 
           alt={product.name} 
           referrerPolicy="no-referrer"
+          onClick={handleImageTap}
           className={`w-full h-full object-cover drop-shadow-md group-hover:scale-105 transition-all duration-500 animate-fade-in ${product.stock === 0 ? 'opacity-40 grayscale' : 'opacity-100'}`} 
         />
 
-        {/* Premium Dot Indicators showing hover slideshow progress */}
-        {isHovered && images.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/40 px-2 py-1 rounded-full backdrop-blur-sm z-30 transition-opacity duration-300">
+        {/* Dot indicators — always visible on mobile, hover-only on desktop */}
+        {showDots && (
+          <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/40 px-2 py-1 rounded-full backdrop-blur-sm z-30 transition-opacity duration-300">
             {images.map((_, idx) => (
               <div 
                 key={idx}
@@ -84,17 +105,17 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="p-4 sm:p-5 border-t border-slate-100 relative z-20 bg-white">
-        <div className="flex justify-between items-start mb-4">
+      <div className="p-3 sm:p-5 border-t border-slate-100 relative z-20 bg-white">
+        <div className="flex justify-between items-start mb-3 md:mb-4">
           <div>
-            <p className="text-kora text-[10px] font-bold uppercase tracking-widest mb-2">{product.category}</p>
-            <h3 className="text-base font-bold text-slate-900 leading-tight line-clamp-1 font-sans">{product.name}</h3>
+            <p className="text-kora text-[10px] font-bold uppercase tracking-widest mb-1.5 md:mb-2">{product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}</p>
+            <h3 className="text-sm md:text-base font-bold text-slate-900 leading-tight line-clamp-1 font-sans">{product.name}</h3>
           </div>
-          <span className="text-lg font-bold text-slate-900 ml-2 shrink-0 whitespace-nowrap font-sans">
+          <span className="text-base md:text-lg font-bold text-slate-900 ml-2 shrink-0 whitespace-nowrap font-sans">
             {CURRENCY}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
           </span>
         </div>
-        <div className={`w-full text-center font-bold text-sm py-2.5 rounded-lg transition-colors border ${
+        <div className={`w-full text-center font-bold text-xs md:text-sm py-2 md:py-2.5 rounded-lg transition-colors border ${
           product.stock === 0 
             ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed" 
             : "bg-slate-100 group-hover:bg-kora text-slate-700 group-hover:text-white border-slate-200 group-hover:border-kora"
@@ -108,7 +129,7 @@ export function ProductCard({ product }: { product: Product }) {
 
 export function ProductSkeletonCard() {
   return (
-    <div className="group relative bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col sm:h-[380px] h-[330px] animate-pulse">
+    <div className="group relative bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[300px] sm:h-[380px] animate-pulse">
       <div className="relative flex-1 bg-slate-50 flex items-center justify-center p-8">
         <div className="w-32 h-32 bg-slate-200 rounded-full blur-xl"></div>
       </div>

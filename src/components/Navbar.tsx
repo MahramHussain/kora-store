@@ -73,7 +73,7 @@ export default function Navbar() {
       </div>
 
       {/* MAIN HEADER - Fixed Layout */}
-      <header className="px-6 py-4 flex flex-wrap md:flex-nowrap items-center justify-between gap-4 border-b border-slate-200 bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+      <header className="px-4 md:px-6 py-3 md:py-4 flex flex-wrap md:flex-nowrap items-center justify-between gap-3 md:gap-4 border-b border-slate-200 bg-white/90 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         
         {/* 1. Hamburger & Logo (Left Side) */}
         <div className="flex items-center gap-4 order-1 shrink-0">
@@ -84,7 +84,7 @@ export default function Navbar() {
             {isMobileMenuOpen ? <FaXmark /> : <FaBars />}
           </button>
 
-          <Link href="/" className="text-3xl font-black tracking-tighter uppercase hover:scale-105 transition-transform">
+          <Link href="/" className="text-2xl md:text-3xl font-black tracking-tighter uppercase hover:scale-105 transition-transform">
             <span className="text-slate-900">KORA</span><span className="text-kora drop-shadow-[0_0_10px_rgba(107,0,255,0.4)]">STORE</span>
           </Link>
         </div>
@@ -100,7 +100,7 @@ export default function Navbar() {
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setTimeout(() => setIsFocused(false), 200)}
                 placeholder="What can we help you find?" 
-                className="w-full bg-slate-100 border border-slate-200 rounded-full py-3 pl-6 pr-12 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all relative z-20 font-sans"
+                className="w-full bg-slate-100 border border-slate-200 rounded-full py-2.5 md:py-3 pl-5 md:pl-6 pr-10 md:pr-12 text-sm md:text-base text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all relative z-20 font-sans"
               />
               <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-kora transition-colors z-20 hover:scale-110">
                 &#128269;
@@ -135,13 +135,32 @@ export default function Navbar() {
 
         {/* --- MOBILE SLIDE-DOWN MENU --- */}
         {isMobileMenuOpen && (
-          <div className="absolute top-full left-0 w-full bg-white border-b border-slate-200 flex flex-col md:hidden z-40 shadow-xl animate-fade-in-up">
+          <div className="absolute top-full left-0 w-full bg-white border-b border-slate-200 flex flex-col md:hidden z-40 shadow-xl" style={{ animation: 'mobileSlideUp 0.25s ease-out' }}>
             <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-slate-100 text-slate-900 font-bold hover:bg-slate-50 flex items-center justify-between">
               Shop The Vault <span className="text-kora">→</span>
             </Link>
             <Link href="/shop?tag=Trending" onClick={() => setIsMobileMenuOpen(false)} className="px-6 py-4 border-b border-slate-100 text-slate-900 font-bold hover:bg-slate-50">
               Trending Gear
             </Link>
+
+            {/* Category Quick Links */}
+            <div className="px-6 py-4 border-b border-slate-100">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">Browse</p>
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                <Link href="/shop" onClick={() => setIsMobileMenuOpen(false)} className="shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-kora text-white border border-kora shadow-sm">
+                  Featured
+                </Link>
+                <Link href="/shop?category=Shirts" onClick={() => setIsMobileMenuOpen(false)} className="shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-slate-700 border border-slate-200 active:bg-slate-50">
+                  Jerseys
+                </Link>
+                <Link href="/shop?category=Boots" onClick={() => setIsMobileMenuOpen(false)} className="shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-slate-700 border border-slate-200 active:bg-slate-50">
+                  Shoes
+                </Link>
+                <Link href="/shop?category=Flags" onClick={() => setIsMobileMenuOpen(false)} className="shrink-0 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-slate-700 border border-slate-200 active:bg-slate-50">
+                  Accessories
+                </Link>
+              </div>
+            </div>
             
             <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between font-bold">
               <Show when="signed-out">

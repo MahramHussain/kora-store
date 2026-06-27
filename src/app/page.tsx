@@ -14,7 +14,7 @@ async function WorldCupJerseySlider() {
   return (
     <>
       {products.map((product) => (
-        <div key={product.id} className="snap-start shrink-0 w-[260px] md:w-[300px]">
+        <div key={product.id} className="snap-start shrink-0 w-[220px] md:w-[300px]">
           <ProductCard product={{...product, price: product.price.toString()}} />
         </div>
       ))}
@@ -32,7 +32,7 @@ async function ShoesSlider() {
   return (
     <>
       {products.map((product) => (
-        <div key={product.id} className="snap-start shrink-0 w-[260px] md:w-[300px]">
+        <div key={product.id} className="snap-start shrink-0 w-[220px] md:w-[300px]">
           <ProductCard product={{...product, price: product.price.toString()}} />
         </div>
       ))}
@@ -50,7 +50,7 @@ async function StreetwearAndGearSlider() {
   return (
     <>
       {products.map((product) => (
-        <div key={product.id} className="snap-start shrink-0 w-[260px] md:w-[300px]">
+        <div key={product.id} className="snap-start shrink-0 w-[220px] md:w-[300px]">
           <ProductCard product={{...product, price: product.price.toString()}} />
         </div>
       ))}
@@ -72,35 +72,37 @@ export default async function Home() {
   });
 
   return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pb-20">
-      {/* 3. CATEGORY NAVIGATION */}
-      <nav className="flex items-center gap-8 px-6 py-4 overflow-x-auto text-sm font-semibold tracking-wider uppercase whitespace-nowrap border-b border-slate-200 bg-slate-50 scrollbar-hide shadow-sm">
+    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pb-12 md:pb-20">
+      {/* 3. CATEGORY NAVIGATION — Hidden on mobile (in burger menu), visible on desktop */}
+      <nav className="hidden md:flex items-center gap-8 px-6 py-4 overflow-x-auto text-sm font-semibold tracking-wider uppercase whitespace-nowrap border-b border-slate-200 bg-slate-50 scrollbar-hide shadow-sm">
         <Link href="/shop" className="text-kora hover:text-purple-700 transition-colors">Featured</Link>
         <Link href="/shop" className="text-slate-600 hover:text-kora transition-colors">Shop All</Link>
         <Link href="/shop?category=Shirts" className="text-slate-600 hover:text-emerald-600 transition-colors">Jerseys</Link>
         <Link href="/shop?category=Boots" className="text-slate-600 hover:text-rose-600 transition-colors">Shoes</Link>
-        <Link href="/shop?category=Flags" className="text-slate-600 hover:text-blue-600 transition-colors">Club Flags</Link>
+        <Link href="/shop?category=Flags" className="text-slate-600 hover:text-blue-600 transition-colors">Accessories</Link>
       </nav>
 
-      {/* 4. PROMO BANNER */}
-      <div className="bg-purple-100 border-b border-purple-200 py-2.5 text-center text-sm font-bold text-purple-900 px-4">
-        🏆 <span className="text-purple-700 font-black">WORLD CUP 2026 DEBUT:</span> Secure the new official national jerseys before the tournament starts. Use code <span className="font-bold text-kora">WORLD26</span> for free shipping.
+      {/* 4. PROMO BANNER — Scannable on mobile */}
+      <div className="bg-purple-100 border-b border-purple-200 py-3 md:py-2.5 text-center text-xs md:text-sm font-bold text-purple-900 px-4">
+        <span className="block md:inline">🏆 <span className="text-purple-700 font-black">WORLD CUP 2026 DEBUT</span></span>
+        <span className="block md:inline md:ml-1 mt-0.5 md:mt-0">Use code <span className="font-bold text-kora">WORLD26</span> for free shipping</span>
       </div>
 
       <div className="max-w-7xl mx-auto w-full">
         {/* 5. SHOP YOUR TEAM & NATION SECTION */}
-        <section className="px-6 pt-12 pb-0">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8 mb-1">
-            <div className="flex flex-col shrink-0">
-              <h2 className="text-2xl font-black tracking-tighter uppercase">Support Your Side</h2>
-              <p className="text-xs text-slate-500 mt-1 max-w-[200px]">National teams & world-class clubs.</p>
-              <Link href="/shop" className="mt-4 text-xs font-bold border border-slate-300 rounded-full py-2 px-4 hover:bg-slate-100 text-slate-600 transition-colors w-max text-center">
+        <section className="px-4 md:px-6 pt-8 md:pt-12 pb-0">
+          {/* Mobile: centered header. Desktop: side-by-side layout preserved */}
+          <div className="flex flex-col lg:flex-row items-center lg:items-center gap-4 md:gap-8 mb-1">
+            <div className="flex flex-col items-center md:items-start shrink-0">
+              <h2 className="text-lg md:text-2xl font-black tracking-tighter uppercase text-center md:text-left">Support Your Side</h2>
+              <p className="text-[11px] md:text-xs text-slate-500 mt-1 max-w-[200px] text-center md:text-left">National teams & world-class clubs.</p>
+              <Link href="/shop" className="hidden md:inline-flex mt-4 text-xs font-bold border border-slate-300 rounded-full py-2 px-4 hover:bg-slate-100 text-slate-600 transition-colors w-max text-center">
                 See All Teams
               </Link>
             </div>
             
             {/* Scroll Container of Teams & Nations */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 w-full">
               <ScrollSlider>
                 {[
                   // National Teams (First/Spotlighted)
@@ -184,8 +186,8 @@ export default async function Home() {
                     text: 'group-hover:text-red-500'
                   }
                 ].map((team, i) => (
-                  <Link href={`/shop?team=${team.name}`} key={i} className="flex flex-col items-center gap-3 shrink-0 cursor-pointer group px-2 snap-start">
-                    <div className={`relative w-20 h-20 rounded-full flex items-center justify-center p-3 bg-white border border-slate-200 transition-all duration-500 z-10 shadow-sm ${team.glow}`}>
+                  <Link href={`/shop?team=${team.name}`} key={i} className="flex flex-col items-center gap-2 md:gap-3 shrink-0 cursor-pointer group px-1.5 md:px-2 snap-start mobile-tap-feedback">
+                    <div className={`relative w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center p-2.5 md:p-3 bg-white border border-slate-200 transition-all duration-500 z-10 shadow-sm ${team.glow}`}>
                       <img 
                         src={team.logo} 
                         alt={`${team.name} Logo`} 
@@ -193,7 +195,7 @@ export default async function Home() {
                         className="relative z-20 w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
-                    <span className={`text-xs font-semibold text-slate-500 text-center max-w-[80px] transition-colors duration-500 uppercase ${team.text}`}>
+                    <span className={`text-[10px] md:text-xs font-semibold text-slate-500 text-center max-w-[64px] md:max-w-[80px] transition-colors duration-500 uppercase leading-tight ${team.text}`}>
                       {team.name}
                     </span>
                   </Link>
@@ -205,22 +207,22 @@ export default async function Home() {
       </div>
 
       {/* 6. WORLD CUP HERO BANNER */}
-      <section className="w-full mb-12">
-        <div className="relative w-full h-[400px] md:h-[600px] rounded-none overflow-hidden group">
+      <section className="w-full mb-8 md:mb-12">
+        <div className="relative w-full h-[480px] md:h-[600px] rounded-none overflow-hidden group">
           <img 
             src="/assets/worldcup_banner.jpg" 
             alt="World Cup 2026"
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 pointer-events-none"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent z-10"></div>
-          <div className="absolute bottom-6 md:bottom-12 left-6 md:left-12 z-20 max-w-xl">
-            <h2 className="text-3xl md:text-5xl font-black text-white mb-3 tracking-tighter uppercase font-sans drop-shadow-md">
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 md:via-slate-950/20 to-transparent z-10"></div>
+          <div className="absolute bottom-0 left-0 right-0 md:right-auto md:bottom-12 md:left-12 p-5 md:p-0 z-20 md:max-w-xl">
+            <h2 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-3 tracking-tighter uppercase font-sans drop-shadow-md">
               World Cup 26 is here
             </h2>
-            <p className="text-slate-200 text-xs md:text-sm mb-6 max-w-md font-sans font-medium leading-relaxed drop-shadow-sm">
-              Gear up for the biggest tournament on earth. Official national jerseys, elite training apparel, and exclusive federation gear. Sourced direct.
+            <p className="text-slate-300 md:text-slate-200 text-xs md:text-sm mb-5 md:mb-6 max-w-[320px] md:max-w-md font-sans font-medium leading-relaxed drop-shadow-sm">
+              Official national jerseys, elite training apparel, and exclusive federation gear. Sourced direct.
             </p>
-            <Link href="/shop" className="inline-block bg-white text-slate-900 px-6 md:px-8 py-2.5 md:py-3 rounded-none font-bold text-xs md:text-sm hover:bg-kora hover:text-white hover:scale-105 transition-all shadow-lg uppercase tracking-wider">
+            <Link href="/shop" className="mobile-cta-full md:inline-block bg-white text-slate-900 px-6 md:px-8 py-3.5 md:py-3 rounded-xl md:rounded-none font-bold text-sm md:text-sm hover:bg-kora hover:text-white hover:scale-105 transition-all shadow-lg uppercase tracking-wider">
               Shop Now
             </Link>
           </div>
@@ -228,12 +230,12 @@ export default async function Home() {
       </section>
 
       {/* 7. LATEST WORLD CUP DROP (SPOTLIGHT SECTION) */}
-      <section className="px-6 mb-16 max-w-7xl mx-auto w-full">
-        <div className="flex justify-between items-end mb-6">
-          <h2 className="text-2xl font-bold flex items-center gap-4 uppercase tracking-tight">
-            <span className="relative flex h-4 w-4">
+      <section className="px-4 md:px-6 mb-10 md:mb-16 max-w-7xl mx-auto w-full">
+        <div className="flex justify-between items-end mb-4 md:mb-6">
+          <h2 className="text-xl md:text-2xl font-bold flex items-center gap-3 md:gap-4 uppercase tracking-tight">
+            <span className="relative flex h-3 w-3 md:h-4 md:w-4">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-kora opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-4 w-4 bg-kora"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 md:h-4 md:w-4 bg-kora"></span>
             </span>
             World Cup Spotlight
           </h2>
@@ -241,28 +243,28 @@ export default async function Home() {
         
         {argentinaAwayKit && (
           <div 
-            className="relative w-full h-[320px] md:h-[400px] rounded-2xl overflow-hidden group border border-slate-200 hover:border-[#d45372]/50 transition-colors shadow-2xl"
+            className="relative w-full h-[400px] md:h-[400px] rounded-2xl overflow-hidden group border border-slate-200 hover:border-[#d45372]/50 transition-colors shadow-2xl"
             style={{ backgroundColor: '#d45372' }}
           >
-            {/* Spotlight Banner Image aligned to the right, showing fully with contain */}
+            {/* Spotlight Banner Image — top area on mobile, right-aligned on desktop */}
             <img 
               src="/assets/argentina_away_spotlight.png" 
               alt="Argentina Away Kit"
-              className="absolute right-0 top-0 h-full w-auto object-contain pointer-events-none z-0 group-hover:scale-102 transition-transform duration-700"
+              className="absolute right-0 top-0 h-[55%] md:h-full w-auto object-contain pointer-events-none z-0 group-hover:scale-102 transition-transform duration-700"
             />
             
-            {/* Pink gradient overlay on the left to blend image seamlessly and keep text readable */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#d45372] via-[#d45372]/90 to-transparent z-10"></div>
+            {/* Gradient overlay — bottom-up on mobile for text area, left-to-right on desktop */}
+            <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#d45372] via-[#d45372]/95 md:via-[#d45372]/90 to-transparent z-10"></div>
             
-            <div className="absolute top-1/2 -translate-y-1/2 left-6 md:left-12 z-20 max-w-[280px] sm:max-w-md md:max-w-lg">
-              <p className="text-pink-200 font-bold tracking-widest text-xs md:text-sm uppercase mb-2 md:mb-3">World Cup Highlight</p>
-              <h3 className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-3 md:mb-4 leading-none tracking-tighter uppercase break-words font-sans">
+            <div className="absolute bottom-0 left-0 right-0 md:right-auto md:top-1/2 md:-translate-y-1/2 md:left-12 p-5 md:p-0 z-20 md:max-w-lg">
+              <p className="text-pink-200 font-bold tracking-widest text-[10px] md:text-sm uppercase mb-1.5 md:mb-3">World Cup Highlight</p>
+              <h3 className="text-2xl md:text-5xl lg:text-6xl font-black text-white mb-2 md:mb-4 leading-none tracking-tighter uppercase break-words font-sans">
                 Argentina Away Kit
               </h3>
-              <p className="text-pink-100 mb-6 md:mb-8 max-w-xs md:max-w-sm text-xs md:text-base line-clamp-2 md:line-clamp-3 font-sans font-medium">
+              <p className="text-pink-100 mb-4 md:mb-8 max-w-[280px] md:max-w-sm text-xs md:text-base line-clamp-2 md:line-clamp-3 font-sans font-medium">
                 {argentinaAwayKit.description || "Represent your nation on the world stage. Official premium federation apparel engineered for breathability and elite comfort."}
               </p>
-              <Link href={`/shop/${argentinaAwayKit.id}`} className="inline-block bg-white text-[#d45372] px-6 md:px-8 py-2 md:py-3 rounded-full font-bold text-xs md:text-sm hover:scale-105 transition-transform shadow-[0_0_20px_rgba(212,83,114,0.4)]">
+              <Link href={`/shop/${argentinaAwayKit.id}`} className="mobile-cta-full md:inline-block bg-white text-[#d45372] px-6 md:px-8 py-3 md:py-3 rounded-full font-bold text-xs md:text-sm hover:scale-105 transition-transform shadow-[0_0_20px_rgba(212,83,114,0.4)]">
                 Shop The National Kit
               </Link>
             </div>
@@ -271,17 +273,17 @@ export default async function Home() {
       </section>
 
       {/* 8. WORLD CUP JERSEYS (Horizontal Slider) */}
-      <section className="px-6 mb-16 max-w-7xl mx-auto w-full">
-        <div className="flex justify-between items-end mb-6 border-b border-slate-200 pb-4">
+      <section className="px-4 md:px-6 mb-10 md:mb-16 max-w-7xl mx-auto w-full">
+        <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 pb-3 md:pb-4">
           <div>
-            <h2 className="text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
+            <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
               National Jerseys
             </h2>
-            <p className="text-sm text-slate-500 mt-2">The latest World Cup 2026 kit releases.</p>
+            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">The latest World Cup 2026 kit releases.</p>
           </div>
           <Link 
             href="/shop?category=Shirts" 
-            className="text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-2 group"
+            className="text-[10px] md:text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
             See All 
             <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -292,7 +294,7 @@ export default async function Home() {
           <Suspense fallback={
             <>
               {[1, 2, 3, 4].map(n => (
-                <div key={n} className="snap-start shrink-0 w-[260px] md:w-[300px]">
+                <div key={n} className="snap-start shrink-0 w-[220px] md:w-[300px]">
                   <ProductSkeletonCard />
                 </div>
               ))}
@@ -304,17 +306,17 @@ export default async function Home() {
       </section>
 
       {/* 8.5 SHOES (Horizontal Slider) */}
-      <section className="px-6 mb-16 max-w-7xl mx-auto w-full">
-        <div className="flex justify-between items-end mb-6 border-b border-slate-200 pb-4">
+      <section className="px-4 md:px-6 mb-10 md:mb-16 max-w-7xl mx-auto w-full">
+        <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 pb-3 md:pb-4">
           <div>
-            <h2 className="text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
+            <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
               Shoes
             </h2>
-            <p className="text-sm text-slate-500 mt-2">Elite pitch boots and luxury streetwear sneakers.</p>
+            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">Elite pitch boots and luxury streetwear sneakers.</p>
           </div>
           <Link 
             href="/shop?category=Boots" 
-            className="text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-2 group"
+            className="text-[10px] md:text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
             See All 
             <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -325,7 +327,7 @@ export default async function Home() {
           <Suspense fallback={
             <>
               {[1, 2, 3, 4].map(n => (
-                <div key={n} className="snap-start shrink-0 w-[260px] md:w-[300px]">
+                <div key={n} className="snap-start shrink-0 w-[220px] md:w-[300px]">
                   <ProductSkeletonCard />
                 </div>
               ))}
@@ -337,19 +339,19 @@ export default async function Home() {
       </section>
 
       {/* 9. STREETWEAR, ACCESSORIES & FLAGS (Horizontal Slider) */}
-      <section className="px-6 mb-24 max-w-7xl mx-auto w-full">
-        <div className="flex justify-between items-end mb-6 border-b border-slate-200 pb-4">
+      <section className="px-4 md:px-6 mb-16 md:mb-24 max-w-7xl mx-auto w-full">
+        <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 pb-3 md:pb-4">
           <div>
-            <h2 className="text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
-              Streetwear & Accessories
+            <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
+              Streetwear & Gear
             </h2>
-            <p className="text-sm text-slate-500 mt-2">Premium performance socks and official club flags.</p>
+            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">Premium performance socks and official club flags.</p>
           </div>
           <Link 
             href="/shop" 
-            className="text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-2 group"
+            className="text-[10px] md:text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
-            Explore All Gear 
+            See All 
             <span className="group-hover:translate-x-1 transition-transform">→</span>
           </Link>
         </div>
@@ -358,7 +360,7 @@ export default async function Home() {
           <Suspense fallback={
             <>
               {[1, 2, 3, 4].map(n => (
-                <div key={n} className="snap-start shrink-0 w-[260px] md:w-[300px]">
+                <div key={n} className="snap-start shrink-0 w-[220px] md:w-[300px]">
                   <ProductSkeletonCard />
                 </div>
               ))}

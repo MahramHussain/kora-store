@@ -1,12 +1,72 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { FaFilter, FaSearch } from "react-icons/fa";
+import { FaXmark } from "react-icons/fa6";
 import { ProductCard } from "@/components/ProductCard";
 import Link from "next/link";
 import { CURRENCY } from "@/lib/constants";
 
-const CATEGORIES = ["All", "World Cup", "Shoes", "Shirts", "Retro Kits", "Accessories", "Flags"];
+const CATEGORIES = ["All", "World Cup", "Shoes", "Shirts", "Retro Kits", "Accessories"];
 const TEAMS = ["All Teams", "Argentina", "Brazil", "France", "Germany", "Portugal", "Spain", "Uruguay", "Arsenal", "Barcelona", "Real Madrid", "Man City", "PSG", "Manchester United"];
+
+// ─── Mini Image Carousel (pure CSS scroll-snap, no JS animation) ───
+function MiniCarousel({ images, alt, soldOut }: { images: string[]; alt: string; soldOut: boolean }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      const slideWidth = el.clientWidth;
+      if (slideWidth > 0) {
+        setActiveSlide(Math.round(el.scrollLeft / slideWidth));
+      }
+    };
+    el.addEventListener("scroll", handleScroll, { passive: true });
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  if (images.length <= 1) {
+    return (
+      <img
+        src={images[0] || ""}
+        alt={alt}
+        referrerPolicy="no-referrer"
+        loading="lazy"
+        className={`w-full h-full object-cover ${soldOut ? "opacity-40 grayscale" : ""}`}
+      />
+    );
+  }
+
+  return (
+    <div className="relative w-full h-full">
+      <div ref={scrollRef} className="mobile-mini-carousel w-full h-full">
+        {images.slice(0, 3).map((img, idx) => (
+          <img
+            key={idx}
+            src={img}
+            alt={`${alt} ${idx + 1}`}
+            referrerPolicy="no-referrer"
+            loading="lazy"
+            className={`mobile-mini-carousel-slide object-cover ${soldOut ? "opacity-40 grayscale" : ""}`}
+          />
+        ))}
+      </div>
+      {/* Dot indicators */}
+      <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-1 z-10">
+        {images.slice(0, 3).map((_, idx) => (
+          <div
+            key={idx}
+            className={`w-1.5 h-1.5 rounded-full transition-all ${
+              idx === activeSlide ? "bg-kora scale-125" : "bg-slate-300"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function ShopUI({ products }: { products: any[] }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,6 +74,7 @@ export default function ShopUI({ products }: { products: any[] }) {
   const [activeTeam, setActiveTeam] = useState("All Teams");
   const [activeTag, setActiveTag] = useState("All");
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -61,6 +122,16 @@ export default function ShopUI({ products }: { products: any[] }) {
     };
   }, []);
 
+  // Lock body scroll when bottom sheet is open
+  useEffect(() => {
+    if (isBottomSheetOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isBottomSheetOpen]);
+
   // Reset page scroll to the top of viewport when filters change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -71,6 +142,7 @@ export default function ShopUI({ products }: { products: any[] }) {
     const matchesCategory = activeCategory === "All" || 
       (activeCategory === "Shoes" && product.category === "Boots") ||
       (activeCategory === "World Cup" && product.isWorldCup) ||
+      (activeCategory === "Accessories" && (product.category === "Flags" || product.category === "Accessories")) ||
       product.category === activeCategory;
     const matchesTag = activeTag === "All" || product.tag === activeTag;
     const matchesTeam = activeTeam === "All Teams" || (product.team && product.team.toLowerCase() === activeTeam.toLowerCase());
@@ -84,8 +156,8 @@ export default function ShopUI({ products }: { products: any[] }) {
   const categoryPriority = (cat: string) => {
     if (cat === "Shirts") return 1;
     if (cat === "Boots") return 2;
-    if (cat === "Accessories") return 3;
-    return 4; // Flags, etc.
+    if (cat === "Accessories" || cat === "Flags") return 3;
+    return 4;
   };
 
   const tagPriority = (tag: string | null) => {
@@ -95,31 +167,51 @@ export default function ShopUI({ products }: { products: any[] }) {
   };
 
   displayProducts.sort((a, b) => {
-    // 1. Primary: Category priority
     const catA = categoryPriority(a.category);
     const catB = categoryPriority(b.category);
-    if (catA !== catB) {
-      return catA - catB;
-    }
+    if (catA !== catB) return catA - catB;
 
-    // 2. Secondary: Tag priority
     const tagA = tagPriority(a.tag);
     const tagB = tagPriority(b.tag);
-    if (tagA !== tagB) {
-      return tagA - tagB;
-    }
+    if (tagA !== tagB) return tagA - tagB;
 
-    // 3. Tertiary: Alphabetical sorting of names
     return a.name.localeCompare(b.name);
   });
 
-  return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans pt-8 pb-20 px-6">
-      <div className="max-w-7xl mx-auto">
-        
+  // Count active filters for badge
+  const activeFilterCount = 
+    (activeCategory !== "All" ? 1 : 0) + 
+    (activeTeam !== "All Teams" ? 1 : 0) +
+    (activeTag !== "All" ? 1 : 0);
 
-        {/* Toggle Button for mobile filters */}
-        <div className="w-full lg:hidden flex gap-3 mb-6">
+  return (
+    <main className="min-h-screen bg-white text-slate-900 font-sans pt-4 md:pt-8 pb-20 px-4 md:px-6">
+      <div className="max-w-7xl mx-auto">
+
+        {/* ═══ MOBILE: Always-visible sticky search bar ═══ */}
+        <div className="sm:hidden sticky top-[57px] z-30 bg-white pb-3 pt-1 -mx-4 px-4">
+          <div className="relative">
+            <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
+            <input
+              type="text"
+              placeholder="Search jerseys, boots..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-9 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all font-sans"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 active:text-slate-600"
+              >
+                <FaXmark className="text-sm" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ═══ TABLET: Toggle for filters (sm to lg only) ═══ */}
+        <div className="w-full hidden sm:flex lg:hidden gap-3 mb-6">
           <button 
             onClick={() => setIsFiltersOpen(!isFiltersOpen)}
             className="flex-1 flex items-center justify-center gap-2 bg-slate-50 border border-slate-200 rounded-xl py-3 text-sm font-bold text-slate-800 active:bg-slate-100 transition-colors shadow-sm"
@@ -129,11 +221,11 @@ export default function ShopUI({ products }: { products: any[] }) {
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8 items-start">
-          {/* Filters Sidebar (Confined scroll: scrolling here doesn't affect page) */}
+          {/* Filters Sidebar (Desktop/Tablet only — hidden on mobile, replaced by bottom sheet) */}
           <aside 
             ref={sidebarRef}
-            className={`w-full lg:w-64 xl:w-72 shrink-0 lg:sticky lg:top-28 z-20 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto scrollbar-hide overscroll-contain ${
-              isFiltersOpen ? "block" : "hidden lg:block"
+            className={`w-full lg:w-64 xl:w-72 shrink-0 lg:sticky lg:top-28 z-20 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto scrollbar-hide overscroll-contain hidden sm:block ${
+              isFiltersOpen ? "sm:block" : "sm:hidden lg:block"
             }`}
           >
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
@@ -201,22 +293,21 @@ export default function ShopUI({ products }: { products: any[] }) {
 
           {/* Products Grid/List Pane */}
           <div className="flex-1 w-full">
-            {/* Mobile View: Amazon-style List Layout */}
-            <div className="block sm:hidden space-y-4">
+            {/* Mobile View: List Layout with Image Slideshow */}
+            <div className="block sm:hidden space-y-3">
               {displayProducts.map((product) => {
                 const images = product.images && product.images.length > 0
                   ? product.images
                   : product.image
                     ? [product.image]
                     : [];
-                const imageUrl = images[0] || "";
                 return (
                   <Link 
                     href={`/shop/${product.id}`} 
                     key={product.id}
-                    className="flex gap-4 p-3 bg-white border border-slate-200 active:border-kora rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.99] overflow-hidden"
+                    className="flex gap-3 p-2.5 bg-white border border-slate-200 active:border-kora rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.99] overflow-hidden"
                   >
-                    {/* Left: Product Image */}
+                    {/* Left: Product Image Carousel */}
                     <div className="w-28 h-28 shrink-0 bg-slate-50 border border-slate-100 rounded-xl overflow-hidden flex items-center justify-center relative">
                       {product.stock === 0 ? (
                         <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest z-10 bg-rose-100 text-rose-800 border border-rose-200">
@@ -229,18 +320,17 @@ export default function ShopUI({ products }: { products: any[] }) {
                           {product.tag}
                         </div>
                       ) : null}
-                      <img 
-                        src={imageUrl} 
+                      <MiniCarousel 
+                        images={images} 
                         alt={product.name} 
-                        referrerPolicy="no-referrer"
-                        className={`w-full h-full object-cover ${product.stock === 0 ? 'opacity-40 grayscale' : 'opacity-100'}`} 
+                        soldOut={product.stock === 0} 
                       />
                     </div>
 
                     {/* Right: Product Info */}
-                    <div className="flex-1 flex flex-col justify-between py-1 font-sans">
+                    <div className="flex-1 flex flex-col justify-between py-0.5 font-sans">
                       <div>
-                        <p className="text-kora text-[9px] font-bold uppercase tracking-widest mb-1">{product.category}</p>
+                        <p className="text-kora text-[9px] font-bold uppercase tracking-widest mb-1">{product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}</p>
                         <h3 className="text-sm font-bold text-slate-900 leading-tight line-clamp-2">{product.name}</h3>
                       </div>
                       
@@ -273,9 +363,9 @@ export default function ShopUI({ products }: { products: any[] }) {
             </div>
 
             {displayProducts.length === 0 && (
-              <div className="text-center py-24 border border-slate-200 rounded-2xl bg-slate-50 shadow-sm">
+              <div className="text-center py-16 md:py-24 border border-slate-200 rounded-2xl bg-slate-50 shadow-sm">
                 <div className="text-4xl mb-4 opacity-50">🏟️</div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">The Vault is empty.</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">The Vault is empty.</h3>
                 <button 
                   onClick={() => {
                     setSearchQuery("");
@@ -290,6 +380,102 @@ export default function ShopUI({ products }: { products: any[] }) {
             )}
           </div>
         </div>
+
+        {/* ═══ MOBILE: Filter FAB (Floating Action Button) ═══ */}
+        <button
+          onClick={() => setIsBottomSheetOpen(true)}
+          className="sm:hidden mobile-filter-fab"
+          aria-label="Open filters"
+        >
+          <FaFilter className="text-lg" />
+          {activeFilterCount > 0 && (
+            <span className="mobile-filter-fab-badge">{activeFilterCount}</span>
+          )}
+        </button>
+
+        {/* ═══ MOBILE: Bottom Sheet Filter Drawer ═══ */}
+        {isBottomSheetOpen && (
+          <>
+            <div 
+              className="sm:hidden mobile-bottom-sheet-backdrop"
+              onClick={() => setIsBottomSheetOpen(false)}
+            />
+            <div className="sm:hidden mobile-bottom-sheet">
+              <div className="mobile-bottom-sheet-handle" />
+              
+              <div className="p-5 space-y-5">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-black uppercase tracking-tight">Filters</h3>
+                  <button 
+                    onClick={() => setIsBottomSheetOpen(false)}
+                    className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:bg-slate-200"
+                  >
+                    <FaXmark className="text-sm" />
+                  </button>
+                </div>
+
+                {/* Categories */}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2.5">Category</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {CATEGORIES.map((category) => (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => setActiveCategory(category)}
+                        className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
+                          activeCategory === category
+                            ? "bg-kora border-kora text-white shadow-sm"
+                            : "bg-white text-slate-600 border-slate-200 active:border-kora"
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Teams */}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2.5">Team</p>
+                  <div className="relative">
+                    <select
+                      value={activeTeam}
+                      onChange={(e) => setActiveTeam(e.target.value)}
+                      className="w-full appearance-none bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm text-slate-900 focus:outline-none focus:border-kora transition-all font-sans"
+                    >
+                      {TEAMS.map((team) => (
+                        <option key={team} value={team}>{team}</option>
+                      ))}
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">&#9662;</div>
+                  </div>
+                </div>
+
+                {/* Action buttons */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => {
+                      setActiveCategory("All");
+                      setActiveTeam("All Teams");
+                      setActiveTag("All");
+                    }}
+                    className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-wider border border-slate-200 text-slate-600 active:bg-slate-50"
+                  >
+                    Clear All
+                  </button>
+                  <button
+                    onClick={() => setIsBottomSheetOpen(false)}
+                    className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-kora text-white border border-kora shadow-sm active:bg-purple-700"
+                  >
+                    Show Results ({displayProducts.length})
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
 
       </div>
     </main>

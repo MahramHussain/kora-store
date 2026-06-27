@@ -116,7 +116,7 @@ export default function ProductUI({ product }: { product: any }) {
           <div className="flex-1 w-full flex flex-col justify-center">
             <div className="mb-8">
               <span className="text-kora font-bold tracking-widest uppercase text-xs mb-2 block">
-                {product.category === "Boots" ? "Shoes" : product.category}
+                {product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}
               </span>
               <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-4 leading-tight uppercase">
                 {product.name}

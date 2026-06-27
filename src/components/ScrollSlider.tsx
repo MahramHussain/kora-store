@@ -6,12 +6,19 @@ export function ScrollSlider({ children }: { children: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const checkScroll = () => {
     if (containerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
       setShowLeft(scrollLeft > 5);
       setShowRight(scrollLeft + clientWidth < scrollWidth - 5);
+      
+      // Calculate scroll progress for mobile indicator
+      const maxScroll = scrollWidth - clientWidth;
+      if (maxScroll > 0) {
+        setScrollProgress((scrollLeft / maxScroll) * 100);
+      }
     }
   };
 
@@ -66,9 +73,17 @@ export function ScrollSlider({ children }: { children: React.ReactNode }) {
       {/* Touch-Scrollable Container */}
       <div
         ref={containerRef}
-        className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory w-full scroll-smooth py-2 px-1"
+        className="flex gap-4 md:gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory w-full scroll-smooth py-2 px-1"
       >
         {children}
+      </div>
+
+      {/* Mobile-only scroll progress indicator */}
+      <div className="md:hidden mobile-scroll-progress">
+        <div 
+          className="mobile-scroll-progress-bar" 
+          style={{ width: `${Math.max(scrollProgress, 8)}%` }}
+        />
       </div>
     </div>
   );

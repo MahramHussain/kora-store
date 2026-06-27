@@ -134,3 +134,289 @@
 .cl-userButtonPopoverFooter {
   display: none !important;
 }
+
+/* ==========================================================================
+   MOBILE-ONLY ENHANCEMENTS (< 768px)
+   Zero impact on md+ breakpoints
+   ========================================================================== */
+
+/* Mobile entrance animation */
+@keyframes mobileSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mobileFadeScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes mobileShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes mobilePulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(107, 0, 255, 0.3); }
+  50% { box-shadow: 0 0 0 6px rgba(107, 0, 255, 0); }
+}
+
+@media (max-width: 767px) {
+  /* Premium touch feedback for tappable elements */
+  .mobile-tap-feedback {
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+  }
+  .mobile-tap-feedback:active {
+    transform: scale(0.97);
+    opacity: 0.85;
+  }
+
+  /* Section entrance animations */
+  .mobile-section-animate {
+    animation: mobileSlideUp 0.5s ease-out both;
+  }
+
+  /* Team logo entrance stagger via CSS */
+  .mobile-fade-scale {
+    animation: mobileFadeScale 0.4s ease-out both;
+  }
+
+  /* iOS momentum scrolling enhancement */
+  .scrollbar-hide {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+
+  /* Scroll fade indicators for horizontal scroll containers */
+  .mobile-scroll-fade-right::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 48px;
+    background: linear-gradient(to right, transparent, white);
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  .mobile-scroll-fade-left::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 48px;
+    background: linear-gradient(to left, transparent, white);
+    pointer-events: none;
+    z-index: 20;
+  }
+
+  /* Mobile scroll progress bar */
+  .mobile-scroll-progress {
+    height: 3px;
+    background: #e2e8f0;
+    border-radius: 99px;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+  .mobile-scroll-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #6B00FF, #a855f7);
+    border-radius: 99px;
+    transition: width 0.15s ease-out;
+  }
+
+  /* Category pill active state */
+  .mobile-category-pill {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 18px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border: 1.5px solid #e2e8f0;
+    background: white;
+    color: #475569;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-category-pill:active {
+    transform: scale(0.95);
+  }
+  .mobile-category-pill-active {
+    background: #6B00FF;
+    color: white;
+    border-color: #6B00FF;
+    box-shadow: 0 2px 12px -2px rgba(107, 0, 255, 0.4);
+  }
+
+  /* Mobile hero CTA full-width */
+  .mobile-cta-full {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Premium mobile promo banner */
+  .mobile-promo-text {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  /* ======================
+     BOTTOM SHEET FILTER
+     ====================== */
+  .mobile-bottom-sheet-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 90;
+    animation: mobileFadeIn 0.2s ease-out;
+  }
+
+  .mobile-bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    z-index: 91;
+    max-height: 75vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    animation: mobileSheetUp 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  .mobile-bottom-sheet-handle {
+    width: 40px;
+    height: 4px;
+    background: #cbd5e1;
+    border-radius: 99px;
+    margin: 12px auto 0;
+  }
+
+  /* Filter FAB */
+  .mobile-filter-fab {
+    position: fixed;
+    bottom: 20px;
+    right: 16px;
+    z-index: 80;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #6B00FF;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(107, 0, 255, 0.45);
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.15s ease;
+  }
+  .mobile-filter-fab:active {
+    transform: scale(0.9);
+  }
+  .mobile-filter-fab-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+  }
+
+  /* Mini image carousel for product list */
+  .mobile-mini-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mobile-mini-carousel::-webkit-scrollbar {
+    display: none;
+  }
+  .mobile-mini-carousel-slide {
+    flex-shrink: 0;
+    width: 100%;
+    height: 100%;
+    scroll-snap-align: start;
+  }
+
+  /* ======================
+     FOOTER ACCORDION
+     ====================== */
+  .mobile-accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }
+  .mobile-accordion-content.open {
+    max-height: 300px;
+  }
+
+  .mobile-footer-social-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #e2e8f0;
+    background: white;
+    color: #475569;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mobile-footer-social-btn:active {
+    transform: scale(0.9);
+  }
+}
+
+/* Bottom sheet slide-up (outside media query so keyframe is global) */
+@keyframes mobileSheetUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes mobileFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -98,7 +98,7 @@ export default function AdminInventoryPage() {
                 <tr key={product.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="p-4 text-slate-400 font-mono hidden md:table-cell">{product.id.slice(-6).toUpperCase()}</td>
                   <td className="p-4 font-bold text-slate-900 max-w-[200px] truncate">{product.name}</td>
-                  <td className="p-4 text-slate-600">{product.category === "Boots" ? "Shoes" : product.category}</td>
+                  <td className="p-4 text-slate-600">{product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}</td>
                   <td className="p-4 text-emerald-600 font-black">{CURRENCY}{parseFloat(product.price).toFixed(2)}</td>
                   <td className="p-4 text-right space-x-3">
                     <button 
