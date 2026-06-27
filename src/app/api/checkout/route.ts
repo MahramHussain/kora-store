@@ -51,13 +51,31 @@ export async function POST(req: Request) {
       return new NextResponse("Please enter a valid UAE phone number.", { status: 400 });
     }
 
+    const userEmail = clerkUser.emailAddresses[0].emailAddress;
+
+    // Check if user already exists by email (with different ID)
+    const existingUser = await prisma.user.findUnique({
+      where: { email: userEmail }
+    });
+
+    if (existingUser && existingUser.id !== userId) {
+      // Clean up old relations for this email (since the user is transitioning Clerk instances)
+      await prisma.$transaction([
+        prisma.cartItem.deleteMany({ where: { userId: existingUser.id } }),
+        prisma.review.deleteMany({ where: { userId: existingUser.id } }),
+        prisma.orderItem.deleteMany({ where: { order: { userId: existingUser.id } } }),
+        prisma.order.deleteMany({ where: { userId: existingUser.id } }),
+        prisma.user.delete({ where: { id: existingUser.id } })
+      ]);
+    }
+
     // Ensure Clerk user is registered locally in DB
     await prisma.user.upsert({
       where: { id: userId },
       update: {},
       create: {
         id: userId,
-        email: clerkUser.emailAddresses[0].emailAddress,
+        email: userEmail,
         firstName: clerkUser.firstName || "Kora",
         lastName: clerkUser.lastName || "Shopper",
       }

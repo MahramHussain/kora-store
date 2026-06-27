@@ -57,6 +57,28 @@ export async function POST(req: Request) {
     // Grab their primary email
     const primaryEmail = email_addresses[0].email_address
 
+    // Check if user already exists by email (with different ID)
+    const existingUser = await prisma.user.findUnique({
+      where: { email: primaryEmail }
+    });
+
+    if (existingUser) {
+      if (existingUser.id !== id) {
+        // Clean up old relations for this email (since the user is transitioning Clerk instances)
+        await prisma.$transaction([
+          prisma.cartItem.deleteMany({ where: { userId: existingUser.id } }),
+          prisma.review.deleteMany({ where: { userId: existingUser.id } }),
+          prisma.orderItem.deleteMany({ where: { order: { userId: existingUser.id } } }),
+          prisma.order.deleteMany({ where: { userId: existingUser.id } }),
+          prisma.user.delete({ where: { id: existingUser.id } })
+        ]);
+      } else {
+        // User already exists with the correct ID, we're done
+        console.log(`User already exists for: ${primaryEmail}`);
+        return new Response('', { status: 200 });
+      }
+    }
+
     // Tell Prisma to create a permanent row for them in our Database
     await prisma.user.create({
       data: {
