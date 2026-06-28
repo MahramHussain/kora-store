@@ -8,7 +8,7 @@ import { CURRENCY } from "@/lib/constants";
 import { useSearchParams } from "next/navigation";
 
 const CATEGORIES = ["All", "World Cup", "Shoes", "Shirts", "Retro Kits", "Accessories"];
-const TEAMS = ["All Teams", "Argentina", "Brazil", "France", "Germany", "Portugal", "Spain", "Uruguay", "Arsenal", "Barcelona", "Real Madrid", "Man City", "PSG", "Manchester United"];
+const TEAMS = ["All Teams", "Argentina", "Brazil", "France", "Germany", "Portugal", "Spain", "Uruguay", "Arsenal", "Barcelona", "Real Madrid", "Manchester City", "Paris Saint-Germain", "Manchester United"];
 
 // ─── Mini Image Carousel (pure CSS scroll-snap, no JS animation) ───
 function MiniCarousel({ images, alt, soldOut }: { images: string[]; alt: string; soldOut: boolean }) {
@@ -138,6 +138,13 @@ export default function ShopUI({ products }: { products: any[] }) {
     window.scrollTo({ top: 0, behavior: "instant" });
   }, [activeCategory, activeTeam, searchQuery]);
 
+  const normalizeTeam = (teamName: string) => {
+    const lower = teamName.toLowerCase().trim();
+    if (lower === "man city" || lower === "manchester city") return "manchester city";
+    if (lower === "psg" || lower === "paris saint-germain") return "paris saint-germain";
+    return lower;
+  };
+
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === "All" || 
@@ -146,7 +153,7 @@ export default function ShopUI({ products }: { products: any[] }) {
       (activeCategory === "Accessories" && (product.category === "Flags" || product.category === "Accessories")) ||
       product.category === activeCategory;
     const matchesTag = activeTag === "All" || product.tag === activeTag;
-    const matchesTeam = activeTeam === "All Teams" || (product.team && product.team.toLowerCase() === activeTeam.toLowerCase());
+    const matchesTeam = activeTeam === "All Teams" || (product.team && normalizeTeam(product.team) === normalizeTeam(activeTeam));
 
     return matchesSearch && matchesCategory && matchesTag && matchesTeam;
   });
@@ -225,7 +232,7 @@ export default function ShopUI({ products }: { products: any[] }) {
           {/* Filters Sidebar (Desktop/Tablet only — hidden on mobile, replaced by bottom sheet) */}
           <aside 
             ref={sidebarRef}
-            className={`w-full lg:w-64 xl:w-72 shrink-0 lg:sticky lg:top-28 z-20 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto scrollbar-hide overscroll-contain hidden sm:block ${
+            className={`w-full lg:w-64 xl:w-72 shrink-0 z-20 hidden sm:block ${
               isFiltersOpen ? "sm:block" : "sm:hidden lg:block"
             }`}
           >
@@ -247,24 +254,6 @@ export default function ShopUI({ products }: { products: any[] }) {
                 </div>
               </div>
 
-              {/* Support Your Side (Teams Selection) */}
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">
-                  Support Your Side
-                </h3>
-                <div className="relative">
-                  <select 
-                    value={activeTeam}
-                    onChange={(e) => setActiveTeam(e.target.value)}
-                    className="w-full appearance-none bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-slate-900 focus:outline-none focus:border-kora transition-all cursor-pointer font-sans text-sm shadow-sm"
-                  >
-                    {TEAMS.map(team => (
-                      <option key={team} value={team} className="bg-white text-slate-900">{team}</option>
-                    ))}
-                  </select>
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">&#9662;</div>
-                </div>
-              </div>
 
               {/* Categories Selector */}
               <div>
@@ -293,7 +282,81 @@ export default function ShopUI({ products }: { products: any[] }) {
           </aside>
 
           {/* Products Grid/List Pane */}
-          <div className="flex-1 w-full">
+          <div className="flex-1 w-full animate-fade-in-up">
+            
+            {/* Active Filter Chips */}
+            {(searchQuery || activeCategory !== "All" || activeTeam !== "All Teams" || activeTag !== "All") && (
+              <div className="flex items-center gap-2 mb-6 font-sans overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 py-1 flex-wrap sm:flex-nowrap">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider mr-1 shrink-0">Active Filters:</span>
+                
+                <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
+                  {searchQuery && (
+                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold uppercase tracking-wider">
+                      Search: &quot;{searchQuery}&quot;
+                      <button 
+                        onClick={() => setSearchQuery("")} 
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-150 active:bg-slate-200 transition-colors"
+                        aria-label="Clear Search"
+                      >
+                        <FaXmark className="text-xs" />
+                      </button>
+                    </span>
+                  )}
+
+                  {activeCategory !== "All" && (
+                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold uppercase tracking-wider">
+                      {activeCategory}
+                      <button 
+                        onClick={() => setActiveCategory("All")} 
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-150 active:bg-slate-200 transition-colors"
+                        aria-label="Clear Category"
+                      >
+                        <FaXmark className="text-xs" />
+                      </button>
+                    </span>
+                  )}
+
+                  {activeTeam !== "All Teams" && (
+                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold uppercase tracking-wider">
+                      Team: {activeTeam}
+                      <button 
+                        onClick={() => setActiveTeam("All Teams")} 
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-150 active:bg-slate-200 transition-colors"
+                        aria-label="Clear Team"
+                      >
+                        <FaXmark className="text-xs" />
+                      </button>
+                    </span>
+                  )}
+
+                  {activeTag !== "All" && (
+                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold uppercase tracking-wider">
+                      {activeTag}
+                      <button 
+                        onClick={() => setActiveTag("All")} 
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-150 active:bg-slate-200 transition-colors"
+                        aria-label="Clear Tag"
+                      >
+                        <FaXmark className="text-xs" />
+                      </button>
+                    </span>
+                  )}
+
+                  <button 
+                    onClick={() => {
+                      setSearchQuery("");
+                      setActiveCategory("All");
+                      setActiveTeam("All Teams");
+                      setActiveTag("All");
+                    }}
+                    className="text-xs font-bold text-kora hover:text-purple-700 underline underline-offset-4 uppercase tracking-wider ml-1 shrink-0 py-1"
+                  >
+                    Clear All
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Mobile View: List Layout with Image Slideshow */}
             <div className="block sm:hidden space-y-3">
               {displayProducts.map((product) => {
@@ -438,22 +501,6 @@ export default function ShopUI({ products }: { products: any[] }) {
                   </div>
                 </div>
 
-                {/* Teams */}
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2.5">Team</p>
-                  <div className="relative">
-                    <select
-                      value={activeTeam}
-                      onChange={(e) => setActiveTeam(e.target.value)}
-                      className="w-full appearance-none bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm text-slate-900 focus:outline-none focus:border-kora transition-all font-sans"
-                    >
-                      {TEAMS.map((team) => (
-                        <option key={team} value={team}>{team}</option>
-                      ))}
-                    </select>
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">&#9662;</div>
-                  </div>
-                </div>
 
                 {/* Action buttons */}
                 <div className="flex gap-3 pt-2">
@@ -462,6 +509,7 @@ export default function ShopUI({ products }: { products: any[] }) {
                       setActiveCategory("All");
                       setActiveTeam("All Teams");
                       setActiveTag("All");
+                      setSearchQuery("");
                     }}
                     className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-wider border border-slate-200 text-slate-600 active:bg-slate-50"
                   >

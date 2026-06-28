@@ -79,8 +79,7 @@
     "description": "Sleek light blue-green design with signature French details. Breathable and comfortable for daily wear and peak pitch activities.",
     "images": [
       "/assets/wc26 jerseys/France Away/08401f29.jpg",
-      "/assets/wc26 jerseys/France Away/70fb383b-600x600.jpg",
-      "/assets/wc26 jerseys/France Away/96e26282.webp"
+      "/assets/wc26 jerseys/France Away/70fb383b-600x600.jpg"
     ],
     "sizes": ["S", "M", "L", "XL"],
     "tag": "Trending",
@@ -372,7 +371,7 @@
     "id": "manchester-city-flag",
     "name": "Manchester City Official Fan Flag",
     "category": "Flags",
-    "team": "Man City",
+    "team": "Manchester City",
     "price": 25.00,
     "description": "Celebrate the sky blue champions! Durable fabric flag displaying the official Man City crest.",
     "images": [

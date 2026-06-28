@@ -248,12 +248,68 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700 !important;
 }
 
-/* 7. Modal Popover Overrides for User Buttons */
+/* 7. Modal Popover Overrides for User Buttons - Premium Kora Store Skin */
 .cl-userButtonPopoverCard {
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 1.25rem !important;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  background-color: #ffffff !important;
+  border: 1px solid rgba(107, 0, 255, 0.15) !important;
+  border-radius: 1.5rem !important;
+  box-shadow: 0 20px 25px -5px rgba(107, 0, 255, 0.1), 0 8px 10px -6px rgba(107, 0, 255, 0.05) !important;
   overflow: hidden !important;
+  font-family: var(--font-outfit), 'Outfit', sans-serif !important;
+}
+
+.cl-userPreview {
+  padding: 1.25rem !important;
+  background: linear-gradient(135deg, rgba(107, 0, 255, 0.05) 0%, rgba(168, 85, 247, 0.01) 100%) !important;
+  border-bottom: 1px solid rgba(107, 0, 255, 0.08) !important;
+}
+
+.cl-userPreviewAvatarBox {
+  border: 2px solid #6b00ff !important;
+  box-shadow: 0 0 10px rgba(107, 0, 255, 0.2) !important;
+}
+
+.cl-userPreviewMainIdentifier {
+  font-family: var(--font-outfit), 'Outfit', sans-serif !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: -0.01em !important;
+  color: #0f172a !important;
+}
+
+.cl-userPreviewSecondaryIdentifier {
+  font-family: var(--font-body), 'Inter', sans-serif !important;
+  color: #64748b !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+}
+
+.cl-userButtonPopoverActions {
+  padding: 0.5rem !important;
+}
+
+.cl-userButtonPopoverActionButton {
+  border-radius: 0.75rem !important;
+  padding: 0.75rem 1rem !important;
+  color: #334155 !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-left: 3px solid transparent !important;
+}
+
+.cl-userButtonPopoverActionButton:hover {
+  background-color: rgba(107, 0, 255, 0.05) !important;
+  color: #6b00ff !important;
+  border-left-color: #6b00ff !important;
+  padding-left: 1.125rem !important;
+}
+
+.cl-userButtonPopoverActionButtonText {
+  font-weight: 700 !important;
+  font-family: var(--font-body), 'Inter', sans-serif !important;
+}
+
+.cl-userButtonPopoverActionButtonIcon {
+  color: #6b00ff !important;
 }
 
 /* Hide branding under the main popover menu */
@@ -709,4 +765,27 @@ h1, h2, h3, h4, h5, h6 {
   .animate-fade-in-slide {
     animation: fadeInSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
+}
+
+/* ==========================================================================
+   FORCE SYSTEM-WIDE SITE FONTS (Excludes SVG/icon wrappers to prevent breaking)
+   ========================================================================== */
+body, 
+input, 
+textarea, 
+select, 
+button, 
+a, 
+p, 
+span, 
+li, 
+h1, h2, h3, h4, h5, h6,
+div:not([class*="icon"]):not(svg):not(path) {
+  font-family: var(--font-body), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+h1, h2, h3, h4, h5, h6, 
+.font-display,
+h1 *, h2 *, h3 *, h4 *, h5 *, h6 * {
+  font-family: var(--font-outfit), 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
 }

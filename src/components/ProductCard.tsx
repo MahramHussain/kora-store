@@ -83,15 +83,25 @@ export function ProductCard({ product }: { product: Product }) {
           </div>
         ) : null}
         
-        {/* Dynamic Image — tap to cycle on mobile, hover slideshow on desktop */}
-        <img 
-          key={activeIdx}
-          src={imageUrl} 
-          alt={product.name} 
-          referrerPolicy="no-referrer"
-          onClick={handleImageTap}
-          className={`w-full h-full object-cover drop-shadow-md group-hover:scale-105 transition-all duration-500 animate-fade-in ${product.stock === 0 ? 'opacity-40 grayscale' : 'opacity-100'}`} 
-        />
+        {/* Dynamic Images — absolute overlay transitioning opacity for smooth, flicker-free hover animation */}
+        {images.length > 0 ? (
+          images.slice(0, 4).map((imgUrl, idx) => (
+            <img 
+              key={idx}
+              src={imgUrl} 
+              alt={`${product.name} View ${idx + 1}`} 
+              referrerPolicy="no-referrer"
+              onClick={handleImageTap}
+              className={`absolute inset-0 w-full h-full object-cover drop-shadow-md group-hover:scale-105 transition-all duration-700 ${
+                idx === activeIdx 
+                  ? (product.stock === 0 ? 'opacity-40 grayscale' : 'opacity-100') 
+                  : 'opacity-0 pointer-events-none'
+              }`} 
+            />
+          ))
+        ) : (
+          <div className="text-slate-300 text-xs">No Image</div>
+        )}
 
         {/* Dot indicators — always visible on mobile, hover-only on desktop */}
         {showDots && (

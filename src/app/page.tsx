@@ -82,10 +82,13 @@ export default async function Home() {
       {/* 6. WORLD CUP HERO BANNER */}
       <section className="w-full mb-0">
         <div className="relative w-full h-[480px] md:h-[600px] rounded-none overflow-hidden group">
-          <img 
-            src="/assets/worldcup_banner.jpg" 
-            alt="World Cup 2026"
-            className="absolute inset-0 w-full h-full object-cover group-hover:scale-102 transition-transform duration-700 pointer-events-none"
+          <video 
+            src="/hero_banner_video.mp4" 
+            autoPlay 
+            loop 
+            muted 
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 md:via-slate-950/20 to-transparent z-10"></div>
           <div className="absolute bottom-0 left-0 right-0 md:right-auto md:bottom-12 md:left-12 p-5 md:p-0 z-20 md:max-w-xl">
