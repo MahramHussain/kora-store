@@ -52,7 +52,11 @@ export default function CheckoutPage() {
   }, 0);
 
   const handleApplyPromo = () => {
-    if (promoCode.trim().toUpperCase() === "KORA20") {
+    const code = promoCode.trim().toUpperCase();
+    if (code === "KORA10") {
+      setDiscountPercent(0.10);
+      setPromoMessage("10% Off Applied!");
+    } else if (code === "KORA20") {
       setDiscountPercent(0.20);
       setPromoMessage("20% Off Applied!");
     } else {
@@ -458,7 +462,7 @@ export default function CheckoutPage() {
 
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-emerald-600">
-                    <span>Discount (20%)</span>
+                    <span>Discount ({discountPercent * 100}%)</span>
                     <span className="font-bold">-{CURRENCY}{discountAmount.toFixed(2)}</span>
                   </div>
                 )}

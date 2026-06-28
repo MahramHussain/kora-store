@@ -75,8 +75,8 @@ export default async function Home() {
     <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pb-12 md:pb-20">
       {/* 4. PROMO BANNER — Scannable on mobile */}
       <div className="bg-neutral-100 border-b border-neutral-200 py-3 md:py-2.5 text-center text-xs md:text-sm font-bold text-neutral-800 px-4">
-        <span className="block md:inline">🏆 <span className="text-neutral-900 font-black">WORLD CUP 2026 DEBUT</span></span>
-        <span className="block md:inline md:ml-1 mt-0.5 md:mt-0">Use code <span className="font-bold text-emerald-600">WORLD26</span> for free shipping</span>
+        <span className="block md:inline">🏆 <span className="text-neutral-900 font-black">STORE PROMO ACTIVE</span></span>
+        <span className="block md:inline md:ml-1 mt-0.5 md:mt-0">Use code <span className="font-bold text-[#6B00FF]">KORA10</span> for 10% off your entire order</span>
       </div>
 
       {/* 6. WORLD CUP HERO BANNER */}
@@ -263,7 +263,7 @@ export default async function Home() {
             <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">Elite pitch boots and luxury streetwear sneakers.</p>
           </div>
           <Link 
-            href="/shop?category=Boots" 
+            href="/shop?category=Shoes" 
             className="text-[10px] md:text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
             See All 
@@ -296,7 +296,7 @@ export default async function Home() {
             <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">Premium performance socks and official club flags.</p>
           </div>
           <Link 
-            href="/shop" 
+            href="/shop?category=Accessories" 
             className="text-[10px] md:text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
             See All 

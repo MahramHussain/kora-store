@@ -219,8 +219,18 @@ export default function Navbar() {
       {/* 1. FLOWING TICKER BANNER (Desktop & Mobile) */}
       <div className="relative w-full overflow-hidden bg-neutral-100 text-neutral-800 border-b border-neutral-200 py-2.5 text-xs md:text-[13px] font-bold select-none z-50">
         <div className="flex w-max animate-marquee whitespace-nowrap">
-          <span className="mx-2">Pay in 3 with Klarna • No-hassle returns • Free UK Shipping when you spend £100+ • 100% OFFICIAL from Nike, adidas, Puma • Ultra fast international shipping via DHL/EMS •</span>
-          <span className="mx-2">Pay in 3 with Klarna • No-hassle returns • Free UK Shipping when you spend £100+ • 100% OFFICIAL from Nike, adidas, Puma • Ultra fast international shipping via DHL/EMS •</span>
+          <span className="mx-4">
+            USE CODE KORA10 FOR 10% OFF ON ORDER TOTAL &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            FREE SHIPPING ON ORDER TOTAL 200 AED &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            SHIPPING ALL OVER UAE WITHIN 1-2 DAYS &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            100+ POSITIVE REVIEWS &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+          </span>
+          <span className="mx-4">
+            USE CODE KORA10 FOR 10% OFF ON ORDER TOTAL &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            FREE SHIPPING ON ORDER TOTAL 200 AED &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            SHIPPING ALL OVER UAE WITHIN 1-2 DAYS &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            100+ POSITIVE REVIEWS &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+          </span>
         </div>
       </div>
 
@@ -490,19 +500,7 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* 3. DISMISSIBLE PROMO BANNER (Vibrant Purple) */}
-      {isBannerVisible && (
-        <div className="w-full bg-[#6B00FF] text-white py-2.5 px-4 text-center text-xs font-black uppercase tracking-wider flex items-center justify-center relative z-20">
-          <span>AVAILABLE NOW! adidas x FIFA World Cup Patches</span>
-          <button 
-            onClick={() => setIsBannerVisible(false)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:opacity-70 p-1 text-sm font-black focus:outline-none"
-            title="Dismiss Banner"
-          >
-            ✕
-          </button>
-        </div>
-      )}
+
 
       {/* Slide-over backdrop */}
       {isMobileMenuOpen && (
@@ -696,24 +694,6 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Drawer Footer (Sign In / Register) */}
-        <div className="p-5 border-t border-neutral-200 bg-neutral-50 flex items-center justify-between font-bold text-xs uppercase tracking-wider shrink-0">
-          <Show when="signed-out">
-            <SignInButton mode="modal">
-              <button className="text-[#6B00FF] hover:text-purple-600 flex items-center gap-2">
-                <FiUser className="text-sm" /> Sign In / Register
-              </button>
-            </SignInButton>
-          </Show>
-          <Show when="signed-in">
-            <div className="flex items-center gap-3">
-              <Link href="/account/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-[#6B00FF] hover:text-purple-600">
-                My Vault Account
-              </Link>
-              <UserButton />
-            </div>
-          </Show>
-        </div>
       </div>
     </>
   );

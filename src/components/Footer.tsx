@@ -49,8 +49,10 @@ export default function Footer() {
                 <span>WhatsApp: +971 50 123 4567</span>
               </li>
               <li className="flex items-center gap-3 hover:text-pink-400 transition-colors cursor-pointer group">
-                <FaInstagram className="text-xl group-hover:scale-110 transition-transform" /> 
-                <span>Instagram: @KoraStore</span>
+                <a href="https://www.instagram.com/korastore.ae/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
+                  <FaInstagram className="text-xl group-hover:scale-110 transition-transform" /> 
+                  <span>Instagram: @korastore.ae</span>
+                </a>
               </li>
             </ul>
           </div>
@@ -74,7 +76,7 @@ export default function Footer() {
               <a href="https://wa.me/971501234567" target="_blank" rel="noopener noreferrer" className="mobile-footer-social-btn hover:text-emerald-500 active:border-emerald-500 active:text-emerald-500" aria-label="WhatsApp">
                 <FaWhatsapp className="text-lg" />
               </a>
-              <a href="https://instagram.com/KoraStore" target="_blank" rel="noopener noreferrer" className="mobile-footer-social-btn hover:text-pink-500 active:border-pink-500 active:text-pink-500" aria-label="Instagram">
+              <a href="https://www.instagram.com/korastore.ae/" target="_blank" rel="noopener noreferrer" className="mobile-footer-social-btn hover:text-pink-500 active:border-pink-500 active:text-pink-500" aria-label="Instagram">
                 <FaInstagram className="text-lg" />
               </a>
             </div>
@@ -119,9 +121,11 @@ export default function Footer() {
                     <FaWhatsapp className="text-sm text-slate-400" />
                     <span>+971 50 123 4567</span>
                   </li>
-                  <li className="flex items-center gap-3 py-1">
-                    <FaInstagram className="text-sm text-slate-400" />
-                    <span>@KoraStore</span>
+                  <li className="flex items-center gap-3 py-1 hover:text-pink-400 transition-colors cursor-pointer">
+                    <a href="https://www.instagram.com/korastore.ae/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
+                      <FaInstagram className="text-sm text-slate-400" />
+                      <span>@korastore.ae</span>
+                    </a>
                   </li>
                 </ul>
               </div>
