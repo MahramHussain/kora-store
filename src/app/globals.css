@@ -768,24 +768,46 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* ==========================================================================
-   FORCE SYSTEM-WIDE SITE FONTS (Excludes SVG/icon wrappers to prevent breaking)
+   FORCE SYSTEM-WIDE SITE FONTS (100% Strict Overrides)
    ========================================================================== */
+
+/* Step A: Force the body font (Inter) on ALL elements */
 body, 
-input, 
-textarea, 
-select, 
-button, 
-a, 
 p, 
 span, 
 li, 
-h1, h2, h3, h4, h5, h6,
+a, 
+button, 
+input, 
+textarea, 
+select, 
+td, 
+th,
+strong,
+em,
+b,
+i,
+small,
 div:not([class*="icon"]):not(svg):not(path) {
-  font-family: var(--font-body), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
 }
 
+/* Step B: Force the display font (Outfit) on headings and display elements, taking precedence over Step A */
 h1, h2, h3, h4, h5, h6, 
+h1 *, h2 *, h3 *, h4 *, h5 *, h6 *,
 .font-display,
-h1 *, h2 *, h3 *, h4 *, h5 *, h6 * {
+.font-display *,
+[class*="font-display"],
+[class*="font-display"] *,
+.logo-font,
+.logo-font * {
+  font-family: var(--font-outfit), 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* Step C: Force the display font (Outfit) on website logos, taking precedence over Step A */
+a[href="/"],
+a[href="/"] *,
+a[href="/"] span,
+a[href="/"] div {
   font-family: var(--font-outfit), 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
 }

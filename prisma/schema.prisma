@@ -64,6 +64,7 @@ model Order {
   tax             Decimal  @default(0)
   referenceNumber String?  @unique
   paymentIntentId String?  @unique
+  trackingId      String?
   createdAt       DateTime @default(now())
   
   // An order can have multiple different shirts/boots inside it

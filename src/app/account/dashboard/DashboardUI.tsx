@@ -12,9 +12,7 @@ import {
   FiSettings,
   FiLogOut,
   FiCheckCircle,
-  FiTruck,
   FiMapPin,
-  FiPhone,
   FiCreditCard,
   FiTag,
   FiActivity,
@@ -22,11 +20,11 @@ import {
   FiChevronRight,
   FiSearch,
   FiArrowRight,
-  FiClock,
   FiShield,
   FiAward,
   FiCheck,
-  FiGrid
+  FiGrid,
+  FiInfo
 } from "react-icons/fi";
 
 // ── CUSTOM CSS FOOTBALL JERSEYS (Offline friendly, highly creative vectors) ──
@@ -159,7 +157,6 @@ function StatusTimeline({ status }: { status: string }) {
         {steps.map((step, idx) => {
           const isDone = idx < currentIdx;
           const isActive = idx === currentIdx;
-          const isPending = idx > currentIdx;
 
           return (
             <div key={idx} className="flex flex-col items-center text-center flex-1 relative z-10">
@@ -198,7 +195,6 @@ function StatusTimeline({ status }: { status: string }) {
         {steps.map((step, idx) => {
           const isDone = idx < currentIdx;
           const isActive = idx === currentIdx;
-          const isPending = idx > currentIdx;
 
           return (
             <div key={idx} className="flex gap-4 relative z-10 items-start">

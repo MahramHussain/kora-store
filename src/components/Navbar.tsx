@@ -7,7 +7,7 @@ import { useCart } from "@/context/CartContext";
 import { getProducts } from "@/app/admin/actions";
 import { FaBars, FaXmark, FaBoxOpen } from "react-icons/fa6";
 import { FiUser, FiShoppingBag, FiSearch, FiChevronDown, FiChevronRight } from "react-icons/fi";
-import { SignInButton, UserButton, Show } from "@clerk/nextjs";
+import { SignInButton, Show, useUser } from "@clerk/nextjs";
 
 const clubCategories = [
   {
@@ -161,10 +161,12 @@ const nationalCategories = [
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { user: clerkUser } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); 
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   
   // Mobile accordion states
   const [isMobileClubsOpen, setIsMobileClubsOpen] = useState(false);
@@ -197,7 +199,21 @@ export default function Navbar() {
   // Close mobile menu on path changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    setIsMobileSearchOpen(false);
   }, [pathname]);
+
+  // Sync mobile menu and mobile search states (mutually exclusive)
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      setIsMobileSearchOpen(false);
+    }
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    if (isMobileSearchOpen) {
+      setIsMobileMenuOpen(false);
+    }
+  }, [isMobileSearchOpen]);
 
   const filteredSuggestions = suggestions.filter(item => 
     item.toLowerCase().includes(searchTerm.toLowerCase())
@@ -211,6 +227,7 @@ export default function Navbar() {
       setSearchTerm(""); 
       setIsFocused(false);
       setIsMobileMenuOpen(false); 
+      setIsMobileSearchOpen(false);
     }
   };
 
@@ -238,10 +255,10 @@ export default function Navbar() {
       <header className="relative w-full bg-white text-neutral-900 border-b border-neutral-200 sticky top-0 z-40 shadow-sm">
         
         {/* ROW 1: Main Bar (Logo, Search, Profile, Basket) */}
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-4 relative">
           
           {/* Logo & Mobile Menu Hamburger */}
-          <div className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-2.5 md:gap-4 shrink-0 z-10">
             <button 
               className="md:hidden text-neutral-900 text-2xl hover:text-[#6B00FF] transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -249,10 +266,29 @@ export default function Navbar() {
               {isMobileMenuOpen ? <FaXmark /> : <FaBars />}
             </button>
 
-            <Link href="/" className="text-2xl md:text-3xl font-black tracking-tighter uppercase hover:scale-105 transition-transform">
+            {/* Mobile Search Toggle Icon */}
+            <button 
+              className="md:hidden text-neutral-900 text-2xl hover:text-[#6B00FF] transition-colors p-1"
+              onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
+              title="Search"
+            >
+              <FiSearch />
+            </button>
+
+            {/* Brand Logo (Desktop only - hidden on mobile) */}
+            <Link href="/" className="hidden md:block text-2xl md:text-3xl font-black tracking-tighter uppercase hover:scale-105 transition-transform">
               <span className="text-slate-900">KORA</span><span className="text-kora drop-shadow-[0_0_10px_rgba(107,0,255,0.4)]">STORE</span>
             </Link>
           </div>
+
+          {/* Brand Logo (Mobile only - absolutely centered) */}
+          <Link 
+            href="/" 
+            onClick={() => { setIsMobileMenuOpen(false); setIsMobileSearchOpen(false); }}
+            className="md:hidden absolute left-1/2 -translate-x-1/2 text-2xl font-black tracking-tighter uppercase hover:scale-105 transition-transform z-10"
+          >
+            <span className="text-slate-900">KORA</span><span className="text-kora drop-shadow-[0_0_10px_rgba(107,0,255,0.4)]">STORE</span>
+          </Link>
           
           {/* Centralized Search Bar */}
           {pathname !== '/shop' ? (
@@ -291,7 +327,7 @@ export default function Navbar() {
           )}
 
           {/* Right Side Icons */}
-          <div className="flex items-center gap-4 md:gap-5 shrink-0">
+          <div className="flex items-center gap-4 md:gap-5 shrink-0 z-10">
             {/* Cart/Basket */}
             <Link href="/cart" className="relative text-neutral-800 hover:text-[#6B00FF] transition-colors p-1" title="Shopping Cart">
               <FiShoppingBag className="text-xl md:text-2xl" />
@@ -302,7 +338,7 @@ export default function Navbar() {
               )}
             </Link>
 
-            {/* Profile Button (Clerk integration) */}
+            {/* Profile Button (Clerk integration / Direct Dashboard Redirect) */}
             <div className="flex items-center">
               <Show when="signed-out">
                 <SignInButton mode="modal">
@@ -312,24 +348,31 @@ export default function Navbar() {
                 </SignInButton>
               </Show>
               <Show when="signed-in">
-                <div className="flex items-center">
-                  <UserButton>
-                    <UserButton.MenuItems>
-                      <UserButton.Link
-                        label="Vault Dashboard"
-                        labelIcon={<FaBoxOpen className="text-sm text-slate-500" />}
-                        href="/account/dashboard"
-                      />
-                    </UserButton.MenuItems>
-                  </UserButton>
-                </div>
+                <Link 
+                  href="/account/dashboard" 
+                  className="flex items-center justify-center hover:scale-105 transition-transform p-1" 
+                  title="Vault Dashboard"
+                >
+                  {clerkUser?.imageUrl ? (
+                    <img 
+                      src={clerkUser.imageUrl} 
+                      alt="Profile" 
+                      className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-neutral-200 object-cover shadow-xs" 
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#6B00FF] text-white flex items-center justify-center text-[10px] md:text-xs font-black uppercase shadow-xs">
+                      {(clerkUser?.firstName || "V").charAt(0)}
+                    </div>
+                  )}
+                </Link>
               </Show>
             </div>
           </div>
         </div>
 
         {/* Mobile Search Row */}
-        {pathname !== '/shop' && (
+        {pathname !== '/shop' && isMobileSearchOpen && (
           <div className="md:hidden px-4 pb-3 relative" ref={dropdownRef}>
             <form onSubmit={(e) => handleSearch(e)} className="relative group z-20">
               <input 
@@ -517,25 +560,23 @@ export default function Navbar() {
         }`}
       >
         {/* Drawer Header */}
-        <div className="p-4 border-b border-neutral-200 flex justify-between items-center bg-white shrink-0">
-          <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="text-2xl font-black tracking-tighter uppercase hover:scale-105 transition-transform">
-            <span className="text-slate-900">KORA</span><span className="text-kora drop-shadow-[0_0_10px_rgba(107,0,255,0.4)]">STORE</span>
-          </Link>
+        <div className="p-5 border-b border-neutral-200 flex justify-end items-center bg-white shrink-0">
           <button 
             onClick={() => setIsMobileMenuOpen(false)}
-            className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-neutral-500 hover:text-neutral-800 focus:outline-none"
+            className="w-8 h-8 flex items-center justify-center text-neutral-500 hover:text-neutral-800 focus:outline-none"
+            aria-label="Close menu"
           >
-            <FaXmark className="text-lg" />
+            <FaXmark className="text-xl" />
           </button>
         </div>
 
         {/* Drawer Scrollable Content */}
         <div className="flex-1 overflow-y-auto">
-          {/* Shop */}
+          {/* Shop / Latest */}
           <Link 
             href="/shop" 
             onClick={() => setIsMobileMenuOpen(false)} 
-            className="px-6 py-4 border-b border-neutral-200 text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex items-center justify-between tracking-wide"
+            className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
           >
             Shop
           </Link>
@@ -544,7 +585,7 @@ export default function Navbar() {
           <Link 
             href="/shop?category=World Cup" 
             onClick={() => setIsMobileMenuOpen(false)} 
-            className="px-6 py-4 border-b border-neutral-200 text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex items-center justify-between tracking-wide"
+            className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
           >
             World Cup
           </Link>
@@ -553,7 +594,7 @@ export default function Navbar() {
           <div className="border-b border-neutral-200">
             <button 
               onClick={() => setIsMobileClubsOpen(!isMobileClubsOpen)} 
-              className="w-full px-6 py-4 text-left text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex justify-between items-center tracking-wide"
+              className="w-full px-6 py-5 text-left text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex justify-between items-center transition-colors"
             >
               <span>Club</span>
               {isMobileClubsOpen ? (
@@ -616,7 +657,7 @@ export default function Navbar() {
           <div className="border-b border-neutral-200">
             <button 
               onClick={() => setIsMobileNationalOpen(!isMobileNationalOpen)} 
-              className="w-full px-6 py-4 text-left text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex justify-between items-center tracking-wide"
+              className="w-full px-6 py-5 text-left text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex justify-between items-center transition-colors"
             >
               <span>National</span>
               {isMobileNationalOpen ? (
@@ -679,7 +720,7 @@ export default function Navbar() {
           <Link 
             href="/shop?category=Accessories" 
             onClick={() => setIsMobileMenuOpen(false)} 
-            className="px-6 py-4 border-b border-neutral-200 text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex items-center justify-between tracking-wide"
+            className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
           >
             Accessories
           </Link>
@@ -688,7 +729,7 @@ export default function Navbar() {
           <Link 
             href="/shop?category=Retro Kits" 
             onClick={() => setIsMobileMenuOpen(false)} 
-            className="px-6 py-4 border-b border-neutral-200 text-neutral-800 font-bold hover:bg-neutral-50 text-sm uppercase flex items-center justify-between tracking-wide"
+            className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
           >
             Retro
           </Link>
