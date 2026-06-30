@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: "/",
       disallow: ["/admin/", "/api/", "/account/"],
     },
-    sitemap: "https://www.korastore.com/sitemap.xml",
+    sitemap: "https://korastore.ae/sitemap.xml",
   };
 }

@@ -9,6 +9,82 @@ import { FaBars, FaXmark, FaBoxOpen } from "react-icons/fa6";
 import { FiUser, FiShoppingBag, FiSearch, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { SignInButton, Show, useUser } from "@clerk/nextjs";
 
+const JERSEYS: Record<
+  string,
+  { name: string; primary: string; secondary: string; stripes?: boolean; sleeves?: string }
+> = {
+  argentina: { name: "Argentina", primary: "#74acdf", secondary: "#ffffff", stripes: true },
+  realmadrid: { name: "Real Madrid", primary: "#ffffff", secondary: "#d4af37", sleeves: "#ffffff" },
+  alnassr: { name: "Al Nassr", primary: "#ffcc00", secondary: "#0055b8", sleeves: "#ffcc00" },
+  portugal: { name: "Portugal", primary: "#bc0000", secondary: "#006600", sleeves: "#bc0000" },
+  barcelona: { name: "Barcelona", primary: "#004d98", secondary: "#a50044", stripes: true },
+  mancity: { name: "Man City", primary: "#6cabdd", secondary: "#ffffff", sleeves: "#6cabdd" },
+  arsenal: { name: "Arsenal", primary: "#ef0107", secondary: "#ffffff", sleeves: "#ffffff" },
+  intermiami: { name: "Inter Miami", primary: "#f7b5cd", secondary: "#000000", sleeves: "#f7b5cd" },
+};
+
+function MiniJersey({ colors }: { colors: typeof JERSEYS[string] }) {
+  return (
+    <div className="relative w-8 h-8 flex items-center justify-center filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.15)] shrink-0 overflow-hidden">
+      {/* Torso */}
+      <div
+        className="relative w-4.5 h-6 rounded-t-2xs overflow-hidden"
+        style={{ backgroundColor: colors.primary }}
+      >
+        {colors.stripes && (
+          <div className="absolute inset-0 flex justify-around">
+            <div className="w-1 h-full" style={{ backgroundColor: colors.secondary }} />
+            <div className="w-1 h-full" style={{ backgroundColor: colors.secondary }} />
+          </div>
+        )}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2.5 h-1 bg-slate-900/10 rounded-b-full" />
+      </div>
+      {/* Left Sleeve */}
+      <div
+        className="absolute top-0.5 left-0.5 w-2 h-3.5 rounded-l-2xs origin-top-right -rotate-25"
+        style={{ backgroundColor: colors.sleeves || colors.primary }}
+      />
+      {/* Right Sleeve */}
+      <div
+        className="absolute top-0.5 right-0.5 w-2 h-3.5 rounded-r-2xs origin-top-left rotate-25"
+        style={{ backgroundColor: colors.sleeves || colors.primary }}
+      />
+    </div>
+  );
+}
+
+function NavbarAvatar({
+  imageUrl,
+  name,
+  selectedAvatar,
+  size = "w-6 h-6 md:w-8 md:h-8"
+}: {
+  imageUrl?: string;
+  name: string;
+  selectedAvatar: string | null;
+  size?: string;
+}) {
+  if (selectedAvatar && JERSEYS[selectedAvatar]) {
+    return (
+      <div className={`${size} rounded-full bg-slate-900 border border-neutral-200 shadow-xs flex items-center justify-center overflow-hidden shrink-0`}>
+        <MiniJersey colors={JERSEYS[selectedAvatar]} />
+      </div>
+    );
+  }
+
+  if (imageUrl) {
+    return (
+      <img src={imageUrl} alt="Profile" className={`${size} rounded-full border border-neutral-200 shadow-xs object-cover shrink-0`} referrerPolicy="no-referrer" />
+    );
+  }
+
+  return (
+    <div className={`${size} rounded-full bg-[#6B00FF] text-white flex items-center justify-center text-[10px] md:text-xs font-black uppercase shadow-xs`}>
+      {name.charAt(0)}
+    </div>
+  );
+}
+
 const clubCategories = [
   {
     title: "Premier League",
@@ -163,6 +239,12 @@ export default function Navbar() {
   const router = useRouter();
   const { user: clerkUser } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("kora_vault_avatar");
+    setSelectedAvatar(saved);
+  }, [pathname]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isFocused, setIsFocused] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); 
@@ -353,18 +435,11 @@ export default function Navbar() {
                   className="flex items-center justify-center hover:scale-105 transition-transform p-1" 
                   title="Vault Dashboard"
                 >
-                  {clerkUser?.imageUrl ? (
-                    <img 
-                      src={clerkUser.imageUrl} 
-                      alt="Profile" 
-                      className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-neutral-200 object-cover shadow-xs" 
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#6B00FF] text-white flex items-center justify-center text-[10px] md:text-xs font-black uppercase shadow-xs">
-                      {(clerkUser?.firstName || "V").charAt(0)}
-                    </div>
-                  )}
+                  <NavbarAvatar 
+                    imageUrl={clerkUser?.imageUrl} 
+                    name={clerkUser?.firstName || "V"} 
+                    selectedAvatar={selectedAvatar} 
+                  />
                 </Link>
               </Show>
             </div>

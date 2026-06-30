@@ -3,6 +3,8 @@
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import { getAdminStats } from "./actions";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -48,6 +50,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  const [stats, setStats] = useState<{ productCount: number; orderCount: number; totalValue: number; totalEarnings: number } | null>(null);
+
+  useEffect(() => {
+    if (isSignedIn && (userEmail === "mahramh40@gmail.com" || userEmail === "korastore.ae@gmail.com")) {
+      getAdminStats().then(data => setStats(data));
+    }
+  }, [isSignedIn, userEmail, pathname]);
+
   // Helper to determine if a route is active
   const isActive = (path: string) => {
     if (path === "/admin") {
@@ -70,6 +80,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             Go to Vault &rarr;
           </Link>
         </div>
+
+        {/* Dashboard Widgets */}
+        {stats && (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:shadow-sm transition-all">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">📦 Total Products</span>
+              <span className="text-2xl font-black text-slate-900 mt-2 block">{stats.productCount}</span>
+            </div>
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:shadow-sm transition-all">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">🛒 Active Orders</span>
+              <span className="text-2xl font-black text-slate-900 mt-2 block">{stats.orderCount}</span>
+            </div>
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:shadow-sm transition-all">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">💰 Sales Revenue</span>
+              <span className="text-2xl font-black text-emerald-600 mt-2 block">AED {stats.totalEarnings.toFixed(2)}</span>
+            </div>
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:shadow-sm transition-all">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">💎 Vault Valuation</span>
+              <span className="text-2xl font-black text-slate-900 mt-2 block">AED {stats.totalValue.toFixed(2)}</span>
+            </div>
+          </div>
+        )}
 
         {/* Sub-Navigation Tabs */}
         <nav className="flex flex-wrap gap-3 mb-10 border-b border-slate-200 pb-6">

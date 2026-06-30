@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://www.korastore.com";
+  const baseUrl = "https://korastore.ae";
 
   // Static routes
   const staticRoutes = [

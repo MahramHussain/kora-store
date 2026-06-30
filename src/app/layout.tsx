@@ -19,6 +19,11 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Kora Store",
   description: "Elite Football Gear",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/icon.png",
+  }
 };
 
 export default function RootLayout({

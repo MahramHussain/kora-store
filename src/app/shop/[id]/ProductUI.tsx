@@ -7,6 +7,9 @@ import { FaChevronLeft, FaStar, FaTruckFast } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
+import { FiEdit, FiAward } from "react-icons/fi";
+
+// Sizing or customization helper constants
 
 export default function ProductUI({ product }: { product: any }) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -21,6 +24,112 @@ export default function ProductUI({ product }: { product: any }) {
   const { addToCart } = useCart();
   const [isAdded, setIsAdded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Personalization states
+  const [personalizationTab, setPersonalizationTab] = useState<"none" | "custom" | "player">("none");
+  const [hasFifaPatch, setHasFifaPatch] = useState(false);
+
+  const renderPersonalizationBox = () => {
+    if (product.category !== "Shirts") return null;
+
+    return (
+      <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-5 mb-6 font-sans shadow-xs">
+        <div className="flex items-start gap-4">
+          {/* Jersey Icon */}
+          <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center text-slate-800 shadow-xs shrink-0">
+            <svg className="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v1.244c0 .54-.438.976-.977.976H5.216c-.732 0-1.393.479-1.579 1.186L2.01 12.872a1.082 1.082 0 00.938 1.348h2.091c.484 0 .903.327 1.018.799l2.128 8.79c.121.5.57.844 1.086.844h5.474c.516 0 .965-.344 1.086-.844l2.128-8.79c.115-.472.534-.799 1.018-.799h2.091a1.082 1.082 0 00.938-1.348l-1.627-6.362c-.186-.707-.847-1.186-1.579-1.186h-3.557c-.539 0-.977-.436-.977-.976V3.104c0-.573-.464-1.037-1.036-1.037H10.786c-.572 0-1.036.464-1.036 1.037z" />
+            </svg>
+          </div>
+
+          <div>
+            <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">Personalise your kit</h3>
+            <p className="text-slate-400 text-xs mt-1">Add your name and number or select sleeve patches</p>
+          </div>
+        </div>
+
+        {/* Toggles */}
+        <div className="flex gap-3 mt-5">
+          <button
+            type="button"
+            onClick={() => setPersonalizationTab(personalizationTab === "custom" ? "none" : "custom")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
+              personalizationTab === "custom"
+                ? "bg-[#6B00FF] border-[#6B00FF] text-white shadow-md shadow-[#6B00FF]/25"
+                : "bg-white border-slate-200 text-slate-700 hover:border-[#6B00FF]/50 hover:text-[#6B00FF] hover:shadow-sm hover:shadow-[#6B00FF]/10"
+            }`}
+          >
+            <FiEdit className="text-sm shrink-0" />
+            <span>Add your own</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPersonalizationTab(personalizationTab === "player" ? "none" : "player")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
+              personalizationTab === "player"
+                ? "bg-[#6B00FF] border-[#6B00FF] text-white shadow-md shadow-[#6B00FF]/25"
+                : "bg-white border-slate-200 text-slate-700 hover:border-[#6B00FF]/50 hover:text-[#6B00FF] hover:shadow-sm hover:shadow-[#6B00FF]/10"
+            }`}
+          >
+            <FiAward className="text-sm shrink-0" />
+            <span>Patches</span>
+          </button>
+        </div>
+
+        {/* Sub-panels */}
+        {personalizationTab === "custom" && (
+          <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Name</label>
+                <input
+                  type="text"
+                  maxLength={15}
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value.toUpperCase())}
+                  placeholder="e.g. MESSI"
+                  className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider"
+                />
+              </div>
+              <div className="w-24">
+                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Number</label>
+                <input
+                  type="text"
+                  maxLength={3}
+                  value={customNumber}
+                  onChange={(e) => setCustomNumber(e.target.value.replace(/[^0-9]/g, ""))}
+                  placeholder="10"
+                  className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold text-center"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {personalizationTab === "player" && (
+          <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
+            {/* Sleeve Patch Toggle inside Player Panel */}
+            <div className="pt-2">
+              <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Sleeve Badge (Optional)</label>
+              <button
+                type="button"
+                onClick={() => setHasFifaPatch(!hasFifaPatch)}
+                className={`w-full py-2.5 px-4 rounded-xl border text-xs font-bold transition-all duration-200 active:scale-98 flex items-center justify-between ${
+                  hasFifaPatch
+                    ? "bg-[#6B00FF] border-[#6B00FF] text-white shadow-sm shadow-[#6B00FF]/20"
+                    : "bg-white border-slate-200 text-slate-700 hover:border-slate-300"
+                }`}
+              >
+                <span>Fifa patch right and left sleeve</span>
+                <span className={hasFifaPatch ? "text-white font-extrabold" : "text-[#6B00FF] font-black"}>+10 DHS</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const galleryRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -61,19 +170,36 @@ export default function ProductUI({ product }: { product: any }) {
 
   const handleAddToCart = () => {
     if (!selectedSize) return;
+    
+    let finalName = "";
+    let finalNumber = "";
+    
+    if (customName.trim()) {
+      finalName = customName.trim();
+    }
+    if (customNumber.trim()) {
+      finalNumber = customNumber.trim();
+    }
+
+    const basePrice = parseFloat(product.price);
+    const finalPrice = basePrice + (hasFifaPatch ? 10 : 0);
+
     addToCart({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: finalPrice.toFixed(2),
       image: product.images?.[activeImageIndex] || product.images?.[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png",
       size: selectedSize,
       quantity: quantity,
-      customName: customName.trim(),
-      customNumber: customNumber.trim(),
+      customName: finalName || undefined,
+      customNumber: finalNumber || undefined,
     });
+    
     setIsAdded(true);
     setCustomName("");
     setCustomNumber("");
+    setHasFifaPatch(false);
+    setPersonalizationTab("none");
     setTimeout(() => setIsAdded(false), 2000);
   };
 
@@ -228,7 +354,7 @@ export default function ProductUI({ product }: { product: any }) {
         {/* Price + Stock */}
         <div className="flex items-center justify-between mb-5 pb-5 border-b border-slate-100">
           <span className="text-3xl font-black text-slate-900">
-            {CURRENCY}{product.price}
+            {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0)}
           </span>
           {product.stock === 0 ? (
             <span className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-full">
@@ -322,37 +448,7 @@ export default function ProductUI({ product }: { product: any }) {
         </div>
 
         {/* Custom Printing (Shirts only) */}
-        {product.category === "Shirts" && (
-          <div className="mb-5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-3">
-              Custom Printing <span className="text-slate-300 font-normal normal-case">(optional)</span>
-            </p>
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Name</label>
-                <input
-                  type="text"
-                  maxLength={15}
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value.toUpperCase())}
-                  placeholder="e.g. MESSI"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider"
-                />
-              </div>
-              <div className="w-24">
-                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Number</label>
-                <input
-                  type="text"
-                  maxLength={3}
-                  value={customNumber}
-                  onChange={(e) => setCustomNumber(e.target.value.replace(/[^0-9]/g, ""))}
-                  placeholder="10"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold text-center"
-                />
-              </div>
-            </div>
-          </div>
-        )}
+        {renderPersonalizationBox()}
 
         {/* Description */}
         <div className="mb-6">
@@ -557,7 +653,7 @@ export default function ProductUI({ product }: { product: any }) {
                 {product.name}
               </h1>
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-3xl font-bold font-sans text-slate-900">{CURRENCY}{product.price}</span>
+                <span className="text-3xl font-bold font-sans text-slate-900">{CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0)}</span>
                 <div className="flex items-center gap-1.5 text-sm">
                   {[1,2,3,4,5].map(s => (
                     <FaStar key={s} className={s <= Math.round(avgRating) ? "text-yellow-400" : "text-slate-200"} />
@@ -646,37 +742,7 @@ export default function ProductUI({ product }: { product: any }) {
             </div>
 
             {/* Custom Printing Inputs (Only for shirts!) */}
-            {product.category === "Shirts" && (
-              <div className="mb-10 font-sans animate-fade-in-up">
-                <h3 className="text-slate-900 font-bold uppercase tracking-wider text-xs mb-4">
-                  Custom Jersey Printing (Optional)
-                </h3>
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1.5 tracking-wider">Name on Shirt</label>
-                    <input
-                      type="text"
-                      maxLength={15}
-                      value={customName}
-                      onChange={(e) => setCustomName(e.target.value.toUpperCase())}
-                      placeholder="e.g. MESSI"
-                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm text-sm font-bold tracking-wider"
-                    />
-                  </div>
-                  <div className="w-28">
-                    <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1.5 tracking-wider">Number</label>
-                    <input
-                      type="text"
-                      maxLength={3}
-                      value={customNumber}
-                      onChange={(e) => setCustomNumber(e.target.value.replace(/[^0-9]/g, ""))}
-                      placeholder="10"
-                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm text-sm font-bold text-center"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
+            {renderPersonalizationBox()}
 
             {/* Add to Cart Action with Quantity Selector */}
             <div className="flex gap-4 mb-8 h-14 font-sans">

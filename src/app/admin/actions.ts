@@ -91,6 +91,31 @@ export async function deleteProduct(productId: string) {
   }
 }
 
+export async function getAdminStats() {
+  try {
+    await ensureAdmin();
+    const [productCount, orderCount, products, orders] = await Promise.all([
+      prisma.product.count(),
+      prisma.order.count(),
+      prisma.product.findMany({ select: { price: true, stock: true } }),
+      prisma.order.findMany({ select: { total: true } })
+    ]);
+    
+    const totalValue = products.reduce((acc, p) => acc + (parseFloat(p.price.toString()) * p.stock), 0);
+    const totalEarnings = orders.reduce((acc, o) => acc + parseFloat(o.total.toString()), 0);
+
+    return {
+      productCount,
+      orderCount,
+      totalValue,
+      totalEarnings
+    };
+  } catch (error) {
+    console.error("Failed to fetch admin stats:", error);
+    return { productCount: 0, orderCount: 0, totalValue: 0, totalEarnings: 0 };
+  }
+}
+
 export async function updateProduct(
   productId: string, 
   data: { 
@@ -102,6 +127,8 @@ export async function updateProduct(
     sizes: string[]; 
     description: string; 
     images: string[]; 
+    stock?: number;
+    isWorldCup?: boolean;
   }
 ) {
   try {
@@ -123,6 +150,8 @@ export async function updateProduct(
         sizes: data.sizes,
         description: data.description,
         images: resolvedImages,
+        stock: data.stock !== undefined ? data.stock : undefined,
+        isWorldCup: data.isWorldCup !== undefined ? data.isWorldCup : undefined,
       },
     });
     return { success: true, product: { ...updatedProduct, price: updatedProduct.price.toString() } };
