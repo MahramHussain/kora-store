@@ -17,6 +17,9 @@ export async function getOrders() {
   try {
     await ensureAdmin();
     const orders = await prisma.order.findMany({
+      where: {
+        status: { not: "Pending" }
+      },
       orderBy: { createdAt: "desc" },
       include: {
         user: true,
@@ -96,9 +99,9 @@ export async function getAdminStats() {
     await ensureAdmin();
     const [productCount, orderCount, products, orders] = await Promise.all([
       prisma.product.count(),
-      prisma.order.count(),
+      prisma.order.count({ where: { status: { not: "Pending" } } }),
       prisma.product.findMany({ select: { price: true, stock: true } }),
-      prisma.order.findMany({ select: { total: true } })
+      prisma.order.findMany({ where: { status: { not: "Pending" } }, select: { total: true } })
     ]);
     
     const totalValue = products.reduce((acc, p) => acc + (parseFloat(p.price.toString()) * p.stock), 0);
@@ -158,5 +161,26 @@ export async function updateProduct(
   } catch (error) {
     console.error("Failed to update product:", error);
     return { success: false, error: "Failed to save product changes" };
+  }
+}
+
+export async function deleteOrder(orderId: string) {
+  try {
+    await ensureAdmin();
+
+    // 1. Delete associated order items due to foreign key constraints
+    await prisma.orderItem.deleteMany({
+      where: { orderId: orderId }
+    });
+
+    // 2. Delete the order itself from the database
+    await prisma.order.delete({
+      where: { id: orderId }
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete order from database:", error);
+    return { success: false, error: "Failed to delete order from database" };
   }
 }

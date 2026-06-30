@@ -44,30 +44,30 @@ const JERSEYS: Record<
 
 function MiniJersey({ colors }: { colors: typeof JERSEYS[string] }) {
   return (
-    <div className="relative w-12 h-12 flex items-center justify-center filter drop-shadow-md transition-transform hover:scale-110">
+    <div className="relative w-full h-full flex items-center justify-center scale-90 select-none">
       {/* Torso */}
       <div
-        className="relative w-7 h-9 rounded-t-sm overflow-hidden"
+        className="relative w-[56%] h-[75%] rounded-t-[4px] overflow-hidden z-10"
         style={{ backgroundColor: colors.primary }}
       >
         {colors.stripes && (
           <div className="absolute inset-0 flex justify-around">
-            <div className="w-1.5 h-full" style={{ backgroundColor: colors.secondary }} />
-            <div className="w-1.5 h-full" style={{ backgroundColor: colors.secondary }} />
-            <div className="w-1.5 h-full" style={{ backgroundColor: colors.secondary }} />
+            <div className="w-[20%] h-full" style={{ backgroundColor: colors.secondary }} />
+            <div className="w-[20%] h-full" style={{ backgroundColor: colors.secondary }} />
+            <div className="w-[20%] h-full" style={{ backgroundColor: colors.secondary }} />
           </div>
         )}
         {/* Neck collar */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3.5 h-1.5 bg-slate-900/10 rounded-b-full" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[50%] h-[15%] bg-slate-900/15 rounded-b-full" />
       </div>
       {/* Left Sleeve */}
       <div
-        className="absolute top-1 -left-0.5 w-3 h-5 rounded-l-sm origin-top-right -rotate-25"
+        className="absolute top-[12%] left-[8%] w-[25%] h-[44%] rounded-l-[2px] origin-top-right -rotate-25"
         style={{ backgroundColor: colors.sleeves || colors.primary }}
       />
       {/* Right Sleeve */}
       <div
-        className="absolute top-1 -right-0.5 w-3 h-5 rounded-r-sm origin-top-left rotate-25"
+        className="absolute top-[12%] right-[8%] w-[25%] h-[44%] rounded-r-[2px] origin-top-left rotate-25"
         style={{ backgroundColor: colors.sleeves || colors.primary }}
       />
     </div>
@@ -78,13 +78,21 @@ function AvatarDisplay({
   imageUrl,
   name,
   selectedAvatar,
+  customProfilePic,
   size = "w-14 h-14"
 }: {
   imageUrl?: string;
   name: string;
   selectedAvatar: string | null;
+  customProfilePic: string | null;
   size?: string;
 }) {
+  if (selectedAvatar === "custom_upload" && customProfilePic) {
+    return (
+      <img src={customProfilePic} alt="Profile" className={`${size} rounded-full border-2 border-kora shadow-md object-cover shrink-0`} />
+    );
+  }
+
   if (selectedAvatar && JERSEYS[selectedAvatar]) {
     return (
       <div className={`${size} rounded-full bg-slate-900 border-2 border-kora shadow-md flex items-center justify-center overflow-hidden shrink-0`}>
@@ -235,6 +243,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
   const [nameInput, setNameInput] = useState(user.name);
   const [saveStatus, setSaveStatus] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [customProfilePic, setCustomProfilePic] = useState<string | null>(null);
 
   // Filter States
   const [statusFilter, setStatusFilter] = useState<"all" | "processing" | "shipped" | "delivered">("all");
@@ -244,10 +253,13 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
   const [prefEmail, setPrefEmail] = useState(true);
   const [prefDrops, setPrefDrops] = useState(true);
 
-  // Load custom avatar from local storage on mount
+  // Load custom avatar and custom image from local storage on mount
   useEffect(() => {
-    const saved = localStorage.getItem("kora_vault_avatar");
-    if (saved) setSelectedAvatar(saved);
+    const savedAvatar = localStorage.getItem("kora_vault_avatar");
+    if (savedAvatar) setSelectedAvatar(savedAvatar);
+    
+    const savedPic = localStorage.getItem("kora_vault_custom_profile_pic");
+    if (savedPic) setCustomProfilePic(savedPic);
   }, []);
 
   const changeAvatar = (avatarId: string | null) => {
@@ -257,6 +269,71 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
     } else {
       localStorage.removeItem("kora_vault_avatar");
     }
+    // Dispatch custom event to update Navbar avatar immediately
+    window.dispatchEvent(new Event("kora_avatar_update"));
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check size limit (e.g. 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setSaveStatus("❌ Image must be smaller than 5MB.");
+      return;
+    }
+
+    setSaveStatus("Optimizing photo...");
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const maxDim = 192; // 192x192 is ideal for profile avatars & keeps payload tiny
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          }
+        } else {
+          if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.75); // Compress to light JPEG (around 10-15KB)
+          setCustomProfilePic(compressedBase64);
+          localStorage.setItem("kora_vault_custom_profile_pic", compressedBase64);
+          changeAvatar("custom_upload");
+          setSaveStatus("✅ Profile photo uploaded & optimized!");
+          setTimeout(() => setSaveStatus(""), 4000);
+        }
+      };
+    };
+    reader.onerror = () => {
+      setSaveStatus("❌ Failed to process custom image.");
+    };
+  };
+
+  const removeCustomImage = () => {
+    setCustomProfilePic(null);
+    localStorage.removeItem("kora_vault_custom_profile_pic");
+    if (selectedAvatar === "custom_upload") {
+      changeAvatar(null);
+    }
+    setSaveStatus("✅ Custom profile photo removed.");
+    setTimeout(() => setSaveStatus(""), 4000);
   };
 
   const handleLogout = () => signOut(() => router.push("/"));
@@ -342,6 +419,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                 imageUrl={clerkUser?.imageUrl || user.imageUrl}
                 name={clerkUser?.firstName || user.name}
                 selectedAvatar={selectedAvatar}
+                customProfilePic={customProfilePic}
                 size="w-16 h-16 sm:w-20 sm:h-20"
               />
               <div className="min-w-0">
@@ -1017,10 +1095,77 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                             }`}
                             title={colors.name}
                           >
-                            <MiniJersey colors={colors} />
+                            <div className="w-12 h-12 flex items-center justify-center shrink-0">
+                              <MiniJersey colors={colors} />
+                            </div>
                             <span className="text-[9px] font-bold text-slate-500 mt-1 truncate max-w-full">{colors.name}</span>
                           </button>
                         ))}
+                      </div>
+
+                      {/* Custom Upload Section */}
+                      <div className="mt-6 pt-5 border-t border-slate-100">
+                        <h4 className="text-[11px] text-slate-900 font-extrabold uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                          📸 Upload Custom Profile Pic
+                        </h4>
+                        <p className="text-slate-400 text-xs leading-relaxed mb-4">
+                          Upload any photo of choice. It will be compressed to less than 15KB for instant page loads.
+                        </p>
+
+                        <div className="flex items-center gap-4">
+                          {customProfilePic ? (
+                            <div className="relative group shrink-0">
+                              <img src={customProfilePic} alt="Preview" className="w-16 h-16 rounded-2xl border border-slate-200 object-cover" />
+                              <button
+                                type="button"
+                                onClick={removeCustomImage}
+                                className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white rounded-full p-1 shadow-md hover:bg-rose-600 transition-colors"
+                                title="Remove Custom Image"
+                              >
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="w-16 h-16 rounded-2xl border-2 border-dashed border-slate-200 flex items-center justify-center text-slate-300 shrink-0">
+                              <FiUser className="w-8 h-8" />
+                            </div>
+                          )}
+
+                          <div className="flex-1 flex flex-wrap gap-2.5">
+                            <input
+                              type="file"
+                              id="kora-custom-avatar-file"
+                              accept="image/*"
+                              onChange={handleImageUpload}
+                              className="hidden"
+                            />
+                            <label
+                              htmlFor="kora-custom-avatar-file"
+                              className="cursor-pointer bg-slate-900 hover:bg-kora text-white font-extrabold py-2.5 px-4 rounded-xl transition-all shadow-sm text-[10px] uppercase tracking-wider flex items-center gap-1.5 select-none"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                              </svg>
+                              Upload Photo
+                            </label>
+                            
+                            {customProfilePic && (
+                              <button
+                                type="button"
+                                onClick={() => changeAvatar("custom_upload")}
+                                className={`font-extrabold py-2.5 px-4 rounded-xl transition-all text-[10px] uppercase tracking-wider ${
+                                  selectedAvatar === "custom_upload"
+                                    ? "bg-kora/10 text-kora border border-kora/20"
+                                    : "bg-white text-slate-700 border border-slate-200 hover:border-slate-300"
+                                }`}
+                              >
+                                Select Photo
+                              </button>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
 

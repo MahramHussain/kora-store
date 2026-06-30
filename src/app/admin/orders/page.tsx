@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { CURRENCY } from "@/lib/constants";
-import { getOrders, updateOrderFulfillment } from "../actions";
+import { getOrders, updateOrderFulfillment, deleteOrder } from "../actions";
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -27,6 +27,20 @@ export default function AdminOrdersPage() {
     if (!res?.success) {
       setOrders(originalOrders);
       alert("Failed to update order");
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (!window.confirm("Are you sure you want to permanently delete this order? This action will remove it from the database.")) {
+      return;
+    }
+    const originalOrders = [...orders];
+    setOrders(orders.filter(o => o.id !== orderId));
+    
+    const res = await deleteOrder(orderId);
+    if (!res?.success) {
+      setOrders(originalOrders);
+      alert(res?.error || "Failed to delete order");
     }
   };
 
@@ -106,12 +120,23 @@ export default function AdminOrdersPage() {
 
                 <div>
                   {/* Order header row */}
-                  <div className="flex justify-between items-center mb-4 pb-3 border-b border-slate-100 mt-1">
+                  <div className="flex justify-between items-start mb-4 pb-3 border-b border-slate-100 mt-1">
                     <div className="flex flex-col">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Order Ref</span>
                       <span className="text-sm font-black text-slate-900 uppercase font-mono">{order.referenceNumber || `REF-${order.id.slice(-4).toUpperCase()}`}</span>
                     </div>
-                    <span className="text-lg font-black text-slate-900">{CURRENCY}{formattedTotal}</span>
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-lg font-black text-slate-900">{CURRENCY}{formattedTotal}</span>
+                      <button
+                        onClick={() => handleDeleteOrder(order.id)}
+                        className="text-slate-400 hover:text-rose-600 transition-colors p-1"
+                        title="Delete Order"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                   
                   {/* Customer details info */}

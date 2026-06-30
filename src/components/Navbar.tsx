@@ -25,28 +25,29 @@ const JERSEYS: Record<
 
 function MiniJersey({ colors }: { colors: typeof JERSEYS[string] }) {
   return (
-    <div className="relative w-8 h-8 flex items-center justify-center filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.15)] shrink-0 overflow-hidden">
+    <div className="relative w-full h-full flex items-center justify-center scale-90 select-none">
       {/* Torso */}
       <div
-        className="relative w-4.5 h-6 rounded-t-2xs overflow-hidden"
+        className="relative w-[56%] h-[75%] rounded-t-[4px] overflow-hidden z-10"
         style={{ backgroundColor: colors.primary }}
       >
         {colors.stripes && (
           <div className="absolute inset-0 flex justify-around">
-            <div className="w-1 h-full" style={{ backgroundColor: colors.secondary }} />
-            <div className="w-1 h-full" style={{ backgroundColor: colors.secondary }} />
+            <div className="w-[20%] h-full" style={{ backgroundColor: colors.secondary }} />
+            <div className="w-[20%] h-full" style={{ backgroundColor: colors.secondary }} />
+            <div className="w-[20%] h-full" style={{ backgroundColor: colors.secondary }} />
           </div>
         )}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2.5 h-1 bg-slate-900/10 rounded-b-full" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[50%] h-[15%] bg-slate-900/15 rounded-b-full" />
       </div>
       {/* Left Sleeve */}
       <div
-        className="absolute top-0.5 left-0.5 w-2 h-3.5 rounded-l-2xs origin-top-right -rotate-25"
+        className="absolute top-[12%] left-[8%] w-[25%] h-[44%] rounded-l-[2px] origin-top-right -rotate-25"
         style={{ backgroundColor: colors.sleeves || colors.primary }}
       />
       {/* Right Sleeve */}
       <div
-        className="absolute top-0.5 right-0.5 w-2 h-3.5 rounded-r-2xs origin-top-left rotate-25"
+        className="absolute top-[12%] right-[8%] w-[25%] h-[44%] rounded-r-[2px] origin-top-left rotate-25"
         style={{ backgroundColor: colors.sleeves || colors.primary }}
       />
     </div>
@@ -57,13 +58,21 @@ function NavbarAvatar({
   imageUrl,
   name,
   selectedAvatar,
+  customProfilePic,
   size = "w-6 h-6 md:w-8 md:h-8"
 }: {
   imageUrl?: string;
   name: string;
   selectedAvatar: string | null;
+  customProfilePic: string | null;
   size?: string;
 }) {
+  if (selectedAvatar === "custom_upload" && customProfilePic) {
+    return (
+      <img src={customProfilePic} alt="Profile" className={`${size} rounded-full border border-neutral-200 shadow-xs object-cover shrink-0`} />
+    );
+  }
+
   if (selectedAvatar && JERSEYS[selectedAvatar]) {
     return (
       <div className={`${size} rounded-full bg-slate-900 border border-neutral-200 shadow-xs flex items-center justify-center overflow-hidden shrink-0`}>
@@ -240,10 +249,22 @@ export default function Navbar() {
   const { user: clerkUser } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
+  const [customProfilePic, setCustomProfilePic] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("kora_vault_avatar");
-    setSelectedAvatar(saved);
+    const handleAvatarUpdate = () => {
+      const saved = localStorage.getItem("kora_vault_avatar");
+      setSelectedAvatar(saved);
+      const customPic = localStorage.getItem("kora_vault_custom_profile_pic");
+      setCustomProfilePic(customPic);
+    };
+
+    handleAvatarUpdate();
+
+    window.addEventListener("kora_avatar_update", handleAvatarUpdate);
+    return () => {
+      window.removeEventListener("kora_avatar_update", handleAvatarUpdate);
+    };
   }, [pathname]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isFocused, setIsFocused] = useState(false);
@@ -439,6 +460,7 @@ export default function Navbar() {
                     imageUrl={clerkUser?.imageUrl} 
                     name={clerkUser?.firstName || "V"} 
                     selectedAvatar={selectedAvatar} 
+                    customProfilePic={customProfilePic}
                   />
                 </Link>
               </Show>

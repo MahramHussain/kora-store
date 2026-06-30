@@ -24,7 +24,10 @@ export default async function DashboardPage() {
 
   // 3. SECURE PRISMA FETCH: Pull their real orders!
   const rawOrders = await prisma.order.findMany({
-    where: { userId: userId },
+    where: { 
+      userId: userId,
+      status: { not: "Pending" }
+    },
     include: {
       items: {
         include: {
