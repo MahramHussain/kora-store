@@ -84,151 +84,248 @@ export default function AdminInventoryPage() {
     return matchesSearch && matchesCategory;
   });
 
+  // Stock badge renderer (reused for both table and card views)
+  const StockBadge = ({ stockCount }: { stockCount: number }) => {
+    if (stockCount === 0) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200/60">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+          Out of stock
+        </span>
+      );
+    } else if (stockCount <= 3) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200/60 animate-pulse">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+          Low stock ({stockCount})
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+        In Stock ({stockCount})
+      </span>
+    );
+  };
+
   return (
     <div className="max-w-6xl mx-auto font-sans">
       
       {/* Controls Bar */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
-        <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight self-start md:self-center">Product Inventory</h2>
-        
-        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <input 
-            type="text" 
-            placeholder="Search gear..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold text-slate-700 placeholder-slate-400 outline-none focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] transition-all shadow-2xs sm:w-60"
-          />
-          <select 
-            value={selectedCategoryFilter}
-            onChange={(e) => setSelectedCategoryFilter(e.target.value)}
-            className="bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold text-slate-700 outline-none focus:border-[#6B00FF] cursor-pointer shadow-2xs transition-all"
-          >
-            <option value="All">All Categories</option>
-            <option value="Shirts">Shirts</option>
-            <option value="Boots">Shoes / Boots</option>
-            <option value="Retro Kits">Retro Kits</option>
-            <option value="Accessories">Accessories</option>
-          </select>
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-sm mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between sm:items-center">
+          <div>
+            <h2 className="text-lg sm:text-xl font-black text-slate-900 uppercase tracking-tight">Product Inventory</h2>
+            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">{filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""} found</p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto">
+            <div className="relative flex-1 sm:flex-none">
+              <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input 
+                type="text" 
+                placeholder="Search gear..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-50/80 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-xs font-bold text-slate-700 placeholder-slate-400 outline-none focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 transition-all sm:w-60"
+              />
+            </div>
+            <select 
+              value={selectedCategoryFilter}
+              onChange={(e) => setSelectedCategoryFilter(e.target.value)}
+              className="bg-slate-50/80 border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:border-kora cursor-pointer transition-all"
+            >
+              <option value="All">All Categories</option>
+              <option value="Shirts">Shirts</option>
+              <option value="Boots">Shoes / Boots</option>
+              <option value="Retro Kits">Retro Kits</option>
+              <option value="Accessories">Accessories</option>
+            </select>
+          </div>
         </div>
       </div>
       
       {loadingProducts ? (
-        <div className="text-center py-16 bg-white border border-slate-200 rounded-3xl shadow-sm">
-          <div className="w-8 h-8 border-4 border-slate-200 border-t-kora rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="text-center py-16 bg-white border border-slate-200/80 rounded-3xl shadow-sm">
+          <div className="relative w-10 h-10 mx-auto mb-4">
+            <div className="absolute inset-0 rounded-full border-[3px] border-slate-100" />
+            <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-kora animate-spin" />
+          </div>
           <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Loading vault inventory...</p>
         </div>
       ) : (
-        <div className="bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse min-w-[700px]">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200 text-[10px] uppercase tracking-widest text-slate-400">
-                  <th className="p-4 font-bold">Details</th>
-                  <th className="p-4 font-bold">Category</th>
-                  <th className="p-4 font-bold">Stock Status</th>
-                  <th className="p-4 font-bold">Price</th>
-                  <th className="p-4 font-bold text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 text-sm">
-                {filteredProducts.map((product) => {
-                  const stockCount = product.stock !== undefined ? product.stock : 10;
-                  return (
-                    <tr key={product.id} className="hover:bg-slate-50/50 transition-colors">
-                      {/* Product details */}
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-slate-50 border border-slate-200/50 rounded-xl overflow-hidden flex items-center justify-center p-1.5 shrink-0">
-                            {product.images && product.images[0] ? (
-                              <img src={product.images[0]} alt="" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
-                            ) : (
-                              <span className="text-[9px] text-slate-300 font-black">N/A</span>
-                            )}
-                          </div>
-                          <div>
-                            <span className="text-[10px] font-mono text-slate-400 block">ID: {product.id.slice(-6).toUpperCase()}</span>
-                            <span className="font-extrabold text-slate-900 block max-w-[240px] truncate uppercase">{product.name}</span>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="p-4 text-slate-600 font-bold">
-                        {product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}
-                      </td>
-
-                      {/* Stock indicator badge */}
-                      <td className="p-4">
-                        {stockCount === 0 ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200/60">
-                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                            Out of stock
-                          </span>
-                        ) : stockCount <= 3 ? (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200/60 animate-pulse">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                            Low stock ({stockCount})
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/60">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            In Stock ({stockCount})
-                          </span>
-                        )}
-                      </td>
-
-                      <td className="p-4 text-slate-900 font-black">{CURRENCY}{parseFloat(product.price).toFixed(2)}</td>
-
-                      <td className="p-4 text-right space-x-3">
-                        <button 
-                          onClick={() => { setProductToEdit({ ...product }); setEditModalOpen(true); }}
-                          className="text-xs font-black text-[#6B00FF] hover:text-purple-700 uppercase tracking-widest transition-colors"
-                        >
-                          Edit
-                        </button>
-                        <button 
-                          onClick={() => { setProductToDelete(product.id); setDeleteModalOpen(true); }}
-                          className="text-xs font-black text-rose-500 hover:text-rose-600 uppercase tracking-widest transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-                {filteredProducts.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="p-12 text-center text-slate-400 font-bold tracking-widest uppercase text-xs">No matching products found.</td>
+        <>
+          {/* ═══════ DESKTOP TABLE VIEW (md+) ═══════ */}
+          <div className="hidden md:block bg-white border border-slate-200/80 rounded-3xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[700px]">
+                <thead>
+                  <tr className="bg-slate-50/80 border-b border-slate-200 text-[10px] uppercase tracking-widest text-slate-400">
+                    <th className="p-4 font-bold">Details</th>
+                    <th className="p-4 font-bold">Category</th>
+                    <th className="p-4 font-bold">Stock Status</th>
+                    <th className="p-4 font-bold">Price</th>
+                    <th className="p-4 font-bold text-right">Actions</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-sm">
+                  {filteredProducts.map((product) => {
+                    const stockCount = product.stock !== undefined ? product.stock : 10;
+                    return (
+                      <tr key={product.id} className="hover:bg-slate-50/50 transition-colors">
+                        {/* Product details */}
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-slate-50 border border-slate-200/50 rounded-xl overflow-hidden flex items-center justify-center p-1.5 shrink-0">
+                              {product.images && product.images[0] ? (
+                                <img src={product.images[0]} alt="" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                              ) : (
+                                <span className="text-[9px] text-slate-300 font-black">N/A</span>
+                              )}
+                            </div>
+                            <div>
+                              <span className="text-[10px] font-mono text-slate-400 block">ID: {product.id.slice(-6).toUpperCase()}</span>
+                              <span className="font-extrabold text-slate-900 block max-w-[240px] truncate uppercase">{product.name}</span>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="p-4 text-slate-600 font-bold">
+                          {product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}
+                        </td>
+
+                        {/* Stock indicator badge */}
+                        <td className="p-4">
+                          <StockBadge stockCount={stockCount} />
+                        </td>
+
+                        <td className="p-4 text-slate-900 font-black">{CURRENCY}{parseFloat(product.price).toFixed(2)}</td>
+
+                        <td className="p-4 text-right space-x-3">
+                          <button 
+                            onClick={() => { setProductToEdit({ ...product }); setEditModalOpen(true); }}
+                            className="text-xs font-black text-kora hover:text-purple-700 uppercase tracking-widest transition-colors"
+                          >
+                            Edit
+                          </button>
+                          <button 
+                            onClick={() => { setProductToDelete(product.id); setDeleteModalOpen(true); }}
+                            className="text-xs font-black text-rose-500 hover:text-rose-600 uppercase tracking-widest transition-colors"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {filteredProducts.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="p-12 text-center text-slate-400 font-bold tracking-widest uppercase text-xs">No matching products found.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+
+          {/* ═══════ MOBILE CARD VIEW (<md) ═══════ */}
+          <div className="md:hidden space-y-3">
+            {filteredProducts.map((product) => {
+              const stockCount = product.stock !== undefined ? product.stock : 10;
+              return (
+                <div key={product.id} className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all">
+                  <div className="flex gap-3.5">
+                    {/* Product image */}
+                    <div className="w-16 h-16 bg-slate-50 border border-slate-200/50 rounded-xl overflow-hidden flex items-center justify-center p-2 shrink-0">
+                      {product.images && product.images[0] ? (
+                        <img src={product.images[0]} alt="" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
+                      ) : (
+                        <span className="text-[9px] text-slate-300 font-black">N/A</span>
+                      )}
+                    </div>
+                    
+                    {/* Product info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <span className="font-extrabold text-slate-900 block truncate uppercase text-sm">{product.name}</span>
+                          <span className="text-[10px] font-mono text-slate-400 block mt-0.5">ID: {product.id.slice(-6).toUpperCase()}</span>
+                        </div>
+                        <span className="text-sm font-black text-slate-900 shrink-0">{CURRENCY}{parseFloat(product.price).toFixed(2)}</span>
+                      </div>
+                      
+                      <div className="flex flex-wrap items-center gap-2 mt-2.5">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200/60">
+                          {product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}
+                        </span>
+                        <StockBadge stockCount={stockCount} />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Mobile actions */}
+                  <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
+                    <button 
+                      onClick={() => { setProductToEdit({ ...product }); setEditModalOpen(true); }}
+                      className="flex-1 py-2.5 bg-kora/5 hover:bg-kora/10 text-kora font-bold text-xs uppercase tracking-wider rounded-xl transition-colors text-center border border-kora/10"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => { setProductToDelete(product.id); setDeleteModalOpen(true); }}
+                      className="flex-1 py-2.5 bg-rose-50 hover:bg-rose-100/60 text-rose-600 font-bold text-xs uppercase tracking-wider rounded-xl transition-colors text-center border border-rose-200/60"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+            {filteredProducts.length === 0 && (
+              <div className="text-center py-16 bg-white border border-slate-200/80 rounded-3xl shadow-sm">
+                <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto mb-4 border border-slate-100 text-2xl">📭</div>
+                <p className="text-slate-400 font-bold tracking-widest text-sm uppercase">No matching products found.</p>
+                <p className="text-slate-300 text-xs mt-1">Try adjusting your search or filters.</p>
+              </div>
+            )}
+          </div>
+        </>
       )}
 
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4">
-          <div className="bg-white border border-rose-200 p-8 rounded-3xl max-w-sm w-full shadow-2xl">
-            <h3 className="text-lg font-black text-slate-900 mb-4">Confirm Deletion</h3>
-            <p className="text-slate-500 mb-8 text-sm leading-relaxed">Are you sure you want to permanently delete this product? This action cannot be reversed.</p>
-            <div className="flex space-x-4">
-              <button onClick={() => setDeleteModalOpen(false)} className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors">Cancel</button>
-              <button onClick={handleDeleteProduct} className="flex-1 py-3 bg-rose-600 hover:bg-rose-700 text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-rose-600/20">Delete</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
+          <div className="bg-white border border-slate-200/80 p-6 sm:p-8 rounded-3xl max-w-sm w-full shadow-2xl animate-fade-in-up">
+            <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-200/60 flex items-center justify-center mx-auto mb-5 text-2xl">🗑️</div>
+            <h3 className="text-lg font-black text-slate-900 text-center mb-2">Confirm Deletion</h3>
+            <p className="text-slate-500 mb-8 text-sm leading-relaxed text-center">Are you sure you want to permanently delete this product? This action cannot be reversed.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeleteModalOpen(false)} className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition-colors text-sm">Cancel</button>
+              <button onClick={handleDeleteProduct} className="flex-1 py-3.5 bg-rose-600 hover:bg-rose-700 text-white font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-rose-600/20 text-sm">Delete</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Edit Form Drawer Modal */}
+      {/* Edit Form Modal */}
       {editModalOpen && productToEdit && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 overflow-y-auto">
-          <div className="bg-white border border-slate-200 p-6 rounded-3xl max-w-lg w-full shadow-2xl flex flex-col max-h-[90vh]">
-            <h3 className="text-lg font-black text-slate-900 mb-2 uppercase tracking-widest border-b border-slate-100 pb-3 shrink-0">Edit Gear</h3>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/40 backdrop-blur-sm p-0 sm:p-4 overflow-y-auto">
+          <div className="bg-white border border-slate-200/80 rounded-t-3xl sm:rounded-3xl max-w-lg w-full shadow-2xl flex flex-col max-h-[95vh] sm:max-h-[90vh] animate-fade-in-up">
+            
+            {/* Modal header with gradient accent */}
+            <div className="relative px-5 sm:px-6 pt-6 pb-4 border-b border-slate-100 shrink-0">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-kora via-purple-500 to-pink-500 rounded-t-3xl" />
+              {/* Mobile drag handle */}
+              <div className="sm:hidden w-10 h-1 bg-slate-200 rounded-full mx-auto mb-4" />
+              <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">Edit Gear</h3>
+              <p className="text-slate-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">Update product details</p>
+            </div>
             
             <form onSubmit={handleUpdateProductSubmit} className="flex flex-col flex-1 min-h-0">
-              <div className="space-y-4 overflow-y-auto pr-2 flex-1 my-4">
+              <div className="space-y-4 overflow-y-auto px-5 sm:px-6 flex-1 my-4 scrollbar-hide">
                 
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Name</label>
@@ -236,7 +333,7 @@ export default function AdminInventoryPage() {
                     required type="text" 
                     value={productToEdit.name} 
                     onChange={e => setProductToEdit({...productToEdit, name: e.target.value})} 
-                    className="w-full bg-slate-50 border border-slate-200 focus:bg-white rounded-xl p-3 text-slate-900 focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] outline-none text-xs shadow-2xs transition-all font-bold" 
+                    className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
                   />
                 </div>
 
@@ -247,7 +344,7 @@ export default function AdminInventoryPage() {
                       required type="number" step="0.01" 
                       value={productToEdit.price} 
                       onChange={e => setProductToEdit({...productToEdit, price: e.target.value})} 
-                      className="w-full bg-slate-50 border border-slate-200 focus:bg-white rounded-xl p-3 text-slate-900 focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] outline-none text-xs font-mono shadow-2xs transition-all font-bold" 
+                      className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-mono font-bold transition-all" 
                     />
                   </div>
                   <div>
@@ -255,7 +352,7 @@ export default function AdminInventoryPage() {
                     <select 
                       value={productToEdit.category} 
                       onChange={e => setProductToEdit({...productToEdit, category: e.target.value})} 
-                      className="w-full bg-slate-50 border border-slate-200 focus:bg-white rounded-xl p-3 text-slate-900 focus:border-[#6B00FF] outline-none text-xs cursor-pointer shadow-2xs transition-all font-bold"
+                      className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora outline-none text-xs cursor-pointer font-bold transition-all"
                     >
                       <option value="Shirts">Shirts</option>
                       <option value="Boots">Shoes / Boots</option>
@@ -272,18 +369,18 @@ export default function AdminInventoryPage() {
                       required type="number" min="0"
                       value={productToEdit.stock !== undefined ? productToEdit.stock : 10} 
                       onChange={e => setProductToEdit({...productToEdit, stock: e.target.value})} 
-                      className="w-full bg-slate-50 border border-slate-200 focus:bg-white rounded-xl p-3 text-slate-900 focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] outline-none text-xs shadow-2xs transition-all font-bold" 
+                      className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
                     />
                   </div>
                   <div className="flex items-end">
-                    <label className="flex items-center gap-2 cursor-pointer bg-slate-50 hover:bg-slate-100/60 border border-slate-200 rounded-xl p-3 w-full select-none transition-colors h-[42px]">
+                    <label className="flex items-center gap-2 cursor-pointer bg-slate-50/80 hover:bg-slate-100/60 border border-slate-200 rounded-xl p-3 w-full select-none transition-colors h-[42px]">
                       <input 
                         type="checkbox" 
                         checked={!!productToEdit.isWorldCup} 
                         onChange={e => setProductToEdit({...productToEdit, isWorldCup: e.target.checked})} 
                         className="rounded text-[#6B00FF] focus:ring-[#6B00FF] h-4 w-4 border-slate-300"
                       />
-                      <span className="text-xs font-bold text-slate-800">World Cup Campaign</span>
+                      <span className="text-xs font-bold text-slate-800">World Cup</span>
                     </label>
                   </div>
                 </div>
@@ -295,7 +392,7 @@ export default function AdminInventoryPage() {
                       type="text" 
                       value={productToEdit.team || ""} 
                       onChange={e => setProductToEdit({...productToEdit, team: e.target.value || null})} 
-                      className="w-full bg-slate-50 border border-slate-200 focus:bg-white rounded-xl p-3 text-slate-900 focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] outline-none text-xs shadow-2xs transition-all font-bold" 
+                      className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
                       placeholder="None"
                     />
                   </div>
@@ -304,7 +401,7 @@ export default function AdminInventoryPage() {
                     <select 
                       value={productToEdit.tag || ""} 
                       onChange={e => setProductToEdit({...productToEdit, tag: e.target.value || null})} 
-                      className="w-full bg-slate-50 border border-slate-200 focus:bg-white rounded-xl p-3 text-slate-900 focus:border-[#6B00FF] outline-none text-xs cursor-pointer shadow-2xs transition-all font-bold"
+                      className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora outline-none text-xs cursor-pointer font-bold transition-all"
                     >
                       <option value="">None</option>
                       <option value="Latest">Latest</option>
@@ -329,7 +426,7 @@ export default function AdminInventoryPage() {
                       return img;
                     }).join(", ") : productToEdit.images} 
                     onChange={e => setProductToEdit({...productToEdit, images: e.target.value})} 
-                    className="w-full bg-slate-50 border border-slate-200 focus:bg-white rounded-xl p-3 text-slate-900 focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] outline-none font-mono text-xs shadow-2xs transition-all" 
+                    className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none font-mono text-xs transition-all" 
                   />
                 </div>
 
@@ -339,7 +436,7 @@ export default function AdminInventoryPage() {
                     required type="text" 
                     value={Array.isArray(productToEdit.sizes) ? productToEdit.sizes.join(", ") : productToEdit.sizes} 
                     onChange={e => setProductToEdit({...productToEdit, sizes: e.target.value})} 
-                    className="w-full bg-slate-50 border border-slate-200 focus:bg-white rounded-xl p-3 text-slate-900 focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] outline-none font-mono text-xs shadow-2xs transition-all" 
+                    className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none font-mono text-xs transition-all" 
                     placeholder="S, M, L, XL"
                   />
                 </div>
@@ -350,15 +447,15 @@ export default function AdminInventoryPage() {
                     required 
                     value={productToEdit.description || ""} 
                     onChange={e => setProductToEdit({...productToEdit, description: e.target.value})} 
-                    className="w-full bg-slate-50 border border-slate-200 focus:bg-white rounded-xl p-3 text-slate-900 focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] outline-none h-20 resize-none text-xs shadow-2xs transition-all" 
+                    className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none h-20 resize-none text-xs transition-all" 
                     placeholder="Product description..."
                   />
                 </div>
               </div>
               
-              <div className="flex space-x-3 pt-4 border-t border-slate-100 shrink-0">
-                <button type="button" onClick={() => setEditModalOpen(false)} className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors text-xs uppercase tracking-wider">Cancel</button>
-                <button type="submit" className="flex-1 py-3 bg-slate-900 hover:bg-[#6B00FF] text-white font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-[#6B00FF]/10 text-xs">Save Changes</button>
+              <div className="flex gap-3 px-5 sm:px-6 py-4 border-t border-slate-100 bg-slate-50/30 shrink-0 rounded-b-3xl">
+                <button type="button" onClick={() => setEditModalOpen(false)} className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition-colors text-xs uppercase tracking-wider">Cancel</button>
+                <button type="submit" className="flex-1 py-3.5 bg-gradient-to-r from-kora to-purple-600 hover:from-purple-700 hover:to-kora text-white font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-kora/20 text-xs">Save Changes</button>
               </div>
             </form>
           </div>
