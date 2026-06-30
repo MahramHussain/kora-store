@@ -20,7 +20,10 @@ export const metadata: Metadata = {
   title: "Kora Store",
   description: "Elite Football Gear",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/icon.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" }
+    ],
     shortcut: "/favicon.ico",
     apple: "/icon.png",
   }

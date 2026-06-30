@@ -29,6 +29,123 @@ export default function ProductUI({ product }: { product: any }) {
   const [personalizationTab, setPersonalizationTab] = useState<"none" | "custom" | "player">("none");
   const [hasFifaPatch, setHasFifaPatch] = useState(false);
 
+  // Zoom states for desktop main image
+  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+  const [isZooming, setIsZooming] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPos({ x, y });
+  };
+
+  const renderDesktopPersonalizationBox = () => {
+    if (product.category !== "Shirts") return null;
+
+    return (
+      <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-6 mb-8 font-sans shadow-sm">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center text-slate-800 shadow-sm shrink-0">
+            <svg className="w-6 h-6 text-kora" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v1.244c0 .54-.438.976-.977.976H5.216c-.732 0-1.393.479-1.579 1.186L2.01 12.872a1.082 1.082 0 00.938 1.348h2.091c.484 0 .903.327 1.018.799l2.128 8.79c.121.5.57.844 1.086.844h5.474c.516 0 .965-.344 1.086-.844l2.128-8.79c.115-.472.534-.799 1.018-.799h2.091a1.082 1.082 0 00.938-1.348l-1.627-6.362c-.186-.707-.847-1.186-1.579-1.186h-3.557c-.539 0-.977-.436-.977-.976V3.104c0-.573-.464-1.037-1.036-1.037H10.786c-.572 0-1.036.464-1.036 1.037z" />
+            </svg>
+          </div>
+
+          <div>
+            <span className="text-[10px] font-extrabold uppercase text-kora tracking-widest bg-kora/10 px-2.5 py-0.5 rounded-sm">Bespoke Lab</span>
+            <h3 className="text-slate-900 font-extrabold text-base leading-tight mt-1">Kit Personalisation</h3>
+            <p className="text-slate-400 text-xs mt-0.5">Add custom name & number, or official sleeve patches</p>
+          </div>
+        </div>
+
+        <div className="flex gap-3 mt-6">
+          <button
+            type="button"
+            onClick={() => setPersonalizationTab(personalizationTab === "custom" ? "none" : "custom")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
+              personalizationTab === "custom"
+                ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
+                : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-xs"
+            }`}
+          >
+            <FiEdit className="text-sm shrink-0" />
+            <span>Add Name & Number</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setPersonalizationTab(personalizationTab === "player" ? "none" : "player")}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
+              personalizationTab === "player"
+                ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
+                : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-xs"
+            }`}
+          >
+            <FiAward className="text-sm shrink-0" />
+            <span>Sleeve Patches</span>
+          </button>
+        </div>
+
+        {personalizationTab === "custom" && (
+          <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Name on Back</label>
+                <input
+                  type="text"
+                  maxLength={15}
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value.toUpperCase())}
+                  placeholder="e.g. MESSI"
+                  className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider"
+                />
+              </div>
+              <div className="w-24">
+                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Number</label>
+                <input
+                  type="text"
+                  maxLength={3}
+                  value={customNumber}
+                  onChange={(e) => setCustomNumber(e.target.value.replace(/[^0-9]/g, ""))}
+                  placeholder="10"
+                  className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold text-center"
+                />
+              </div>
+            </div>
+            <p className="text-[10px] text-slate-400 italic">Bespoke hot-pressed vinyl printing. Handcrafted in-house.</p>
+          </div>
+        )}
+
+        {personalizationTab === "player" && (
+          <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
+            <div className="pt-2">
+              <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Sleeve Badge (Optional)</label>
+              <button
+                type="button"
+                onClick={() => setHasFifaPatch(!hasFifaPatch)}
+                className={`w-full py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-98 flex items-center justify-between shadow-xs hover:shadow-sm ${
+                  hasFifaPatch
+                    ? "bg-kora border-kora text-white shadow-sm shadow-kora/20"
+                    : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:text-slate-900"
+                }`}
+              >
+                <div className="flex items-center gap-2.5 text-left">
+                  <FiAward className={`text-base shrink-0 ${hasFifaPatch ? "text-white" : "text-kora"}`} />
+                  <div>
+                    <span className="block font-bold">FIFA World Cup Badge Set</span>
+                    <span className={`block text-[10px] font-medium ${hasFifaPatch ? "text-purple-200" : "text-slate-400"}`}>Official right and left sleeve badges</span>
+                  </div>
+                </div>
+                <span className={hasFifaPatch ? "text-white font-extrabold" : "text-kora font-black"}>+10 DHS</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const renderPersonalizationBox = () => {
     if (product.category !== "Shirts") return null;
 
@@ -600,98 +717,158 @@ export default function ProductUI({ product }: { product: any }) {
   //  DESKTOP LAYOUT  (≥ 768px — completely unchanged from original)
   // ──────────────────────────────────────────────────────────────────────────
   const DesktopView = (
-    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-24 pb-24 px-6">
-      <div className="max-w-7xl mx-auto">
+    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-6 pb-24 px-8 relative overflow-hidden">
+      {/* Decorative gradient blobs for ambient background lighting */}
+      <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-kora/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+      <div className="absolute top-2/3 right-0 w-[500px] h-[500px] bg-pink-500/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
-        <Link href="/shop" className="inline-flex items-center gap-2 text-slate-500 hover:text-kora transition-colors mb-8 font-bold text-xs uppercase tracking-wider">
-          <FaChevronLeft /> Back to Vault
+      <div className="max-w-7xl mx-auto">
+        {/* Sleek Breadcrumb back button */}
+        <Link href="/shop" className="group inline-flex items-center gap-2.5 text-slate-400 hover:text-kora transition-colors mb-6 font-bold text-xs uppercase tracking-widest">
+          <FaChevronLeft className="transition-transform group-hover:-translate-x-1" />
+          <span>Back to Vault</span>
         </Link>
 
-        <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 mb-20">
+        {/* Two Column Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-20 items-start mb-10">
+          
+          {/* LEFT: Image Showcase */}
+          <div className="lg:col-span-7 flex gap-6 items-start sticky top-24">
+            
+            {/* Vertical thumbnails list */}
+            {images.length > 1 && (
+              <div className="flex flex-col gap-3.5 shrink-0 scrollbar-hide max-h-[600px] overflow-y-auto pr-1">
+                {images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveImageIndex(i)}
+                    className={`w-20 h-20 rounded-2xl border bg-slate-50 flex items-center justify-center overflow-hidden transition-all duration-300 relative group ${
+                      activeImageIndex === i
+                        ? "border-kora border-2 shadow-md shadow-kora/20 scale-[1.02]"
+                        : "border-slate-200/80 hover:border-slate-300 hover:scale-[1.02]"
+                    }`}
+                  >
+                    <img 
+                      src={img} 
+                      alt={`Thumbnail ${i + 1}`} 
+                      className="w-14 h-14 object-contain transition-opacity duration-300 group-hover:opacity-100" 
+                    />
+                    <div className={`absolute inset-0 bg-kora/5 transition-opacity duration-300 ${activeImageIndex === i ? "opacity-100" : "opacity-0"}`} />
+                  </button>
+                ))}
+              </div>
+            )}
 
-          {/* LEFT: Image Gallery */}
-          <div className="flex-1 w-full flex flex-col gap-4">
-            <div className="w-full h-[320px] sm:h-[450px] md:h-[600px] bg-slate-50 rounded-3xl border border-slate-200 flex items-center justify-center relative overflow-hidden group shadow-sm hover:shadow-md transition-shadow p-4">
-              <div className="absolute inset-0 bg-gradient-to-br from-kora/5 to-transparent z-0"></div>
+            {/* Main Showcase Box with Zoom-on-Hover */}
+            <div 
+              className="flex-1 aspect-[4/5] bg-slate-50 rounded-[32px] border border-slate-200/60 flex items-center justify-center relative overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 p-0 cursor-zoom-in"
+              onMouseMove={handleMouseMove}
+              onMouseEnter={() => setIsZooming(true)}
+              onMouseLeave={() => setIsZooming(false)}
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-kora/10 via-transparent to-pink-500/5 opacity-40 z-0"></div>
               {images.length > 0 ? (
                 <img
                   src={images[activeImageIndex] || images[0]}
-                  alt="Product View"
-                  className="relative z-10 w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                  alt={product.name}
+                  className="relative z-10 w-full h-full object-cover transition-transform duration-200 select-none pointer-events-none"
+                  style={
+                    isZooming
+                      ? {
+                          transform: "scale(1.8)",
+                          transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                        }
+                      : { transform: "scale(1)", transformOrigin: "center" }
+                  }
                 />
               ) : (
                 <div className="relative z-10 text-slate-400 font-sans">No Image Available</div>
               )}
-            </div>
 
-            {product.category !== "Boots" && images.length > 0 && (
-              <div className="flex flex-col gap-2 w-full">
-                <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
-                  {images.map((img: string, i: number) => (
-                    <button
-                      key={i}
-                      onClick={() => setActiveImageIndex(i)}
-                      className={`shrink-0 w-24 h-24 rounded-xl border flex items-center justify-center bg-white overflow-hidden transition-all duration-300 shadow-sm ${
-                        activeImageIndex === i
-                          ? "border-kora border-2 shadow-md shadow-kora/30 scale-102"
-                          : "border-slate-200 hover:border-slate-300"
-                      }`}
-                    >
-                      <img src={img} alt={`Thumbnail ${i + 1}`} className="w-16 h-16 object-contain opacity-70 hover:opacity-100 transition-opacity" />
-                    </button>
-                  ))}
-                </div>
+              {/* Category pill indicator */}
+              <div className="absolute top-5 right-5 bg-white/90 backdrop-blur-xs border border-slate-200/50 rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-widest text-slate-600 shadow-xs z-20">
+                {categoryLabel}
               </div>
-            )}
+            </div>
           </div>
 
-          {/* RIGHT: Product Details & Cart logic */}
-          <div className="flex-1 w-full flex flex-col justify-center">
-            <div className="mb-8">
-              <span className="text-kora font-bold tracking-widest uppercase text-xs mb-2 block">{categoryLabel}</span>
-              <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-4 leading-tight uppercase">
-                {product.name}
-              </h1>
-              <div className="flex items-center gap-4 mb-4">
-                <span className="text-3xl font-bold font-sans text-slate-900">{CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0)}</span>
-                <div className="flex items-center gap-1.5 text-sm">
-                  {[1,2,3,4,5].map(s => (
-                    <FaStar key={s} className={s <= Math.round(avgRating) ? "text-yellow-400" : "text-slate-200"} />
-                  ))}
-                  {avgRatingDisplay && <span className="font-black text-slate-900 ml-1">{avgRatingDisplay}</span>}
-                  <span className="text-slate-400 font-sans ml-1">({product.reviews?.length || 0} Reviews)</span>
-                </div>
-              </div>
+          {/* RIGHT: Product Details & Purchase Actions */}
+          <div className="lg:col-span-5 flex flex-col">
+            
+            {/* Category tag */}
+            <div className="mb-4">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-kora/10 border border-kora/20 text-kora text-[10px] font-black tracking-widest uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-kora animate-pulse"></span>
+                {categoryLabel}
+              </span>
+            </div>
 
-              {/* Premium Inventory Stock Level Badging */}
-              <div className="mb-6">
+            {/* Title */}
+            <h1 className="text-4xl xl:text-5xl font-black tracking-tight text-slate-900 mb-3.5 uppercase leading-none font-display">
+              {product.name}
+            </h1>
+
+            {/* Ratings Header */}
+            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100">
+              <div className="flex text-yellow-400 text-sm gap-0.5">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <FaStar key={s} className={s <= Math.round(avgRating) ? "text-yellow-400 drop-shadow-[0_0_4px_rgba(250,204,21,0.4)]" : "text-slate-200"} />
+                ))}
+              </div>
+              {avgRatingDisplay && (
+                <span className="text-sm font-black text-slate-900 font-display">{avgRatingDisplay}</span>
+              )}
+              <button 
+                onClick={() => {
+                  setActiveTab("reviews");
+                  const reviewsEl = document.getElementById("reviews-section-ref");
+                  if (reviewsEl) {
+                    reviewsEl.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+                className="text-xs text-slate-500 hover:text-kora font-bold underline underline-offset-4 transition-colors uppercase tracking-wider"
+              >
+                ({product.reviews?.length || 0} Reviews)
+              </button>
+            </div>
+
+            {/* Pricing & Stock Status capsule */}
+            <div className="bg-slate-50 border border-slate-200/60 rounded-3xl p-5 mb-8 flex items-center justify-between shadow-xs">
+              <div className="flex flex-col">
+                <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5">Price</span>
+                <span className="text-3xl font-extrabold text-slate-900 font-display">
+                  {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0)}
+                </span>
+              </div>
+              <div>
                 {product.stock === 0 ? (
-                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-xl text-xs font-bold uppercase tracking-wider font-sans">
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
-                    Sold Out - Restocking Soon
+                  <span className="inline-flex items-center gap-2 px-3.5 py-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider">
+                    <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+                    Sold Out
                   </span>
                 ) : product.stock <= 3 ? (
-                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-xl text-xs font-bold uppercase tracking-wider font-sans animate-pulse">
-                    <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
-                    Priority Alert: Only {product.stock} items left in The Vault!
+                  <span className="inline-flex items-center gap-2 px-3.5 py-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider animate-pulse">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                    Only {product.stock} Left
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-xl text-xs font-bold uppercase tracking-wider font-sans">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                    Secured: In Stock ({product.stock} kits ready for priority shipping)
+                  <span className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    In Stock
                   </span>
                 )}
               </div>
-
-              <p className="text-slate-600 leading-relaxed text-lg font-sans">
-                {product.description || "Premium gear sourced directly from Kora Store's exclusive vault."}
-              </p>
             </div>
 
-            {/* Style Variation Selector for Shoes */}
+            {/* Product Description */}
+            <p className="text-slate-600 leading-relaxed text-sm font-sans mb-8">
+              {product.description || "Premium gear sourced directly from Kora Store's exclusive vault."}
+            </p>
+
+            {/* Style Variation Selector (Boots) */}
             {product.category === "Boots" && images.length > 0 && (
               <div className="mb-8 font-sans">
-                <h3 className="text-slate-900 font-bold uppercase tracking-wider text-xs mb-3">
+                <h3 className="text-slate-950 font-black uppercase tracking-wider text-xs mb-3.5">
                   Select Style / Variation
                 </h3>
                 <div className="flex flex-wrap gap-3">
@@ -699,14 +876,14 @@ export default function ProductUI({ product }: { product: any }) {
                     <button
                       key={i}
                       onClick={() => setActiveImageIndex(i)}
-                      className={`w-16 h-16 rounded-xl border-2 flex items-center justify-center p-1 bg-slate-50 overflow-hidden transition-all ${
+                      className={`w-16 h-16 rounded-2xl border-2 flex items-center justify-center p-1 bg-slate-50 overflow-hidden transition-all duration-300 relative group ${
                         activeImageIndex === i
-                          ? "border-kora shadow-md shadow-kora/20 scale-105 animate-pulse"
+                          ? "border-kora shadow-md shadow-kora/20 scale-105"
                           : "border-slate-200 hover:border-slate-300"
                       }`}
-                      style={{ transition: "all 0.3s ease" }}
                     >
                       <img src={img} alt={`Style ${i + 1}`} className="w-full h-full object-contain" />
+                      <div className={`absolute inset-0 bg-kora/5 transition-opacity ${activeImageIndex === i ? "opacity-100" : "opacity-0"}`} />
                     </button>
                   ))}
                 </div>
@@ -714,93 +891,128 @@ export default function ProductUI({ product }: { product: any }) {
             )}
 
             {/* Size Selector */}
-            <div className="mb-10 font-sans">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-slate-900 font-bold uppercase tracking-wider text-xs">Select Size</h3>
-                <Link href="/faq" className="text-kora hover:text-purple-700 text-sm underline underline-offset-4 font-sans">Size Guide</Link>
+            <div className="mb-8 font-sans">
+              <div className="flex justify-between items-center mb-3.5">
+                <h3 className="text-slate-950 font-black uppercase tracking-wider text-xs">Select Size</h3>
+                <Link href="/faq" className="text-kora hover:text-purple-700 text-xs font-bold uppercase tracking-wider flex items-center gap-1 group">
+                  Size Guide <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                </Link>
               </div>
-              <div className="flex flex-wrap gap-3">
-                {product.sizes && product.sizes.length > 0 ? product.sizes.map((size: string) => (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    disabled={product.stock === 0}
-                    className={`w-14 h-14 rounded-xl font-bold text-lg border transition-all duration-300 ${
-                      product.stock === 0
-                        ? "bg-slate-50 border-slate-200 text-slate-300 cursor-not-allowed"
-                        : selectedSize === size
-                        ? "bg-kora border-kora text-white shadow-md shadow-kora/30 scale-105"
-                        : "bg-white border-slate-200 text-slate-500 hover:border-kora/50 hover:text-slate-900 shadow-sm"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                )) : (
-                  <span className="text-slate-500 font-sans">One Size</span>
+              <div className="flex flex-wrap gap-2.5">
+                {product.sizes && product.sizes.length > 0 ? (
+                  product.sizes.map((size: string) => (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      disabled={product.stock === 0}
+                      className={`w-14 h-12 rounded-xl font-bold text-sm border transition-all duration-300 relative flex items-center justify-center ${
+                        product.stock === 0
+                          ? "bg-slate-50 border-slate-200 text-slate-300 cursor-not-allowed"
+                          : selectedSize === size
+                          ? "bg-kora border-kora text-white shadow-md shadow-kora/25 scale-[1.02]"
+                          : "bg-white border-slate-200 text-slate-600 hover:border-kora/50 hover:text-kora shadow-sm hover:scale-[1.02]"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))
+                ) : (
+                  <span className="text-slate-500 text-sm font-bold bg-slate-100 px-4 py-2 rounded-xl">One Size</span>
                 )}
               </div>
             </div>
 
-            {/* Custom Printing Inputs (Only for shirts!) */}
-            {renderPersonalizationBox()}
+            {/* Custom Personalization (Shirts Only) */}
+            {renderDesktopPersonalizationBox()}
 
-            {/* Add to Cart Action with Quantity Selector */}
+            {/* Add to Vault Row */}
             <div className="flex gap-4 mb-8 h-14 font-sans">
-              <div className={`flex items-center justify-between bg-white border border-slate-200 rounded-full px-2 w-32 shrink-0 shadow-sm ${product.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}>
+              {/* Quantity */}
+              <div className={`flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-2xl px-2.5 w-32 shrink-0 shadow-sm ${product.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}>
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   disabled={product.stock === 0}
-                  className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors text-xl disabled:cursor-not-allowed"
+                  className="w-9 h-9 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-white rounded-xl transition-all text-lg font-bold disabled:cursor-not-allowed"
                 >
                   −
                 </button>
-                <span className="font-bold text-slate-900 text-lg">{product.stock === 0 ? 0 : quantity}</span>
+                <span className="font-bold text-slate-900 text-sm">{product.stock === 0 ? 0 : quantity}</span>
                 <button
                   onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                   disabled={product.stock === 0 || quantity >= product.stock}
-                  className="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-full transition-colors text-xl disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="w-9 h-9 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-white rounded-xl transition-all text-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   +
                 </button>
               </div>
 
+              {/* Add to Vault button */}
               <button
                 onClick={handleAddToCart}
                 disabled={product.stock === 0 || (!selectedSize && product.sizes?.length > 0) || isAdded}
-                className={`flex-1 rounded-full font-bold text-sm uppercase tracking-widest transition-all shadow-md h-full flex items-center justify-center ${
+                className={`flex-1 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-md h-full flex items-center justify-center gap-2 transform-gpu active:scale-98 ${
                   product.stock === 0
                     ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none"
                     : isAdded
-                    ? "bg-emerald-500 text-white scale-[1.02]"
+                    ? "bg-emerald-500 text-white shadow-emerald-500/25"
                     : selectedSize || !product.sizes?.length
-                    ? "bg-slate-900 text-white hover:bg-kora hover:text-white hover:scale-[1.02] hover:shadow-kora/30"
+                    ? "bg-slate-900 text-white hover:bg-kora hover:scale-[1.01] shadow-lg hover:shadow-kora/25"
                     : "bg-slate-100 text-slate-400 cursor-not-allowed shadow-none"
                 }`}
               >
-                {product.stock === 0 ? "Sold Out" : !selectedSize && product.sizes?.length > 0 ? "Select a Size" : isAdded ? "Added to Vault!" : "Add to Vault"}
+                {product.stock === 0 ? (
+                  <span>Sold Out</span>
+                ) : !selectedSize && product.sizes?.length > 0 ? (
+                  <span>Select a Size</span>
+                ) : isAdded ? (
+                  <>
+                    <svg className="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Added to Vault!</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Add to Vault</span>
+                  </>
+                )}
               </button>
             </div>
 
             {/* Trust Badges */}
-            <div className="grid grid-cols-2 gap-4 pt-8 border-t border-slate-200">
-              <div className="flex items-center gap-3 text-slate-600">
-                <FaTruckFast className="text-2xl text-kora" />
-                <span className="text-sm font-medium font-sans">1-3 Day UAE Delivery</span>
+            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-100">
+              <div className="flex items-center gap-3.5 p-3.5 bg-slate-50 border border-slate-200/50 rounded-2xl">
+                <div className="w-10 h-10 bg-white rounded-xl border border-slate-200/50 flex items-center justify-center shrink-0">
+                  <FaTruckFast className="text-lg text-kora" />
+                </div>
+                <div>
+                  <span className="block text-xs font-extrabold text-slate-800 uppercase tracking-wide">1–3 Day UAE Delivery</span>
+                  <span className="block text-[10px] text-slate-400 font-medium">Free express delivery</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3 text-slate-600">
-                <FaShieldAlt className="text-2xl text-kora" />
-                <span className="text-sm font-medium font-sans">7-Day Guarantee</span>
+              <div className="flex items-center gap-3.5 p-3.5 bg-slate-50 border border-slate-200/50 rounded-2xl">
+                <div className="w-10 h-10 bg-white rounded-xl border border-slate-200/50 flex items-center justify-center shrink-0">
+                  <FaShieldAlt className="text-lg text-kora" />
+                </div>
+                <div>
+                  <span className="block text-xs font-extrabold text-slate-800 uppercase tracking-wide">7-Day Guarantee</span>
+                  <span className="block text-[10px] text-slate-400 font-medium">Hassle-free vault returns</span>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
 
-        {/* --- BOTTOM SECTION: DETAILS & REVIEWS TABS --- */}
-        <div className="max-w-4xl mx-auto mt-24">
+        {/* BOTTOM SECTION: DETAILS & REVIEWS TABS */}
+        <div id="reviews-section-ref" className="max-w-4xl mx-auto mt-10 pt-8 border-t border-slate-100">
           <div className="flex gap-8 border-b border-slate-200 mb-8 font-bold uppercase">
             <button
               onClick={() => setActiveTab("details")}
-              className={`pb-4 text-lg transition-all border-b-2 ${
+              className={`pb-4 text-sm tracking-widest transition-all border-b-2 font-black ${
                 activeTab === "details" ? "border-kora text-slate-900" : "border-transparent text-slate-400 hover:text-slate-600"
               }`}
             >
@@ -808,7 +1020,7 @@ export default function ProductUI({ product }: { product: any }) {
             </button>
             <button
               onClick={() => setActiveTab("reviews")}
-              className={`pb-4 text-lg transition-all border-b-2 ${
+              className={`pb-4 text-sm tracking-widest transition-all border-b-2 font-black ${
                 activeTab === "reviews" ? "border-kora text-slate-900" : "border-transparent text-slate-400 hover:text-slate-600"
               }`}
             >
@@ -818,62 +1030,136 @@ export default function ProductUI({ product }: { product: any }) {
 
           <div className="min-h-[300px]">
             {activeTab === "details" && (
-              <div className="animate-fade-in-up text-slate-600 leading-relaxed space-y-6 font-sans">
-                <p>
+              <div className="animate-fade-in-up space-y-8 font-sans">
+                <p className="text-slate-600 leading-relaxed text-sm">
                   Every kit inside Kora Store is rigorously quality-checked before dispatch. We bypass traditional retail channels to bring you absolute 1:1 specifications.
                 </p>
-                <ul className="list-disc list-inside space-y-2">
-                  <li><strong className="text-slate-900">Fit:</strong> Standard athletic cut. (Size up if selecting a Player Issue version).</li>
-                  <li><strong className="text-slate-900">Material:</strong> 100% Recycled Polyester with advanced sweat-wicking tech.</li>
-                  <li><strong className="text-slate-900">Care:</strong> Machine wash cold, inside out. Do not tumble dry to protect printing.</li>
-                </ul>
+                
+                {/* Specifications Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2">
+                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">FIT & CUT</span>
+                    <span className="text-slate-800 font-bold text-sm">Athletic Cut</span>
+                    <p className="text-slate-400 text-xs leading-normal">Standard athletic fit. Size up if selecting a Player Issue version for a looser fit.</p>
+                  </div>
+                  
+                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2">
+                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">MATERIAL</span>
+                    <span className="text-slate-800 font-bold text-sm">100% Polyester</span>
+                    <p className="text-slate-400 text-xs leading-normal">Recycled high-performance polyester with advanced sweat-wicking knit technology.</p>
+                  </div>
+                  
+                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2">
+                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">CARE</span>
+                    <span className="text-slate-800 font-bold text-sm">Machine Wash</span>
+                    <p className="text-slate-400 text-xs leading-normal">Wash cold, inside out. Hang dry only to protect printed graphics and patches.</p>
+                  </div>
+                  
+                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2">
+                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">ORIGIN</span>
+                    <span className="text-slate-800 font-bold text-sm">Vault Standard</span>
+                    <p className="text-slate-400 text-xs leading-normal">Bypassing traditional retail margins to source the highest authentic grade direct.</p>
+                  </div>
+                </div>
               </div>
             )}
 
             {activeTab === "reviews" && (
               <div className="animate-fade-in-up space-y-10 font-sans">
-                <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl shadow-sm">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-bold uppercase text-slate-900">Drop a Review</h3>
-                    <span className="text-[10px] text-slate-400 uppercase tracking-widest">Hover &amp; click to rate</span>
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                  
+                  {/* Rating Summary breakdown */}
+                  <div className="md:col-span-4 bg-slate-50 border border-slate-200/60 p-6 rounded-3xl flex flex-col items-center text-center shadow-xs">
+                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">AVERAGE SCORE</span>
+                    <span className="text-5xl font-black text-slate-900 font-display mb-2">
+                      {avgRatingDisplay || "0.0"}
+                    </span>
+                    <div className="flex text-yellow-400 text-xs gap-0.5 mb-2">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <FaStar key={s} className={s <= Math.round(avgRating) ? "text-yellow-400" : "text-slate-200"} />
+                      ))}
+                    </div>
+                    <span className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-6">
+                      Based on {product.reviews?.length || 0} reviews
+                    </span>
+                    
+                    <div className="w-full space-y-2">
+                      {[5, 4, 3, 2, 1].map((rating) => (
+                        <div key={rating} className="flex items-center gap-2 text-xs text-slate-500 w-full">
+                          <span className="w-3 shrink-0">{rating}</span>
+                          <div className="flex-1 bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                            <div 
+                              className="bg-yellow-400 h-full rounded-full" 
+                              style={{ 
+                                width: `${product.reviews?.length ? (product.reviews.filter((r: any) => r.rating === rating).length / product.reviews.length) * 100 : 0}%` 
+                              }}
+                            ></div>
+                          </div>
+                          <span className="w-6 text-right shrink-0">{product.reviews?.filter((r: any) => r.rating === rating).length || 0}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="mb-4"><StarPicker size="text-2xl" /></div>
-                  <textarea
-                    value={reviewText}
-                    onChange={(e) => setReviewText(e.target.value)}
-                    placeholder="How was the fit and quality?"
-                    className="w-full bg-white border border-slate-200 rounded-xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none shadow-sm"
-                  />
-                  <button
-                    onClick={handleSubmitReview}
-                    disabled={isSubmitting || !reviewText.trim()}
-                    className="bg-slate-900 hover:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3 px-8 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-kora/30"
-                  >
-                    {isSubmitting ? "Dropping Intel..." : "Submit Review"}
-                  </button>
+
+                  {/* Submit review form */}
+                  <div className="md:col-span-8 bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-base font-black uppercase text-slate-900 tracking-wide">Drop a Review</h3>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Tap stars to rate</span>
+                    </div>
+                    <div className="mb-4"><StarPicker size="text-xl" /></div>
+                    <textarea
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      placeholder="How was the fit and quality? Add your experience to the vault."
+                      className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none shadow-sm text-sm"
+                    />
+                    <button
+                      onClick={handleSubmitReview}
+                      disabled={isSubmitting || !reviewText.trim()}
+                      className="bg-slate-900 hover:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3.5 px-8 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-kora/25 active:scale-95 transform-gpu"
+                    >
+                      {isSubmitting ? "Dropping Intel..." : "Submit Review"}
+                    </button>
+                  </div>
                 </div>
 
-                <div className="space-y-6">
+                {/* Reviews List */}
+                <div className="space-y-6 pt-6">
                   {product.reviews && product.reviews.length > 0 ? (
-                    product.reviews.map((review: any) => (
-                      <div key={review.id} className="border-b border-slate-200 pb-6">
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <p className="text-slate-900 font-bold font-sans">{review.user?.firstName || "Vault Member"}</p>
-                            <div className="flex text-yellow-500 text-xs mt-1">
-                              {[...Array(review.rating || 5)].map((_, i) => <FaStar key={i} />)}
+                    product.reviews.map((review: any) => {
+                      const reviewerName = review.user?.firstName || "Vault Member";
+                      const reviewerInitials = reviewerName.split(" ").map((n: string) => n[0]).join("").toUpperCase().substring(0, 2);
+                      return (
+                        <div key={review.id} className="border-b border-slate-100 pb-6">
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-kora/10 text-kora flex items-center justify-center font-bold text-xs border border-kora/15">
+                                {reviewerInitials}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-slate-900 font-bold font-sans text-sm">{reviewerName}</p>
+                                  <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                                    Verified Purchaser
+                                  </span>
+                                </div>
+                                <div className="flex text-yellow-400 text-xs gap-0.5 mt-1">
+                                  {[...Array(review.rating || 5)].map((_, i) => <FaStar key={i} />)}
+                                </div>
+                              </div>
                             </div>
+                            <span className="text-xs text-slate-400 font-sans font-medium">
+                              {new Date(review.createdAt).toLocaleDateString()}
+                            </span>
                           </div>
-                          <span className="text-xs text-slate-500 font-sans">
-                            {new Date(review.createdAt).toLocaleDateString()}
-                          </span>
+                          <p className="text-slate-600 text-sm leading-relaxed pl-13">{review.comment}</p>
                         </div>
-                        <p className="text-slate-600 text-sm mt-3 leading-relaxed font-sans">{review.comment}</p>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
-                    <div className="text-center py-10 border border-dashed border-slate-200 bg-slate-50 rounded-2xl">
-                      <p className="text-slate-500 italic font-sans">No reviews yet. Be the first to drop the intel.</p>
+                    <div className="text-center py-12 border border-dashed border-slate-200 bg-slate-50/50 rounded-3xl">
+                      <p className="text-slate-400 italic text-sm">No reviews yet. Be the first to drop the intel.</p>
                     </div>
                   )}
                 </div>
