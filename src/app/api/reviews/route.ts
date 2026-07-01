@@ -18,6 +18,9 @@ export async function POST(req: Request) {
       return new NextResponse("Missing data", { status: 400 });
     }
 
+    const clerkUser = await currentUser();
+    const email = clerkUser?.emailAddresses[0]?.emailAddress || "";
+
     const dbUser = await prisma.user.upsert({
       where: { id: userId },
       update: {
