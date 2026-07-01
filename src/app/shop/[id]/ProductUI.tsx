@@ -7,8 +7,8 @@ import { FaChevronLeft, FaStar, FaTruckFast } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
-import { FiEdit, FiAward, FiThumbsUp, FiFilter, FiX, FiCheck, FiMessageSquare, FiTrash2, FiCornerDownRight } from "react-icons/fi";
-import { useUser } from "@clerk/nextjs";
+import { FiEdit, FiAward, FiThumbsUp, FiFilter, FiX, FiCheck, FiMessageSquare, FiTrash2, FiCornerDownRight, FiLock } from "react-icons/fi";
+import { useUser, SignInButton } from "@clerk/nextjs";
 
 const JERSEYS: Record<
   string,
@@ -107,7 +107,7 @@ function AvatarDisplay({
 
 const VerifiedTick = () => (
   <svg
-    className="w-4.5 h-4.5 text-[#6b00ff] fill-current inline-block shrink-0 align-middle ml-1 select-none"
+    className="w-[14px] h-[14px] text-[#0095f6] fill-current inline-block shrink-0 align-middle ml-0.5 select-none"
     viewBox="0 0 22 22"
     aria-label="Verified Account"
   >
@@ -973,9 +973,9 @@ export default function ProductUI({ product }: { product: any }) {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="text-[9px] font-black uppercase text-kora tracking-widest block mb-0.5">RECOMMENDED</span>
-                    <span className="text-2xl font-black font-display text-emerald-400 block leading-none">{recommendPercent}%</span>
-                    <span className="text-[10px] text-slate-400 font-bold block mt-1">Based on {product.reviews?.length || 0} reviews</span>
+                    <span className="text-[9px] font-black uppercase text-kora tracking-widest block mb-0.5">TOTAL REVIEWS</span>
+                    <span className="text-2xl font-black font-display text-white block leading-none">{product.reviews?.length || 0}</span>
+                    <span className="text-[10px] text-slate-400 font-bold block mt-1">Verified Ratings</span>
                   </div>
                 </div>
               </div>
@@ -1014,26 +1014,39 @@ export default function ProductUI({ product }: { product: any }) {
               </div>
 
               {/* Review input */}
-              <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs relative overflow-hidden">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-black uppercase text-slate-900 tracking-wide">Drop a Review</h3>
-                  <span className="text-[9px] text-slate-400 uppercase tracking-widest font-bold">Tap stars to rate</span>
+              {!clerkUser ? (
+                <div className="bg-slate-50 border border-dashed border-slate-200 rounded-3xl p-6 text-center shadow-xs">
+                  <FiLock className="mx-auto text-slate-400 text-2xl mb-2" />
+                  <h3 className="text-sm font-bold text-slate-800 mb-1">Want to drop a review?</h3>
+                  <p className="text-xs text-slate-400 mb-4">You must be logged in to share your kit experience.</p>
+                  <SignInButton mode="modal">
+                    <button className="w-full bg-slate-900 active:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3 rounded-xl transition-all shadow-sm">
+                      Sign In to Review
+                    </button>
+                  </SignInButton>
                 </div>
-                <div className="mb-4"><StarPicker size="text-lg" /></div>
-                <textarea
-                  value={reviewText}
-                  onChange={(e) => setReviewText(e.target.value)}
-                  placeholder="How was the fit and quality? Add your experience to the vault."
-                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none text-xs"
-                />
-                <button
-                  onClick={handleSubmitReview}
-                  disabled={isSubmitting || !reviewText.trim()}
-                  className="w-full bg-slate-900 active:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all disabled:opacity-40 shadow-md transform-gpu active:scale-95"
-                >
-                  {isSubmitting ? "Dropping Intel..." : "Submit Review"}
-                </button>
-              </div>
+              ) : (
+                <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs relative overflow-hidden">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-black uppercase text-slate-900 tracking-wide">Drop a Review</h3>
+                    <span className="text-[9px] text-slate-400 uppercase tracking-widest font-bold">Tap stars to rate</span>
+                  </div>
+                  <div className="mb-4"><StarPicker size="text-lg" /></div>
+                  <textarea
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                    placeholder="How was the fit and quality? Add your experience to the vault."
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none text-xs"
+                  />
+                  <button
+                    onClick={handleSubmitReview}
+                    disabled={isSubmitting || !reviewText.trim()}
+                    className="w-full bg-slate-900 active:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all disabled:opacity-40 shadow-md transform-gpu active:scale-95"
+                  >
+                    {isSubmitting ? "Dropping Intel..." : "Submit Review"}
+                  </button>
+                </div>
+              )}
 
               {/* Active Filter Indicator */}
               {ratingFilter !== null && (
@@ -1067,25 +1080,34 @@ export default function ProductUI({ product }: { product: any }) {
                     };
 
                     return (
-                      <div key={review.id} className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs pdp-mobile-animate animate-fade-in-up">
-                        <div className="flex justify-between items-start mb-3">
+                      <div key={review.id} className="relative bg-white border border-slate-100 rounded-3xl p-5 shadow-xs overflow-hidden pdp-mobile-animate animate-fade-in-up">
+                        {review.hasPurchased && !isReviewerAdmin && (
+                          <div className="absolute right-4 bottom-4 opacity-[0.03] pointer-events-none select-none hidden sm:block">
+                            <span className="text-3xl font-black tracking-widest text-slate-900 uppercase border-[3px] border-slate-900 px-2 py-0.5 rounded-lg transform rotate-12 inline-block">
+                              VERIFIED ORDER
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex justify-between items-start mb-3 relative z-10">
                           <div className="flex items-center gap-3">
                             <AvatarDisplay
-                              imageUrl={review.user?.imageUrl}
+                              imageUrl={isReviewerAdmin ? "/icon.png" : review.user?.imageUrl}
                               name={reviewerName}
-                              selectedAvatar={review.user?.selectedAvatar}
-                              customProfilePic={review.user?.customProfilePic}
+                              selectedAvatar={isReviewerAdmin ? null : review.user?.selectedAvatar}
+                              customProfilePic={isReviewerAdmin ? null : review.user?.customProfilePic}
                               size="w-9 h-9"
                             />
                             <div>
-                              <div className="flex items-center gap-1 flex-wrap">
-                                <p className="text-xs font-bold text-slate-900 flex items-center">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <p className="text-xs font-bold text-slate-900 flex items-center gap-0.5">
                                   {reviewerName}
                                   {isReviewerAdmin && <VerifiedTick />}
                                 </p>
-                                <span className="inline-flex items-center gap-0.5 text-[8px] font-black uppercase text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
-                                  Verified
-                                </span>
+                                {review.hasPurchased && !isReviewerAdmin && (
+                                  <span className="inline-flex items-center gap-0.5 text-[8px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-100">
+                                    <FiCheck className="stroke-[3px]" /> Verified
+                                  </span>
+                                )}
                               </div>
                               <div className="flex text-yellow-400 text-[10px] gap-0.5 mt-0.5">
                                 {[...Array(review.rating || 5)].map((_, i) => <FaStar key={i} />)}
@@ -1169,23 +1191,26 @@ export default function ProductUI({ product }: { product: any }) {
 
                         {/* Official Admin Reply display */}
                         {review.adminReply && (
-                          <div className="mt-4 pl-3.5 border-l-2 border-kora/40 bg-slate-50 p-3 rounded-r-2xl relative overflow-hidden">
-                            <div className="flex items-center gap-1 flex-wrap mb-1">
-                              <span className="text-[9px] font-black uppercase text-kora tracking-wider">OFFICIAL VAULT REPLY</span>
-                              <VerifiedTick />
-                              {isAdmin && (
-                                <button
-                                  onClick={() => {
-                                    setReplyingReviewId(review.id);
-                                    setReplyText(review.adminReply);
-                                  }}
-                                  className="text-[9px] text-slate-400 hover:text-kora font-bold uppercase underline ml-auto transition-colors"
-                                >
-                                  Edit Reply
-                                </button>
-                              )}
+                          <div className="mt-4 pl-3.5 border-l-2 border-kora/40 bg-slate-50 p-3 rounded-r-2xl relative overflow-hidden flex gap-2.5 items-start">
+                            <img src="/icon.png" alt="Kora Store" className="w-6 h-6 rounded-full border border-kora/30 object-cover shrink-0 mt-0.5" />
+                            <div className="flex-1">
+                              <div className="flex items-center gap-1 flex-wrap mb-1">
+                                <span className="text-[9px] font-black uppercase text-kora tracking-wider">OFFICIAL VAULT REPLY</span>
+                                <VerifiedTick />
+                                {isAdmin && (
+                                  <button
+                                    onClick={() => {
+                                      setReplyingReviewId(review.id);
+                                      setReplyText(review.adminReply);
+                                    }}
+                                    className="text-[9px] text-slate-400 hover:text-kora font-bold uppercase underline ml-auto transition-colors"
+                                  >
+                                    Edit Reply
+                                  </button>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-700 leading-relaxed">{review.adminReply}</p>
                             </div>
-                            <p className="text-xs text-slate-700 leading-relaxed">{review.adminReply}</p>
                           </div>
                         )}
 
@@ -1251,21 +1276,7 @@ export default function ProductUI({ product }: { product: any }) {
                           </div>
                         )}
 
-                        {/* Helpfulness Bar */}
-                        <div className="flex items-center gap-3 pt-3 border-t border-slate-50 text-[10px] text-slate-400 font-bold mt-3">
-                          <span>Helpful?</span>
-                          <button
-                            onClick={handleHelpfulClick}
-                            className={`flex items-center gap-1 px-2.5 py-1 rounded-full border transition-all ${
-                              votes.voted === 'yes'
-                                ? "bg-emerald-50 border-emerald-200 text-emerald-600"
-                                : "bg-slate-50 border-slate-200 text-slate-500 active:scale-95"
-                            }`}
-                          >
-                            <FiThumbsUp className="text-[11px]" />
-                            <span>Yes ({votes.yes})</span>
-                          </button>
-                        </div>
+
                       </div>
                     );
                   })}
@@ -1690,8 +1701,8 @@ export default function ProductUI({ product }: { product: any }) {
 
             {activeTab === "reviews" && (
               <div className="animate-fade-in-up space-y-10 font-sans">
-                {/* 3-Column Reviews Stats Dashboard */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                {/* 2-Column Reviews Stats Dashboard */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
                   
                   {/* Card 1: Average Score */}
                   <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl flex flex-col items-center justify-center text-center shadow-xs hover:border-kora/20 transition-all duration-300">
@@ -1743,53 +1754,46 @@ export default function ProductUI({ product }: { product: any }) {
                     </div>
                   </div>
 
-                  {/* Card 3: Recommendation Percentage */}
-                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl flex flex-col items-center justify-center text-center shadow-xs hover:border-kora/20 transition-all duration-300">
-                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">SATISFACTION RATE</span>
-                    <div className="relative w-24 h-24 flex items-center justify-center">
-                      {/* Circular Progress (Vector SVG) */}
-                      <svg className="w-full h-full transform -rotate-90">
-                        <circle cx="48" cy="48" r="40" stroke="#e2e8f0" strokeWidth="6" fill="transparent" />
-                        <circle cx="48" cy="48" r="40" stroke="#10b981" strokeWidth="6" fill="transparent"
-                          strokeDasharray={251.2}
-                          strokeDashoffset={251.2 - (251.2 * recommendPercent) / 100}
-                          className="transition-all duration-1000 ease-out"
-                        />
-                      </svg>
-                      <span className="absolute text-xl font-black text-slate-900 font-display">{recommendPercent}%</span>
-                    </div>
-                    <span className="text-slate-500 text-[11px] font-bold uppercase tracking-wider mt-3">
-                      of members recommend this gear
-                    </span>
-                  </div>
-
                 </div>
 
                 {/* Drop a Review Box */}
-                <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-kora/5 rounded-full blur-3xl pointer-events-none"></div>
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="text-base font-black uppercase text-slate-900 tracking-wide">Drop a Review</h3>
-                      <p className="text-slate-400 text-xs mt-0.5">Share your kit experience with the vault community.</p>
-                    </div>
-                    <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Tap stars to rate</span>
+                {!clerkUser ? (
+                  <div className="bg-slate-50 border border-dashed border-slate-200 p-8 rounded-3xl text-center shadow-xs flex flex-col items-center justify-center min-h-[220px]">
+                    <FiLock className="text-slate-400 text-3xl mb-3 animate-pulse" />
+                    <h3 className="text-base font-black uppercase text-slate-900 tracking-wide mb-1">Join the Vault to Review</h3>
+                    <p className="text-slate-400 text-xs mb-5 max-w-xs">Sign in to share your rating and order feedback with other members.</p>
+                    <SignInButton mode="modal">
+                      <button className="bg-slate-900 hover:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3 px-8 rounded-xl transition-all shadow-sm">
+                        Sign In to Review
+                      </button>
+                    </SignInButton>
                   </div>
-                  <div className="mb-4"><StarPicker size="text-xl" /></div>
-                  <textarea
-                    value={reviewText}
-                    onChange={(e) => setReviewText(e.target.value)}
-                    placeholder="How was the fit and quality? Add your experience to the vault."
-                    className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none shadow-sm text-sm"
-                  />
-                  <button
-                    onClick={handleSubmitReview}
-                    disabled={isSubmitting || !reviewText.trim()}
-                    className="bg-slate-900 hover:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3.5 px-8 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-kora/25 active:scale-95 transform-gpu"
-                  >
-                    {isSubmitting ? "Dropping Intel..." : "Submit Review"}
-                  </button>
-                </div>
+                ) : (
+                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-kora/5 rounded-full blur-3xl pointer-events-none"></div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-base font-black uppercase text-slate-900 tracking-wide">Drop a Review</h3>
+                        <p className="text-slate-400 text-xs mt-0.5">Share your kit experience with the vault community.</p>
+                      </div>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Tap stars to rate</span>
+                    </div>
+                    <div className="mb-4"><StarPicker size="text-xl" /></div>
+                    <textarea
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      placeholder="How was the fit and quality? Add your experience to the vault."
+                      className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none shadow-sm text-sm"
+                    />
+                    <button
+                      onClick={handleSubmitReview}
+                      disabled={isSubmitting || !reviewText.trim()}
+                      className="bg-slate-900 hover:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3.5 px-8 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-kora/25 active:scale-95 transform-gpu"
+                    >
+                      {isSubmitting ? "Dropping Intel..." : "Submit Review"}
+                    </button>
+                  </div>
+                )}
 
                 {/* Active Filter Indicator */}
                 {ratingFilter !== null && (
@@ -1829,25 +1833,34 @@ export default function ProductUI({ product }: { product: any }) {
                       };
 
                       return (
-                        <div key={review.id} className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all duration-300 hover:border-slate-200/80 animate-fade-in-up">
-                          <div className="flex justify-between items-start mb-4">
+                        <div key={review.id} className="relative bg-white border border-slate-100 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all duration-300 hover:border-slate-200/80 overflow-hidden animate-fade-in-up">
+                          {review.hasPurchased && !isReviewerAdmin && (
+                            <div className="absolute right-6 bottom-4 opacity-[0.03] pointer-events-none select-none">
+                              <span className="text-4xl font-black tracking-widest text-slate-900 uppercase border-4 border-slate-900 px-3 py-1 rounded-xl transform rotate-12 inline-block">
+                                VERIFIED ORDER
+                              </span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-start mb-4 relative z-10">
                             <div className="flex items-center gap-3.5">
                               <AvatarDisplay
-                                imageUrl={review.user?.imageUrl}
+                                imageUrl={isReviewerAdmin ? "/icon.png" : review.user?.imageUrl}
                                 name={reviewerName}
-                                selectedAvatar={review.user?.selectedAvatar}
-                                customProfilePic={review.user?.customProfilePic}
+                                selectedAvatar={isReviewerAdmin ? null : review.user?.selectedAvatar}
+                                customProfilePic={isReviewerAdmin ? null : review.user?.customProfilePic}
                                 size="w-11 h-11"
                               />
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <p className="text-slate-900 font-bold font-sans text-sm flex items-center">
+                                  <p className="text-slate-900 font-bold font-sans text-sm flex items-center gap-0.5">
                                     {reviewerName}
                                     {isReviewerAdmin && <VerifiedTick />}
                                   </p>
-                                  <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                                    Verified Purchaser
-                                  </span>
+                                  {review.hasPurchased && !isReviewerAdmin && (
+                                    <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                                      <FiCheck className="stroke-[2px]" /> Verified Purchaser
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="flex text-yellow-400 text-xs gap-0.5 mt-1">
                                   {[...Array(review.rating || 5)].map((_, i) => <FaStar key={i} />)}
@@ -1931,23 +1944,26 @@ export default function ProductUI({ product }: { product: any }) {
 
                           {/* Official Admin Reply display */}
                           {review.adminReply && (
-                            <div className="mt-4 ml-14 pl-4 border-l-2 border-kora/40 bg-slate-50 p-4 rounded-r-2xl relative overflow-hidden animate-fade-in-up">
-                              <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
-                                <span className="text-[10px] font-black uppercase text-kora tracking-widest">OFFICIAL VAULT REPLY</span>
-                                <VerifiedTick />
-                                {isAdmin && (
-                                  <button
-                                    onClick={() => {
-                                      setReplyingReviewId(review.id);
-                                      setReplyText(review.adminReply);
-                                    }}
-                                    className="text-xs text-slate-400 hover:text-kora font-bold uppercase underline ml-auto transition-colors"
-                                  >
-                                    Edit Reply
-                                  </button>
-                                )}
+                            <div className="mt-4 ml-14 pl-4 border-l-2 border-kora/40 bg-slate-50 p-4 rounded-r-2xl relative overflow-hidden flex gap-3.5 items-start animate-fade-in-up">
+                              <img src="/icon.png" alt="Kora Store" className="w-8 h-8 rounded-full border border-kora/30 object-cover shrink-0 mt-0.5" />
+                              <div className="flex-1">
+                                <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+                                  <span className="text-[10px] font-black uppercase text-kora tracking-widest">OFFICIAL VAULT REPLY</span>
+                                  <VerifiedTick />
+                                  {isAdmin && (
+                                    <button
+                                      onClick={() => {
+                                        setReplyingReviewId(review.id);
+                                        setReplyText(review.adminReply);
+                                      }}
+                                      className="text-xs text-slate-400 hover:text-kora font-bold uppercase underline ml-auto transition-colors"
+                                    >
+                                      Edit Reply
+                                    </button>
+                                  )}
+                                </div>
+                                <p className="text-xs text-slate-700 leading-relaxed">{review.adminReply}</p>
                               </div>
-                              <p className="text-xs text-slate-700 leading-relaxed">{review.adminReply}</p>
                             </div>
                           )}
 
@@ -2012,22 +2028,6 @@ export default function ProductUI({ product }: { product: any }) {
                               </div>
                             </div>
                           )}
-
-                          {/* Helpfulness Bar */}
-                          <div className="flex items-center gap-3 pl-14 pt-3 border-t border-slate-50 text-xs text-slate-400 font-bold mt-4">
-                            <span>Was this review helpful?</span>
-                            <button
-                              onClick={handleHelpfulClick}
-                              className={`flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all ${
-                                votes.voted === 'yes'
-                                  ? "bg-emerald-50 border-emerald-200 text-emerald-600"
-                                  : "bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-700 active:scale-95"
-                              }`}
-                            >
-                              <FiThumbsUp className="text-xs" />
-                              <span>Yes ({votes.yes})</span>
-                            </button>
-                          </div>
                         </div>
                       );
                     })

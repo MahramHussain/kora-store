@@ -22,13 +22,33 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     return notFound();
   }
 
+  // Fetch users who have purchased this product
+  const reviewerUserIds = rawProduct.reviews?.map((review: any) => review.userId) || [];
+  
+  const purchases = await prisma.order.findMany({
+    where: {
+      userId: { in: reviewerUserIds },
+      items: {
+        some: {
+          productId: id
+        }
+      }
+    },
+    select: {
+      userId: true
+    }
+  });
+
+  const purchasedUserIds = new Set(purchases.map((p: any) => p.userId));
+
   const safeProduct = {
     ...rawProduct,
     price: rawProduct.price.toString(),
     createdAt: rawProduct.createdAt?.toISOString() || null,
     reviews: rawProduct.reviews?.map((review: any) => ({
       ...review,
-      createdAt: review.createdAt?.toISOString() || null
+      createdAt: review.createdAt?.toISOString() || null,
+      hasPurchased: purchasedUserIds.has(review.userId)
     })) || []
   };
 
