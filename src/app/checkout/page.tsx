@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { CURRENCY } from "@/lib/constants";
@@ -23,6 +23,18 @@ export default function CheckoutPage() {
   const { cart, cartCount, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal" | "cod">("card");
+
+  const hasPersonalizedItem = cart.some(
+    (item) =>
+      (item.customName && item.customName.trim() !== "") ||
+      (item.customNumber && item.customNumber.trim() !== "")
+  );
+
+  useEffect(() => {
+    if (hasPersonalizedItem && paymentMethod === "cod") {
+      setPaymentMethod("card");
+    }
+  }, [hasPersonalizedItem, paymentMethod]);
   
   // Auth state from Clerk
   const { isSignedIn, isLoaded } = useAuth();
@@ -271,6 +283,15 @@ export default function CheckoutPage() {
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
                 <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider">Payment Method</h2>
                 
+                {hasPersonalizedItem && (
+                  <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3 text-amber-800 animate-fade-in shadow-xs font-sans">
+                    <div className="text-lg shrink-0 mt-0.5">⚠️</div>
+                    <div className="flex-1 text-xs font-bold uppercase tracking-wider leading-relaxed">
+                      Cash on Delivery (COD) is disabled because your vault cart contains a personalized kit (custom print name/number). Only online card payment via Ziina is accepted for customized items.
+                    </div>
+                  </div>
+                )}
+
                 {/* Payment Tabs */}
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   <div 
@@ -289,14 +310,23 @@ export default function CheckoutPage() {
                   >
                     <FaPaypal /> PayPal
                   </div>
-                  <div 
-                    onClick={() => setPaymentMethod("cod")}
-                    className={`border rounded-xl py-3 flex justify-center items-center gap-2 cursor-pointer transition-colors font-sans ${
-                      paymentMethod === "cod" ? "bg-kora/10 border-kora text-kora font-bold" : "bg-white border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300"
-                    }`}
-                  >
-                    <FaMoneyBillWave /> COD
-                  </div>
+                  {hasPersonalizedItem ? (
+                    <div 
+                      className="border rounded-xl py-3 flex justify-center items-center gap-2 bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed font-sans opacity-60"
+                      title="Cash on Delivery is unavailable for personalized jerseys"
+                    >
+                      <FaMoneyBillWave /> COD (Locked)
+                    </div>
+                  ) : (
+                    <div 
+                      onClick={() => setPaymentMethod("cod")}
+                      className={`border rounded-xl py-3 flex justify-center items-center gap-2 cursor-pointer transition-colors font-sans ${
+                        paymentMethod === "cod" ? "bg-kora/10 border-kora text-kora font-bold" : "bg-white border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300"
+                      }`}
+                    >
+                      <FaMoneyBillWave /> COD
+                    </div>
+                  )}
                 </div>
 
                 {paymentMethod === "card" && (

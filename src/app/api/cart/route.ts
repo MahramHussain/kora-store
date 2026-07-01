@@ -14,16 +14,22 @@ export async function GET(req: NextRequest) {
       include: { product: true }
     });
 
-    const formattedCart = cartItems.map(item => ({
-      id: item.productId,
-      name: item.product.name,
-      price: `$${item.product.price.toString()}`,
-      image: item.image || item.product.images[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png",
-      size: item.size,
-      quantity: item.quantity,
-      customName: item.customName,
-      customNumber: item.customNumber
-    }));
+    const formattedCart = cartItems.map(item => {
+      const basePrice = parseFloat(item.product.price.toString());
+      const hasCustomPrint = (item.customName && item.customName.trim() !== "") || (item.customNumber && item.customNumber.trim() !== "");
+      const finalPrice = basePrice + (hasCustomPrint ? 25 : 0);
+
+      return {
+        id: item.productId,
+        name: item.product.name,
+        price: `$${finalPrice.toFixed(2)}`,
+        image: item.image || item.product.images[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png",
+        size: item.size,
+        quantity: item.quantity,
+        customName: item.customName,
+        customNumber: item.customNumber
+      };
+    });
 
     return NextResponse.json(formattedCart);
   } catch (error) {

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { CURRENCY } from "@/lib/constants";
 import { getProducts, deleteProduct, updateProduct } from "../actions";
+import ImageUploader from "@/components/ImageUploader";
 
 export default function AdminInventoryPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -412,21 +413,10 @@ export default function AdminInventoryPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Image Filenames (Comma separated)</label>
-                  <input 
-                    required type="text" 
-                    value={Array.isArray(productToEdit.images) ? productToEdit.images.map((img: string) => {
-                      if (img.startsWith("/uploads/products/")) {
-                        return img.substring("/uploads/products/".length);
-                      }
-                      if (img.startsWith("/") && img.includes("/assets/")) {
-                        const parts = img.split("/");
-                        return parts[parts.length - 1];
-                      }
-                      return img;
-                    }).join(", ") : productToEdit.images} 
-                    onChange={e => setProductToEdit({...productToEdit, images: e.target.value})} 
-                    className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none font-mono text-xs transition-all" 
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Product Images</label>
+                  <ImageUploader
+                    images={Array.isArray(productToEdit.images) ? productToEdit.images : []}
+                    onChange={uploadedUrls => setProductToEdit({ ...productToEdit, images: uploadedUrls })}
                   />
                 </div>
 

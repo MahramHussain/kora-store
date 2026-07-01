@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CURRENCY } from "@/lib/constants";
+import ImageUploader from "@/components/ImageUploader";
 
 export default function AdminPage() {
   const [status, setStatus] = useState("");
@@ -12,7 +13,7 @@ export default function AdminPage() {
     price: "",
     description: "",
     tag: "Latest",
-    images: "",
+    images: [] as string[],
     sizes: "S, M, L, XL",
     stock: "10",
     isWorldCup: false
@@ -34,9 +35,13 @@ export default function AdminPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus("Dropping into Vault...");
 
-    const rawImages = formData.images.split(",").map(img => img.trim()).filter(Boolean);
+    if (formData.images.length === 0) {
+      setStatus("❌ Please upload at least one image.");
+      return;
+    }
+
+    setStatus("Dropping into Vault...");
 
     try {
       const response = await fetch("/api/gear", {
@@ -44,7 +49,6 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          images: rawImages,
           sizes: formData.sizes.split(",").map(size => size.trim()).filter(Boolean),
           stock: parseInt(formData.stock) || 0,
           isWorldCup: formData.isWorldCup
@@ -60,7 +64,7 @@ export default function AdminPage() {
           price: "",
           description: "",
           tag: "Latest",
-          images: "",
+          images: [],
           sizes: "S, M, L, XL",
           stock: "10",
           isWorldCup: false
@@ -208,16 +212,11 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Image Filenames (Comma separated)</label>
-              <input
-                required
-                type="text"
-                value={formData.images}
-                onChange={e => setFormData({...formData, images: e.target.value})}
-                className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3.5 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none font-mono text-xs transition-all"
-                placeholder="realmadrid-home.png, realmadrid-home-back.png"
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2.5">Product Images</label>
+              <ImageUploader
+                images={formData.images}
+                onChange={uploadedUrls => setFormData({ ...formData, images: uploadedUrls })}
               />
-              <span className="text-[10px] text-slate-400 mt-2 block">Files are resolved recursively inside the public/assets/ and public/uploads/ directories.</span>
             </div>
 
             <div>

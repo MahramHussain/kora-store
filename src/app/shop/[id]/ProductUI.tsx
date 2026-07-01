@@ -70,7 +70,7 @@ export default function ProductUI({ product }: { product: any }) {
             }`}
           >
             <FiEdit className="text-sm shrink-0" />
-            <span>Add Name & Number</span>
+            <span>Add Name & Number (+25 DHS)</span>
           </button>
 
           <button
@@ -114,6 +114,10 @@ export default function ProductUI({ product }: { product: any }) {
               </div>
             </div>
             <p className="text-[10px] text-slate-400 italic">Bespoke hot-pressed vinyl printing. Handcrafted in-house.</p>
+            <p className="text-[10px] text-kora font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3">
+              <span>✨ Custom Player Printing</span>
+              <span>+25 DHS</span>
+            </p>
           </div>
         )}
 
@@ -177,7 +181,7 @@ export default function ProductUI({ product }: { product: any }) {
             }`}
           >
             <FiEdit className="text-sm shrink-0" />
-            <span>Add your own</span>
+            <span>Add your own (+25 DHS)</span>
           </button>
 
           <button
@@ -221,6 +225,10 @@ export default function ProductUI({ product }: { product: any }) {
                 />
               </div>
             </div>
+            <p className="text-[10px] text-[#6B00FF] font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3">
+              <span>✨ Custom Player Printing</span>
+              <span>+25 DHS</span>
+            </p>
           </div>
         )}
 
@@ -299,7 +307,8 @@ export default function ProductUI({ product }: { product: any }) {
     }
 
     const basePrice = parseFloat(product.price);
-    const finalPrice = basePrice + (hasFifaPatch ? 10 : 0);
+    const hasCustomPrint = finalName !== "" || finalNumber !== "";
+    const finalPrice = basePrice + (hasFifaPatch ? 10 : 0) + (hasCustomPrint ? 25 : 0);
 
     addToCart({
       id: product.id,
@@ -471,7 +480,7 @@ export default function ProductUI({ product }: { product: any }) {
         {/* Price + Stock */}
         <div className="flex items-center justify-between mb-5 pb-5 border-b border-slate-100">
           <span className="text-3xl font-black text-slate-900">
-            {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0)}
+            {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + ((customName || customNumber) ? 25 : 0)}
           </span>
           {product.stock === 0 ? (
             <span className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-full">
@@ -837,7 +846,7 @@ export default function ProductUI({ product }: { product: any }) {
               <div className="flex flex-col">
                 <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5">Price</span>
                 <span className="text-3xl font-extrabold text-slate-900 font-display">
-                  {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0)}
+                  {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + ((customName || customNumber) ? 25 : 0)}
                 </span>
               </div>
               <div>

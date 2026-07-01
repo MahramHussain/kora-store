@@ -51,6 +51,15 @@ export async function POST(req: Request) {
       return new NextResponse("Please enter a valid UAE phone number.", { status: 400 });
     }
 
+    // Validate that personalized items do not use COD
+    const hasPersonalizedItem = items.some((item: any) => 
+      (item.customName && item.customName.trim() !== "") || 
+      (item.customNumber && item.customNumber.trim() !== "")
+    );
+    if (hasPersonalizedItem && paymentMethod === "cod") {
+      return new NextResponse("Cash on Delivery is unavailable for personalized custom kits. Please pay by Card.", { status: 400 });
+    }
+
     const userEmail = clerkUser.emailAddresses[0].emailAddress;
 
     // Check if user already exists by email (with different ID)
