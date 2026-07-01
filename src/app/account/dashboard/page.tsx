@@ -19,6 +19,14 @@ export default async function DashboardPage() {
     where: { id: userId },
   });
 
+  if (dbUser) {
+    const isBanned = dbUser.isBanned || (dbUser.bannedUntil && new Date() < new Date(dbUser.bannedUntil));
+    const isShadowBanned = dbUser.isShadowBanned && (!dbUser.shadowBanExpiresAt || new Date() < new Date(dbUser.shadowBanExpiresAt));
+    if (isBanned || isShadowBanned) {
+      redirect("/account?banned=true");
+    }
+  }
+
   const safeUser = {
     name: clerkUser?.firstName || "Vault Member",
     email: clerkUser?.emailAddresses[0]?.emailAddress || "",
@@ -26,6 +34,9 @@ export default async function DashboardPage() {
     memberSince: joinYear.slice(-2), // Turns "2024" into "24" for your UI!
     selectedAvatar: dbUser?.selectedAvatar || null,
     customProfilePic: dbUser?.customProfilePic || null,
+    gender: dbUser?.gender || null,
+    phone: dbUser?.phone || null,
+    location: dbUser?.location || null,
   };
 
   // 3. SECURE PRISMA FETCH: Pull their real orders!

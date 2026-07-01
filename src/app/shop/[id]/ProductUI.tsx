@@ -7,7 +7,8 @@ import { FaChevronLeft, FaStar, FaTruckFast } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
-import { FiEdit, FiAward, FiThumbsUp, FiFilter, FiX, FiCheck, FiMessageSquare } from "react-icons/fi";
+import { FiEdit, FiAward, FiThumbsUp, FiFilter, FiX, FiCheck, FiMessageSquare, FiTrash2, FiCornerDownRight } from "react-icons/fi";
+import { useUser } from "@clerk/nextjs";
 
 const JERSEYS: Record<
   string,
@@ -104,6 +105,16 @@ function AvatarDisplay({
   );
 }
 
+const VerifiedTick = () => (
+  <svg
+    className="w-4.5 h-4.5 text-[#6B00FF] fill-current inline-block shrink-0 align-middle ml-1 select-none"
+    viewBox="0 0 24 24"
+    aria-label="Verified Account"
+  >
+    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+  </svg>
+);
+
 // Sizing or customization helper constants
 
 export default function ProductUI({ product }: { product: any }) {
@@ -112,6 +123,13 @@ export default function ProductUI({ product }: { product: any }) {
   const [activeTab, setActiveTab] = useState<"details" | "reviews">("details");
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
   const [helpfulVotes, setHelpfulVotes] = useState<Record<string, { yes: number; voted: 'yes' | null }>>({});
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
+  const [editRating, setEditRating] = useState<number>(5);
+  const [editComment, setEditComment] = useState<string>("");
+  const [replyingReviewId, setReplyingReviewId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState<string>("");
+  const [isEditingSubmitting, setIsEditingSubmitting] = useState(false);
+  const [isReplyingSubmitting, setIsReplyingSubmitting] = useState(false);
   const [reviewText, setReviewText] = useState("");
   const [selectedRating, setSelectedRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
@@ -119,6 +137,10 @@ export default function ProductUI({ product }: { product: any }) {
   const [customNumber, setCustomNumber] = useState("");
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
+  const { user: clerkUser } = useUser();
+  const currentUserId = clerkUser?.id;
+  const clerkEmail = clerkUser?.emailAddresses[0]?.emailAddress;
+  const isAdmin = clerkEmail === "mahramh40@gmail.com" || clerkEmail === "korastore.ae@gmail.com";
   const [isAdded, setIsAdded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -376,6 +398,24 @@ export default function ProductUI({ product }: { product: any }) {
     ? product.reviews.filter((r: any) => ratingFilter === null || r.rating === ratingFilter)
     : [];
 
+  // Redirect banned or shadow-banned users immediately to account block page
+  useEffect(() => {
+    if (clerkUser) {
+      fetch("/api/user/profile")
+        .then(res => res.json())
+        .then(dbUser => {
+          if (dbUser) {
+            const isBanned = dbUser.isBanned || (dbUser.bannedUntil && new Date() < new Date(dbUser.bannedUntil));
+            const isShadowBanned = dbUser.isShadowBanned && (!dbUser.shadowBanExpiresAt || new Date() < new Date(dbUser.shadowBanExpiresAt));
+            if (isBanned || isShadowBanned) {
+              router.push("/account?banned=true");
+            }
+          }
+        })
+        .catch(err => console.error("Error checking ban status:", err));
+    }
+  }, [clerkUser, router]);
+
   // Detect mobile
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -455,6 +495,76 @@ export default function ProductUI({ product }: { product: any }) {
       console.error("Failed to submit review");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: string) => {
+    if (!confirm("Are you sure you want to delete this review permanently?")) return;
+    try {
+      const res = await fetch(`/api/reviews?reviewId=${reviewId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        router.refresh();
+      } else {
+        alert("Failed to delete review.");
+      }
+    } catch (error) {
+      console.error("Delete review error:", error);
+    }
+  };
+
+  const handleEditReview = async (reviewId: string) => {
+    if (!editComment.trim()) return;
+    setIsEditingSubmitting(true);
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reviewId,
+          action: "edit",
+          comment: editComment,
+          rating: editRating,
+        }),
+      });
+      if (res.ok) {
+        setEditingReviewId(null);
+        setEditComment("");
+        router.refresh();
+      } else {
+        alert("Failed to save changes.");
+      }
+    } catch (error) {
+      console.error("Edit review error:", error);
+    } finally {
+      setIsEditingSubmitting(false);
+    }
+  };
+
+  const handleReplyReview = async (reviewId: string) => {
+    setIsReplyingSubmitting(true);
+    try {
+      const res = await fetch("/api/reviews", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          reviewId,
+          action: "reply",
+          replyText: replyText.trim() || null,
+        }),
+      });
+      if (res.ok) {
+        setReplyingReviewId(null);
+        setReplyText("");
+        router.refresh();
+      } else {
+        alert("Failed to save reply.");
+      }
+    } catch (error) {
+      console.error("Post reply error:", error);
+    } finally {
+      setIsReplyingSubmitting(false);
     }
   };
 
@@ -834,6 +944,9 @@ export default function ProductUI({ product }: { product: any }) {
                     const helpfulKey = review.id;
                     const votes = helpfulVotes[helpfulKey] || { yes: review.id.charCodeAt(0) % 6, voted: null };
 
+                    const isReviewerAdmin = review.user?.email === "mahramh40@gmail.com" || review.user?.email === "korastore.ae@gmail.com";
+                    const isEditing = editingReviewId === review.id;
+
                     const handleHelpfulClick = () => {
                       if (votes.voted === 'yes') return;
                       setHelpfulVotes({
@@ -843,7 +956,7 @@ export default function ProductUI({ product }: { product: any }) {
                     };
 
                     return (
-                      <div key={review.id} className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs pdp-mobile-animate">
+                      <div key={review.id} className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs pdp-mobile-animate animate-fade-in-up">
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex items-center gap-3">
                             <AvatarDisplay
@@ -854,8 +967,11 @@ export default function ProductUI({ product }: { product: any }) {
                               size="w-9 h-9"
                             />
                             <div>
-                              <div className="flex items-center gap-1.5 flex-wrap">
-                                <p className="text-xs font-bold text-slate-900">{reviewerName}</p>
+                              <div className="flex items-center gap-1 flex-wrap">
+                                <p className="text-xs font-bold text-slate-900 flex items-center">
+                                  {reviewerName}
+                                  {isReviewerAdmin && <VerifiedTick />}
+                                </p>
                                 <span className="inline-flex items-center gap-0.5 text-[8px] font-black uppercase text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
                                   Verified
                                 </span>
@@ -865,12 +981,167 @@ export default function ProductUI({ product }: { product: any }) {
                               </div>
                             </div>
                           </div>
-                          <span className="text-[10px] text-slate-400 font-medium">{new Date(review.createdAt).toLocaleDateString()}</span>
+                          
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] text-slate-400 font-medium">
+                              {new Date(review.createdAt).toLocaleDateString()}
+                              {review.edited && (
+                                <span className="text-[9px] text-slate-400 italic ml-1 select-none">(edited)</span>
+                              )}
+                            </span>
+                            
+                            {isAdmin && (
+                              <button
+                                onClick={() => handleDeleteReview(review.id)}
+                                className="text-rose-500 hover:text-rose-700 p-1 transition-colors"
+                                title="Delete Review"
+                              >
+                                <FiTrash2 className="text-xs" />
+                              </button>
+                            )}
+
+                            {review.userId === currentUserId && !isEditing && (
+                              <button
+                                onClick={() => {
+                                  setEditingReviewId(review.id);
+                                  setEditRating(review.rating);
+                                  setEditComment(review.comment);
+                                }}
+                                className="text-slate-400 hover:text-kora p-1 transition-colors"
+                                title="Edit Review"
+                              >
+                                <FiEdit className="text-xs" />
+                              </button>
+                            )}
+                          </div>
                         </div>
-                        <p className="text-xs text-slate-600 leading-relaxed mb-4">{review.comment}</p>
-                        
+
+                        {/* Inline Review Edit Block */}
+                        {isEditing ? (
+                          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 mb-3">
+                            <div className="flex items-center gap-1 mb-2">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onClick={() => setEditRating(star)}
+                                  className="focus:outline-none hover:scale-110 transition-transform"
+                                >
+                                  <FaStar className={`text-base ${star <= editRating ? "text-yellow-400" : "text-slate-200"}`} />
+                                </button>
+                              ))}
+                            </div>
+                            <textarea
+                              value={editComment}
+                              onChange={(e) => setEditComment(e.target.value)}
+                              className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-kora mb-3 resize-none h-20"
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleEditReview(review.id)}
+                                disabled={isEditingSubmitting || !editComment.trim()}
+                                className="bg-kora text-white text-[10px] font-bold uppercase py-2 px-4 rounded-xl shadow-xs disabled:opacity-50"
+                              >
+                                {isEditingSubmitting ? "Saving..." : "Save"}
+                              </button>
+                              <button
+                                onClick={() => setEditingReviewId(null)}
+                                className="bg-white border border-slate-200 text-slate-600 text-[10px] font-bold uppercase py-2 px-4 rounded-xl hover:border-slate-300"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-slate-600 leading-relaxed mb-4">{review.comment}</p>
+                        )}
+
+                        {/* Official Admin Reply display */}
+                        {review.adminReply && (
+                          <div className="mt-4 pl-3.5 border-l-2 border-kora/40 bg-slate-50 p-3 rounded-r-2xl relative overflow-hidden">
+                            <div className="flex items-center gap-1 flex-wrap mb-1">
+                              <span className="text-[9px] font-black uppercase text-kora tracking-wider">OFFICIAL VAULT REPLY</span>
+                              <VerifiedTick />
+                              {isAdmin && (
+                                <button
+                                  onClick={() => {
+                                    setReplyingReviewId(review.id);
+                                    setReplyText(review.adminReply);
+                                  }}
+                                  className="text-[9px] text-slate-400 hover:text-kora font-bold uppercase underline ml-auto transition-colors"
+                                >
+                                  Edit Reply
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-xs text-slate-700 leading-relaxed">{review.adminReply}</p>
+                          </div>
+                        )}
+
+                        {/* Admin Reply Action button if no reply exists */}
+                        {isAdmin && !review.adminReply && replyingReviewId !== review.id && (
+                          <button
+                            onClick={() => {
+                              setReplyingReviewId(review.id);
+                              setReplyText("");
+                            }}
+                            className="inline-flex items-center gap-1 mt-3 text-[10px] text-slate-400 hover:text-kora font-bold uppercase transition-colors"
+                          >
+                            <FiCornerDownRight className="text-[11px]" />
+                            <span>Reply to review</span>
+                          </button>
+                        )}
+
+                        {/* Admin Reply Text Editor */}
+                        {replyingReviewId === review.id && (
+                          <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+                            <textarea
+                              value={replyText}
+                              onChange={(e) => setReplyText(e.target.value)}
+                              placeholder="Type official shop reply..."
+                              className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-kora mb-2 resize-none h-16 bg-white"
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleReplyReview(review.id)}
+                                disabled={isReplyingSubmitting}
+                                className="bg-slate-900 hover:bg-kora text-white text-[10px] font-bold uppercase py-2 px-4 rounded-xl transition-all shadow-xs"
+                              >
+                                {isReplyingSubmitting ? "Posting..." : "Post Reply"}
+                              </button>
+                              {review.adminReply && (
+                                <button
+                                  onClick={() => {
+                                    if (confirm("Delete this reply?")) {
+                                      setReplyText("");
+                                      setIsReplyingSubmitting(true);
+                                      fetch("/api/reviews", {
+                                        method: "PUT",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({ reviewId: review.id, action: "reply", replyText: null })
+                                      }).then(() => {
+                                        setReplyingReviewId(null);
+                                        router.refresh();
+                                      }).finally(() => setIsReplyingSubmitting(false));
+                                    }
+                                  }}
+                                  className="bg-rose-50 border border-rose-200 text-rose-600 text-[10px] font-bold uppercase py-2 px-4 rounded-xl"
+                                >
+                                  Delete
+                                </button>
+                              )}
+                              <button
+                                onClick={() => setReplyingReviewId(null)}
+                                className="bg-white border border-slate-200 text-slate-600 text-[10px] font-bold uppercase py-2 px-4 rounded-xl"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        )}
+
                         {/* Helpfulness Bar */}
-                        <div className="flex items-center gap-3 pt-3 border-t border-slate-50 text-[10px] text-slate-400 font-bold">
+                        <div className="flex items-center gap-3 pt-3 border-t border-slate-50 text-[10px] text-slate-400 font-bold mt-3">
                           <span>Helpful?</span>
                           <button
                             onClick={handleHelpfulClick}
@@ -1435,6 +1706,9 @@ export default function ProductUI({ product }: { product: any }) {
                       const helpfulKey = review.id;
                       const votes = helpfulVotes[helpfulKey] || { yes: review.id.charCodeAt(0) % 6, voted: null };
 
+                      const isReviewerAdmin = review.user?.email === "mahramh40@gmail.com" || review.user?.email === "korastore.ae@gmail.com";
+                      const isEditing = editingReviewId === review.id;
+
                       const handleHelpfulClick = () => {
                         if (votes.voted === 'yes') return;
                         setHelpfulVotes({
@@ -1455,8 +1729,11 @@ export default function ProductUI({ product }: { product: any }) {
                                 size="w-11 h-11"
                               />
                               <div>
-                                <div className="flex items-center gap-2.5">
-                                  <p className="text-slate-900 font-bold font-sans text-sm">{reviewerName}</p>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-slate-900 font-bold font-sans text-sm flex items-center">
+                                    {reviewerName}
+                                    {isReviewerAdmin && <VerifiedTick />}
+                                  </p>
                                   <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
                                     Verified Purchaser
                                   </span>
@@ -1466,14 +1743,167 @@ export default function ProductUI({ product }: { product: any }) {
                                 </div>
                               </div>
                             </div>
-                            <span className="text-xs text-slate-400 font-sans font-medium">
-                              {new Date(review.createdAt).toLocaleDateString()}
-                            </span>
+                            
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs text-slate-400 font-sans font-medium">
+                                {new Date(review.createdAt).toLocaleDateString()}
+                                {review.edited && (
+                                  <span className="text-[10px] text-slate-400 italic ml-1.5 select-none">(edited)</span>
+                                )}
+                              </span>
+
+                              {isAdmin && (
+                                <button
+                                  onClick={() => handleDeleteReview(review.id)}
+                                  className="text-rose-500 hover:text-rose-700 p-1 transition-colors"
+                                  title="Delete Review"
+                                >
+                                  <FiTrash2 className="text-sm" />
+                                </button>
+                              )}
+
+                              {review.userId === currentUserId && !isEditing && (
+                                <button
+                                  onClick={() => {
+                                    setEditingReviewId(review.id);
+                                    setEditRating(review.rating);
+                                    setEditComment(review.comment);
+                                  }}
+                                  className="text-slate-400 hover:text-kora p-1 transition-colors"
+                                  title="Edit Review"
+                                >
+                                  <FiEdit className="text-sm" />
+                                </button>
+                              )}
+                            </div>
                           </div>
-                          <p className="text-slate-600 text-sm leading-relaxed pl-14 mb-4">{review.comment}</p>
-                          
+
+                          {/* Inline Review Edit Block */}
+                          {isEditing ? (
+                            <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 mb-4 ml-14">
+                              <div className="flex items-center gap-1.5 mb-3">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => setEditRating(star)}
+                                    className="focus:outline-none hover:scale-110 transition-transform"
+                                  >
+                                    <FaStar className={`text-lg ${star <= editRating ? "text-yellow-400" : "text-slate-200"}`} />
+                                  </button>
+                                ))}
+                              </div>
+                              <textarea
+                                value={editComment}
+                                onChange={(e) => setEditComment(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-sm text-slate-900 focus:outline-none focus:border-kora mb-3 resize-none h-24"
+                              />
+                              <div className="flex gap-3">
+                                <button
+                                  onClick={() => handleEditReview(review.id)}
+                                  disabled={isEditingSubmitting || !editComment.trim()}
+                                  className="bg-kora hover:bg-purple-700 text-white text-xs font-bold uppercase py-2.5 px-6 rounded-xl shadow-sm transition-colors disabled:opacity-50"
+                                >
+                                  {isEditingSubmitting ? "Saving..." : "Save Changes"}
+                                </button>
+                                <button
+                                  onClick={() => setEditingReviewId(null)}
+                                  className="bg-white border border-slate-200 text-slate-600 text-xs font-bold uppercase py-2.5 px-6 rounded-xl hover:border-slate-300 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-slate-600 text-sm leading-relaxed pl-14 mb-4">{review.comment}</p>
+                          )}
+
+                          {/* Official Admin Reply display */}
+                          {review.adminReply && (
+                            <div className="mt-4 ml-14 pl-4 border-l-2 border-kora/40 bg-slate-50 p-4 rounded-r-2xl relative overflow-hidden animate-fade-in-up">
+                              <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
+                                <span className="text-[10px] font-black uppercase text-kora tracking-widest">OFFICIAL VAULT REPLY</span>
+                                <VerifiedTick />
+                                {isAdmin && (
+                                  <button
+                                    onClick={() => {
+                                      setReplyingReviewId(review.id);
+                                      setReplyText(review.adminReply);
+                                    }}
+                                    className="text-xs text-slate-400 hover:text-kora font-bold uppercase underline ml-auto transition-colors"
+                                  >
+                                    Edit Reply
+                                  </button>
+                                )}
+                              </div>
+                              <p className="text-xs text-slate-700 leading-relaxed">{review.adminReply}</p>
+                            </div>
+                          )}
+
+                          {/* Admin Reply Action button if no reply exists */}
+                          {isAdmin && !review.adminReply && replyingReviewId !== review.id && (
+                            <button
+                              onClick={() => {
+                                setReplyingReviewId(review.id);
+                                setReplyText("");
+                              }}
+                              className="inline-flex items-center gap-1.5 mt-3 ml-14 text-xs text-slate-400 hover:text-kora font-bold uppercase transition-colors"
+                            >
+                              <FiCornerDownRight className="text-xs" />
+                              <span>Reply to review</span>
+                            </button>
+                          )}
+
+                          {/* Admin Reply Text Editor */}
+                          {replyingReviewId === review.id && (
+                            <div className="mt-3 ml-14 p-4 bg-slate-50 border border-slate-200 rounded-3xl animate-fade-in-up">
+                              <textarea
+                                value={replyText}
+                                onChange={(e) => setReplyText(e.target.value)}
+                                placeholder="Type official shop reply..."
+                                className="w-full border border-slate-200 rounded-2xl p-3.5 text-sm text-slate-900 focus:outline-none focus:border-kora mb-3 resize-none h-20 bg-white"
+                              />
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleReplyReview(review.id)}
+                                  disabled={isReplyingSubmitting}
+                                  className="bg-slate-900 hover:bg-kora text-white text-xs font-bold uppercase py-2.5 px-6 rounded-xl transition-all shadow-xs"
+                                >
+                                  {isReplyingSubmitting ? "Posting..." : "Post Reply"}
+                                </button>
+                                {review.adminReply && (
+                                  <button
+                                    onClick={() => {
+                                      if (confirm("Delete this reply?")) {
+                                        setReplyText("");
+                                        setIsReplyingSubmitting(true);
+                                        fetch("/api/reviews", {
+                                          method: "PUT",
+                                          headers: { "Content-Type": "application/json" },
+                                          body: JSON.stringify({ reviewId: review.id, action: "reply", replyText: null })
+                                        }).then(() => {
+                                          setReplyingReviewId(null);
+                                          router.refresh();
+                                        }).finally(() => setIsReplyingSubmitting(false));
+                                      }
+                                    }}
+                                    className="bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold uppercase py-2.5 px-6 rounded-xl"
+                                  >
+                                    Delete
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => setReplyingReviewId(null)}
+                                  className="bg-white border border-slate-200 text-slate-600 text-xs font-bold uppercase py-2.5 px-6 rounded-xl"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
                           {/* Helpfulness Bar */}
-                          <div className="flex items-center gap-3 pl-14 pt-3 border-t border-slate-50 text-xs text-slate-400 font-bold">
+                          <div className="flex items-center gap-3 pl-14 pt-3 border-t border-slate-50 text-xs text-slate-400 font-bold mt-4">
                             <span>Was this review helpful?</span>
                             <button
                               onClick={handleHelpfulClick}

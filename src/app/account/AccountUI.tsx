@@ -29,11 +29,44 @@ const clerkAppearance = {
   },
 };
 
-export default function AccountUI({ user, orders }: { user: any; orders: any[] }) {
+export default function AccountUI({ user, orders, banned = false }: { user: any; orders: any[]; banned?: boolean }) {
   const router = useRouter();
   const { signOut } = useClerk();
   const [isLogin, setIsLogin] = useState(true);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+
+  if (banned) {
+    return (
+      <main className="min-h-[80vh] bg-transparent flex items-center justify-center px-4 font-sans relative overflow-hidden py-12">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-rose-500/5 rounded-full blur-[80px] pointer-events-none" />
+        <div className="max-w-md w-full bg-white border border-slate-200/80 p-8 rounded-3xl shadow-xl text-center space-y-6 relative z-10">
+          <div className="w-16 h-16 bg-rose-50 border border-rose-100 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-sm text-rose-500">
+            ⚠️
+          </div>
+          <div>
+            <h1 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-2">Vault Access Restricted</h1>
+            <p className="text-[10px] text-rose-600 font-bold uppercase tracking-widest mb-4">Account Suspended</p>
+            <p className="text-sm text-slate-500 leading-relaxed">
+              Your account has been restricted or shadow-banned by the store administration. You are currently blocked from browsing the vault, writing reviews, and purchasing gear.
+            </p>
+          </div>
+          <div className="pt-2">
+            <button
+              onClick={() => signOut(() => {
+                localStorage.removeItem("kora_vault_avatar");
+                localStorage.removeItem("kora_vault_custom_profile_pic");
+                window.dispatchEvent(new Event("kora_avatar_update"));
+                router.push("/");
+              })}
+              className="w-full bg-slate-900 hover:bg-rose-600 text-white font-bold py-3.5 px-6 rounded-2xl transition-all uppercase tracking-wider text-xs shadow-md shadow-slate-900/10 active:scale-95"
+            >
+              Sign Out &rarr;
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   // ── LOGGED-IN (legacy fallback, redirects to /dashboard in normal flow) ──
   if (user) {

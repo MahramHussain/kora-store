@@ -40,6 +40,23 @@ export default function CheckoutPage() {
   const { isSignedIn, isLoaded } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
 
+  useEffect(() => {
+    if (isSignedIn) {
+      fetch("/api/user/profile")
+        .then(res => res.json())
+        .then(dbUser => {
+          if (dbUser) {
+            const isBanned = dbUser.isBanned || (dbUser.bannedUntil && new Date() < new Date(dbUser.bannedUntil));
+            const isShadowBanned = dbUser.isShadowBanned && (!dbUser.shadowBanExpiresAt || new Date() < new Date(dbUser.shadowBanExpiresAt));
+            if (isBanned || isShadowBanned) {
+              router.push("/account?banned=true");
+            }
+          }
+        })
+        .catch(err => console.error("Error checking ban status:", err));
+    }
+  }, [isSignedIn, router]);
+
   // Shipping details state
   const [shippingFirstName, setShippingFirstName] = useState("");
   const [shippingLastName, setShippingLastName] = useState("");

@@ -14,6 +14,15 @@ export async function POST(req: Request) {
       return new NextResponse("Unauthorized. Please log in.", { status: 401 });
     }
 
+    const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+    if (dbUser) {
+      const isBanned = dbUser.isBanned || (dbUser.bannedUntil && new Date() < new Date(dbUser.bannedUntil));
+      const isShadowBanned = dbUser.isShadowBanned && (!dbUser.shadowBanExpiresAt || new Date() < new Date(dbUser.shadowBanExpiresAt));
+      if (isBanned || isShadowBanned) {
+        return new NextResponse("Forbidden: Your account is restricted. Checkout blocked.", { status: 403 });
+      }
+    }
+
     // 2. Parse checkout data from request body
     const body = await req.json();
     const {

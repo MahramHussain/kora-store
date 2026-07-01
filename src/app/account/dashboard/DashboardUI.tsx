@@ -24,7 +24,8 @@ import {
   FiAward,
   FiCheck,
   FiGrid,
-  FiInfo
+  FiInfo,
+  FiPhone
 } from "react-icons/fi";
 
 // ── CUSTOM CSS FOOTBALL JERSEYS (Offline friendly, highly creative vectors) ──
@@ -244,6 +245,9 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
   const [saveStatus, setSaveStatus] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(user.selectedAvatar || null);
   const [customProfilePic, setCustomProfilePic] = useState<string | null>(user.customProfilePic || null);
+  const [genderInput, setGenderInput] = useState<string>(user.gender || "");
+  const [phoneInput, setPhoneInput] = useState<string>(user.phone || "");
+  const [locationInput, setLocationInput] = useState<string>(user.location || "");
 
   // Filter States
   const [statusFilter, setStatusFilter] = useState<"all" | "processing" | "shipped" | "delivered">("all");
@@ -401,12 +405,23 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
     try {
       await clerkUser.update({ firstName: nameInput });
       // Sync names to Postgres DB
-      await fetch("/api/user/profile", {
+      const res = await fetch("/api/user/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName: nameInput })
+        body: JSON.stringify({ 
+          firstName: nameInput,
+          gender: genderInput || null,
+          phone: phoneInput || null,
+          location: locationInput || null
+        })
       });
-      setSaveStatus("✅ Profile updated successfully!");
+      
+      if (res.ok) {
+        setSaveStatus("✅ Profile updated successfully!");
+      } else {
+        const text = await res.text();
+        setSaveStatus(`❌ ${text || "Failed to update profile."}`);
+      }
       setTimeout(() => setSaveStatus(""), 4000);
     } catch (err: any) {
       setSaveStatus("❌ " + (err.errors?.[0]?.message || "Failed to update profile."));
@@ -1081,6 +1096,54 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                           <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 w-4.5 h-4.5" />
                         </div>
                         <p className="text-[10px] text-slate-400 mt-1.5 font-medium pl-1">Email is locked and managed via Clerk authentication.</p>
+                      </div>
+
+                      {/* Gender Picker */}
+                      <div>
+                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">Gender</label>
+                        <div className="relative">
+                          <select
+                            value={genderInput}
+                            onChange={(e) => setGenderInput(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-10 pr-4 text-sm text-slate-900 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm font-semibold appearance-none"
+                          >
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                          </select>
+                          <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4.5 h-4.5 pointer-events-none" />
+                        </div>
+                      </div>
+
+                      {/* Phone Number */}
+                      <div>
+                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">Phone Number</label>
+                        <div className="relative">
+                          <input
+                            type="tel"
+                            placeholder="e.g. +971 50 123 4567"
+                            value={phoneInput}
+                            onChange={(e) => setPhoneInput(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-10 pr-4 text-sm text-slate-900 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm font-semibold"
+                          />
+                          <FiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4.5 h-4.5" />
+                        </div>
+                      </div>
+
+                      {/* Default Delivery Location */}
+                      <div>
+                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">Default Delivery Location</label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder="e.g. Apartment 12A, Downtown Dubai"
+                            value={locationInput}
+                            onChange={(e) => setLocationInput(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-10 pr-4 text-sm text-slate-900 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm font-semibold"
+                          />
+                          <FiMapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4.5 h-4.5" />
+                        </div>
                       </div>
 
                       {saveStatus && (

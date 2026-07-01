@@ -184,3 +184,87 @@ export async function deleteOrder(orderId: string) {
     return { success: false, error: "Failed to delete order from database" };
   }
 }
+
+export async function getUsers() {
+  try {
+    await ensureAdmin();
+    const users = await prisma.user.findMany({
+      include: {
+        orders: {
+          where: { status: { not: "Pending" } },
+          orderBy: { createdAt: "desc" },
+        },
+        reviews: true,
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return users.map((u) => {
+      // Resolve phone and location from order history if not filled
+      const resolvedPhone = u.phone || u.orders[0]?.shippingPhone || null;
+      const resolvedLocation =
+        u.location ||
+        (u.orders[0]
+          ? `${u.orders[0].shippingStreet || ""}, ${u.orders[0].shippingCity || ""}`.trim()
+          : null);
+
+      return {
+        ...u,
+        phone: resolvedPhone,
+        location: resolvedLocation,
+        createdAt: u.createdAt.toISOString(),
+        bannedUntil: u.bannedUntil ? u.bannedUntil.toISOString() : null,
+        shadowBanExpiresAt: u.shadowBanExpiresAt ? u.shadowBanExpiresAt.toISOString() : null,
+        orders: u.orders.map((o) => ({
+          ...o,
+          total: o.total.toString(),
+          createdAt: o.createdAt.toISOString(),
+        })),
+        reviews: u.reviews.map((r) => ({
+          ...r,
+          createdAt: r.createdAt.toISOString(),
+          adminReplyAt: r.adminReplyAt ? r.adminReplyAt.toISOString() : null,
+        })),
+      };
+    });
+  } catch (error) {
+    console.error("Failed to fetch users:", error);
+    return [];
+  }
+}
+
+export async function updateUserBanStatus(
+  userId: string,
+  data: {
+    isBanned: boolean;
+    bannedUntil: string | null;
+    isShadowBanned: boolean;
+    shadowBanExpiresAt: string | null;
+  }
+) {
+  try {
+    await ensureAdmin();
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        isBanned: data.isBanned,
+        bannedUntil: data.bannedUntil ? new Date(data.bannedUntil) : null,
+        isShadowBanned: data.isShadowBanned,
+        shadowBanExpiresAt: data.shadowBanExpiresAt ? new Date(data.shadowBanExpiresAt) : null,
+      },
+    });
+
+    return {
+      success: true,
+      user: {
+        ...updatedUser,
+        createdAt: updatedUser.createdAt.toISOString(),
+        bannedUntil: updatedUser.bannedUntil ? updatedUser.bannedUntil.toISOString() : null,
+        shadowBanExpiresAt: updatedUser.shadowBanExpiresAt ? updatedUser.shadowBanExpiresAt.toISOString() : null,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to update user ban status:", error);
+    return { success: false, error: "Failed to update ban configuration" };
+  }
+}

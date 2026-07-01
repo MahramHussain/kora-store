@@ -12,14 +12,21 @@ datasource db {
 
 // 1. THE USER MODEL (Linked to Clerk Auth)
 model User {
-  id               String   @id // We will use the Clerk User ID here so they match perfectly
-  email            String   @unique
-  firstName        String?
-  lastName         String?
-  selectedAvatar   String?
-  customProfilePic String?
-  imageUrl         String?
-  createdAt        DateTime @default(now())
+  id                 String    @id // We will use the Clerk User ID here so they match perfectly
+  email              String    @unique
+  firstName          String?
+  lastName           String?
+  selectedAvatar     String?
+  customProfilePic   String?
+  imageUrl           String?
+  gender             String?
+  phone              String?
+  location           String?
+  isBanned           Boolean   @default(false)
+  bannedUntil        DateTime?
+  isShadowBanned     Boolean   @default(false)
+  shadowBanExpiresAt DateTime?
+  createdAt          DateTime  @default(now())
 
   // A user can have many orders, reviews, and cart items
   orders    Order[]
@@ -91,10 +98,13 @@ model OrderItem {
 }
 
 model Review {
-  id        String   @id @default(cuid())
-  rating    Int      @default(5)
-  comment   String
-  createdAt DateTime @default(now())
+  id           String    @id @default(cuid())
+  rating       Int       @default(5)
+  comment      String
+  edited       Boolean   @default(false)
+  adminReply   String?
+  adminReplyAt DateTime?
+  createdAt    DateTime  @default(now())
 
   // The Review belongs to one User
   userId    String
