@@ -242,8 +242,8 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [nameInput, setNameInput] = useState(user.name);
   const [saveStatus, setSaveStatus] = useState("");
-  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
-  const [customProfilePic, setCustomProfilePic] = useState<string | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(user.selectedAvatar || null);
+  const [customProfilePic, setCustomProfilePic] = useState<string | null>(user.customProfilePic || null);
 
   // Filter States
   const [statusFilter, setStatusFilter] = useState<"all" | "processing" | "shipped" | "delivered">("all");
@@ -253,16 +253,29 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
   const [prefEmail, setPrefEmail] = useState(true);
   const [prefDrops, setPrefDrops] = useState(true);
 
-  // Load custom avatar and custom image from local storage on mount
+  // Load and sync avatar and custom image from database or local storage on mount
   useEffect(() => {
     const savedAvatar = localStorage.getItem("kora_vault_avatar");
-    if (savedAvatar) setSelectedAvatar(savedAvatar);
-    
     const savedPic = localStorage.getItem("kora_vault_custom_profile_pic");
-    if (savedPic) setCustomProfilePic(savedPic);
-  }, []);
+    
+    if (user.selectedAvatar) {
+      localStorage.setItem("kora_vault_avatar", user.selectedAvatar);
+      setSelectedAvatar(user.selectedAvatar);
+    } else if (savedAvatar) {
+      setSelectedAvatar(savedAvatar);
+    }
+    
+    if (user.customProfilePic) {
+      localStorage.setItem("kora_vault_custom_profile_pic", user.customProfilePic);
+      setCustomProfilePic(user.customProfilePic);
+    } else if (savedPic) {
+      setCustomProfilePic(savedPic);
+    }
+    
+    window.dispatchEvent(new Event("kora_avatar_update"));
+  }, [user]);
 
-  const changeAvatar = (avatarId: string | null) => {
+  const changeAvatar = async (avatarId: string | null) => {
     setSelectedAvatar(avatarId);
     if (avatarId) {
       localStorage.setItem("kora_vault_avatar", avatarId);
@@ -271,6 +284,16 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
     }
     // Dispatch custom event to update Navbar avatar immediately
     window.dispatchEvent(new Event("kora_avatar_update"));
+
+    try {
+      await fetch("/api/user/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ selectedAvatar: avatarId })
+      });
+    } catch (e) {
+      console.error("Failed to sync avatar to database:", e);
+    }
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -315,9 +338,22 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
           const compressedBase64 = canvas.toDataURL("image/jpeg", 0.75); // Compress to light JPEG (around 10-15KB)
           setCustomProfilePic(compressedBase64);
           localStorage.setItem("kora_vault_custom_profile_pic", compressedBase64);
-          changeAvatar("custom_upload");
+          setSelectedAvatar("custom_upload");
+          localStorage.setItem("kora_vault_avatar", "custom_upload");
+          window.dispatchEvent(new Event("kora_avatar_update"));
           setSaveStatus("✅ Profile photo uploaded & optimized!");
           setTimeout(() => setSaveStatus(""), 4000);
+
+          fetch("/api/user/profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              selectedAvatar: "custom_upload", 
+              customProfilePic: compressedBase64 
+            })
+          }).catch((e) => {
+            console.error("Failed to sync custom profile pic to database:", e);
+          });
         }
       };
     };
@@ -326,14 +362,31 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
     };
   };
 
-  const removeCustomImage = () => {
+  const removeCustomImage = async () => {
     setCustomProfilePic(null);
     localStorage.removeItem("kora_vault_custom_profile_pic");
+    let nextAvatar = null;
     if (selectedAvatar === "custom_upload") {
-      changeAvatar(null);
+      setSelectedAvatar(null);
+      localStorage.removeItem("kora_vault_avatar");
+      window.dispatchEvent(new Event("kora_avatar_update"));
+      nextAvatar = null;
     }
     setSaveStatus("✅ Custom profile photo removed.");
     setTimeout(() => setSaveStatus(""), 4000);
+
+    try {
+      await fetch("/api/user/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          selectedAvatar: nextAvatar, 
+          customProfilePic: null 
+        })
+      });
+    } catch (e) {
+      console.error("Failed to remove custom profile pic from database:", e);
+    }
   };
 
   const handleLogout = () => signOut(() => router.push("/"));
@@ -347,6 +400,12 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
     setSaveStatus("Saving...");
     try {
       await clerkUser.update({ firstName: nameInput });
+      // Sync names to Postgres DB
+      await fetch("/api/user/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName: nameInput })
+      });
       setSaveStatus("✅ Profile updated successfully!");
       setTimeout(() => setSaveStatus(""), 4000);
     } catch (err: any) {

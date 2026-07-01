@@ -6,12 +6,16 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   
   const { id } = await params;
 
-  // 1. Removed the broken "user: true" request. It just pulls the reviews now!
+  // 1. Fetch reviews along with the user profiles to display correct custom/google avatars
   const rawProduct = await prisma.product.findUnique({
     where: { id: id },
     include: {
-      reviews: true 
-    }
+      reviews: {
+        include: {
+          user: true,
+        },
+      },
+    },
   });
 
   if (!rawProduct) {

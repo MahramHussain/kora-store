@@ -15,11 +15,17 @@ export default async function DashboardPage() {
   const clerkUser = await currentUser();
   const joinYear = clerkUser?.createdAt ? new Date(clerkUser.createdAt).getFullYear().toString() : "2024";
   
+  const dbUser = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
   const safeUser = {
     name: clerkUser?.firstName || "Vault Member",
     email: clerkUser?.emailAddresses[0]?.emailAddress || "",
     imageUrl: clerkUser?.imageUrl,
     memberSince: joinYear.slice(-2), // Turns "2024" into "24" for your UI!
+    selectedAvatar: dbUser?.selectedAvatar || null,
+    customProfilePic: dbUser?.customProfilePic || null,
   };
 
   // 3. SECURE PRISMA FETCH: Pull their real orders!

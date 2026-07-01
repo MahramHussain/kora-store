@@ -7,7 +7,102 @@ import { FaChevronLeft, FaStar, FaTruckFast } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
-import { FiEdit, FiAward } from "react-icons/fi";
+import { FiEdit, FiAward, FiThumbsUp, FiFilter, FiX, FiCheck, FiMessageSquare } from "react-icons/fi";
+
+const JERSEYS: Record<
+  string,
+  { name: string; primary: string; secondary: string; stripes?: boolean; sleeves?: string }
+> = {
+  argentina: { name: "Argentina", primary: "#74acdf", secondary: "#ffffff", stripes: true },
+  realmadrid: { name: "Real Madrid", primary: "#ffffff", secondary: "#d4af37", sleeves: "#ffffff" },
+  alnassr: { name: "Al Nassr", primary: "#ffcc00", secondary: "#0055b8", sleeves: "#ffcc00" },
+  portugal: { name: "Portugal", primary: "#bc0000", secondary: "#006600", sleeves: "#bc0000" },
+  barcelona: { name: "Barcelona", primary: "#004d98", secondary: "#a50044", stripes: true },
+  mancity: { name: "Man City", primary: "#6cabdd", secondary: "#ffffff", sleeves: "#6cabdd" },
+  arsenal: { name: "Arsenal", primary: "#ef0107", secondary: "#ffffff", sleeves: "#ffffff" },
+  intermiami: { name: "Inter Miami", primary: "#f7b5cd", secondary: "#000000", sleeves: "#f7b5cd" },
+};
+
+function MiniJersey({ colors }: { colors: typeof JERSEYS[string] }) {
+  return (
+    <div className="relative w-full h-full flex items-center justify-center scale-90 select-none">
+      {/* Torso */}
+      <div
+        className="relative w-[56%] h-[75%] rounded-t-[4px] overflow-hidden z-10"
+        style={{ backgroundColor: colors.primary }}
+      >
+        {colors.stripes && (
+          <div className="absolute inset-0 flex justify-around">
+            <div className="w-[20%] h-full" style={{ backgroundColor: colors.secondary }} />
+            <div className="w-[20%] h-full" style={{ backgroundColor: colors.secondary }} />
+            <div className="w-[20%] h-full" style={{ backgroundColor: colors.secondary }} />
+          </div>
+        )}
+        {/* Neck collar */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[50%] h-[15%] bg-slate-900/15 rounded-b-full" />
+      </div>
+      {/* Left Sleeve */}
+      <div
+        className="absolute top-[12%] left-[8%] w-[25%] h-[44%] rounded-l-[2px] origin-top-right -rotate-25"
+        style={{ backgroundColor: colors.sleeves || colors.primary }}
+      />
+      {/* Right Sleeve */}
+      <div
+        className="absolute top-[12%] right-[8%] w-[25%] h-[44%] rounded-r-[2px] origin-top-left rotate-25"
+        style={{ backgroundColor: colors.sleeves || colors.primary }}
+      />
+    </div>
+  );
+}
+
+function AvatarDisplay({
+  imageUrl,
+  name,
+  selectedAvatar,
+  customProfilePic,
+  size = "w-10 h-10"
+}: {
+  imageUrl?: string;
+  name: string;
+  selectedAvatar: string | null;
+  customProfilePic: string | null;
+  size?: string;
+}) {
+  if (selectedAvatar === "custom_upload" && customProfilePic) {
+    return (
+      <img src={customProfilePic} alt="Profile" className={`${size} rounded-full border-2 border-kora shadow-md object-cover shrink-0`} />
+    );
+  }
+
+  if (selectedAvatar && JERSEYS[selectedAvatar]) {
+    return (
+      <div className={`${size} rounded-full bg-slate-900 border-2 border-kora shadow-md flex items-center justify-center overflow-hidden shrink-0`}>
+        <MiniJersey colors={JERSEYS[selectedAvatar]} />
+      </div>
+    );
+  }
+
+  if (imageUrl) {
+    return (
+      <img src={imageUrl} alt="Profile" className={`${size} rounded-full border-2 border-kora/60 shadow-md object-cover shrink-0`} />
+    );
+  }
+
+  const fallbackInitials = name
+    ? name
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase()
+        .substring(0, 2)
+    : "V";
+
+  return (
+    <div className={`${size} rounded-full bg-gradient-to-tr from-kora to-purple-500 flex items-center justify-center text-white font-black text-xs shadow-md shrink-0 uppercase`}>
+      {fallbackInitials || "V"}
+    </div>
+  );
+}
 
 // Sizing or customization helper constants
 
@@ -15,6 +110,8 @@ export default function ProductUI({ product }: { product: any }) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
   const [activeTab, setActiveTab] = useState<"details" | "reviews">("details");
+  const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+  const [helpfulVotes, setHelpfulVotes] = useState<Record<string, { yes: number; voted: 'yes' | null }>>({});
   const [reviewText, setReviewText] = useState("");
   const [selectedRating, setSelectedRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
@@ -265,6 +362,19 @@ export default function ProductUI({ product }: { product: any }) {
     ? (product.reviews.reduce((sum: number, r: any) => sum + (r.rating || 5), 0) / product.reviews.length)
     : 0;
   const avgRatingDisplay = avgRating > 0 ? avgRating.toFixed(1) : null;
+
+  // Percentage of positive reviews (4 or 5 stars)
+  const positiveReviewsCount = product.reviews
+    ? product.reviews.filter((r: any) => (r.rating || 5) >= 4).length
+    : 0;
+  const recommendPercent = product.reviews && product.reviews.length > 0
+    ? Math.round((positiveReviewsCount / product.reviews.length) * 100)
+    : 100;
+
+  // Filter reviews based on current rating selection
+  const filteredReviews = product.reviews
+    ? product.reviews.filter((r: any) => ratingFilter === null || r.rating === ratingFilter)
+    : [];
 
   // Detect mobile
   useEffect(() => {
@@ -625,47 +735,170 @@ export default function ProductUI({ product }: { product: any }) {
 
           {activeTab === "reviews" && (
             <div className="space-y-6 pdp-mobile-animate">
+              {/* Mobile Stats Summary */}
+              <div className="bg-slate-900 text-white rounded-3xl p-5 shadow-lg relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-kora/20 rounded-full blur-2xl pointer-events-none"></div>
+                <div className="relative z-10 flex items-center justify-between">
+                  <div>
+                    <span className="text-[9px] font-black uppercase text-kora tracking-widest block mb-0.5">Average Intel</span>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-black font-display leading-none">{avgRatingDisplay || "0.0"}</span>
+                      <span className="text-xs text-slate-400 font-bold">/ 5.0</span>
+                    </div>
+                    <div className="flex text-yellow-400 text-[10px] gap-0.5 mt-1.5">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <FaStar key={s} className={s <= Math.round(avgRating) ? "text-yellow-400" : "text-slate-700"} />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-[9px] font-black uppercase text-kora tracking-widest block mb-0.5">RECOMMENDED</span>
+                    <span className="text-2xl font-black font-display text-emerald-400 block leading-none">{recommendPercent}%</span>
+                    <span className="text-[10px] text-slate-400 font-bold block mt-1">Based on {product.reviews?.length || 0} reviews</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Rating Filters (Horizontal Scrollable Chips) */}
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1">
+                <button
+                  onClick={() => setRatingFilter(null)}
+                  className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                    ratingFilter === null
+                      ? "bg-slate-900 border-slate-900 text-white shadow-sm"
+                      : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                  }`}
+                >
+                  All ({product.reviews?.length || 0})
+                </button>
+                {[5, 4, 3, 2, 1].map((rating) => {
+                  const count = product.reviews ? product.reviews.filter((r: any) => r.rating === rating).length : 0;
+                  return (
+                    <button
+                      key={rating}
+                      onClick={() => setRatingFilter(ratingFilter === rating ? null : rating)}
+                      className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${
+                        ratingFilter === rating
+                          ? "bg-kora border-kora text-white shadow-sm shadow-kora/25"
+                          : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                      }`}
+                    >
+                      <span className="flex items-center gap-0.5">
+                        {rating} <FaStar className="text-[10px] text-yellow-500 fill-yellow-500" />
+                      </span>
+                      <span className="opacity-60">({count})</span>
+                    </button>
+                  );
+                })}
+              </div>
+
               {/* Review input */}
-              <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                <h3 className="text-sm font-black uppercase tracking-wide text-slate-900 mb-1">Drop a Review</h3>
-                <p className="text-[10px] text-slate-400 uppercase tracking-widest mb-3">Tap stars to rate</p>
-                <div className="mb-3"><StarPicker size="text-lg" /></div>
+              <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs relative overflow-hidden">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-black uppercase text-slate-900 tracking-wide">Drop a Review</h3>
+                  <span className="text-[9px] text-slate-400 uppercase tracking-widest font-bold">Tap stars to rate</span>
+                </div>
+                <div className="mb-4"><StarPicker size="text-lg" /></div>
                 <textarea
                   value={reviewText}
                   onChange={(e) => setReviewText(e.target.value)}
-                  placeholder="How was the fit and quality?"
-                  className="w-full bg-white border border-slate-200 rounded-xl p-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-3 h-20 resize-none text-sm"
+                  placeholder="How was the fit and quality? Add your experience to the vault."
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none text-xs"
                 />
                 <button
                   onClick={handleSubmitReview}
                   disabled={isSubmitting || !reviewText.trim()}
-                  className="w-full bg-slate-900 active:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3 rounded-xl transition-all disabled:opacity-40"
+                  className="w-full bg-slate-900 active:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all disabled:opacity-40 shadow-md transform-gpu active:scale-95"
                 >
-                  {isSubmitting ? "Submitting..." : "Submit Review"}
+                  {isSubmitting ? "Dropping Intel..." : "Submit Review"}
                 </button>
               </div>
 
+              {/* Active Filter Indicator */}
+              {ratingFilter !== null && (
+                <div className="flex items-center justify-between bg-slate-100 border border-slate-200 px-4 py-2.5 rounded-xl">
+                  <span className="text-xs text-slate-600 font-bold">
+                    Showing only {ratingFilter}-star reviews ({filteredReviews.length})
+                  </span>
+                  <button onClick={() => setRatingFilter(null)} className="text-slate-400 hover:text-slate-900">
+                    <FiX className="text-base" />
+                  </button>
+                </div>
+              )}
+
               {/* Reviews list */}
-              {product.reviews && product.reviews.length > 0 ? (
+              {filteredReviews.length > 0 ? (
                 <div className="space-y-4">
-                  {product.reviews.map((review: any) => (
-                    <div key={review.id} className="border-b border-slate-100 pb-4">
-                      <div className="flex justify-between items-start mb-1.5">
-                        <div>
-                          <p className="text-sm font-bold text-slate-900">{review.user?.firstName || "Vault Member"}</p>
-                          <div className="flex text-yellow-400 text-xs gap-0.5 mt-0.5">
-                            {[...Array(review.rating || 5)].map((_, i) => <FaStar key={i} />)}
+                  {filteredReviews.map((review: any) => {
+                    const reviewerName = review.user?.firstName || "Vault Member";
+                    const helpfulKey = review.id;
+                    const votes = helpfulVotes[helpfulKey] || { yes: review.id.charCodeAt(0) % 6, voted: null };
+
+                    const handleHelpfulClick = () => {
+                      if (votes.voted === 'yes') return;
+                      setHelpfulVotes({
+                        ...helpfulVotes,
+                        [helpfulKey]: { yes: votes.yes + 1, voted: 'yes' }
+                      });
+                    };
+
+                    return (
+                      <div key={review.id} className="bg-white border border-slate-100 rounded-3xl p-5 shadow-xs pdp-mobile-animate">
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex items-center gap-3">
+                            <AvatarDisplay
+                              imageUrl={review.user?.imageUrl}
+                              name={reviewerName}
+                              selectedAvatar={review.user?.selectedAvatar}
+                              customProfilePic={review.user?.customProfilePic}
+                              size="w-9 h-9"
+                            />
+                            <div>
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <p className="text-xs font-bold text-slate-900">{reviewerName}</p>
+                                <span className="inline-flex items-center gap-0.5 text-[8px] font-black uppercase text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+                                  Verified
+                                </span>
+                              </div>
+                              <div className="flex text-yellow-400 text-[10px] gap-0.5 mt-0.5">
+                                {[...Array(review.rating || 5)].map((_, i) => <FaStar key={i} />)}
+                              </div>
+                            </div>
                           </div>
+                          <span className="text-[10px] text-slate-400 font-medium">{new Date(review.createdAt).toLocaleDateString()}</span>
                         </div>
-                        <span className="text-[10px] text-slate-400">{new Date(review.createdAt).toLocaleDateString()}</span>
+                        <p className="text-xs text-slate-600 leading-relaxed mb-4">{review.comment}</p>
+                        
+                        {/* Helpfulness Bar */}
+                        <div className="flex items-center gap-3 pt-3 border-t border-slate-50 text-[10px] text-slate-400 font-bold">
+                          <span>Helpful?</span>
+                          <button
+                            onClick={handleHelpfulClick}
+                            className={`flex items-center gap-1 px-2.5 py-1 rounded-full border transition-all ${
+                              votes.voted === 'yes'
+                                ? "bg-emerald-50 border-emerald-200 text-emerald-600"
+                                : "bg-slate-50 border-slate-200 text-slate-500 active:scale-95"
+                            }`}
+                          >
+                            <FiThumbsUp className="text-[11px]" />
+                            <span>Yes ({votes.yes})</span>
+                          </button>
+                        </div>
                       </div>
-                      <p className="text-sm text-slate-500 leading-relaxed">{review.comment}</p>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
-                <div className="text-center py-8 border border-dashed border-slate-200 rounded-2xl">
-                  <p className="text-sm text-slate-400 italic">No reviews yet. Be the first to drop intel.</p>
+                <div className="text-center py-10 border border-dashed border-slate-200 rounded-3xl bg-slate-50/50">
+                  <p className="text-xs text-slate-400 italic">No {ratingFilter ? `${ratingFilter}-star ` : ""}reviews found.</p>
+                  {ratingFilter !== null && (
+                    <button
+                      onClick={() => setRatingFilter(null)}
+                      className="mt-3 text-xs text-kora font-bold underline uppercase tracking-wider"
+                    >
+                      Clear Filter
+                    </button>
+                  )}
                 </div>
               )}
             </div>
@@ -1075,79 +1308,154 @@ export default function ProductUI({ product }: { product: any }) {
 
             {activeTab === "reviews" && (
               <div className="animate-fade-in-up space-y-10 font-sans">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                {/* 3-Column Reviews Stats Dashboard */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
                   
-                  {/* Rating Summary breakdown */}
-                  <div className="md:col-span-4 bg-slate-50 border border-slate-200/60 p-6 rounded-3xl flex flex-col items-center text-center shadow-xs">
-                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">AVERAGE SCORE</span>
-                    <span className="text-5xl font-black text-slate-900 font-display mb-2">
+                  {/* Card 1: Average Score */}
+                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl flex flex-col items-center justify-center text-center shadow-xs hover:border-kora/20 transition-all duration-300">
+                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1.5">AVERAGE INTEL</span>
+                    <span className="text-6xl font-black text-slate-900 font-display mb-1.5">
                       {avgRatingDisplay || "0.0"}
                     </span>
-                    <div className="flex text-yellow-400 text-xs gap-0.5 mb-2">
+                    <div className="flex text-yellow-400 text-sm gap-0.5 mb-2">
                       {[1, 2, 3, 4, 5].map((s) => (
-                        <FaStar key={s} className={s <= Math.round(avgRating) ? "text-yellow-400" : "text-slate-200"} />
+                        <FaStar key={s} className={s <= Math.round(avgRating) ? "text-yellow-400 drop-shadow-[0_0_4px_rgba(250,204,21,0.4)]" : "text-slate-200"} />
                       ))}
                     </div>
-                    <span className="text-slate-500 text-xs font-semibold uppercase tracking-wider mb-6">
+                    <span className="text-slate-500 text-[11px] font-bold uppercase tracking-wider">
                       Based on {product.reviews?.length || 0} reviews
                     </span>
-                    
-                    <div className="w-full space-y-2">
-                      {[5, 4, 3, 2, 1].map((rating) => (
-                        <div key={rating} className="flex items-center gap-2 text-xs text-slate-500 w-full">
-                          <span className="w-3 shrink-0">{rating}</span>
-                          <div className="flex-1 bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                            <div 
-                              className="bg-yellow-400 h-full rounded-full" 
-                              style={{ 
-                                width: `${product.reviews?.length ? (product.reviews.filter((r: any) => r.rating === rating).length / product.reviews.length) * 100 : 0}%` 
-                              }}
-                            ></div>
-                          </div>
-                          <span className="w-6 text-right shrink-0">{product.reviews?.filter((r: any) => r.rating === rating).length || 0}</span>
-                        </div>
-                      ))}
+                  </div>
+
+                  {/* Card 2: Interactive Star Breakdown */}
+                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs hover:border-kora/20 transition-all duration-300 flex flex-col justify-center">
+                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-3.5 block text-center">RATING BREAKDOWN</span>
+                    <div className="space-y-2.5">
+                      {[5, 4, 3, 2, 1].map((rating) => {
+                        const count = product.reviews ? product.reviews.filter((r: any) => r.rating === rating).length : 0;
+                        const percent = product.reviews?.length ? (count / product.reviews.length) * 100 : 0;
+                        const isActiveFilter = ratingFilter === rating;
+
+                        return (
+                          <button
+                            key={rating}
+                            onClick={() => setRatingFilter(isActiveFilter ? null : rating)}
+                            className={`flex items-center gap-3 text-xs text-slate-500 w-full hover:bg-slate-100/80 p-1.5 rounded-lg transition-all ${
+                              isActiveFilter ? "bg-kora/5 text-kora font-black animate-pulse" : ""
+                            }`}
+                          >
+                            <span className="w-3 shrink-0 text-left font-bold">{rating}</span>
+                            <FaStar className={`text-[10px] ${isActiveFilter ? "text-kora" : "text-yellow-400"}`} />
+                            <div className="flex-1 bg-slate-200 h-2 rounded-full overflow-hidden relative">
+                              <div 
+                                className={`h-full rounded-full transition-all duration-500 ${
+                                  isActiveFilter ? "bg-kora" : "bg-yellow-400"
+                                }`} 
+                                style={{ width: `${percent}%` }}
+                              ></div>
+                            </div>
+                            <span className="w-6 text-right shrink-0 font-medium">({count})</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  {/* Submit review form */}
-                  <div className="md:col-span-8 bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-base font-black uppercase text-slate-900 tracking-wide">Drop a Review</h3>
-                      <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Tap stars to rate</span>
+                  {/* Card 3: Recommendation Percentage */}
+                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl flex flex-col items-center justify-center text-center shadow-xs hover:border-kora/20 transition-all duration-300">
+                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-2">SATISFACTION RATE</span>
+                    <div className="relative w-24 h-24 flex items-center justify-center">
+                      {/* Circular Progress (Vector SVG) */}
+                      <svg className="w-full h-full transform -rotate-90">
+                        <circle cx="48" cy="48" r="40" stroke="#e2e8f0" strokeWidth="6" fill="transparent" />
+                        <circle cx="48" cy="48" r="40" stroke="#10b981" strokeWidth="6" fill="transparent"
+                          strokeDasharray={251.2}
+                          strokeDashoffset={251.2 - (251.2 * recommendPercent) / 100}
+                          className="transition-all duration-1000 ease-out"
+                        />
+                      </svg>
+                      <span className="absolute text-xl font-black text-slate-900 font-display">{recommendPercent}%</span>
                     </div>
-                    <div className="mb-4"><StarPicker size="text-xl" /></div>
-                    <textarea
-                      value={reviewText}
-                      onChange={(e) => setReviewText(e.target.value)}
-                      placeholder="How was the fit and quality? Add your experience to the vault."
-                      className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none shadow-sm text-sm"
-                    />
+                    <span className="text-slate-500 text-[11px] font-bold uppercase tracking-wider mt-3">
+                      of members recommend this gear
+                    </span>
+                  </div>
+
+                </div>
+
+                {/* Drop a Review Box */}
+                <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-kora/5 rounded-full blur-3xl pointer-events-none"></div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="text-base font-black uppercase text-slate-900 tracking-wide">Drop a Review</h3>
+                      <p className="text-slate-400 text-xs mt-0.5">Share your kit experience with the vault community.</p>
+                    </div>
+                    <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Tap stars to rate</span>
+                  </div>
+                  <div className="mb-4"><StarPicker size="text-xl" /></div>
+                  <textarea
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                    placeholder="How was the fit and quality? Add your experience to the vault."
+                    className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none shadow-sm text-sm"
+                  />
+                  <button
+                    onClick={handleSubmitReview}
+                    disabled={isSubmitting || !reviewText.trim()}
+                    className="bg-slate-900 hover:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3.5 px-8 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-kora/25 active:scale-95 transform-gpu"
+                  >
+                    {isSubmitting ? "Dropping Intel..." : "Submit Review"}
+                  </button>
+                </div>
+
+                {/* Active Filter Indicator */}
+                {ratingFilter !== null && (
+                  <div className="flex items-center justify-between bg-slate-50 border border-kora/20 px-5 py-3 rounded-2xl">
+                    <div className="flex items-center gap-2.5">
+                      <FiFilter className="text-kora text-base" />
+                      <span className="text-sm text-slate-700 font-bold">
+                        Showing only {ratingFilter}-star reviews ({filteredReviews.length} found)
+                      </span>
+                    </div>
                     <button
-                      onClick={handleSubmitReview}
-                      disabled={isSubmitting || !reviewText.trim()}
-                      className="bg-slate-900 hover:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3.5 px-8 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-kora/25 active:scale-95 transform-gpu"
+                      onClick={() => setRatingFilter(null)}
+                      className="text-slate-400 hover:text-slate-900 text-xs font-bold uppercase tracking-wider flex items-center gap-1"
                     >
-                      {isSubmitting ? "Dropping Intel..." : "Submit Review"}
+                      Clear Filter <FiX className="text-base" />
                     </button>
                   </div>
-                </div>
+                )}
 
                 {/* Reviews List */}
                 <div className="space-y-6 pt-6">
-                  {product.reviews && product.reviews.length > 0 ? (
-                    product.reviews.map((review: any) => {
+                  {filteredReviews.length > 0 ? (
+                    filteredReviews.map((review: any) => {
                       const reviewerName = review.user?.firstName || "Vault Member";
-                      const reviewerInitials = reviewerName.split(" ").map((n: string) => n[0]).join("").toUpperCase().substring(0, 2);
+                      const helpfulKey = review.id;
+                      const votes = helpfulVotes[helpfulKey] || { yes: review.id.charCodeAt(0) % 6, voted: null };
+
+                      const handleHelpfulClick = () => {
+                        if (votes.voted === 'yes') return;
+                        setHelpfulVotes({
+                          ...helpfulVotes,
+                          [helpfulKey]: { yes: votes.yes + 1, voted: 'yes' }
+                        });
+                      };
+
                       return (
-                        <div key={review.id} className="border-b border-slate-100 pb-6">
-                          <div className="flex justify-between items-start mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-kora/10 text-kora flex items-center justify-center font-bold text-xs border border-kora/15">
-                                {reviewerInitials}
-                              </div>
+                        <div key={review.id} className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xs hover:shadow-md transition-all duration-300 hover:border-slate-200/80 animate-fade-in-up">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center gap-3.5">
+                              <AvatarDisplay
+                                imageUrl={review.user?.imageUrl}
+                                name={reviewerName}
+                                selectedAvatar={review.user?.selectedAvatar}
+                                customProfilePic={review.user?.customProfilePic}
+                                size="w-11 h-11"
+                              />
                               <div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-2.5">
                                   <p className="text-slate-900 font-bold font-sans text-sm">{reviewerName}</p>
                                   <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
                                     Verified Purchaser
@@ -1162,13 +1470,37 @@ export default function ProductUI({ product }: { product: any }) {
                               {new Date(review.createdAt).toLocaleDateString()}
                             </span>
                           </div>
-                          <p className="text-slate-600 text-sm leading-relaxed pl-13">{review.comment}</p>
+                          <p className="text-slate-600 text-sm leading-relaxed pl-14 mb-4">{review.comment}</p>
+                          
+                          {/* Helpfulness Bar */}
+                          <div className="flex items-center gap-3 pl-14 pt-3 border-t border-slate-50 text-xs text-slate-400 font-bold">
+                            <span>Was this review helpful?</span>
+                            <button
+                              onClick={handleHelpfulClick}
+                              className={`flex items-center gap-1.5 px-3 py-1 rounded-full border transition-all ${
+                                votes.voted === 'yes'
+                                  ? "bg-emerald-50 border-emerald-200 text-emerald-600"
+                                  : "bg-slate-50 border-slate-200 text-slate-500 hover:text-slate-700 active:scale-95"
+                              }`}
+                            >
+                              <FiThumbsUp className="text-xs" />
+                              <span>Yes ({votes.yes})</span>
+                            </button>
+                          </div>
                         </div>
                       );
                     })
                   ) : (
-                    <div className="text-center py-12 border border-dashed border-slate-200 bg-slate-50/50 rounded-3xl">
-                      <p className="text-slate-400 italic text-sm">No reviews yet. Be the first to drop the intel.</p>
+                    <div className="text-center py-16 border border-dashed border-slate-200 bg-slate-50/50 rounded-3xl">
+                      <p className="text-slate-400 italic text-sm">No {ratingFilter ? `${ratingFilter}-star ` : ""}reviews found.</p>
+                      {ratingFilter !== null && (
+                        <button
+                          onClick={() => setRatingFilter(null)}
+                          className="mt-4 text-xs bg-slate-900 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-kora transition-colors uppercase tracking-wider"
+                        >
+                          Clear Filter
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>

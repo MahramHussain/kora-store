@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
@@ -17,6 +17,26 @@ export async function POST(req: Request) {
     if (!productId || !comment) {
       return new NextResponse("Missing data", { status: 400 });
     }
+
+    // Ensure the User exists in the database
+    const clerkUser = await currentUser();
+    const email = clerkUser?.emailAddresses[0]?.emailAddress || "";
+    
+    await prisma.user.upsert({
+      where: { id: userId },
+      update: {
+        firstName: clerkUser?.firstName || "",
+        lastName: clerkUser?.lastName || "",
+        imageUrl: clerkUser?.imageUrl || "",
+      },
+      create: {
+        id: userId,
+        email: email,
+        firstName: clerkUser?.firstName || "",
+        lastName: clerkUser?.lastName || "",
+        imageUrl: clerkUser?.imageUrl || "",
+      },
+    });
 
     // 3. Tell Prisma to save it permanently to the Vault!
     const review = await prisma.review.create({
