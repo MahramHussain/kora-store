@@ -634,6 +634,7 @@ export default function Navbar() {
               </div>
             </div>
 
+            <Link href="/shop?category=Shoes" className="hover:text-[#6B00FF] transition-colors">Shoes</Link>
             <Link href="/shop?category=Accessories" className="hover:text-[#6B00FF] transition-colors">Accessories</Link>
             <Link href="/shop?category=Retro Kits" className="hover:text-[#6B00FF] transition-colors">Retro</Link>
           </div>
@@ -812,6 +813,15 @@ export default function Navbar() {
               </div>
             )}
           </div>
+
+          {/* Shoes */}
+          <Link 
+            href="/shop?category=Shoes" 
+            onClick={() => setIsMobileMenuOpen(false)} 
+            className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
+          >
+            Shoes
+          </Link>
 
           {/* Accessories */}
           <Link 

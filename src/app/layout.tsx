@@ -30,9 +30,10 @@ export const metadata: Metadata = {
     siteName: "Kora Store",
     images: [
       {
-        url: "/opengraph-image.png",
+        url: "/opengraph-image.jpg",
         width: 1200,
         height: 630,
+        type: "image/jpeg",
         alt: "Kora Store - Elite Football Gear"
       }
     ],
@@ -43,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Kora Store | Elite Football Gear",
     description: "Secure your premium 1:1 grade football jerseys. Vintage collections, latest club releases, and player editions with custom print names and numbers.",
-    images: ["/opengraph-image.png"],
+    images: ["/opengraph-image.jpg"],
   },
   icons: {
     icon: [
