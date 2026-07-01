@@ -178,7 +178,7 @@ export default function AccountUI({ user, orders, banned = false }: { user: any;
           {/* Trust pillars */}
           <div className="space-y-4">
             {[
-              { icon: <FaTruckFast className="text-purple-400" />, label: "1–3 Day UAE Delivery", sub: "Local stock, zero delays" },
+              { icon: <FaTruckFast className="text-purple-400" />, label: "UAE Delivery within 48 Hours", sub: "Local stock, zero delays" },
               { icon: <FaShieldAlt className="text-purple-400" />, label: "7-Day Satisfaction Guarantee", sub: "Quality checked before dispatch" },
               { icon: <FaCheckCircle className="text-purple-400" />, label: "100% Premium Quality", sub: "1:1 grade sourced direct" },
             ].map((item) => (

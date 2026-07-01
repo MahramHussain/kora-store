@@ -161,7 +161,7 @@ export async function POST(req: Request) {
           paymentMethod: paymentMethod,
           promoCode: promoCode || null,
           discountAmount: new Prisma.Decimal(discountAmount || 0),
-          shippingFee: new Prisma.Decimal(shippingFee || 10),
+          shippingFee: new Prisma.Decimal(shippingFee || 25),
           tax: new Prisma.Decimal(tax || 0),
           referenceNumber: referenceNumber,
           items: {

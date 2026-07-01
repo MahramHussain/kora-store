@@ -65,9 +65,9 @@ export default function ShippingReturnsPage() {
                   <FaTruckFast />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">UAE Standard Delivery</h3>
+                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">UAE Priority Delivery</h3>
                   <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-sans">
-                    Because we stock our inventory locally in the UAE, we bypass the month-long waits of overseas dropshipping. Once your order is verified, it is processed and handed off to our local couriers. You can expect your gear at your door within <strong className="text-slate-900">1 to 3 business days</strong>.
+                    Because we stock our inventory locally in the UAE, we bypass the month-long waits of overseas dropshipping. Once your order is verified, it is processed and handed off to our local couriers. You can expect your gear at your door within <strong className="text-slate-900">48 hours</strong>.
                   </p>
                 </div>
               </div>

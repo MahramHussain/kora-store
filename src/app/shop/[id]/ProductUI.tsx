@@ -107,15 +107,33 @@ function AvatarDisplay({
 
 const VerifiedTick = () => (
   <svg
-    className="w-4.5 h-4.5 text-[#6B00FF] fill-current inline-block shrink-0 align-middle ml-1 select-none"
-    viewBox="0 0 24 24"
+    className="w-4.5 h-4.5 text-[#6b00ff] fill-current inline-block shrink-0 align-middle ml-1 select-none"
+    viewBox="0 0 22 22"
     aria-label="Verified Account"
   >
-    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+    <path d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z" />
   </svg>
 );
 
 // Sizing or customization helper constants
+
+const PRESET_PLAYERS: Record<string, Array<{ name: string; number: string }>> = {
+  "ARGENTINA AWAY": [{ name: "MESSI", number: "10" }],
+  "BRAZIL AWAY": [{ name: "NEYMAR", number: "10" }, { name: "VINI", number: "7" }, { name: "RAPHINHA", number: "11" }],
+  "FRANCE AWAY": [{ name: "MBAPPE", number: "10" }, { name: "OLISE", number: "11" }, { name: "DEMBELE", number: "7" }],
+  "PORTUGAL AWAY": [{ name: "RONALDO", number: "7" }],
+  "SPAIN AWAY": [{ name: "LAMINE YAMAL", number: "19" }, { name: "PEDRI", number: "20" }],
+  "ARGENTINA HOME": [{ name: "MESSI", number: "10" }],
+  "BRAZIL HOME": [{ name: "NEYMAR", number: "10" }],
+  "FRANCE HOME": [{ name: "MBAPPE", number: "10" }, { name: "DEMBELE", number: "7" }],
+  "PORTUGAL HOME": [{ name: "RONALDO", number: "7" }],
+  "SPAIN HOME": [{ name: "LAMINE YAMAL", number: "19" }, { name: "PEDRI", number: "20" }],
+};
+
+const getPresetPlayersForProduct = (productName: string) => {
+  const normalized = productName.toUpperCase().replace(/\s+KIT$/i, "").trim();
+  return PRESET_PLAYERS[normalized] || [];
+};
 
 export default function ProductUI({ product }: { product: any }) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -147,6 +165,20 @@ export default function ProductUI({ product }: { product: any }) {
   // Personalization states
   const [personalizationTab, setPersonalizationTab] = useState<"none" | "custom" | "player">("none");
   const [hasFifaPatch, setHasFifaPatch] = useState(false);
+  const [selectedPresetPlayer, setSelectedPresetPlayer] = useState<{ name: string; number: string } | null>(null);
+  const presetPlayers = getPresetPlayersForProduct(product.name);
+
+  const handleSelectPresetPlayer = (player: { name: string; number: string }) => {
+    if (selectedPresetPlayer?.name === player.name) {
+      setSelectedPresetPlayer(null);
+      setCustomName("");
+      setCustomNumber("");
+    } else {
+      setSelectedPresetPlayer(player);
+      setCustomName(player.name);
+      setCustomNumber(player.number);
+    }
+  };
 
   // Zoom states for desktop main image
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
@@ -181,7 +213,12 @@ export default function ProductUI({ product }: { product: any }) {
         <div className="flex gap-3 mt-6">
           <button
             type="button"
-            onClick={() => setPersonalizationTab(personalizationTab === "custom" ? "none" : "custom")}
+            onClick={() => {
+              setPersonalizationTab(personalizationTab === "custom" ? "none" : "custom");
+              setSelectedPresetPlayer(null);
+              setCustomName("");
+              setCustomNumber("");
+            }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
               personalizationTab === "custom"
                 ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
@@ -189,12 +226,17 @@ export default function ProductUI({ product }: { product: any }) {
             }`}
           >
             <FiEdit className="text-sm shrink-0" />
-            <span>Add Name & Number (+25 DHS)</span>
+            <span>Add Name & Number</span>
           </button>
 
           <button
             type="button"
-            onClick={() => setPersonalizationTab(personalizationTab === "player" ? "none" : "player")}
+            onClick={() => {
+              setPersonalizationTab(personalizationTab === "player" ? "none" : "player");
+              setSelectedPresetPlayer(null);
+              setCustomName("");
+              setCustomNumber("");
+            }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
               personalizationTab === "player"
                 ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
@@ -202,7 +244,7 @@ export default function ProductUI({ product }: { product: any }) {
             }`}
           >
             <FiAward className="text-sm shrink-0" />
-            <span>Sleeve Patches</span>
+            <span>Add Player/Patches</span>
           </button>
         </div>
 
@@ -242,6 +284,32 @@ export default function ProductUI({ product }: { product: any }) {
 
         {personalizationTab === "player" && (
           <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
+            {presetPlayers.length > 0 && (
+              <div className="pb-3 border-b border-slate-200/60">
+                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-3 tracking-widest">Select Player Print (+15 DHS)</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {presetPlayers.map((player: { name: string; number: string }) => {
+                    const isSelected = selectedPresetPlayer?.name === player.name;
+                    return (
+                      <button
+                        key={player.name}
+                        type="button"
+                        onClick={() => handleSelectPresetPlayer(player)}
+                        className={`py-2.5 px-3.5 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-98 flex items-center justify-between ${
+                          isSelected
+                            ? "bg-kora border-kora text-white shadow-sm shadow-kora/25"
+                            : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:text-slate-900"
+                        }`}
+                      >
+                        <span className="truncate">{player.name}</span>
+                        <span className={`text-[10px] ml-1.5 shrink-0 ${isSelected ? "text-purple-200" : "text-slate-400"}`}>#{player.number}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            
             <div className="pt-2">
               <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Sleeve Badge (Optional)</label>
               <button
@@ -292,7 +360,12 @@ export default function ProductUI({ product }: { product: any }) {
         <div className="flex gap-3 mt-5">
           <button
             type="button"
-            onClick={() => setPersonalizationTab(personalizationTab === "custom" ? "none" : "custom")}
+            onClick={() => {
+              setPersonalizationTab(personalizationTab === "custom" ? "none" : "custom");
+              setSelectedPresetPlayer(null);
+              setCustomName("");
+              setCustomNumber("");
+            }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
               personalizationTab === "custom"
                 ? "bg-[#6B00FF] border-[#6B00FF] text-white shadow-md shadow-[#6B00FF]/25"
@@ -300,12 +373,17 @@ export default function ProductUI({ product }: { product: any }) {
             }`}
           >
             <FiEdit className="text-sm shrink-0" />
-            <span>Add your own (+25 DHS)</span>
+            <span>Add your own</span>
           </button>
 
           <button
             type="button"
-            onClick={() => setPersonalizationTab(personalizationTab === "player" ? "none" : "player")}
+            onClick={() => {
+              setPersonalizationTab(personalizationTab === "player" ? "none" : "player");
+              setSelectedPresetPlayer(null);
+              setCustomName("");
+              setCustomNumber("");
+            }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
               personalizationTab === "player"
                 ? "bg-[#6B00FF] border-[#6B00FF] text-white shadow-md shadow-[#6B00FF]/25"
@@ -313,7 +391,7 @@ export default function ProductUI({ product }: { product: any }) {
             }`}
           >
             <FiAward className="text-sm shrink-0" />
-            <span>Patches</span>
+            <span>Player/Patches</span>
           </button>
         </div>
 
@@ -353,6 +431,32 @@ export default function ProductUI({ product }: { product: any }) {
 
         {personalizationTab === "player" && (
           <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
+            {presetPlayers.length > 0 && (
+              <div className="pb-3 border-b border-slate-200/60">
+                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2.5 tracking-widest">Select Player Print (+15 DHS)</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {presetPlayers.map((player: { name: string; number: string }) => {
+                    const isSelected = selectedPresetPlayer?.name === player.name;
+                    return (
+                      <button
+                        key={player.name}
+                        type="button"
+                        onClick={() => handleSelectPresetPlayer(player)}
+                        className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-between ${
+                          isSelected
+                            ? "bg-[#6B00FF] border-[#6B00FF] text-white shadow-sm shadow-[#6B00FF]/20"
+                            : "bg-white border-slate-200 text-slate-700 hover:border-slate-300"
+                        }`}
+                      >
+                        <span className="truncate">{player.name}</span>
+                        <span className={`text-[10px] ml-1 shrink-0 ${isSelected ? "text-purple-200" : "text-slate-400"}`}>#{player.number}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            
             {/* Sleeve Patch Toggle inside Player Panel */}
             <div className="pt-2">
               <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Sleeve Badge (Optional)</label>
@@ -392,6 +496,10 @@ export default function ProductUI({ product }: { product: any }) {
   const recommendPercent = product.reviews && product.reviews.length > 0
     ? Math.round((positiveReviewsCount / product.reviews.length) * 100)
     : 100;
+
+  const isPreset = selectedPresetPlayer !== null;
+  const hasCustomPrint = customName.trim() !== "" || customNumber.trim() !== "";
+  const printUpcharge = hasCustomPrint ? (isPreset ? 15 : 25) : 0;
 
   // Filter reviews based on current rating selection
   const filteredReviews = product.reviews
@@ -458,7 +566,9 @@ export default function ProductUI({ product }: { product: any }) {
 
     const basePrice = parseFloat(product.price);
     const hasCustomPrint = finalName !== "" || finalNumber !== "";
-    const finalPrice = basePrice + (hasFifaPatch ? 10 : 0) + (hasCustomPrint ? 25 : 0);
+    const isPreset = selectedPresetPlayer !== null;
+    const printUpcharge = hasCustomPrint ? (isPreset ? 15 : 25) : 0;
+    const finalPrice = basePrice + (hasFifaPatch ? 10 : 0) + printUpcharge;
 
     addToCart({
       id: product.id,
@@ -474,6 +584,7 @@ export default function ProductUI({ product }: { product: any }) {
     setIsAdded(true);
     setCustomName("");
     setCustomNumber("");
+    setSelectedPresetPlayer(null);
     setHasFifaPatch(false);
     setPersonalizationTab("none");
     setTimeout(() => setIsAdded(false), 2000);
@@ -700,7 +811,7 @@ export default function ProductUI({ product }: { product: any }) {
         {/* Price + Stock */}
         <div className="flex items-center justify-between mb-5 pb-5 border-b border-slate-100">
           <span className="text-3xl font-black text-slate-900">
-            {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + ((customName || customNumber) ? 25 : 0)}
+            {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + printUpcharge}
           </span>
           {product.stock === 0 ? (
             <span className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-full">
@@ -807,7 +918,7 @@ export default function ProductUI({ product }: { product: any }) {
         <div className="grid grid-cols-2 gap-2 mb-6">
           <div className="pdp-trust-badge">
             <FaTruckFast className="text-kora text-base shrink-0" />
-            <span>1–3 Day UAE Delivery</span>
+            <span>UAE Delivery within 48 Hours</span>
           </div>
           <div className="pdp-trust-badge">
             <FaShieldAlt className="text-kora text-base shrink-0" />
@@ -940,11 +1051,11 @@ export default function ProductUI({ product }: { product: any }) {
               {filteredReviews.length > 0 ? (
                 <div className="space-y-4">
                   {filteredReviews.map((review: any) => {
-                    const reviewerName = review.user?.firstName || "Vault Member";
+                    const isReviewerAdmin = review.user?.email === "mahramh40@gmail.com" || review.user?.email === "korastore.ae@gmail.com";
+                    const reviewerName = isReviewerAdmin ? "Kora Store" : (review.user?.firstName || "Vault Member");
                     const helpfulKey = review.id;
                     const votes = helpfulVotes[helpfulKey] || { yes: review.id.charCodeAt(0) % 6, voted: null };
 
-                    const isReviewerAdmin = review.user?.email === "mahramh40@gmail.com" || review.user?.email === "korastore.ae@gmail.com";
                     const isEditing = editingReviewId === review.id;
 
                     const handleHelpfulClick = () => {
@@ -1350,7 +1461,7 @@ export default function ProductUI({ product }: { product: any }) {
               <div className="flex flex-col">
                 <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5">Price</span>
                 <span className="text-3xl font-extrabold text-slate-900 font-display">
-                  {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + ((customName || customNumber) ? 25 : 0)}
+                  {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + printUpcharge}
                 </span>
               </div>
               <div>
@@ -1502,8 +1613,8 @@ export default function ProductUI({ product }: { product: any }) {
                   <FaTruckFast className="text-lg text-kora" />
                 </div>
                 <div>
-                  <span className="block text-xs font-extrabold text-slate-800 uppercase tracking-wide">1–3 Day UAE Delivery</span>
-                  <span className="block text-[10px] text-slate-400 font-medium">Free express delivery</span>
+                  <span className="block text-xs font-extrabold text-slate-800 uppercase tracking-wide">UAE Delivery within 48 Hours</span>
+                  <span className="block text-[10px] text-slate-400 font-medium">Priority local shipping</span>
                 </div>
               </div>
               <div className="flex items-center gap-3.5 p-3.5 bg-slate-50 border border-slate-200/50 rounded-2xl">
@@ -1702,11 +1813,11 @@ export default function ProductUI({ product }: { product: any }) {
                 <div className="space-y-6 pt-6">
                   {filteredReviews.length > 0 ? (
                     filteredReviews.map((review: any) => {
-                      const reviewerName = review.user?.firstName || "Vault Member";
+                      const isReviewerAdmin = review.user?.email === "mahramh40@gmail.com" || review.user?.email === "korastore.ae@gmail.com";
+                      const reviewerName = isReviewerAdmin ? "Kora Store" : (review.user?.firstName || "Vault Member");
                       const helpfulKey = review.id;
                       const votes = helpfulVotes[helpfulKey] || { yes: review.id.charCodeAt(0) % 6, voted: null };
 
-                      const isReviewerAdmin = review.user?.email === "mahramh40@gmail.com" || review.user?.email === "korastore.ae@gmail.com";
                       const isEditing = editingReviewId === review.id;
 
                       const handleHelpfulClick = () => {

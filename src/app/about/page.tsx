@@ -216,8 +216,8 @@ export default function AboutPage() {
               <div className="text-xs text-purple-200 font-bold uppercase tracking-wider">Happy customers</div>
             </div>
             <div className="bg-white/15 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-4 text-center">
-              <div className="text-3xl font-black text-white mb-0.5">1–3</div>
-              <div className="text-xs text-purple-200 font-bold uppercase tracking-wider">Day UAE delivery</div>
+              <div className="text-3xl font-black text-white mb-0.5">48H</div>
+              <div className="text-xs text-purple-200 font-bold uppercase tracking-wider">UAE delivery</div>
             </div>
             <div className="bg-white/15 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-4 text-center">
               <div className="text-3xl font-black text-white mb-0.5">100%</div>

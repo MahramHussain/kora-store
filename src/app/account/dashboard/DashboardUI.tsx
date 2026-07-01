@@ -1002,7 +1002,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                   <div className="space-y-2.5 text-xs">
                                     <div className="flex justify-between text-slate-500 font-semibold">
                                       <span>Items Subtotal</span>
-                                      <span className="font-bold">{CURRENCY}{(parseFloat(order.total) - parseFloat(order.shippingFee || "10") + parseFloat(order.discountAmount || "0")).toFixed(2)}</span>
+                                      <span className="font-bold">{CURRENCY}{(parseFloat(order.total) - parseFloat(order.shippingFee || "25") + parseFloat(order.discountAmount || "0")).toFixed(2)}</span>
                                     </div>
                                     
                                     {order.promoCode && (
@@ -1014,7 +1014,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
 
                                     <div className="flex justify-between text-slate-500 font-semibold">
                                       <span>Delivery Charges</span>
-                                      <span className="font-bold">{CURRENCY}{parseFloat(order.shippingFee || "10").toFixed(2)}</span>
+                                      <span className="font-bold">{CURRENCY}{parseFloat(order.shippingFee || "25").toFixed(2)}</span>
                                     </div>
 
                                     {parseFloat(order.tax || "0") > 0 && (
