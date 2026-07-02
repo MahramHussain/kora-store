@@ -8,7 +8,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        kora: '#6B00FF',
+        kora: '#5E0683',
       },
     },
   },

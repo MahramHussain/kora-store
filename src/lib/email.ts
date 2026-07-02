@@ -37,7 +37,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
           <strong>${item.name}</strong><br/>
           <span style="color: #64748b; font-size: 12px;">Size: ${item.size}</span>${
             item.customName || item.customNumber
-              ? `<br/><span style="color: #6b00ff; font-weight: bold; font-size: 12px;">Print: ${item.customName || "—"} ${item.customNumber ? `#${item.customNumber}` : ""}</span>`
+              ? `<br/><span style="color: #5E0683; font-weight: bold; font-size: 12px;">Print: ${item.customName || "—"} ${item.customNumber ? `#${item.customNumber}` : ""}</span>`
               : ""
           }
         </td>
@@ -59,7 +59,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
         
         <!-- Header -->
-        <div style="background-color: #6b00ff; padding: 32px; text-align: center; color: #ffffff;">
+        <div style="background-color: #5E0683; padding: 32px; text-align: center; color: #ffffff;">
           <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.04em; text-transform: uppercase;">
             ${isAdmin ? "NEW ORDER ALERT" : "GEAR SECURED."}
           </h1>
@@ -115,7 +115,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
               </tr>
               <tr style="font-size: 18px; border-top: 1px solid #e2e8f0;">
                 <td style="padding: 12px 0 0 0; font-weight: 800; color: #0f172a; text-transform: uppercase; font-size: 13px; letter-spacing: 0.05em;">Total</td>
-                <td style="padding: 12px 0 0 0; text-align: right; font-weight: 900; color: #6b00ff;">${params.total}</td>
+                <td style="padding: 12px 0 0 0; text-align: right; font-weight: 900; color: #5E0683;">${params.total}</td>
               </tr>
             </table>
           </div>

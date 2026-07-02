@@ -76,7 +76,7 @@ export default async function Home() {
       {/* 4. PROMO BANNER — Scannable on mobile */}
       <div className="bg-neutral-100 border-b border-neutral-200 py-3 md:py-2.5 text-center text-xs md:text-sm font-bold text-neutral-800 px-4">
         <span className="block md:inline">🏆 <span className="text-neutral-900 font-black">STORE PROMO ACTIVE</span></span>
-        <span className="block md:inline md:ml-1 mt-0.5 md:mt-0">Use code <span className="font-bold text-[#6B00FF]">KORA10</span> for 10% off your entire order</span>
+        <span className="block md:inline md:ml-1 mt-0.5 md:mt-0">Use code <span className="font-bold text-kora">KORA10</span> for 10% off your entire order</span>
       </div>
 
       {/* 6. WORLD CUP HERO BANNER */}
@@ -118,7 +118,7 @@ export default async function Home() {
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-[#6B00FF] transition-colors">
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors">
               Croatia
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
@@ -135,7 +135,7 @@ export default async function Home() {
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-[#6B00FF] transition-colors">
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors">
               Germany
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
@@ -152,7 +152,7 @@ export default async function Home() {
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-[#6B00FF] transition-colors">
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors">
               Portugal
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
@@ -169,7 +169,7 @@ export default async function Home() {
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-[#6B00FF] transition-colors">
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors">
               Argentina
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">

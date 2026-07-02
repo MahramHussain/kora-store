@@ -88,7 +88,7 @@ function NavbarAvatar({
   }
 
   return (
-    <div className={`${size} rounded-full bg-[#6B00FF] text-white flex items-center justify-center text-[10px] md:text-xs font-black uppercase shadow-xs`}>
+    <div className={`${size} rounded-full bg-kora text-white flex items-center justify-center text-[10px] md:text-xs font-black uppercase shadow-xs`}>
       {name.charAt(0)}
     </div>
   );
@@ -337,7 +337,7 @@ export default function Navbar() {
   return (
     <>
       {/* 1. FLOWING TICKER BANNER (Desktop & Mobile) */}
-      <div className="relative w-full overflow-hidden bg-neutral-100 text-neutral-800 border-b border-neutral-200 py-2.5 text-xs md:text-[13px] font-bold select-none z-50">
+      <div className="relative w-full overflow-hidden bg-black text-white border-b border-neutral-900 py-2.5 text-xs md:text-[13px] font-bold select-none z-50">
         <div className="flex w-max animate-marquee whitespace-nowrap">
           <span className="mx-4">
             USE CODE KORA10 FOR 10% OFF ON ORDER TOTAL &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
@@ -354,8 +354,8 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* 2. MAIN HEADER (White Theme) */}
-      <header className="relative w-full bg-white text-neutral-900 border-b border-neutral-200 sticky top-0 z-40 shadow-sm">
+      {/* 2. MAIN HEADER (Theme Purple) */}
+      <header className="relative w-full bg-kora text-white border-b border-purple-900/40 sticky top-0 z-40 shadow-md">
         
         {/* ROW 1: Main Bar (Logo, Search, Profile, Basket) */}
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-4 relative">
@@ -363,7 +363,7 @@ export default function Navbar() {
           {/* Logo & Mobile Menu Hamburger */}
           <div className="flex items-center gap-2.5 md:gap-4 shrink-0 z-10">
             <button 
-              className="md:hidden text-neutral-900 text-2xl hover:text-[#6B00FF] transition-colors"
+              className="md:hidden text-white text-2xl hover:text-purple-200 transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <FaXmark /> : <FaBars />}
@@ -371,7 +371,7 @@ export default function Navbar() {
 
             {/* Mobile Search Toggle Icon */}
             <button 
-              className="md:hidden text-neutral-900 text-2xl hover:text-[#6B00FF] transition-colors p-1"
+              className="md:hidden text-white text-2xl hover:text-purple-200 transition-colors p-1"
               onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
               title="Search"
             >
@@ -379,8 +379,8 @@ export default function Navbar() {
             </button>
 
             {/* Brand Logo (Desktop only - hidden on mobile) */}
-            <Link href="/" className="hidden md:block text-2xl md:text-3xl font-black tracking-tighter uppercase hover:scale-105 transition-transform">
-              <span className="text-slate-900">KORA</span><span className="text-kora drop-shadow-[0_0_10px_rgba(107,0,255,0.4)]">STORE</span>
+            <Link href="/" className="hidden md:block hover:scale-105 transition-transform">
+              <img src="/assets/logo.png" alt="Korastore" className="h-7 md:h-8 w-auto object-contain" />
             </Link>
           </div>
 
@@ -388,9 +388,9 @@ export default function Navbar() {
           <Link 
             href="/" 
             onClick={() => { setIsMobileMenuOpen(false); setIsMobileSearchOpen(false); }}
-            className="md:hidden absolute left-1/2 -translate-x-1/2 text-2xl font-black tracking-tighter uppercase hover:scale-105 transition-transform z-10"
+            className="md:hidden absolute left-1/2 -translate-x-1/2 hover:scale-105 transition-transform z-10"
           >
-            <span className="text-slate-900">KORA</span><span className="text-kora drop-shadow-[0_0_10px_rgba(107,0,255,0.4)]">STORE</span>
+            <img src="/assets/logo.png" alt="Korastore" className="h-7 w-auto object-contain" />
           </Link>
           
           {/* Centralized Search Bar */}
@@ -404,9 +404,9 @@ export default function Navbar() {
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setTimeout(() => setIsFocused(false), 200)}
                   placeholder="Search entire store here..." 
-                  className="w-full bg-neutral-50 border border-neutral-200 rounded-none py-2.5 px-4 pr-10 text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] transition-all font-sans"
+                  className="w-full bg-white border border-neutral-200 rounded-none py-2.5 px-4 pr-10 text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all font-sans"
                 />
-                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-[#6B00FF] transition-colors z-20">
+                <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-kora transition-colors z-20">
                   <FiSearch className="text-lg" />
                 </button>
               </form>
@@ -417,7 +417,7 @@ export default function Navbar() {
                     <div 
                       key={idx}
                       onClick={(e) => handleSearch(e as any, suggestion)}
-                      className="px-4 py-2 hover:bg-neutral-50 cursor-pointer text-neutral-700 hover:text-[#6B00FF] transition-colors flex items-center gap-2 font-sans text-xs"
+                      className="px-4 py-2 hover:bg-neutral-50 cursor-pointer text-neutral-700 hover:text-[#5E0683] transition-colors flex items-center gap-2 font-sans text-xs"
                     >
                       <FiSearch className="text-[10px] text-neutral-400" /> {suggestion}
                     </div>
@@ -432,10 +432,10 @@ export default function Navbar() {
           {/* Right Side Icons */}
           <div className="flex items-center gap-4 md:gap-5 shrink-0 z-10">
             {/* Cart/Basket */}
-            <Link href="/cart" className="relative text-neutral-800 hover:text-[#6B00FF] transition-colors p-1" title="Shopping Cart">
+            <Link href="/cart" className="relative text-white hover:text-purple-200 transition-colors p-1" title="Shopping Cart">
               <FiShoppingBag className="text-xl md:text-2xl" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#6B00FF] text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center border border-white leading-none">
+                <span className="absolute -top-1 -right-1 bg-white text-kora text-[9px] font-extrabold w-4.5 h-4.5 rounded-full flex items-center justify-center leading-none">
                   {cartCount}
                 </span>
               )}
@@ -445,7 +445,7 @@ export default function Navbar() {
             <div className="flex items-center">
               <Show when="signed-out">
                 <SignInButton mode="modal">
-                  <button className="text-neutral-800 hover:text-[#6B00FF] transition-colors p-1" title="Sign In / Register">
+                  <button className="text-white hover:text-purple-200 transition-colors p-1" title="Sign In / Register">
                     <FiUser className="text-xl md:text-2xl" />
                   </button>
                 </SignInButton>
@@ -479,9 +479,9 @@ export default function Navbar() {
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setTimeout(() => setIsFocused(false), 200)}
                 placeholder="Search entire store here..." 
-                className="w-full bg-neutral-50 border border-neutral-200 rounded-none py-2 px-4 pr-10 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-[#6B00FF] focus:ring-1 focus:ring-[#6B00FF] transition-all font-sans"
+                className="w-full bg-white border border-neutral-200 rounded-none py-2 px-4 pr-10 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all font-sans"
               />
-              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-[#6B00FF] transition-colors z-20">
+              <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-kora transition-colors z-20">
                 <FiSearch className="text-md" />
               </button>
             </form>
@@ -491,35 +491,35 @@ export default function Navbar() {
                 {filteredSuggestions.map((suggestion, idx) => (
                   <div 
                     key={idx}
-                    onClick={(e) => handleSearch(e as any, suggestion)}
-                    className="px-4 py-2 hover:bg-neutral-50 cursor-pointer text-neutral-700 hover:text-[#6B00FF] transition-colors flex items-center gap-2 font-sans text-xs"
-                  >
-                    <FiSearch className="text-[10px] text-neutral-400" /> {suggestion}
-                  </div>
+                  onClick={(e) => handleSearch(e as any, suggestion)}
+                  className="px-4 py-2 hover:bg-neutral-50 cursor-pointer text-neutral-700 hover:text-[#5E0683] transition-colors flex items-center gap-2 font-sans text-xs"
+                >
+                  <FiSearch className="text-[10px] text-neutral-400" /> {suggestion}
+                </div>
                 ))}
               </div>
             )}
           </div>
         )}
 
-        {/* ROW 2: Categories Navigation Row (Desktop Only - White Theme) */}
-        <div className="hidden md:block bg-white border-t border-neutral-100 py-3 relative z-30">
-          <div className="max-w-7xl mx-auto px-6 relative flex justify-center items-center gap-8 text-xs font-bold uppercase tracking-wider text-neutral-600">
+        {/* ROW 2: Categories Navigation (Desktop only) */}
+        <div className="hidden md:block bg-kora border-t border-purple-900/40 relative z-30">
+          <div className="max-w-7xl mx-auto px-6 relative flex justify-center items-center gap-8 text-xs font-bold uppercase tracking-wider text-purple-100/90 py-3">
             
-            <Link href="/shop" className="hover:text-[#6B00FF] transition-colors">Shop</Link>
-            <Link href="/shop?category=World Cup" className="hover:text-[#6B00FF] transition-colors">World Cup</Link>
+            <Link href="/shop" className="hover:text-white transition-colors">Shop</Link>
+            <Link href="/shop?category=World Cup" className="hover:text-white transition-colors">World Cup</Link>
             
             {/* Clubs Dropdown Menu */}
             <div className="group static">
-              <button className="flex items-center gap-1 hover:text-[#6B00FF] transition-colors uppercase font-bold py-1">
-                Club <FiChevronDown className="text-xs text-neutral-400 group-hover:text-[#6B00FF]" />
+              <button className="flex items-center gap-1 hover:text-white transition-colors uppercase font-bold py-1">
+                Club <FiChevronDown className="text-xs text-purple-200 group-hover:text-white" />
               </button>
               
               {/* Mega Dropdown */}
-              <div className="absolute top-full left-6 right-6 bg-white border border-neutral-200 shadow-2xl rounded-none z-50 text-neutral-900 py-8 px-10 grid grid-cols-7 gap-6 transition-all duration-300 opacity-0 -translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto animate-fade-in-slide">
+              <div className="absolute top-full left-0 right-0 bg-kora border-x border-b border-purple-900/40 shadow-2xl rounded-b-2xl z-50 text-white py-8 px-10 grid grid-cols-7 gap-6 transition-all duration-300 opacity-0 -translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto animate-fade-in-slide">
                 {clubCategories.map((cat, i) => (
                   <div key={i} className="flex flex-col">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3 pb-1 border-b border-neutral-100">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-purple-300/80 mb-3 pb-1 border-b border-purple-900/40">
                       {cat.title}
                     </h4>
                     <div className="flex flex-col gap-1.5">
@@ -527,9 +527,9 @@ export default function Navbar() {
                         <Link 
                           key={idx} 
                           href={`/shop?team=${team.name}`} 
-                          className="flex items-center gap-2 text-xs font-bold text-neutral-600 hover:text-[#6B00FF] hover:translate-x-1 transition-all duration-200 group/item"
+                          className="flex items-center gap-2 text-xs font-bold text-purple-100/90 hover:text-white hover:translate-x-1.5 transition-all duration-200 group/item"
                         >
-                          <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center bg-neutral-50 border border-neutral-100 shrink-0">
+                          <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center bg-white border border-purple-900/20 shrink-0">
                             <img 
                               src={team.logo} 
                               alt={team.name} 
@@ -540,7 +540,7 @@ export default function Navbar() {
                           <span className="truncate">{team.name}</span>
                         </Link>
                       ))}
-                      <Link href="/shop" className="text-[9px] font-black uppercase text-neutral-400 hover:text-[#6B00FF] mt-1 flex items-center gap-0.5">
+                      <Link href="/shop" className="text-[9px] font-black uppercase text-purple-300/80 hover:text-white mt-1 flex items-center gap-0.5">
                         View All <span>→</span>
                       </Link>
                     </div>
@@ -548,30 +548,30 @@ export default function Navbar() {
                 ))}
                 
                 {/* A-Z Club Teams Card */}
-                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-neutral-50 border border-neutral-200 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(107,0,255,0.06),transparent)]" />
-                  <div className="text-[9px] font-black text-neutral-500 uppercase tracking-widest relative z-10">A-Z Club Teams</div>
+                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03),transparent)]" />
+                  <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">A-Z Club Teams</div>
                   <div className="relative z-10 my-auto text-center">
-                    <span className="text-3xl font-black text-neutral-900 tracking-tighter uppercase block">A <span className="text-kora">TO</span> Z</span>
+                    <span className="text-3xl font-black text-white tracking-tighter uppercase block">A <span className="text-purple-300">TO</span> Z</span>
                   </div>
-                  <div className="text-[9px] font-bold text-neutral-600 group-hover/card:text-kora transition-colors flex items-center gap-1 relative z-10">
+                  <div className="text-[9px] font-bold text-purple-200 group-hover/card:text-white transition-colors flex items-center gap-1 relative z-10">
                     Browse All <span>→</span>
                   </div>
                 </Link>
 
                 {/* World Leagues Card */}
-                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-neutral-50 border border-neutral-200 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(107,0,255,0.06),transparent)]" />
-                  <div className="text-[9px] font-black text-neutral-500 uppercase tracking-widest relative z-10">World Leagues</div>
-                  <div className="relative z-10 grid grid-cols-3 gap-1 opacity-75 group-hover/card:opacity-95 transition-opacity">
-                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">EPL</span>
-                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">LIGA</span>
-                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">SERIE</span>
-                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">BUND</span>
-                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">MLS</span>
-                    <span className="text-[8px] font-black border border-neutral-300 rounded-none p-0.5 text-center text-neutral-700 bg-white">LIGUE</span>
+                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03),transparent)]" />
+                  <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">World Leagues</div>
+                  <div className="relative z-10 grid grid-cols-3 gap-1 opacity-80 group-hover/card:opacity-95 transition-opacity">
+                    <span className="text-[8px] font-black border border-purple-800/30 rounded-none p-0.5 text-center text-purple-200 bg-purple-900/50">EPL</span>
+                    <span className="text-[8px] font-black border border-purple-800/30 rounded-none p-0.5 text-center text-purple-200 bg-purple-900/50">LIGA</span>
+                    <span className="text-[8px] font-black border border-purple-800/30 rounded-none p-0.5 text-center text-purple-200 bg-purple-900/50">SERIE</span>
+                    <span className="text-[8px] font-black border border-purple-800/30 rounded-none p-0.5 text-center text-purple-200 bg-purple-900/50">BUND</span>
+                    <span className="text-[8px] font-black border border-purple-800/30 rounded-none p-0.5 text-center text-purple-200 bg-purple-900/50">MLS</span>
+                    <span className="text-[8px] font-black border border-purple-800/30 rounded-none p-0.5 text-center text-purple-200 bg-purple-900/50">LIGUE</span>
                   </div>
-                  <div className="text-[9px] font-bold text-neutral-600 group-hover/card:text-kora transition-colors flex items-center gap-1 relative z-10">
+                  <div className="text-[9px] font-bold text-purple-200 group-hover/card:text-white transition-colors flex items-center gap-1 relative z-10">
                     Shop Leagues <span>→</span>
                   </div>
                 </Link>
@@ -581,15 +581,15 @@ export default function Navbar() {
 
             {/* National Dropdown Menu */}
             <div className="group static">
-              <button className="flex items-center gap-1 hover:text-[#6B00FF] transition-colors uppercase font-bold py-1">
-                National <FiChevronDown className="text-xs text-neutral-400 group-hover:text-[#6B00FF]" />
+              <button className="flex items-center gap-1 hover:text-white transition-colors uppercase font-bold py-1">
+                National <FiChevronDown className="text-xs text-purple-200 group-hover:text-white" />
               </button>
               
               {/* Mega Dropdown */}
-              <div className="absolute top-full left-6 right-6 bg-white border border-neutral-200 shadow-2xl rounded-none z-50 text-neutral-900 py-8 px-10 grid grid-cols-6 gap-6 transition-all duration-300 opacity-0 -translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto animate-fade-in-slide">
+              <div className="absolute top-full left-0 right-0 bg-kora border-x border-b border-purple-900/40 shadow-2xl rounded-b-2xl z-50 text-white py-8 px-10 grid grid-cols-6 gap-6 transition-all duration-300 opacity-0 -translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto animate-fade-in-slide">
                 {nationalCategories.map((cat, i) => (
                   <div key={i} className="flex flex-col">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3 pb-1 border-b border-neutral-100">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-purple-300/80 mb-3 pb-1 border-b border-purple-900/40">
                       {cat.title}
                     </h4>
                     <div className="flex flex-col gap-1.5">
@@ -597,9 +597,9 @@ export default function Navbar() {
                         <Link 
                           key={idx} 
                           href={`/shop?team=${team.name}`} 
-                          className="flex items-center gap-2 text-xs font-bold text-neutral-600 hover:text-[#6B00FF] hover:translate-x-1 transition-all duration-200 group/item"
+                          className="flex items-center gap-2 text-xs font-bold text-purple-100/90 hover:text-white hover:translate-x-1.5 transition-all duration-200 group/item"
                         >
-                          <div className="w-5 h-3.5 rounded-none overflow-hidden flex items-center justify-center bg-neutral-50 border border-neutral-100 shrink-0">
+                          <div className="w-5 h-3.5 rounded-none overflow-hidden flex items-center justify-center bg-white border border-purple-900/20 shrink-0">
                             <img 
                               src={`https://flagcdn.com/w40/${team.code}.png`} 
                               alt={team.name} 
@@ -611,7 +611,7 @@ export default function Navbar() {
                         </Link>
                       ))}
                       {cat.teams.length > 10 && (
-                        <Link href="/shop" className="text-[9px] font-black uppercase text-neutral-400 hover:text-[#6B00FF] mt-1 flex items-center gap-0.5">
+                        <Link href="/shop" className="text-[9px] font-black uppercase text-purple-300/80 hover:text-white mt-1 flex items-center gap-0.5">
                           + {cat.teams.length - 10} More <span>→</span>
                         </Link>
                       )}
@@ -620,13 +620,13 @@ export default function Navbar() {
                 ))}
                 
                 {/* A-Z National Teams Card */}
-                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-neutral-50 border border-neutral-200 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(107,0,255,0.06),transparent)]" />
-                  <div className="text-[9px] font-black text-neutral-500 uppercase tracking-widest relative z-10">A-Z National Teams</div>
+                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03),transparent)]" />
+                  <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">A-Z National Teams</div>
                   <div className="relative z-10 my-auto text-center">
-                    <span className="text-3xl font-black text-neutral-900 tracking-tighter uppercase block">A <span className="text-kora">TO</span> Z</span>
+                    <span className="text-3xl font-black text-white tracking-tighter uppercase block">A <span className="text-purple-300">TO</span> Z</span>
                   </div>
-                  <div className="text-[9px] font-bold text-neutral-600 group-hover/card:text-kora transition-colors flex items-center gap-1 relative z-10">
+                  <div className="text-[9px] font-bold text-purple-200 group-hover/card:text-white transition-colors flex items-center gap-1 relative z-10">
                     Browse All <span>→</span>
                   </div>
                 </Link>
@@ -634,9 +634,9 @@ export default function Navbar() {
               </div>
             </div>
 
-            <Link href="/shop?category=Shoes" className="hover:text-[#6B00FF] transition-colors">Shoes</Link>
-            <Link href="/shop?category=Accessories" className="hover:text-[#6B00FF] transition-colors">Accessories</Link>
-            <Link href="/shop?category=Retro Kits" className="hover:text-[#6B00FF] transition-colors">Retro</Link>
+            <Link href="/shop?category=Shoes" className="hover:text-white transition-colors">Shoes</Link>
+            <Link href="/shop?category=Accessories" className="hover:text-white transition-colors">Accessories</Link>
+            <Link href="/shop?category=Retro Kits" className="hover:text-white transition-colors">Retro</Link>
           </div>
         </div>
       </header>

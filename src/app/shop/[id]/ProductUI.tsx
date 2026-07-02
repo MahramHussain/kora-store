@@ -368,8 +368,8 @@ export default function ProductUI({ product }: { product: any }) {
             }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
               personalizationTab === "custom"
-                ? "bg-[#6B00FF] border-[#6B00FF] text-white shadow-md shadow-[#6B00FF]/25"
-                : "bg-white border-slate-200 text-slate-700 hover:border-[#6B00FF]/50 hover:text-[#6B00FF] hover:shadow-sm hover:shadow-[#6B00FF]/10"
+                ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
+                : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-sm hover:shadow-kora/10"
             }`}
           >
             <FiEdit className="text-sm shrink-0" />
@@ -386,8 +386,8 @@ export default function ProductUI({ product }: { product: any }) {
             }}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
               personalizationTab === "player"
-                ? "bg-[#6B00FF] border-[#6B00FF] text-white shadow-md shadow-[#6B00FF]/25"
-                : "bg-white border-slate-200 text-slate-700 hover:border-[#6B00FF]/50 hover:text-[#6B00FF] hover:shadow-sm hover:shadow-[#6B00FF]/10"
+                ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
+                : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-sm hover:shadow-kora/10"
             }`}
           >
             <FiAward className="text-sm shrink-0" />
@@ -422,7 +422,7 @@ export default function ProductUI({ product }: { product: any }) {
                 />
               </div>
             </div>
-            <p className="text-[10px] text-[#6B00FF] font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3">
+            <p className="text-[10px] text-kora font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3">
               <span>✨ Custom Player Printing</span>
               <span>+25 DHS</span>
             </p>
@@ -444,7 +444,7 @@ export default function ProductUI({ product }: { product: any }) {
                         onClick={() => handleSelectPresetPlayer(player)}
                         className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-between ${
                           isSelected
-                            ? "bg-[#6B00FF] border-[#6B00FF] text-white shadow-sm shadow-[#6B00FF]/20"
+                            ? "bg-kora border-kora text-white shadow-sm shadow-kora/20"
                             : "bg-white border-slate-200 text-slate-700 hover:border-slate-300"
                         }`}
                       >
@@ -465,12 +465,12 @@ export default function ProductUI({ product }: { product: any }) {
                 onClick={() => setHasFifaPatch(!hasFifaPatch)}
                 className={`w-full py-2.5 px-4 rounded-xl border text-xs font-bold transition-all duration-200 active:scale-98 flex items-center justify-between ${
                   hasFifaPatch
-                    ? "bg-[#6B00FF] border-[#6B00FF] text-white shadow-sm shadow-[#6B00FF]/20"
+                    ? "bg-kora border-kora text-white shadow-sm shadow-kora/20"
                     : "bg-white border-slate-200 text-slate-700 hover:border-slate-300"
                 }`}
               >
                 <span>Fifa patch right and left sleeve</span>
-                <span className={hasFifaPatch ? "text-white font-extrabold" : "text-[#6B00FF] font-black"}>+10 DHS</span>
+                <span className={hasFifaPatch ? "text-white font-extrabold" : "text-kora font-black"}>+10 DHS</span>
               </button>
             </div>
           </div>
