@@ -148,7 +148,7 @@ export default function AdminUsersPage() {
       shadowBanExpiresAt,
     });
 
-    if (res.success) {
+    if (res.success && res.user) {
       // Refresh list
       const updatedUsers = users.map(u => u.id === userId ? { 
         ...u, 

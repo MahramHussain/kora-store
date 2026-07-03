@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { CURRENCY } from "@/lib/constants";
+import { CURRENCY, PRESET_PLAYERS } from "@/lib/constants";
 import Link from "next/link";
 import { FaChevronLeft, FaStar, FaTruckFast } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
@@ -117,18 +117,6 @@ const VerifiedTick = () => (
 
 // Sizing or customization helper constants
 
-const PRESET_PLAYERS: Record<string, Array<{ name: string; number: string }>> = {
-  "ARGENTINA AWAY": [{ name: "MESSI", number: "10" }],
-  "BRAZIL AWAY": [{ name: "NEYMAR", number: "10" }, { name: "VINI", number: "7" }, { name: "RAPHINHA", number: "11" }],
-  "FRANCE AWAY": [{ name: "MBAPPE", number: "10" }, { name: "OLISE", number: "11" }, { name: "DEMBELE", number: "7" }],
-  "PORTUGAL AWAY": [{ name: "RONALDO", number: "7" }],
-  "SPAIN AWAY": [{ name: "LAMINE YAMAL", number: "19" }, { name: "PEDRI", number: "20" }],
-  "ARGENTINA HOME": [{ name: "MESSI", number: "10" }],
-  "BRAZIL HOME": [{ name: "NEYMAR", number: "10" }],
-  "FRANCE HOME": [{ name: "MBAPPE", number: "10" }, { name: "DEMBELE", number: "7" }],
-  "PORTUGAL HOME": [{ name: "RONALDO", number: "7" }],
-  "SPAIN HOME": [{ name: "LAMINE YAMAL", number: "19" }, { name: "PEDRI", number: "20" }],
-};
 
 const getPresetPlayersForProduct = (productName: string) => {
   const normalized = productName.toUpperCase().replace(/\s+KIT$/i, "").trim();
@@ -373,7 +361,7 @@ export default function ProductUI({ product }: { product: any }) {
             }`}
           >
             <FiEdit className="text-sm shrink-0" />
-            <span>Add your own</span>
+            <span>Custom name</span>
           </button>
 
           <button

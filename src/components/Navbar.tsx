@@ -282,6 +282,33 @@ export default function Navbar() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { cartCount } = useCart();
+  const [activeDropdown, setActiveDropdown] = useState<"none" | "clubs" | "nationals">("none");
+  const dropdownTimeoutRef = useRef<any>(null);
+
+  const handleMouseEnter = (menu: "clubs" | "nationals") => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+      dropdownTimeoutRef.current = null;
+    }
+    setActiveDropdown(menu);
+  };
+
+  const handleMouseLeave = () => {
+    if (dropdownTimeoutRef.current) {
+      clearTimeout(dropdownTimeoutRef.current);
+    }
+    dropdownTimeoutRef.current = setTimeout(() => {
+      setActiveDropdown("none");
+    }, 250);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (dropdownTimeoutRef.current) {
+        clearTimeout(dropdownTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     getProducts().then(products => {
@@ -435,7 +462,7 @@ export default function Navbar() {
             <Link href="/cart" className="relative text-white hover:text-purple-200 transition-colors p-1" title="Shopping Cart">
               <FiShoppingBag className="text-xl md:text-2xl" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-white text-kora text-[9px] font-extrabold w-4.5 h-4.5 rounded-full flex items-center justify-center leading-none">
+                <span className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-kora shadow-md shadow-rose-600/35 transition-all duration-300 transform scale-110">
                   {cartCount}
                 </span>
               )}
@@ -510,13 +537,21 @@ export default function Navbar() {
             <Link href="/shop?category=World Cup" className="hover:text-white transition-colors">World Cup</Link>
             
             {/* Clubs Dropdown Menu */}
-            <div className="group static">
+            <div 
+              className="static"
+              onMouseEnter={() => handleMouseEnter("clubs")}
+              onMouseLeave={handleMouseLeave}
+            >
               <button className="flex items-center gap-1 hover:text-white transition-colors uppercase font-bold py-1">
-                Club <FiChevronDown className="text-xs text-purple-200 group-hover:text-white" />
+                Club <FiChevronDown className={`text-xs text-purple-200 transition-colors ${activeDropdown === "clubs" ? "text-white" : ""}`} />
               </button>
               
               {/* Mega Dropdown */}
-              <div className="absolute top-full left-0 right-0 bg-kora border-x border-b border-purple-900/40 shadow-2xl rounded-b-2xl z-50 text-white py-8 px-10 grid grid-cols-7 gap-6 transition-all duration-300 opacity-0 -translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto animate-fade-in-slide">
+              <div className={`absolute top-full left-0 right-0 bg-kora border-x border-b border-purple-900/40 shadow-2xl rounded-b-2xl z-50 text-white py-8 px-10 grid grid-cols-7 gap-6 transition-all duration-300 animate-fade-in-slide ${
+                activeDropdown === "clubs"
+                  ? "opacity-100 translate-y-0 pointer-events-auto"
+                  : "opacity-0 -translate-y-2 pointer-events-none"
+              }`}>
                 {clubCategories.map((cat, i) => (
                   <div key={i} className="flex flex-col">
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-purple-300/80 mb-3 pb-1 border-b border-purple-900/40">
@@ -580,13 +615,21 @@ export default function Navbar() {
             </div>
 
             {/* National Dropdown Menu */}
-            <div className="group static">
+            <div 
+              className="static"
+              onMouseEnter={() => handleMouseEnter("nationals")}
+              onMouseLeave={handleMouseLeave}
+            >
               <button className="flex items-center gap-1 hover:text-white transition-colors uppercase font-bold py-1">
-                National <FiChevronDown className="text-xs text-purple-200 group-hover:text-white" />
+                National <FiChevronDown className={`text-xs text-purple-200 transition-colors ${activeDropdown === "nationals" ? "text-white" : ""}`} />
               </button>
               
               {/* Mega Dropdown */}
-              <div className="absolute top-full left-0 right-0 bg-kora border-x border-b border-purple-900/40 shadow-2xl rounded-b-2xl z-50 text-white py-8 px-10 grid grid-cols-6 gap-6 transition-all duration-300 opacity-0 -translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto animate-fade-in-slide">
+              <div className={`absolute top-full left-0 right-0 bg-kora border-x border-b border-purple-900/40 shadow-2xl rounded-b-2xl z-50 text-white py-8 px-10 grid grid-cols-6 gap-6 transition-all duration-300 animate-fade-in-slide ${
+                activeDropdown === "nationals"
+                  ? "opacity-100 translate-y-0 pointer-events-auto"
+                  : "opacity-0 -translate-y-2 pointer-events-none"
+              }`}>
                 {nationalCategories.map((cat, i) => (
                   <div key={i} className="flex flex-col">
                     <h4 className="text-[10px] font-black uppercase tracking-widest text-purple-300/80 mb-3 pb-1 border-b border-purple-900/40">

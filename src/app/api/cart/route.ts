@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { PRESET_PLAYERS } from "@/lib/constants";
 
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -14,18 +15,6 @@ export async function GET(req: NextRequest) {
       include: { product: true }
     });
 
-    const PRESET_PLAYERS: Record<string, Array<{ name: string; number: string }>> = {
-      "ARGENTINA AWAY": [{ name: "MESSI", number: "10" }],
-      "BRAZIL AWAY": [{ name: "NEYMAR", number: "10" }, { name: "VINI", number: "7" }, { name: "RAPHINHA", number: "11" }],
-      "FRANCE AWAY": [{ name: "MBAPPE", number: "10" }, { name: "OLISE", number: "11" }, { name: "DEMBELE", number: "7" }],
-      "PORTUGAL AWAY": [{ name: "RONALDO", number: "7" }],
-      "SPAIN AWAY": [{ name: "LAMINE YAMAL", number: "19" }, { name: "PEDRI", number: "20" }],
-      "ARGENTINA HOME": [{ name: "MESSI", number: "10" }],
-      "BRAZIL HOME": [{ name: "NEYMAR", number: "10" }],
-      "FRANCE HOME": [{ name: "MBAPPE", number: "10" }, { name: "DEMBELE", number: "7" }],
-      "PORTUGAL HOME": [{ name: "RONALDO", number: "7" }],
-      "SPAIN HOME": [{ name: "LAMINE YAMAL", number: "19" }, { name: "PEDRI", number: "20" }],
-    };
 
     const formattedCart = cartItems.map(item => {
       const basePrice = parseFloat(item.product.price.toString());
@@ -61,7 +50,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId } = auth();
+    const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

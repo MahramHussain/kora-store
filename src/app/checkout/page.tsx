@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import { CURRENCY } from "@/lib/constants";
+import { CURRENCY, isCustomJersey } from "@/lib/constants";
 import { useAuth, SignIn, SignUp } from "@clerk/nextjs";
 import { FaLock, FaCreditCard, FaPaypal, FaMoneyBillWave } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
@@ -25,9 +25,7 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal" | "cod">("card");
 
   const hasPersonalizedItem = cart.some(
-    (item) =>
-      (item.customName && item.customName.trim() !== "") ||
-      (item.customNumber && item.customNumber.trim() !== "")
+    (item) => isCustomJersey(item)
   );
 
   useEffect(() => {
@@ -304,7 +302,7 @@ export default function CheckoutPage() {
                   <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3 text-amber-800 animate-fade-in shadow-xs font-sans">
                     <div className="text-lg shrink-0 mt-0.5">⚠️</div>
                     <div className="flex-1 text-xs font-bold uppercase tracking-wider leading-relaxed">
-                      Cash on Delivery (COD) is disabled because your vault cart contains a personalized kit (custom print name/number). Only online card payment via Ziina is accepted for customized items.
+                      Cash on Delivery (COD) is disabled because your vault cart contains a custom-named shirt. Only online card payment via Ziina is accepted for custom-named items.
                     </div>
                   </div>
                 )}
@@ -330,7 +328,7 @@ export default function CheckoutPage() {
                   {hasPersonalizedItem ? (
                     <div 
                       className="border rounded-xl py-3 flex justify-center items-center gap-2 bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed font-sans opacity-60"
-                      title="Cash on Delivery is unavailable for personalized jerseys"
+                      title="Cash on Delivery is unavailable for custom-named jerseys"
                     >
                       <FaMoneyBillWave /> COD (Locked)
                     </div>
