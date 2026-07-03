@@ -284,8 +284,56 @@ export default function Navbar() {
   const { cartCount } = useCart();
   const [activeDropdown, setActiveDropdown] = useState<"none" | "clubs" | "nationals">("none");
   const dropdownTimeoutRef = useRef<any>(null);
+  const [isClickClosed, setIsClickClosed] = useState(false);
+
+  const handleFilterClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    options: { team?: string; category?: string; resetAll?: boolean }
+  ) => {
+    setIsClickClosed(true);
+    setActiveDropdown("none");
+    setTimeout(() => {
+      setIsClickClosed(false);
+    }, 1000);
+    if (pathname === "/shop") {
+      e.preventDefault();
+      const params = new URLSearchParams(window.location.search);
+      if (options.resetAll) {
+        params.delete("team");
+        params.delete("category");
+        params.delete("q");
+        params.delete("tag");
+      } else {
+        if (options.team !== undefined) {
+          if (options.team === "All Teams") {
+            params.delete("team");
+          } else {
+            params.set("team", options.team);
+          }
+        }
+        if (options.category !== undefined) {
+          if (options.category === "All") {
+            params.delete("category");
+          } else {
+            params.set("category", options.category);
+          }
+        }
+      }
+      window.history.pushState(null, "", `/shop?${params.toString()}`);
+      window.dispatchEvent(
+        new CustomEvent("kora_filter_update", {
+          detail: {
+            team: options.team,
+            category: options.category,
+            resetAll: options.resetAll,
+          },
+        })
+      );
+    }
+  };
 
   const handleMouseEnter = (menu: "clubs" | "nationals") => {
+    if (isClickClosed) return;
     if (dropdownTimeoutRef.current) {
       clearTimeout(dropdownTimeoutRef.current);
       dropdownTimeoutRef.current = null;
@@ -533,8 +581,8 @@ export default function Navbar() {
         <div className="hidden md:block bg-kora border-t border-purple-900/40 relative z-30">
           <div className="max-w-7xl mx-auto px-6 relative flex justify-center items-center gap-8 text-xs font-bold uppercase tracking-wider text-purple-100/90 py-3">
             
-            <Link href="/shop" className="hover:text-white transition-colors">Shop</Link>
-            <Link href="/shop?category=World Cup" className="hover:text-white transition-colors">World Cup</Link>
+            <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="hover:text-white transition-colors">Shop</Link>
+            <Link href="/shop?category=World Cup" onClick={(e) => handleFilterClick(e, { category: "World Cup" })} className="hover:text-white transition-colors">World Cup</Link>
             
             {/* Clubs Dropdown Menu */}
             <div 
@@ -562,6 +610,7 @@ export default function Navbar() {
                         <Link 
                           key={idx} 
                           href={`/shop?team=${team.name}`} 
+                          onClick={(e) => handleFilterClick(e, { team: team.name })}
                           className="flex items-center gap-2 text-xs font-bold text-purple-100/90 hover:text-white hover:translate-x-1.5 transition-all duration-200 group/item"
                         >
                           <div className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center bg-white border border-purple-900/20 shrink-0">
@@ -575,7 +624,7 @@ export default function Navbar() {
                           <span className="truncate">{team.name}</span>
                         </Link>
                       ))}
-                      <Link href="/shop" className="text-[9px] font-black uppercase text-purple-300/80 hover:text-white mt-1 flex items-center gap-0.5">
+                      <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="text-[9px] font-black uppercase text-purple-300/80 hover:text-white mt-1 flex items-center gap-0.5">
                         View All <span>→</span>
                       </Link>
                     </div>
@@ -583,7 +632,7 @@ export default function Navbar() {
                 ))}
                 
                 {/* A-Z Club Teams Card */}
-                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
+                <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03),transparent)]" />
                   <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">A-Z Club Teams</div>
                   <div className="relative z-10 my-auto text-center">
@@ -595,7 +644,7 @@ export default function Navbar() {
                 </Link>
 
                 {/* World Leagues Card */}
-                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
+                <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03),transparent)]" />
                   <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">World Leagues</div>
                   <div className="relative z-10 grid grid-cols-3 gap-1 opacity-80 group-hover/card:opacity-95 transition-opacity">
@@ -640,6 +689,7 @@ export default function Navbar() {
                         <Link 
                           key={idx} 
                           href={`/shop?team=${team.name}`} 
+                          onClick={(e) => handleFilterClick(e, { team: team.name })}
                           className="flex items-center gap-2 text-xs font-bold text-purple-100/90 hover:text-white hover:translate-x-1.5 transition-all duration-200 group/item"
                         >
                           <div className="w-5 h-3.5 rounded-none overflow-hidden flex items-center justify-center bg-white border border-purple-900/20 shrink-0">
@@ -654,7 +704,7 @@ export default function Navbar() {
                         </Link>
                       ))}
                       {cat.teams.length > 10 && (
-                        <Link href="/shop" className="text-[9px] font-black uppercase text-purple-300/80 hover:text-white mt-1 flex items-center gap-0.5">
+                        <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="text-[9px] font-black uppercase text-purple-300/80 hover:text-white mt-1 flex items-center gap-0.5">
                           + {cat.teams.length - 10} More <span>→</span>
                         </Link>
                       )}
@@ -663,7 +713,7 @@ export default function Navbar() {
                 ))}
                 
                 {/* A-Z National Teams Card */}
-                <Link href="/shop" className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
+                <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03),transparent)]" />
                   <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">A-Z National Teams</div>
                   <div className="relative z-10 my-auto text-center">
@@ -677,9 +727,9 @@ export default function Navbar() {
               </div>
             </div>
 
-            <Link href="/shop?category=Shoes" className="hover:text-white transition-colors">Shoes</Link>
-            <Link href="/shop?category=Accessories" className="hover:text-white transition-colors">Accessories</Link>
-            <Link href="/shop?category=Retro Kits" className="hover:text-white transition-colors">Retro</Link>
+            <Link href="/shop?category=Shoes" onClick={(e) => handleFilterClick(e, { category: "Shoes" })} className="hover:text-white transition-colors">Shoes</Link>
+            <Link href="/shop?category=Accessories" onClick={(e) => handleFilterClick(e, { category: "Accessories" })} className="hover:text-white transition-colors">Accessories</Link>
+            <Link href="/shop?category=Retro Kits" onClick={(e) => handleFilterClick(e, { category: "Retro Kits" })} className="hover:text-white transition-colors">Retro</Link>
           </div>
         </div>
       </header>

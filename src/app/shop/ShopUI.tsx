@@ -87,6 +87,27 @@ export default function ShopUI({ products }: { products: any[] }) {
     setActiveCategory(searchParams.get("category") || "All");
   }, [searchParams]);
 
+  useEffect(() => {
+    const handleFilterUpdate = (e: Event) => {
+      const detail = (e as CustomEvent).detail || {};
+      if (detail.resetAll) {
+        setSearchQuery("");
+        setActiveTag("All");
+        setActiveTeam("All Teams");
+        setActiveCategory("All");
+      } else {
+        if (detail.team !== undefined) {
+          setActiveTeam(detail.team || "All Teams");
+        }
+        if (detail.category !== undefined) {
+          setActiveCategory(detail.category || "All");
+        }
+      }
+    };
+    window.addEventListener("kora_filter_update", handleFilterUpdate);
+    return () => window.removeEventListener("kora_filter_update", handleFilterUpdate);
+  }, []);
+
   // Lock scroll inside the sidebar so it doesn't affect the body/product grid
   useEffect(() => {
     const sidebar = sidebarRef.current;
