@@ -119,7 +119,7 @@ const VerifiedTick = () => (
 
 
 const getPresetPlayersForProduct = (productName: string) => {
-  const normalized = productName.toUpperCase().replace(/\s+KIT$/i, "").trim();
+  const normalized = productName.toUpperCase().replace(/\s+KIT.*$/i, "").trim();
   return PRESET_PLAYERS[normalized] || [];
 };
 

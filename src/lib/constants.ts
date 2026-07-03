@@ -18,7 +18,7 @@ export function isCustomJersey(item: { name: string; customName?: string; custom
   const num = (item.customNumber || "").trim();
   if (!name && !num) return false;
 
-  const normalizedProduct = item.name.toUpperCase().replace(/\s+KIT$/i, "").trim();
+  const normalizedProduct = item.name.toUpperCase().replace(/\s+KIT.*$/i, "").trim();
   const presets = PRESET_PLAYERS[normalizedProduct] || [];
   const isPreset = presets.some(p => p.name === name && p.number === num);
   return !isPreset;

@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
       
       let printUpcharge = 0;
       if (hasCustomPrint) {
-        const productName = item.product.name.toUpperCase().replace(/\s+KIT$/i, "").trim();
+        const productName = item.product.name.toUpperCase().replace(/\s+KIT.*$/i, "").trim();
         const presets = PRESET_PLAYERS[productName] || [];
         const isPreset = presets.some(p => p.name === item.customName.trim().toUpperCase() && p.number === item.customNumber.trim());
         printUpcharge = isPreset ? 15 : 25;
