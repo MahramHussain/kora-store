@@ -90,12 +90,18 @@ export default function CartPage() {
                   {/* Details */}
                   <div className="flex-1 flex flex-col justify-center py-1 sm:py-2 font-sans pr-6">
                     <h3 className="font-bold text-slate-900 text-sm sm:text-lg leading-tight line-clamp-2">{item.name}</h3>
-                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                      Size: <span className="font-bold text-slate-900">{item.size}</span>
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1 flex flex-wrap items-center gap-y-1">
+                      <span>Size: <span className="font-bold text-slate-900">{item.size}</span></span>
                       {(item.customName || item.customNumber) && (
                         <>
                           <span className="mx-1 sm:mx-2 text-slate-300">•</span>
-                          Print: <span className="font-bold text-kora">{item.customName || "—"} {item.customNumber ? `#${item.customNumber}` : ""}</span>
+                          <span>Print: <span className="font-bold text-kora">{item.customName || "—"} {item.customNumber ? `#${item.customNumber}` : ""}</span></span>
+                        </>
+                      )}
+                      {item.patch && (
+                        <>
+                          <span className="mx-1 sm:mx-2 text-slate-300">•</span>
+                          <span>Patch: <span className="font-bold text-indigo-600">{item.patch}</span></span>
                         </>
                       )}
                     </p>

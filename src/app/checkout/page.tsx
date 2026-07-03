@@ -466,7 +466,22 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex-1 flex flex-col justify-center">
                       <h3 className="font-bold text-slate-900 text-sm line-clamp-1">{item.name}</h3>
-                      <p className="text-xs text-slate-500">Size: {item.size} | Qty: {item.quantity}</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        Size: <span className="font-semibold text-slate-800">{item.size}</span>
+                        {(item.customName || item.customNumber) && (
+                          <>
+                            <span className="mx-1 text-slate-300">•</span>
+                            Print: <span className="font-semibold text-kora">{item.customName || "—"} {item.customNumber ? `#${item.customNumber}` : ""}</span>
+                          </>
+                        )}
+                        {item.patch && (
+                          <>
+                            <span className="mx-1 text-slate-300">•</span>
+                            Patch: <span className="font-semibold text-indigo-600">{item.patch}</span>
+                          </>
+                        )}
+                      </p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">Qty: {item.quantity}</p>
                     </div>
                     <div className="font-bold text-kora text-sm flex items-center">
                       {item.price}
