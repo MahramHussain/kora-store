@@ -9,6 +9,8 @@ interface EmailItem {
   price: string;
   customName?: string;
   customNumber?: string;
+  playerName?: string;
+  patch?: string;
 }
 
 interface SendOrderEmailParams {
@@ -31,24 +33,31 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
 
   const itemsHtml = params.items
     .map(
-      (item) => `
-      <tr>
-        <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 14px;">
-          <strong>${item.name}</strong><br/>
-          <span style="color: #64748b; font-size: 12px;">Size: ${item.size}</span>${
-            item.customName || item.customNumber
-              ? `<br/><span style="color: #5E0683; font-weight: bold; font-size: 12px;">Print: ${item.customName || "—"} ${item.customNumber ? `#${item.customNumber}` : ""}</span>`
-              : ""
-          }
-        </td>
-        <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; color: #0f172a; font-size: 14px;">
-          ${item.quantity}
-        </td>
-        <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #0f172a; font-weight: bold; font-size: 14px;">
-          ${item.price}
-        </td>
-      </tr>
-    `
+      (item) => {
+        let printInfo = "";
+        if (item.playerName) {
+          printInfo += `<br/><span style="color: #5E0683; font-weight: bold; font-size: 12px;">Preset Player: ${item.playerName} #${item.customNumber || ""}</span>`;
+        } else if (item.customName || item.customNumber) {
+          printInfo += `<br/><span style="color: #5E0683; font-weight: bold; font-size: 12px;">Custom Print: ${item.customName || "—"} #${item.customNumber || ""}</span>`;
+        }
+        if (item.patch) {
+          printInfo += `<br/><span style="color: #0d9488; font-weight: bold; font-size: 12px;">Patch: ${item.patch}</span>`;
+        }
+        return `
+          <tr>
+            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; color: #0f172a; font-size: 14px;">
+              <strong>${item.name}</strong><br/>
+              <span style="color: #64748b; font-size: 12px;">Size: ${item.size}</span>${printInfo}
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: center; color: #0f172a; font-size: 14px;">
+              ${item.quantity}
+            </td>
+            <td style="padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #0f172a; font-weight: bold; font-size: 14px;">
+              ${item.price}
+            </td>
+          </tr>
+        `;
+      }
     )
     .join("");
 

@@ -97,6 +97,16 @@ export async function POST(req: Request) {
       }
     });
 
+    // Calculate and validate amounts on the backend
+    const calculatedSubtotal = items.reduce((acc: number, item: any) => {
+      const numericPrice = parseFloat(item.price.toString().replace(/[^0-9.]/g, ''));
+      return acc + (numericPrice * item.quantity);
+    }, 0);
+    const actualDiscount = parseFloat(discountAmount || 0);
+    const netSubtotal = calculatedSubtotal - actualDiscount;
+    const computedShippingFee = netSubtotal > 200 ? 0 : 25;
+    const computedTotal = netSubtotal + computedShippingFee + parseFloat(tax || 0);
+
     // 3. Process checkout inside a robust transaction
     const order = await prisma.$transaction(async (tx) => {
       
@@ -150,7 +160,7 @@ export async function POST(req: Request) {
       const newOrder = await tx.order.create({
         data: {
           userId: userId,
-          total: new Prisma.Decimal(cartTotal),
+          total: new Prisma.Decimal(computedTotal),
           status: paymentMethod === "card" ? "Pending" : "Processing",
           shippingStreet: shippingDetails.streetAddress,
           shippingCity: shippingDetails.city,
@@ -158,8 +168,8 @@ export async function POST(req: Request) {
           shippingName: `${shippingDetails.firstName.trim()} ${shippingDetails.lastName.trim()}`,
           paymentMethod: paymentMethod,
           promoCode: promoCode || null,
-          discountAmount: new Prisma.Decimal(discountAmount || 0),
-          shippingFee: new Prisma.Decimal(shippingFee || 25),
+          discountAmount: new Prisma.Decimal(actualDiscount),
+          shippingFee: new Prisma.Decimal(computedShippingFee),
           tax: new Prisma.Decimal(tax || 0),
           referenceNumber: referenceNumber,
           items: {
@@ -168,9 +178,11 @@ export async function POST(req: Request) {
               size: item.size,
               image: item.image || "",
               quantity: item.quantity,
-              price: new Prisma.Decimal(parseFloat(item.price.replace('$', ''))),
+              price: new Prisma.Decimal(parseFloat(item.price.toString().replace(/[^0-9.]/g, ''))),
               customName: item.customName || "",
               customNumber: item.customNumber || "",
+              playerName: item.playerName || "",
+              patch: item.patch || "",
             })),
           },
         },
@@ -235,7 +247,7 @@ export async function POST(req: Request) {
     // 5. Trigger Immediate Email Notifications for direct COD orders
     try {
       const calculatedSubtotal = items.reduce((total: number, item: any) => {
-        const numericPrice = parseFloat(item.price.replace(/[^0-9.]/g, ""));
+        const numericPrice = parseFloat(item.price.toString().replace(/[^0-9.]/g, ""));
         return total + (numericPrice * item.quantity);
       }, 0);
 
@@ -249,6 +261,8 @@ export async function POST(req: Request) {
           price: item.price,
           customName: item.customName || "",
           customNumber: item.customNumber || "",
+          playerName: item.playerName || "",
+          patch: item.patch || "",
         })),
         subtotal: `AED ${calculatedSubtotal.toFixed(2)}`,
         shippingFee: `AED ${parseFloat(order.shippingFee.toString()).toFixed(2)}`,
@@ -269,12 +283,15 @@ export async function POST(req: Request) {
         adminShippingAddress += `<br/><br/>📍 <strong>Google Maps Location Pinpoint</strong>:<br/><a href="https://www.google.com/maps?q=${coordinates.lat},${coordinates.lng}" style="color: #6b00ff; font-weight: bold; text-decoration: underline;">Open Google Maps Link</a><br/>(Coords: ${coordinates.lat.toFixed(6)}, ${coordinates.lng.toFixed(6)})`;
       }
 
-      // C. Send notification alert to store admin
-      await sendOrderConfirmationEmail({
-        ...emailParams,
-        shippingAddress: adminShippingAddress,
-        toEmail: "korastore.ae@gmail.com",
-      });
+      // C. Send notification alert to store admins
+      const adminEmails = ["korastore.ae@gmail.com", "mahramh40@gmail.com"];
+      for (const email of adminEmails) {
+        await sendOrderConfirmationEmail({
+          ...emailParams,
+          shippingAddress: adminShippingAddress,
+          toEmail: email,
+        });
+      }
 
       console.log(`📬 [EMAIL SUCCESS] - Direct COD Order emails sent to customer and admin for KORA-${order.referenceNumber}`);
     } catch (emailErr) {

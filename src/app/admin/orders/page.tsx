@@ -201,9 +201,18 @@ export default function AdminOrdersPage() {
                               <span>Qty {item.quantity}</span>
                             </div>
                             {/* Custom prints and badges formatting */}
-                            {(item.customName || item.customNumber) && (
+                            {item.playerName ? (
                               <p className="text-[9px] text-[#6B00FF] font-black uppercase mt-0.5 tracking-wider bg-purple-50 border border-purple-100 px-1.5 py-0.5 rounded inline-block">
-                                Print: {item.customName || "Plain"} #{item.customNumber || "-"}
+                                Preset Player: {item.playerName} #{item.customNumber || "-"}
+                              </p>
+                            ) : (item.customName || item.customNumber) ? (
+                              <p className="text-[9px] text-[#6B00FF] font-black uppercase mt-0.5 tracking-wider bg-purple-50 border border-purple-100 px-1.5 py-0.5 rounded inline-block">
+                                Custom Print: {item.customName || "Plain"} #{item.customNumber || "-"}
+                              </p>
+                            ) : null}
+                            {item.patch && (
+                              <p className="text-[9px] text-teal-600 font-black uppercase mt-0.5 tracking-wider bg-teal-50 border border-teal-100 px-1.5 py-0.5 rounded inline-block ml-1">
+                                Patch: {item.patch}
                               </p>
                             )}
                           </div>

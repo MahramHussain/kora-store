@@ -925,11 +925,26 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                           <p className="font-extrabold text-slate-900 text-sm">{item.product?.name || "Premium Gear"}</p>
                                           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-400 mt-1 font-medium">
                                             <span>Size: <strong className="text-slate-700 font-extrabold">{item.size}</strong></span>
-                                            {(item.customName || item.customNumber) && (
+                                            {item.playerName ? (
                                               <>
                                                 <span className="text-slate-200">|</span>
                                                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-kora font-bold text-[10px] border border-purple-100">
-                                                  Print: {item.customName} {item.customNumber ? `#${item.customNumber}` : ""}
+                                                  Preset Player: {item.playerName} #{item.customNumber || ""}
+                                                </span>
+                                              </>
+                                            ) : (item.customName || item.customNumber) ? (
+                                              <>
+                                                <span className="text-slate-200">|</span>
+                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-kora font-bold text-[10px] border border-purple-100">
+                                                  Custom Print: {item.customName} {item.customNumber ? `#${item.customNumber}` : ""}
+                                                </span>
+                                              </>
+                                            ) : null}
+                                            {item.patch && (
+                                              <>
+                                                <span className="text-slate-200">|</span>
+                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-teal-50 text-teal-600 font-bold text-[10px] border border-teal-100">
+                                                  Patch: {item.patch}
                                                 </span>
                                               </>
                                             )}

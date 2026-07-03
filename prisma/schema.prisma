@@ -95,6 +95,8 @@ model OrderItem {
   price        Decimal // We lock the price here so if the shirt goes on sale later, past orders don't change!
   customName   String  @default("")
   customNumber String  @default("")
+  playerName   String  @default("")
+  patch        String  @default("")
 }
 
 model Review {
@@ -127,6 +129,8 @@ model CartItem {
   quantity     Int
   customName   String   @default("")
   customNumber String   @default("")
+  playerName   String   @default("")
+  patch        String   @default("")
 
-  @@unique([userId, productId, size, image, customName, customNumber])
+  @@unique([userId, productId, size, image, customName, customNumber, playerName, patch])
 }

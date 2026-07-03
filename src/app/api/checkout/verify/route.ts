@@ -98,6 +98,8 @@ export async function POST(req: NextRequest) {
           price: `${CURRENCY}${parseFloat(item.price.toString()).toFixed(2)}`,
           customName: item.customName || "",
           customNumber: item.customNumber || "",
+          playerName: item.playerName || "",
+          patch: item.patch || "",
         })),
         subtotal: `${CURRENCY}${calculatedSubtotal.toFixed(2)}`,
         shippingFee: `${CURRENCY}${parseFloat(order.shippingFee.toString()).toFixed(2)}`,
@@ -112,12 +114,15 @@ export async function POST(req: NextRequest) {
         toEmail: order.user.email,
       });
 
-      // B. Send notification alert to store admin
-      await sendOrderConfirmationEmail({
-        ...emailParams,
-        shippingAddress: `${order.shippingStreet}, ${order.shippingCity}, UAE`,
-        toEmail: "korastore.ae@gmail.com",
-      });
+      // B. Send notification alert to store admins
+      const adminEmails = ["korastore.ae@gmail.com", "mahramh40@gmail.com"];
+      for (const email of adminEmails) {
+        await sendOrderConfirmationEmail({
+          ...emailParams,
+          shippingAddress: `${order.shippingStreet}, ${order.shippingCity}, UAE`,
+          toEmail: email,
+        });
+      }
 
       console.log(`📬 [EMAIL SUCCESS] - Ziina Verified Order emails sent for KORA-${order.referenceNumber}`);
     } catch (emailErr) {

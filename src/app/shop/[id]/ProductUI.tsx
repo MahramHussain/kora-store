@@ -567,6 +567,8 @@ export default function ProductUI({ product }: { product: any }) {
       quantity: quantity,
       customName: finalName || undefined,
       customNumber: finalNumber || undefined,
+      playerName: selectedPresetPlayer?.name || undefined,
+      patch: hasFifaPatch ? "FIFA World Cup Badge Set" : undefined,
     });
     
     setIsAdded(true);

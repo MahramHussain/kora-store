@@ -27,7 +27,8 @@ export async function GET(req: NextRequest) {
         const isPreset = presets.some(p => p.name === item.customName.trim().toUpperCase() && p.number === item.customNumber.trim());
         printUpcharge = isPreset ? 15 : 25;
       }
-      const finalPrice = basePrice + printUpcharge;
+      const patchUpcharge = item.patch ? 10 : 0;
+      const finalPrice = basePrice + printUpcharge + patchUpcharge;
 
       return {
         id: item.productId,
@@ -36,8 +37,10 @@ export async function GET(req: NextRequest) {
         image: item.image || item.product.images[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png",
         size: item.size,
         quantity: item.quantity,
-        customName: item.customName,
-        customNumber: item.customNumber
+        customName: item.customName || undefined,
+        customNumber: item.customNumber || undefined,
+        playerName: item.playerName || undefined,
+        patch: item.patch || undefined
       };
     });
 
@@ -72,7 +75,9 @@ export async function POST(req: NextRequest) {
             image: item.image || "",
             quantity: item.quantity,
             customName: item.customName || "",
-            customNumber: item.customNumber || ""
+            customNumber: item.customNumber || "",
+            playerName: item.playerName || "",
+            patch: item.patch || ""
           }))
         });
       }

@@ -93,7 +93,7 @@ export default function CheckoutPage() {
   };
 
   const discountAmount = subtotal * discountPercent;
-  const shippingCharge = 25;
+  const shippingCharge = (subtotal - discountAmount) > 200 ? 0 : 25;
   const finalTotal = subtotal - discountAmount + shippingCharge;
 
   // Render Vault Sign-in Wall if not authenticated
@@ -515,7 +515,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between">
                   <span>Shipping (UAE Priority)</span>
                   <span className="text-slate-900 font-bold">
-                    {CURRENCY}{shippingCharge.toFixed(2)}
+                    {shippingCharge === 0 ? "FREE" : `${CURRENCY}${shippingCharge.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between">

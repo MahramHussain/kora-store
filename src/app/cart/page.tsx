@@ -21,6 +21,8 @@ export default function CartPage() {
     return total + (numericPrice * item.quantity);
   }, 0);
 
+  const shippingCharge = subtotal > 200 ? 0 : 25;
+
   // --- THE GHOST CHECKOUT ENGINE ---
   const handleCheckout = async () => {
     setIsCheckingOut(true);
@@ -140,13 +142,15 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between">
                     <span>UAE Local Delivery</span>
-                    <span className="text-slate-900 font-bold">{CURRENCY}25.00</span>
+                    <span className="text-slate-900 font-bold">
+                      {shippingCharge === 0 ? "FREE" : `${CURRENCY}25.00`}
+                    </span>
                   </div>
                 </div>
 
                 <div className="flex justify-between items-center border-t border-slate-200 pt-6 mb-8 font-sans">
                   <span className="font-bold text-slate-900 uppercase">Total</span>
-                  <span className="text-3xl font-bold text-slate-900">{CURRENCY}{(subtotal + 25).toFixed(2)}</span>
+                  <span className="text-3xl font-bold text-slate-900">{CURRENCY}{(subtotal + shippingCharge).toFixed(2)}</span>
                 </div>
 
                 <button 
