@@ -18,7 +18,11 @@ const FAQS = [
   },
   {
     question: "What is your return policy?",
-    answer: "We accept returns and exchanges within 7 days of delivery, provided the gear is completely unworn, unwashed, and still has all the original tags attached. Hit up support@korastore.com to start a return."
+    answer: "We accept exchanges and refunds under strict conditions: Jerseys with custom printed names or numbers are non-returnable and non-exchangeable. Non-printed jerseys are eligible for exchange only if they are unused, unwashed, returned in their original packaging, and have all tags attached. A 25 AED delivery fee applies to all exchange requests. We only offer refunds if you receive a damaged item. All refund/exchange requests must be made within 48 hours of delivery. Once the item is received and inspected, refunds are processed to your bank account within 3-4 business days."
+  },
+  {
+    question: "How should I wash and care for my jerseys?",
+    answer: "To preserve your jersey's quality: Hand wash only using cold water and a small amount of mild detergent. Wash gently and do not scrub the prints or logos. Do not use a washing machine or a tumble dryer. Air dry in the shade, and do not wring or twist the fabric. Player Version jerseys require extra care due to their lightweight fabric and heat-pressed details."
   },
   {
     question: "How do I know what size to get?",

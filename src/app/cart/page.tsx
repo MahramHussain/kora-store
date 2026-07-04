@@ -110,14 +110,14 @@ export default function CartPage() {
                     {/* CART QUANTITY ADJUSTER */}
                     <div className="flex items-center gap-3 mt-3 bg-white w-max rounded-full p-1 border border-slate-200 shadow-sm">
                       <button 
-                        onClick={() => updateQuantity(item.id, item.size, item.image, item.customName, item.customNumber, item.quantity - 1)} 
+                        onClick={() => updateQuantity(item.id, item.size, item.image, item.customName, item.customNumber, item.quantity - 1, item.playerName, item.patch)} 
                         className="w-7 h-7 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
                         −
                       </button>
                       <span className="font-bold text-slate-900 text-sm w-4 text-center">{item.quantity}</span>
                       <button 
-                        onClick={() => updateQuantity(item.id, item.size, item.image, item.customName, item.customNumber, item.quantity + 1)} 
+                        onClick={() => updateQuantity(item.id, item.size, item.image, item.customName, item.customNumber, item.quantity + 1, item.playerName, item.patch)} 
                         className="w-7 h-7 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
                         +
@@ -127,7 +127,7 @@ export default function CartPage() {
 
                   {/* Remove Button */}
                   <button 
-                    onClick={() => removeFromCart(item.id, item.size, item.image, item.customName, item.customNumber)}
+                    onClick={() => removeFromCart(item.id, item.size, item.image, item.customName, item.customNumber, item.playerName, item.patch)}
                     className="absolute top-2 right-2 sm:top-4 sm:right-4 text-slate-400 hover:text-rose-600 transition-colors p-2"
                   >
                     <FaTrash />

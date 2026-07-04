@@ -45,8 +45,10 @@ export default function Footer() {
                 <span>support@korastore.com</span>
               </li>
               <li className="flex items-center gap-3 hover:text-emerald-300 transition-colors cursor-pointer group">
-                <FaWhatsapp className="text-xl group-hover:scale-110 transition-transform text-purple-300 group-hover:text-emerald-300" /> 
-                <span>WhatsApp: +971 50 123 4567</span>
+                <a href="https://wa.me/971564245926" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
+                  <FaWhatsapp className="text-xl group-hover:scale-110 transition-transform text-purple-300 group-hover:text-emerald-300" /> 
+                  <span>WhatsApp: +971 56 424 5926</span>
+                </a>
               </li>
               <li className="flex items-center gap-3 hover:text-pink-300 transition-colors cursor-pointer group">
                 <a href="https://www.instagram.com/korastore.ae/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
@@ -73,7 +75,7 @@ export default function Footer() {
               <a href="mailto:support@korastore.com" className="mobile-footer-social-btn text-purple-200 border-purple-800 hover:text-white" aria-label="Email Support">
                 <FaEnvelope className="text-lg" />
               </a>
-              <a href="https://wa.me/971501234567" target="_blank" rel="noopener noreferrer" className="mobile-footer-social-btn text-purple-200 border-purple-800 hover:text-emerald-300" aria-label="WhatsApp">
+              <a href="https://wa.me/971564245926" target="_blank" rel="noopener noreferrer" className="mobile-footer-social-btn text-purple-200 border-purple-800 hover:text-emerald-300" aria-label="WhatsApp">
                 <FaWhatsapp className="text-lg" />
               </a>
               <a href="https://www.instagram.com/korastore.ae/" target="_blank" rel="noopener noreferrer" className="mobile-footer-social-btn text-purple-200 border-purple-800 hover:text-pink-300" aria-label="Instagram">
@@ -117,9 +119,11 @@ export default function Footer() {
                     <FaEnvelope className="text-sm text-purple-300" />
                     <span>support@korastore.com</span>
                   </li>
-                  <li className="flex items-center gap-3 py-1">
-                    <FaWhatsapp className="text-sm text-purple-300" />
-                    <span>+971 50 123 4567</span>
+                  <li className="flex items-center gap-3 py-1 hover:text-emerald-300 transition-colors cursor-pointer">
+                    <a href="https://wa.me/971564245926" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
+                      <FaWhatsapp className="text-sm text-purple-300" />
+                      <span>+971 56 424 5926</span>
+                    </a>
                   </li>
                   <li className="flex items-center gap-3 py-1 hover:text-pink-300 transition-colors cursor-pointer">
                     <a href="https://www.instagram.com/korastore.ae/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
@@ -139,7 +143,7 @@ export default function Footer() {
               Want access to early drops, exclusive promo codes, and personal sourcing requests? Join our VIP list on WhatsApp.
             </p>
             <a 
-              href="https://wa.me/971501234567" 
+              href="https://wa.me/971564245926" 
               target="_blank" 
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-white text-[#5E0683] text-xs font-black uppercase tracking-wider px-6 py-2.5 rounded-full shadow-md hover:bg-purple-50 transition-colors"

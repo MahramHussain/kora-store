@@ -491,7 +491,10 @@ export default function Navbar() {
                   {filteredSuggestions.map((suggestion, idx) => (
                     <div 
                       key={idx}
-                      onClick={(e) => handleSearch(e as any, suggestion)}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleSearch(e as any, suggestion);
+                      }}
                       className="px-4 py-2 hover:bg-neutral-50 cursor-pointer text-neutral-700 hover:text-[#5E0683] transition-colors flex items-center gap-2 font-sans text-xs"
                     >
                       <FiSearch className="text-[10px] text-neutral-400" /> {suggestion}
@@ -566,11 +569,14 @@ export default function Navbar() {
                 {filteredSuggestions.map((suggestion, idx) => (
                   <div 
                     key={idx}
-                  onClick={(e) => handleSearch(e as any, suggestion)}
-                  className="px-4 py-2 hover:bg-neutral-50 cursor-pointer text-neutral-700 hover:text-[#5E0683] transition-colors flex items-center gap-2 font-sans text-xs"
-                >
-                  <FiSearch className="text-[10px] text-neutral-400" /> {suggestion}
-                </div>
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSearch(e as any, suggestion);
+                    }}
+                    className="px-4 py-2 hover:bg-neutral-50 cursor-pointer text-neutral-700 hover:text-[#5E0683] transition-colors flex items-center gap-2 font-sans text-xs"
+                  >
+                    <FiSearch className="text-[10px] text-neutral-400" /> {suggestion}
+                  </div>
                 ))}
               </div>
             )}

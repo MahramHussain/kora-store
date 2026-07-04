@@ -96,30 +96,59 @@ export default function ShippingReturnsPage() {
         {/* RETURNS CONTENT */}
         {activeTab === "returns" && (
           <div className="animate-fade-in-up space-y-6 sm:space-y-8 font-sans">
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-8 md:p-10 shadow-sm">
-              <div className="flex items-start gap-4 sm:gap-6 mb-6 sm:mb-8 border-b border-slate-200 pb-6 sm:pb-8">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 text-xl sm:text-2xl shadow-sm">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-8 md:p-10 shadow-sm space-y-8">
+              
+              {/* Printed vs Non-printed jerseys rule */}
+              <div className="flex items-start gap-4 sm:gap-6 border-b border-slate-200 pb-6">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 bg-rose-100 rounded-xl flex items-center justify-center text-rose-600 text-xl sm:text-2xl shadow-sm">
                   <FaShieldAlt />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">The 7-Day Guarantee</h3>
+                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">Printed vs Non-Printed Items</h3>
+                  <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-sans mb-3">
+                    <strong className="text-rose-600 font-extrabold uppercase">Custom Printed Jerseys:</strong> Jerseys with printed names or numbers are <strong className="text-slate-900">non-returnable and non-exchangeable</strong> under any circumstances.
+                  </p>
                   <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-sans">
-                    We stand by the premium grade of our gear. If you need a different size or aren't entirely satisfied, you have <strong className="text-slate-900">7 days</strong> from the date of delivery to request an exchange or return. 
+                    <strong className="text-slate-900 font-extrabold uppercase">Non-Printed Jerseys:</strong> Eligible for exchange only if:
+                  </p>
+                  <ul className="list-disc list-inside mt-2 space-y-1.5 text-xs sm:text-sm text-slate-500 font-sans">
+                    <li>Completely unused and unwashed</li>
+                    <li>Returned in their original packaging</li>
+                    <li>All original tags are attached</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Exchange Fee */}
+              <div className="flex items-start gap-4 sm:gap-6 border-b border-slate-200 pb-6">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 text-xl sm:text-2xl shadow-sm">
+                  <span className="font-extrabold text-sm sm:text-lg">AED</span>
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">Exchange Fee</h3>
+                  <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-sans">
+                    A flat <strong className="text-slate-900">25 AED delivery fee</strong> applies to all exchange requests to cover logistics and courier operations.
                   </p>
                 </div>
               </div>
 
+              {/* Refunds and Claims window */}
               <div className="flex items-start gap-4 sm:gap-6">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 bg-pink-100 rounded-xl flex items-center justify-center text-pink-600 text-xl sm:text-2xl shadow-sm">
                   <FaArrowRotateLeft />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">Strict Conditions</h3>
-                  <ul className="space-y-3 text-slate-600 list-disc list-inside font-sans">
-                    <li>Items must be <strong className="text-slate-900">unworn and unwashed</strong>.</li>
-                    <li>All original tags must still be attached to the garments.</li>
-                    <li>Shoes must be returned in their original, undamaged box.</li>
-                    <li>Player Issue kits cannot be returned if they have custom name/number printing.</li>
+                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">Refunds & Claims</h3>
+                  <ul className="space-y-3 text-xs sm:text-base text-slate-600 font-sans">
+                    <li>
+                      <strong className="text-slate-900">Damaged Items Only:</strong> Refunds are processed <strong className="text-rose-600">only</strong> if you receive a damaged item.
+                    </li>
+                    <li>
+                      <strong className="text-slate-900">48-Hour Claim Window:</strong> All refund and exchange requests must be made within <strong className="text-slate-900">48 hours</strong> of receiving the order. Requests made after 48 hours will not be accepted.
+                    </li>
+                    <li>
+                      <strong className="text-slate-900">Refund Processing:</strong> Once the returned item is received and inspected, refunds will be processed to your bank account within <strong className="text-slate-900">3-4 business days</strong> (or any bank account of your choice if you do not have your own).
+                    </li>
                   </ul>
                 </div>
               </div>

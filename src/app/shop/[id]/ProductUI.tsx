@@ -123,9 +123,234 @@ const getPresetPlayersForProduct = (productName: string) => {
   return PRESET_PLAYERS[normalized] || [];
 };
 
+// Custom SVG icon for Name & Number printing (shirt with "00")
+function JerseyPrintIcon({ className = "w-6 h-6 text-kora" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 100 100" fill="currentColor">
+      {/* Jersey body shape */}
+      <path d="M 36 18 Q 50 26 64 18 L 90 36 L 79 52 L 74 44 L 74 85 L 26 85 L 26 44 L 21 52 L 10 36 Z" />
+      {/* Sleeve stripes */}
+      <line x1="13" y1="37" x2="23" y2="51" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="87" y1="37" x2="77" y2="51" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+      {/* Bottom stripes */}
+      <line x1="26" y1="76" x2="74" y2="76" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+      <line x1="26" y1="81" x2="74" y2="81" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+      {/* Zero rects */}
+      <rect x="35" y="32" width="12" height="28" rx="4.5" fill="none" stroke="white" strokeWidth="3.5" />
+      <rect x="53" y="32" width="12" height="28" rx="4.5" fill="none" stroke="white" strokeWidth="3.5" />
+    </svg>
+  );
+}
+
+// Custom SVG icon for sleeve patches (folded corner badge)
+function SleevePatchIcon({ className = "w-6 h-6 text-kora" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      {/* Main badge body */}
+      <path d="M19 3H5c-1.1 0-2 .9-2 2v10.5l5.5 5.5H19c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z" />
+      {/* Fold curve separator */}
+      <path d="M3 15.5C5.5 15.5 8 18 8 20.5" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+type CustomSelectOption = {
+  value: string;
+  label: string;
+  image?: string;
+};
+
+type CustomSelectProps = {
+  value: string;
+  onChange: (value: string) => void;
+  options: CustomSelectOption[];
+  placeholder: string;
+  className?: string;
+};
+
+function CustomSelect({ value, onChange, options, placeholder, className = "" }: CustomSelectProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleOutsideClick);
+    return () => document.removeEventListener("mousedown", handleOutsideClick);
+  }, []);
+
+  const selectedOption = options.find((opt) => opt.value === value);
+
+  return (
+    <div ref={containerRef} className={`relative ${className}`}>
+      {/* Trigger Button */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full min-w-0 bg-white border border-slate-200 hover:border-slate-300 rounded-xl py-2 px-3 text-slate-700 font-bold focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all flex items-center justify-between shadow-xs cursor-pointer text-xs text-left min-h-[44px]"
+      >
+        <div className="flex-1 min-w-0 flex items-center gap-2.5 overflow-hidden">
+          {selectedOption?.image && (
+            <img src={selectedOption.image} alt={selectedOption.label} className="w-7 h-7 object-contain rounded-md border border-slate-200/60 shrink-0 bg-white" />
+          )}
+          <span className={`truncate block ${selectedOption ? "text-slate-900 font-bold" : "text-slate-400"}`}>
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
+        </div>
+        <svg
+          className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ${isOpen ? "rotate-180" : ""}`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Dropdown Menu */}
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-1.5 bg-white border border-slate-200/80 rounded-xl shadow-xl py-1 max-h-60 overflow-y-auto animate-fade-in origin-top">
+          {options.length === 0 ? (
+            <div className="px-4 py-3 text-xs text-slate-400 italic text-center">No options available</div>
+          ) : (
+            options.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => {
+                  onChange(opt.value);
+                  setIsOpen(false);
+                }}
+                className={`w-full text-left px-4 py-2 flex items-center gap-2.5 text-xs font-bold transition-colors ${
+                  opt.value === value
+                    ? "bg-kora text-white"
+                    : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                {opt.image && (
+                  <img src={opt.image} alt={opt.label} className="w-8 h-8 object-contain rounded-md border border-slate-200/60 shrink-0 bg-white" />
+                )}
+                <span className="flex-1 min-w-0 truncate">{opt.label}</span>
+              </button>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const RIGHT_SLEEVE_PATCH_OPTIONS: CustomSelectOption[] = [
+  {
+    value: "",
+    label: "Right Patch"
+  },
+  {
+    value: "FIFA Black Patch (Right Sleeve)",
+    label: "FIFA Black Patch (Right Sleeve)",
+    image: "/assets/Patches/Right Sleeve/FIFA-BLACK-RIGHT-SLEEVE.jpg"
+  },
+  {
+    value: "FIFA Black Patch (Right Sleeve) (Transfer)",
+    label: "FIFA Black Patch (Right Sleeve) (Transfer)",
+    image: "/assets/Patches/Right Sleeve/FIFA-BLACK-RIGHT-SLEEVE-transfer.jpg"
+  },
+  {
+    value: "FIFA Champions Gold Patch (Right Sleeve)",
+    label: "FIFA Champions Gold Patch (Right Sleeve)",
+    image: "/assets/Patches/Right Sleeve/FIFA-CHAMPIONS-GOLD-RIGHT-SLEEVE.jpg"
+  },
+  {
+    value: "FIFA Champions Gold Patch (Right Sleeve) (Transfer)",
+    label: "FIFA Champions Gold Patch (Right Sleeve) (Transfer)",
+    image: "/assets/Patches/Right Sleeve/FIFA-CHAMPION-GOLD-RIGHT-SLEEVE-transfer.jpg"
+  },
+  {
+    value: "FIFA Champions White Patch (Right Sleeve)",
+    label: "FIFA Champions White Patch (Right Sleeve)",
+    image: "/assets/Patches/Right Sleeve/FIFA-CHAMPIONS-WHITE-RIGHT-SLEEVE.jpg"
+  },
+  {
+    value: "FIFA Champions White Patch (Right Sleeve) (Transfer)",
+    label: "FIFA Champions White Patch (Right Sleeve) (Transfer)",
+    image: "/assets/Patches/Right Sleeve/FIFA-CHAMPION-WHITE-RIGHT-SLEEVE-transfer.jpg"
+  },
+  {
+    value: "FIFA White Patch (Right Sleeve)",
+    label: "FIFA White Patch (Right Sleeve)",
+    image: "/assets/Patches/Right Sleeve/FIFA-WHITE-RIGHT-SLEEVE.jpg"
+  },
+  {
+    value: "FIFA White Patch (Right Sleeve) (Transfer)",
+    label: "FIFA White Patch (Right Sleeve) (Transfer)",
+    image: "/assets/Patches/Right Sleeve/FIFA-WHITE-RIGHT-SLEEVE-transfer.jpg"
+  }
+];
+
+const LEFT_SLEEVE_PATCH_OPTIONS: CustomSelectOption[] = [
+  {
+    value: "",
+    label: "Left Patch"
+  },
+  {
+    value: "Football Unites The World Blue 3D Patch (Left Sleeve)",
+    label: "Football Unites The World Blue 3D Patch (Left Sleeve)",
+    image: "/assets/Patches/Left Sleeve/LEFT-SLEEVE-FTBL-UNITES-THE-WRLD-BLUE-3D-transfer.jpg"
+  },
+  {
+    value: "Football Unites The World Blue Patch (Left Sleeve)",
+    label: "Football Unites The World Blue Patch (Left Sleeve)",
+    image: "/assets/Patches/Left Sleeve/LEFT-SLEEVE-FTBL-UNITES-THE-WRLD-BLUE-transfer.jpg"
+  },
+  {
+    value: "Football Unites The World White Patch (Left Sleeve)",
+    label: "Football Unites The World White Patch (Left Sleeve)",
+    image: "/assets/Patches/Left Sleeve/LEFT-SLEEVE-FTBL-UNITES-THE-WRLD-WHITE-transfer.jpg"
+  },
+  {
+    value: "Unite For Education Grey Patch (Left Sleeve)",
+    label: "Unite For Education Grey Patch (Left Sleeve)",
+    image: "/assets/Patches/Left Sleeve/LEFT-SLEEVE-UNITE-FOR-EDUCATION-GREY-transfer.jpg"
+  },
+  {
+    value: "Unite For Education Purple Patch (Left Sleeve)",
+    label: "Unite For Education Purple Patch (Left Sleeve)",
+    image: "/assets/Patches/Left Sleeve/LEFT-SLEEVE-UNITE-FOR-EDUCATION-PURPLE-transfer.jpg"
+  },
+  {
+    value: "Unite For Education White Patch (Left Sleeve)",
+    label: "Unite For Education White Patch (Left Sleeve)",
+    image: "/assets/Patches/Left Sleeve/LEFT-SLEEVE-UNITE-FOR-EDUCATION-WHITE-transfer.jpg"
+  },
+  {
+    value: "Unite For Peace Blue Patch (Left Sleeve)",
+    label: "Unite For Peace Blue Patch (Left Sleeve)",
+    image: "/assets/Patches/Left Sleeve/LEFT-SLEEVE-UNITE-FOR-PEACE-BLUE-transfer.jpg"
+  },
+  {
+    value: "Unite For Peace Light Blue Patch (Left Sleeve)",
+    label: "Unite For Peace Light Blue Patch (Left Sleeve)",
+    image: "/assets/Patches/Left Sleeve/LEFT-SLEEVE-UNITE-FOR-PEACE-LIGHT-BLUE-transfer.jpg"
+  },
+  {
+    value: "Unite For Peace White Patch (Left Sleeve)",
+    label: "Unite For Peace White Patch (Left Sleeve)",
+    image: "/assets/Patches/Left Sleeve/LEFT-SLEEVE-UNITE-FOR-PEACE-WHITE-transfer.jpg"
+  }
+];
+
 export default function ProductUI({ product }: { product: any }) {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
+  const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
+  const normalizedName = product.name.toUpperCase().replace(/\s+KIT.*$/i, "").trim();
+  const isChartA = ["PORTUGAL HOME", "PORTUGAL AWAY", "SPAIN AWAY", "FRANCE HOME"].includes(normalizedName);
+  const isChartB = ["ARGENTINA HOME", "ARGENTINA AWAY", "FRANCE AWAY", "SPAIN HOME", "BRAZIL AWAY", "URUGUAY AWAY"].includes(normalizedName);
+  const hasCustomSizeChart = isChartA || isChartB;
   const [activeTab, setActiveTab] = useState<"details" | "reviews">("details");
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
   const [helpfulVotes, setHelpfulVotes] = useState<Record<string, { yes: number; voted: 'yes' | null }>>({});
@@ -152,7 +377,9 @@ export default function ProductUI({ product }: { product: any }) {
 
   // Personalization states
   const [personalizationTab, setPersonalizationTab] = useState<"none" | "custom" | "player">("none");
-  const [hasFifaPatch, setHasFifaPatch] = useState(false);
+  const [leftSleevePatch, setLeftSleevePatch] = useState("");
+  const [rightSleevePatch, setRightSleevePatch] = useState("");
+  const hasFifaPatch = leftSleevePatch !== "" || rightSleevePatch !== "";
   const [selectedPresetPlayer, setSelectedPresetPlayer] = useState<{ name: string; number: string } | null>(null);
   const presetPlayers = getPresetPlayersForProduct(product.name);
 
@@ -182,145 +409,166 @@ export default function ProductUI({ product }: { product: any }) {
   const renderDesktopPersonalizationBox = () => {
     if (product.category !== "Shirts") return null;
 
+    const playerOptions = presetPlayers.map((player: { name: string; number: string }) => ({
+      value: JSON.stringify(player),
+      label: `${player.name} (#${player.number})`
+    }));
+
     return (
-      <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-6 mb-8 font-sans shadow-sm">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center text-slate-800 shadow-sm shrink-0">
-            <svg className="w-6 h-6 text-kora" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v1.244c0 .54-.438.976-.977.976H5.216c-.732 0-1.393.479-1.579 1.186L2.01 12.872a1.082 1.082 0 00.938 1.348h2.091c.484 0 .903.327 1.018.799l2.128 8.79c.121.5.57.844 1.086.844h5.474c.516 0 .965-.344 1.086-.844l2.128-8.79c.115-.472.534-.799 1.018-.799h2.091a1.082 1.082 0 00.938-1.348l-1.627-6.362c-.186-.707-.847-1.186-1.579-1.186h-3.557c-.539 0-.977-.436-.977-.976V3.104c0-.573-.464-1.037-1.036-1.037H10.786c-.572 0-1.036.464-1.036 1.037z" />
-            </svg>
-          </div>
-
-          <div>
-            <span className="text-[10px] font-extrabold uppercase text-kora tracking-widest bg-kora/10 px-2.5 py-0.5 rounded-sm">Bespoke Lab</span>
-            <h3 className="text-slate-900 font-extrabold text-base leading-tight mt-1">Kit Personalisation</h3>
-            <p className="text-slate-400 text-xs mt-0.5">Add custom name & number, or official sleeve patches</p>
-          </div>
-        </div>
-
-        <div className="flex gap-3 mt-6">
-          <button
-            type="button"
-            onClick={() => {
-              setPersonalizationTab(personalizationTab === "custom" ? "none" : "custom");
-              setSelectedPresetPlayer(null);
-              setCustomName("");
-              setCustomNumber("");
-            }}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
-              personalizationTab === "custom"
-                ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
-                : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-xs"
-            }`}
-          >
-            <FiEdit className="text-sm shrink-0" />
-            <span>Add Name & Number</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setPersonalizationTab(personalizationTab === "player" ? "none" : "player");
-              setSelectedPresetPlayer(null);
-              setCustomName("");
-              setCustomNumber("");
-            }}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
-              personalizationTab === "player"
-                ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
-                : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-xs"
-            }`}
-          >
-            <FiAward className="text-sm shrink-0" />
-            <span>Add Player/Patches</span>
-          </button>
-        </div>
-
-        {personalizationTab === "custom" && (
-          <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Name on Back</label>
-                <input
-                  type="text"
-                  maxLength={15}
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value.toUpperCase())}
-                  placeholder="e.g. MESSI"
-                  className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider"
-                />
-              </div>
-              <div className="w-24">
-                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Number</label>
-                <input
-                  type="text"
-                  maxLength={3}
-                  value={customNumber}
-                  onChange={(e) => setCustomNumber(e.target.value.replace(/[^0-9]/g, ""))}
-                  placeholder="10"
-                  className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold text-center"
-                />
-              </div>
+      <div className="space-y-6 mb-8">
+        {/* Name & Number Printing Box */}
+        <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-6 font-sans shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-sm shrink-0">
+              <JerseyPrintIcon className="w-7 h-7 text-kora" />
             </div>
-            <p className="text-[10px] text-slate-400 italic">Bespoke hot-pressed vinyl printing. Handcrafted in-house.</p>
-            <p className="text-[10px] text-kora font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3">
-              <span>✨ Custom Player Printing</span>
-              <span>+25 DHS</span>
-            </p>
-          </div>
-        )}
 
-        {personalizationTab === "player" && (
-          <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
-            {presetPlayers.length > 0 && (
-              <div className="pb-3 border-b border-slate-200/60">
-                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-3 tracking-widest">Select Player Print (+15 DHS)</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {presetPlayers.map((player: { name: string; number: string }) => {
-                    const isSelected = selectedPresetPlayer?.name === player.name;
-                    return (
-                      <button
-                        key={player.name}
-                        type="button"
-                        onClick={() => handleSelectPresetPlayer(player)}
-                        className={`py-2.5 px-3.5 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-98 flex items-center justify-between ${
-                          isSelected
-                            ? "bg-kora border-kora text-white shadow-sm shadow-kora/25"
-                            : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:text-slate-900"
-                        }`}
-                      >
-                        <span className="truncate">{player.name}</span>
-                        <span className={`text-[10px] ml-1.5 shrink-0 ${isSelected ? "text-purple-200" : "text-slate-400"}`}>#{player.number}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-            
-            <div className="pt-2">
-              <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Sleeve Badge (Optional)</label>
-              <button
-                type="button"
-                onClick={() => setHasFifaPatch(!hasFifaPatch)}
-                className={`w-full py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 active:scale-98 flex items-center justify-between shadow-xs hover:shadow-sm ${
-                  hasFifaPatch
-                    ? "bg-kora border-kora text-white shadow-sm shadow-kora/20"
-                    : "bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:text-slate-900"
-                }`}
-              >
-                <div className="flex items-center gap-2.5 text-left">
-                  <FiAward className={`text-base shrink-0 ${hasFifaPatch ? "text-white" : "text-kora"}`} />
-                  <div>
-                    <span className="block font-bold">FIFA World Cup Badge Set</span>
-                    <span className={`block text-[10px] font-medium ${hasFifaPatch ? "text-purple-200" : "text-slate-400"}`}>Official right and left sleeve badges</span>
-                  </div>
-                </div>
-                <span className={hasFifaPatch ? "text-white font-extrabold" : "text-kora font-black"}>+10 DHS</span>
-              </button>
+            <div>
+              <span className="text-[10px] font-extrabold uppercase text-kora tracking-widest bg-kora/10 px-2.5 py-0.5 rounded-sm">Bespoke Lab</span>
+              <h3 className="text-slate-900 font-extrabold text-base leading-tight mt-1">Name & Number printing</h3>
+              <p className="text-slate-400 text-xs mt-0.5">Add the name of your favorite player or any custom name available in official font</p>
             </div>
           </div>
-        )}
+
+          <div className="flex gap-3 mt-6">
+            <button
+              type="button"
+              onClick={() => {
+                setPersonalizationTab(personalizationTab === "player" ? "none" : "player");
+                setSelectedPresetPlayer(null);
+                setCustomName("");
+                setCustomNumber("");
+              }}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 uppercase ${
+                personalizationTab === "player"
+                  ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
+                  : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-xs"
+              }`}
+            >
+              <span>Player Name (+15 {CURRENCY.trim().toLowerCase()})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setPersonalizationTab(personalizationTab === "custom" ? "none" : "custom");
+                setSelectedPresetPlayer(null);
+                setCustomName("");
+                setCustomNumber("");
+              }}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 uppercase ${
+                personalizationTab === "custom"
+                  ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
+                  : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-xs"
+              }`}
+            >
+              <span>Custom Name (+25 {CURRENCY.trim().toLowerCase()})</span>
+            </button>
+          </div>
+
+          {/* Player Name Select Dropdown */}
+          {personalizationTab === "player" && (
+            <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
+              {presetPlayers.length > 0 ? (
+                <div>
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2.5 tracking-widest">Select Player Print</label>
+                  <CustomSelect
+                    value={selectedPresetPlayer ? JSON.stringify(selectedPresetPlayer) : ""}
+                    onChange={(val) => {
+                      if (!val) {
+                        setSelectedPresetPlayer(null);
+                        setCustomName("");
+                        setCustomNumber("");
+                      } else {
+                        const player = JSON.parse(val);
+                        setSelectedPresetPlayer(player);
+                        setCustomName(player.name);
+                        setCustomNumber(player.number);
+                      }
+                    }}
+                    options={playerOptions}
+                    placeholder="Select a player..."
+                  />
+                </div>
+              ) : (
+                <p className="text-[10px] text-slate-400 italic">No preset players available for this product.</p>
+              )}
+            </div>
+          )}
+
+          {/* Custom Name Inputs */}
+          {personalizationTab === "custom" && (
+            <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Name on Back</label>
+                  <input
+                    type="text"
+                    maxLength={15}
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value.toUpperCase())}
+                    placeholder="e.g. ADNAN"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-990 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider text-slate-900"
+                  />
+                </div>
+                <div className="w-24">
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Number</label>
+                  <input
+                    type="text"
+                    maxLength={3}
+                    value={customNumber}
+                    onChange={(e) => setCustomNumber(e.target.value.replace(/[^0-9]/g, ""))}
+                    placeholder="10"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-990 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold text-center text-slate-900"
+                  />
+                </div>
+              </div>
+              <p className="text-[10px] text-slate-400 italic">Bespoke hot-pressed vinyl printing. Handcrafted in-house.</p>
+              <p className="text-[10px] text-kora font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3">
+                <span>✨ Custom Player Printing</span>
+                <span>+25 {CURRENCY.trim().toLowerCase()}</span>
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Sleeve Patches Box */}
+        <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-6 font-sans shadow-sm">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-sm shrink-0">
+                <SleevePatchIcon className="w-7 h-7 text-kora" />
+              </div>
+              <div>
+                <h3 className="text-slate-900 font-extrabold text-base leading-tight">Sleeve Patches</h3>
+                <p className="text-slate-400 text-xs mt-0.5">Add the official sleeve patch</p>
+              </div>
+            </div>
+            <div className="bg-white border border-slate-200/80 rounded-xl px-3.5 py-1.5 text-xs font-bold text-slate-900 shadow-xs">
+              +10 {CURRENCY.trim().toLowerCase()}
+            </div>
+          </div>
+
+          <div className="flex gap-3 mt-5">
+            {/* Right Sleeve Dropdown */}
+            <CustomSelect
+              value={rightSleevePatch}
+              onChange={setRightSleevePatch}
+              options={RIGHT_SLEEVE_PATCH_OPTIONS}
+              placeholder="Right Patch"
+              className="flex-1 min-w-0"
+            />
+
+            {/* Left Sleeve Dropdown */}
+            <CustomSelect
+              value={leftSleevePatch}
+              onChange={setLeftSleevePatch}
+              options={LEFT_SLEEVE_PATCH_OPTIONS}
+              placeholder="Left Patch"
+              className="flex-1 min-w-0"
+            />
+          </div>
+        </div>
       </div>
     );
   };
@@ -328,141 +576,166 @@ export default function ProductUI({ product }: { product: any }) {
   const renderPersonalizationBox = () => {
     if (product.category !== "Shirts") return null;
 
+    const playerOptions = presetPlayers.map((player: { name: string; number: string }) => ({
+      value: JSON.stringify(player),
+      label: `${player.name} (#${player.number})`
+    }));
+
     return (
-      <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-5 mb-6 font-sans shadow-xs">
-        <div className="flex items-start gap-4">
-          {/* Jersey Icon */}
-          <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center text-slate-800 shadow-xs shrink-0">
-            <svg className="w-6 h-6 text-slate-800" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v1.244c0 .54-.438.976-.977.976H5.216c-.732 0-1.393.479-1.579 1.186L2.01 12.872a1.082 1.082 0 00.938 1.348h2.091c.484 0 .903.327 1.018.799l2.128 8.79c.121.5.57.844 1.086.844h5.474c.516 0 .965-.344 1.086-.844l2.128-8.79c.115-.472.534-.799 1.018-.799h2.091a1.082 1.082 0 00.938-1.348l-1.627-6.362c-.186-.707-.847-1.186-1.579-1.186h-3.557c-.539 0-.977-.436-.977-.976V3.104c0-.573-.464-1.037-1.036-1.037H10.786c-.572 0-1.036.464-1.036 1.037z" />
-            </svg>
-          </div>
-
-          <div>
-            <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">Personalise your kit</h3>
-            <p className="text-slate-400 text-xs mt-1">Add your name and number or select sleeve patches</p>
-          </div>
-        </div>
-
-        {/* Toggles */}
-        <div className="flex gap-3 mt-5">
-          <button
-            type="button"
-            onClick={() => {
-              setPersonalizationTab(personalizationTab === "custom" ? "none" : "custom");
-              setSelectedPresetPlayer(null);
-              setCustomName("");
-              setCustomNumber("");
-            }}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
-              personalizationTab === "custom"
-                ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
-                : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-sm hover:shadow-kora/10"
-            }`}
-          >
-            <FiEdit className="text-sm shrink-0" />
-            <span>Custom name</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setPersonalizationTab(personalizationTab === "player" ? "none" : "player");
-              setSelectedPresetPlayer(null);
-              setCustomName("");
-              setCustomNumber("");
-            }}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 ${
-              personalizationTab === "player"
-                ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
-                : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-sm hover:shadow-kora/10"
-            }`}
-          >
-            <FiAward className="text-sm shrink-0" />
-            <span>Player/Patches</span>
-          </button>
-        </div>
-
-        {/* Sub-panels */}
-        {personalizationTab === "custom" && (
-          <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
-            <div className="flex gap-3">
-              <div className="flex-1">
-                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Name</label>
-                <input
-                  type="text"
-                  maxLength={15}
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value.toUpperCase())}
-                  placeholder="e.g. MESSI"
-                  className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider"
-                />
-              </div>
-              <div className="w-24">
-                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Number</label>
-                <input
-                  type="text"
-                  maxLength={3}
-                  value={customNumber}
-                  onChange={(e) => setCustomNumber(e.target.value.replace(/[^0-9]/g, ""))}
-                  placeholder="10"
-                  className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold text-center"
-                />
-              </div>
+      <div className="space-y-4 mb-6">
+        {/* Name & Number Printing Box */}
+        <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-5 font-sans shadow-xs">
+          <div className="flex items-start gap-4">
+            {/* Jersey Icon */}
+            <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-xs shrink-0">
+              <JerseyPrintIcon className="w-7 h-7 text-kora" />
             </div>
-            <p className="text-[10px] text-kora font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3">
-              <span>✨ Custom Player Printing</span>
-              <span>+25 DHS</span>
-            </p>
-          </div>
-        )}
 
-        {personalizationTab === "player" && (
-          <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
-            {presetPlayers.length > 0 && (
-              <div className="pb-3 border-b border-slate-200/60">
-                <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2.5 tracking-widest">Select Player Print (+15 DHS)</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {presetPlayers.map((player: { name: string; number: string }) => {
-                    const isSelected = selectedPresetPlayer?.name === player.name;
-                    return (
-                      <button
-                        key={player.name}
-                        type="button"
-                        onClick={() => handleSelectPresetPlayer(player)}
-                        className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all flex items-center justify-between ${
-                          isSelected
-                            ? "bg-kora border-kora text-white shadow-sm shadow-kora/20"
-                            : "bg-white border-slate-200 text-slate-700 hover:border-slate-300"
-                        }`}
-                      >
-                        <span className="truncate">{player.name}</span>
-                        <span className={`text-[10px] ml-1 shrink-0 ${isSelected ? "text-purple-200" : "text-slate-400"}`}>#{player.number}</span>
-                      </button>
-                    );
-                  })}
+            <div>
+              <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">Name & Number printing</h3>
+              <p className="text-slate-400 text-xs mt-1">Add the name of your favorite player or any custom name available in official font</p>
+            </div>
+          </div>
+
+          {/* Toggles */}
+          <div className="flex gap-3 mt-5">
+            <button
+              type="button"
+              onClick={() => {
+                setPersonalizationTab(personalizationTab === "player" ? "none" : "player");
+                setSelectedPresetPlayer(null);
+                setCustomName("");
+                setCustomNumber("");
+              }}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 uppercase ${
+                personalizationTab === "player"
+                  ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
+                  : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-sm hover:shadow-kora/10"
+              }`}
+            >
+              <span>Player Name (+15 {CURRENCY.trim().toLowerCase()})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                setPersonalizationTab(personalizationTab === "custom" ? "none" : "custom");
+                setSelectedPresetPlayer(null);
+                setCustomName("");
+                setCustomNumber("");
+              }}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl border text-xs font-bold transition-all duration-300 transform-gpu hover:-translate-y-0.5 active:scale-95 uppercase ${
+                personalizationTab === "custom"
+                  ? "bg-kora border-kora text-white shadow-md shadow-kora/25"
+                  : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-sm hover:shadow-kora/10"
+              }`}
+            >
+              <span>Custom Name (+25 {CURRENCY.trim().toLowerCase()})</span>
+            </button>
+          </div>
+
+          {/* Player Dropdown */}
+          {personalizationTab === "player" && (
+            <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
+              {presetPlayers.length > 0 ? (
+                <div>
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2.5 tracking-widest">Select Player Print</label>
+                  <CustomSelect
+                    value={selectedPresetPlayer ? JSON.stringify(selectedPresetPlayer) : ""}
+                    onChange={(val) => {
+                      if (!val) {
+                        setSelectedPresetPlayer(null);
+                        setCustomName("");
+                        setCustomNumber("");
+                      } else {
+                        const player = JSON.parse(val);
+                        setSelectedPresetPlayer(player);
+                        setCustomName(player.name);
+                        setCustomNumber(player.number);
+                      }
+                    }}
+                    options={playerOptions}
+                    placeholder="Select a player..."
+                  />
+                </div>
+              ) : (
+                <p className="text-[10px] text-slate-400 italic">No preset players available for this product.</p>
+              )}
+            </div>
+          )}
+
+          {/* Custom Name Inputs */}
+          {personalizationTab === "custom" && (
+            <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Name</label>
+                  <input
+                    type="text"
+                    maxLength={15}
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value.toUpperCase())}
+                    placeholder="e.g. ADNAN"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider"
+                  />
+                </div>
+                <div className="w-24">
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Number</label>
+                  <input
+                    type="text"
+                    maxLength={3}
+                    value={customNumber}
+                    onChange={(e) => setCustomNumber(e.target.value.replace(/[^0-9]/g, ""))}
+                    placeholder="10"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold text-center"
+                  />
                 </div>
               </div>
-            )}
-            
-            {/* Sleeve Patch Toggle inside Player Panel */}
-            <div className="pt-2">
-              <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2 tracking-widest">Sleeve Badge (Optional)</label>
-              <button
-                type="button"
-                onClick={() => setHasFifaPatch(!hasFifaPatch)}
-                className={`w-full py-2.5 px-4 rounded-xl border text-xs font-bold transition-all duration-200 active:scale-98 flex items-center justify-between ${
-                  hasFifaPatch
-                    ? "bg-kora border-kora text-white shadow-sm shadow-kora/20"
-                    : "bg-white border-slate-200 text-slate-700 hover:border-slate-300"
-                }`}
-              >
-                <span>Fifa patch right and left sleeve</span>
-                <span className={hasFifaPatch ? "text-white font-extrabold" : "text-kora font-black"}>+10 DHS</span>
-              </button>
+              <p className="text-[10px] text-kora font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3">
+                <span>✨ Custom Player Printing</span>
+                <span>+25 {CURRENCY.trim().toLowerCase()}</span>
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Sleeve Patches Box */}
+        <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-5 font-sans shadow-xs">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-xs shrink-0">
+                <SleevePatchIcon className="w-7 h-7 text-kora" />
+              </div>
+              <div>
+                <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">Sleeve Patches</h3>
+                <p className="text-slate-400 text-xs mt-1">Add the official sleeve patch</p>
+              </div>
+            </div>
+            <div className="bg-white border border-slate-200/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 shadow-xs">
+              +10 {CURRENCY.trim().toLowerCase()}
             </div>
           </div>
-        )}
+
+          <div className="flex gap-3 mt-5">
+            {/* Right Sleeve Dropdown */}
+            <CustomSelect
+              value={rightSleevePatch}
+              onChange={setRightSleevePatch}
+              options={RIGHT_SLEEVE_PATCH_OPTIONS}
+              placeholder="Right Patch"
+              className="flex-1 min-w-0"
+            />
+
+            {/* Left Sleeve Dropdown */}
+            <CustomSelect
+              value={leftSleevePatch}
+              onChange={setLeftSleevePatch}
+              options={LEFT_SLEEVE_PATCH_OPTIONS}
+              placeholder="Left Patch"
+              className="flex-1 min-w-0"
+            />
+          </div>
+        </div>
       </div>
     );
   };
@@ -558,6 +831,13 @@ export default function ProductUI({ product }: { product: any }) {
     const printUpcharge = hasCustomPrint ? (isPreset ? 15 : 25) : 0;
     const finalPrice = basePrice + (hasFifaPatch ? 10 : 0) + printUpcharge;
 
+    const patchString = hasFifaPatch
+      ? [
+          leftSleevePatch ? `Left: ${leftSleevePatch}` : "",
+          rightSleevePatch ? `Right: ${rightSleevePatch}` : ""
+        ].filter(Boolean).join(", ")
+      : undefined;
+
     addToCart({
       id: product.id,
       name: product.name,
@@ -568,14 +848,15 @@ export default function ProductUI({ product }: { product: any }) {
       customName: finalName || undefined,
       customNumber: finalNumber || undefined,
       playerName: selectedPresetPlayer?.name || undefined,
-      patch: hasFifaPatch ? "FIFA World Cup Badge Set" : undefined,
+      patch: patchString || (hasFifaPatch ? "FIFA World Cup Badge Set" : undefined),
     });
     
     setIsAdded(true);
     setCustomName("");
     setCustomNumber("");
     setSelectedPresetPlayer(null);
-    setHasFifaPatch(false);
+    setLeftSleevePatch("");
+    setRightSleevePatch("");
     setPersonalizationTab("none");
     setTimeout(() => setIsAdded(false), 2000);
   };
@@ -866,9 +1147,19 @@ export default function ProductUI({ product }: { product: any }) {
         <div className="mb-5">
           <div className="flex items-center justify-between mb-3">
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Select Size</p>
-            <Link href="/faq" className="text-[10px] font-bold text-kora uppercase tracking-wider">
-              Size Guide →
-            </Link>
+            {hasCustomSizeChart ? (
+              <button
+                type="button"
+                onClick={() => setIsSizeChartOpen(true)}
+                className="text-[10px] font-bold text-kora uppercase tracking-wider cursor-pointer focus:outline-none"
+              >
+                Size Guide →
+              </button>
+            ) : (
+              <Link href="/faq" className="text-[10px] font-bold text-kora uppercase tracking-wider">
+                Size Guide →
+              </Link>
+            )}
           </div>
           {product.sizes && product.sizes.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -934,13 +1225,52 @@ export default function ProductUI({ product }: { product: any }) {
           </div>
 
           {activeTab === "details" && (
-            <div className="text-slate-500 text-sm leading-relaxed space-y-4 pdp-mobile-animate">
+            <div className="text-slate-500 text-sm leading-relaxed space-y-6 pdp-mobile-animate">
               <p>Every kit is rigorously quality-checked before dispatch. We bypass traditional retail to bring you absolute 1:1 specifications.</p>
               <ul className="space-y-2.5">
                 <li className="flex gap-2"><span className="font-bold text-slate-800 shrink-0">Fit:</span> Standard athletic cut. Size up for Player Issue versions.</li>
                 <li className="flex gap-2"><span className="font-bold text-slate-800 shrink-0">Material:</span> 100% Recycled Polyester with advanced sweat-wicking tech.</li>
-                <li className="flex gap-2"><span className="font-bold text-slate-800 shrink-0">Care:</span> Machine wash cold, inside out. Do not tumble dry.</li>
+                <li className="flex gap-2"><span className="font-bold text-slate-800 shrink-0">Care:</span> Hand Wash Only. Do not use washing machine or tumble dryer.</li>
               </ul>
+
+              {/* Mobile Policy & Care Details */}
+              <div className="grid grid-cols-1 gap-4 mt-6">
+                {/* Wash Care Card */}
+                <div className="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl shadow-xs">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="p-2 bg-white border border-slate-200/50 rounded-xl text-kora text-base">🧼</span>
+                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">Wash & Care Instructions</h4>
+                  </div>
+                  <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside">
+                    <li><strong className="text-slate-700">Hand wash only</strong> using cold water.</li>
+                    <li>Use a small amount of mild detergent.</li>
+                    <li>Wash gently. <strong className="text-slate-700">Do not scrub</strong> prints or logos.</li>
+                    <li><strong className="text-slate-700">Do not use</strong> a washing machine or tumble dryer.</li>
+                    <li>Air dry in the shade. Do not wring or twist.</li>
+                  </ul>
+                  <p className="text-[10px] text-kora/80 font-semibold italic mt-3 bg-purple-50/50 p-2 border border-purple-100/50 rounded-lg">
+                    *Player Version Jerseys: Require extra care due to lightweight performance fabric and heat-pressed details.
+                  </p>
+                </div>
+
+                {/* Return Policy Card */}
+                <div className="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl shadow-xs">
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="p-2 bg-white border border-slate-200/50 rounded-xl text-kora text-base">🛡️</span>
+                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">Vault Return Policy</h4>
+                  </div>
+                  <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside">
+                    <li><strong className="text-rose-600">Custom Printed Jerseys:</strong> Jerseys with printed names or numbers are <strong className="text-rose-600">non-returnable and non-exchangeable</strong>.</li>
+                    <li><strong className="text-slate-700">Non-Printed Jerseys:</strong> Exchange only if unused, unwashed, in original packaging, and tags attached.</li>
+                    <li><strong className="text-slate-700">Exchange Fee:</strong> A flat 25 AED delivery fee applies to all exchange requests.</li>
+                    <li><strong className="text-slate-700">Refund Policy:</strong> Refund processed only if you receive a damaged item.</li>
+                  </ul>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-3 flex items-center justify-between border-t border-slate-200/60 pt-2.5">
+                    <span>⏱️ Claim Window: Within 48 hours</span>
+                    <span className="text-kora">3-4 days processing</span>
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
@@ -1384,35 +1714,60 @@ export default function ProductUI({ product }: { product: any }) {
               </div>
             )}
 
-            {/* Main Showcase Box with Zoom-on-Hover */}
-            <div 
-              className="flex-1 aspect-[4/5] bg-slate-50 rounded-[32px] border border-slate-200/60 flex items-center justify-center relative overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 p-0 cursor-zoom-in"
-              onMouseMove={handleMouseMove}
-              onMouseEnter={() => setIsZooming(true)}
-              onMouseLeave={() => setIsZooming(false)}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-kora/10 via-transparent to-pink-500/5 opacity-40 z-0"></div>
-              {images.length > 0 ? (
-                <img
-                  src={images[activeImageIndex] || images[0]}
-                  alt={product.name}
-                  className="relative z-10 w-full h-full object-cover transition-transform duration-200 select-none pointer-events-none"
-                  style={
-                    isZooming
-                      ? {
-                          transform: "scale(1.8)",
-                          transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
-                        }
-                      : { transform: "scale(1)", transformOrigin: "center" }
-                  }
-                />
-              ) : (
-                <div className="relative z-10 text-slate-400 font-sans">No Image Available</div>
-              )}
+            {/* Right side of Left Column: Main Showcase & Trust Badges */}
+            <div className="flex-1 flex flex-col gap-6">
+              {/* Main Showcase Box with Zoom-on-Hover */}
+              <div 
+                className="w-full aspect-[4/5] bg-slate-50 rounded-[32px] border border-slate-200/60 flex items-center justify-center relative overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 p-0 cursor-zoom-in"
+                onMouseMove={handleMouseMove}
+                onMouseEnter={() => setIsZooming(true)}
+                onMouseLeave={() => setIsZooming(false)}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-kora/10 via-transparent to-pink-500/5 opacity-40 z-0"></div>
+                {images.length > 0 ? (
+                  <img
+                    src={images[activeImageIndex] || images[0]}
+                    alt={product.name}
+                    className="relative z-10 w-full h-full object-cover transition-transform duration-200 select-none pointer-events-none"
+                    style={
+                      isZooming
+                        ? {
+                            transform: "scale(1.8)",
+                            transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                          }
+                        : { transform: "scale(1)", transformOrigin: "center" }
+                    }
+                  />
+                ) : (
+                  <div className="relative z-10 text-slate-400 font-sans">No Image Available</div>
+                )}
 
-              {/* Category pill indicator */}
-              <div className="absolute top-5 right-5 bg-white/90 backdrop-blur-xs border border-slate-200/50 rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-widest text-slate-600 shadow-xs z-20">
-                {categoryLabel}
+                {/* Category pill indicator */}
+                <div className="absolute top-5 right-5 bg-white/90 backdrop-blur-xs border border-slate-200/50 rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-widest text-slate-600 shadow-xs z-20">
+                  {categoryLabel}
+                </div>
+              </div>
+
+              {/* Trust Badges */}
+              <div className="flex flex-col gap-5 pt-6 border-t border-slate-100">
+                <div className="flex items-center gap-5 p-6 bg-slate-50 border border-slate-200/50 rounded-3xl shadow-xs">
+                  <div className="w-14 h-14 bg-white rounded-2xl border border-slate-200/50 flex items-center justify-center shrink-0 shadow-sm">
+                    <FaTruckFast className="text-2xl text-kora" />
+                  </div>
+                  <div>
+                    <span className="block text-[13px] font-black text-slate-800 uppercase tracking-widest leading-tight">UAE Delivery within 48 Hours</span>
+                    <span className="block text-xs text-slate-400 font-medium mt-1">Priority local shipping directly to your doorstep</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-5 p-6 bg-slate-50 border border-slate-200/50 rounded-3xl shadow-xs">
+                  <div className="w-14 h-14 bg-white rounded-2xl border border-slate-200/50 flex items-center justify-center shrink-0 shadow-sm">
+                    <FaShieldAlt className="text-2xl text-kora" />
+                  </div>
+                  <div>
+                    <span className="block text-[13px] font-black text-slate-800 uppercase tracking-widest leading-tight">7-Day Satisfaction Guarantee</span>
+                    <span className="block text-xs text-slate-400 font-medium mt-1">Hassle-free vault returns and quality-checked replacements</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1519,9 +1874,19 @@ export default function ProductUI({ product }: { product: any }) {
             <div className="mb-8 font-sans">
               <div className="flex justify-between items-center mb-3.5">
                 <h3 className="text-slate-950 font-black uppercase tracking-wider text-xs">Select Size</h3>
-                <Link href="/faq" className="text-kora hover:text-purple-700 text-xs font-bold uppercase tracking-wider flex items-center gap-1 group">
-                  Size Guide <span className="transition-transform group-hover:translate-x-0.5">→</span>
-                </Link>
+                {hasCustomSizeChart ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsSizeChartOpen(true)}
+                    className="text-kora hover:text-purple-700 text-xs font-bold uppercase tracking-wider flex items-center gap-1 group cursor-pointer focus:outline-none"
+                  >
+                    Size Guide <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                  </button>
+                ) : (
+                  <Link href="/faq" className="text-kora hover:text-purple-700 text-xs font-bold uppercase tracking-wider flex items-center gap-1 group">
+                    Size Guide <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                  </Link>
+                )}
               </div>
               <div className="flex flex-wrap gap-2.5">
                 {product.sizes && product.sizes.length > 0 ? (
@@ -1607,27 +1972,7 @@ export default function ProductUI({ product }: { product: any }) {
               </button>
             </div>
 
-            {/* Trust Badges */}
-            <div className="grid grid-cols-2 gap-4 pt-6 border-t border-slate-100">
-              <div className="flex items-center gap-3.5 p-3.5 bg-slate-50 border border-slate-200/50 rounded-2xl">
-                <div className="w-10 h-10 bg-white rounded-xl border border-slate-200/50 flex items-center justify-center shrink-0">
-                  <FaTruckFast className="text-lg text-kora" />
-                </div>
-                <div>
-                  <span className="block text-xs font-extrabold text-slate-800 uppercase tracking-wide">UAE Delivery within 48 Hours</span>
-                  <span className="block text-[10px] text-slate-400 font-medium">Priority local shipping</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3.5 p-3.5 bg-slate-50 border border-slate-200/50 rounded-2xl">
-                <div className="w-10 h-10 bg-white rounded-xl border border-slate-200/50 flex items-center justify-center shrink-0">
-                  <FaShieldAlt className="text-lg text-kora" />
-                </div>
-                <div>
-                  <span className="block text-xs font-extrabold text-slate-800 uppercase tracking-wide">7-Day Guarantee</span>
-                  <span className="block text-[10px] text-slate-400 font-medium">Hassle-free vault returns</span>
-                </div>
-              </div>
-            </div>
+
 
           </div>
         </div>
@@ -1676,8 +2021,8 @@ export default function ProductUI({ product }: { product: any }) {
                   
                   <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2">
                     <span className="text-[10px] font-black uppercase text-kora tracking-widest">CARE</span>
-                    <span className="text-slate-800 font-bold text-sm">Machine Wash</span>
-                    <p className="text-slate-400 text-xs leading-normal">Wash cold, inside out. Hang dry only to protect printed graphics and patches.</p>
+                    <span className="text-slate-800 font-bold text-sm">Hand Wash Only</span>
+                    <p className="text-slate-400 text-xs leading-normal">Wash cold, do not use washing machine or dryer. Shade dry only to preserve prints.</p>
                   </div>
                   
                   <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2">
@@ -1686,6 +2031,46 @@ export default function ProductUI({ product }: { product: any }) {
                     <p className="text-slate-400 text-xs leading-normal">Bypassing traditional retail margins to source the highest authentic grade direct.</p>
                   </div>
                 </div>
+
+                {/* Policy & Care Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                  {/* Wash Care Card */}
+                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="p-2.5 bg-white border border-slate-200/50 rounded-xl text-kora text-lg">🧼</span>
+                      <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">Wash & Care Instructions</h4>
+                    </div>
+                    <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside">
+                      <li><strong className="text-slate-700">Hand wash only</strong> using cold water.</li>
+                      <li>Use a small amount of mild detergent.</li>
+                      <li>Wash gently. <strong className="text-slate-700">Do not scrub</strong> the prints or logos.</li>
+                      <li><strong className="text-slate-700">Do not use</strong> a washing machine or tumble dryer.</li>
+                      <li>Air dry in the shade. Do not wring or twist the jersey.</li>
+                    </ul>
+                    <p className="text-[10px] text-kora/80 font-semibold italic mt-3.5 bg-purple-50/50 p-2.5 border border-purple-100/50 rounded-xl">
+                      *Player Version Jerseys: Require extra care due to lightweight performance fabric and heat-pressed details.
+                    </p>
+                  </div>
+
+                  {/* Return Policy Card */}
+                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="p-2.5 bg-white border border-slate-200/50 rounded-xl text-kora text-lg">🛡️</span>
+                      <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">Vault Return Policy</h4>
+                    </div>
+                    <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside">
+                      <li><strong className="text-rose-600">Custom Printed Jerseys:</strong> Jerseys with printed names or numbers are <strong className="text-rose-600">non-returnable and non-exchangeable</strong>.</li>
+                      <li><strong className="text-slate-700">Non-Printed Jerseys:</strong> Exchange only if unused, unwashed, in original packaging, and tags attached.</li>
+                      <li><strong className="text-slate-700">Exchange Fee:</strong> A flat 25 AED delivery fee applies to all exchange requests.</li>
+                      <li><strong className="text-slate-700">Refund Policy:</strong> Refund processed only if you receive a damaged item.</li>
+                    </ul>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-3.5 flex items-center justify-between border-t border-slate-200/60 pt-3">
+                      <span>⏱️ Claim Window: Within 48 hours</span>
+                      <span className="text-kora">3-4 days processing</span>
+                    </p>
+                  </div>
+                </div>
+
               </div>
             )}
 
@@ -2054,6 +2439,146 @@ export default function ProductUI({ product }: { product: any }) {
       <div className="hidden md:block">
         {DesktopView}
       </div>
+
+      {/* Size Chart Modal */}
+      {isSizeChartOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+            onClick={() => setIsSizeChartOpen(false)}
+          ></div>
+
+          {/* Modal Card */}
+          <div className="relative bg-white rounded-[32px] border border-slate-200/80 shadow-2xl w-full max-w-lg overflow-hidden p-6 sm:p-8 animate-fade-in-up z-10 font-sans">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsSizeChartOpen(false)}
+              className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full bg-slate-50 hover:bg-slate-100 border border-slate-200/60 text-slate-400 hover:text-slate-700 transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Header */}
+            <div className="mb-6">
+              <span className="text-[10px] font-black uppercase text-kora tracking-widest bg-kora/10 px-2.5 py-0.5 rounded-sm">Official Spec</span>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight mt-1">{product.name} Size Chart</h3>
+              <p className="text-slate-400 text-xs mt-1">Detailed flat-lay measurements to help you find your perfect fit.</p>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto border border-slate-200/60 rounded-2xl">
+              <table className="w-full border-collapse text-left text-xs sm:text-sm">
+                <thead>
+                  {isChartA ? (
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-extrabold uppercase text-[10px] tracking-wider">
+                      <th className="px-4 py-3.5">Size</th>
+                      <th className="px-4 py-3.5">Height (in)</th>
+                      <th className="px-4 py-3.5">Height (cm)</th>
+                      <th className="px-4 py-3.5">Width (in)</th>
+                      <th className="px-4 py-3.5">Width (cm)</th>
+                    </tr>
+                  ) : (
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-extrabold uppercase text-[10px] tracking-wider">
+                      <th className="px-4 py-3.5">Size</th>
+                      <th className="px-4 py-3.5">Length (in)</th>
+                      <th className="px-4 py-3.5">Width (in)</th>
+                      <th className="px-4 py-3.5">Length (cm)</th>
+                      <th className="px-4 py-3.5">Width (cm)</th>
+                    </tr>
+                  )}
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-bold text-slate-700">
+                  {isChartA ? (
+                    <>
+                      <tr className="hover:bg-slate-50/40 transition-colors">
+                        <td className="px-4 py-3 text-kora font-black">S</td>
+                        <td className="px-4 py-3">28 in</td>
+                        <td className="px-4 py-3">71.1 cm</td>
+                        <td className="px-4 py-3">18 in</td>
+                        <td className="px-4 py-3">45.7 cm</td>
+                      </tr>
+                      <tr className="bg-slate-50/30 hover:bg-slate-50/40 transition-colors">
+                        <td className="px-4 py-3 text-kora font-black">M</td>
+                        <td className="px-4 py-3">28.5 in</td>
+                        <td className="px-4 py-3">72.4 cm</td>
+                        <td className="px-4 py-3">19 in</td>
+                        <td className="px-4 py-3">48.3 cm</td>
+                      </tr>
+                      <tr className="hover:bg-slate-50/40 transition-colors">
+                        <td className="px-4 py-3 text-kora font-black">L</td>
+                        <td className="px-4 py-3">29 in</td>
+                        <td className="px-4 py-3">73.7 cm</td>
+                        <td className="px-4 py-3">20 in</td>
+                        <td className="px-4 py-3">50.8 cm</td>
+                      </tr>
+                      <tr className="bg-slate-50/30 hover:bg-slate-50/40 transition-colors">
+                        <td className="px-4 py-3 text-kora font-black">XL</td>
+                        <td className="px-4 py-3">29.5 in</td>
+                        <td className="px-4 py-3">74.9 cm</td>
+                        <td className="px-4 py-3">21 in</td>
+                        <td className="px-4 py-3">53.3 cm</td>
+                      </tr>
+                      <tr className="hover:bg-slate-50/40 transition-colors">
+                        <td className="px-4 py-3 text-kora font-black">XXL</td>
+                        <td className="px-4 py-3">30 in</td>
+                        <td className="px-4 py-3">76.2 cm</td>
+                        <td className="px-4 py-3">22 in</td>
+                        <td className="px-4 py-3">55.9 cm</td>
+                      </tr>
+                    </>
+                  ) : (
+                    <>
+                      <tr className="hover:bg-slate-50/40 transition-colors">
+                        <td className="px-4 py-3 text-kora font-black">S</td>
+                        <td className="px-4 py-3">27</td>
+                        <td className="px-4 py-3">19</td>
+                        <td className="px-4 py-3">68.6 cm</td>
+                        <td className="px-4 py-3">48.3 cm</td>
+                      </tr>
+                      <tr className="bg-slate-50/30 hover:bg-slate-50/40 transition-colors">
+                        <td className="px-4 py-3 text-kora font-black">M</td>
+                        <td className="px-4 py-3">27.5</td>
+                        <td className="px-4 py-3">19.5</td>
+                        <td className="px-4 py-3">69.9 cm</td>
+                        <td className="px-4 py-3">49.5 cm</td>
+                      </tr>
+                      <tr className="hover:bg-slate-50/40 transition-colors">
+                        <td className="px-4 py-3 text-kora font-black">L</td>
+                        <td className="px-4 py-3">29.5</td>
+                        <td className="px-4 py-3">20.5</td>
+                        <td className="px-4 py-3">74.9 cm</td>
+                        <td className="px-4 py-3">52.1 cm</td>
+                      </tr>
+                      <tr className="bg-slate-50/30 hover:bg-slate-50/40 transition-colors">
+                        <td className="px-4 py-3 text-kora font-black">XL</td>
+                        <td className="px-4 py-3">30</td>
+                        <td className="px-4 py-3">21</td>
+                        <td className="px-4 py-3">76.2 cm</td>
+                        <td className="px-4 py-3">53.3 cm</td>
+                      </tr>
+                      <tr className="hover:bg-slate-50/40 transition-colors">
+                        <td className="px-4 py-3 text-kora font-black">XXL</td>
+                        <td className="px-4 py-3">31</td>
+                        <td className="px-4 py-3">22</td>
+                        <td className="px-4 py-3">78.7 cm</td>
+                        <td className="px-4 py-3">55.9 cm</td>
+                      </tr>
+                    </>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Footer info */}
+            <div className="mt-5 p-4 bg-slate-50 border border-slate-200/50 rounded-2xl text-[11px] text-slate-500 leading-relaxed">
+              <strong className="text-slate-800">Note:</strong> These measurements are taken when the jersey is laid flat. Sizing is standard athletic fit. If you prefer a looser style or select a Player Issue kit, we suggest ordering one size larger than your usual fit.
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
