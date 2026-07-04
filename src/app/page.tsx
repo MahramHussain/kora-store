@@ -3,6 +3,8 @@ import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import { ProductCard, ProductSkeletonCard } from "@/components/ProductCard";
 import { ScrollSlider } from "@/components/ScrollSlider";
+import { cookies } from "next/headers";
+import { translations } from "@/lib/translations";
 
 async function WorldCupJerseySlider() {
   const products = await prisma.product.findMany({
@@ -59,6 +61,14 @@ async function StreetwearAndGearSlider() {
 }
 
 export default async function Home() {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("lang")?.value || "en";
+  const t = (key: string) => {
+    const entry = (translations as any)[key];
+    if (!entry) return key;
+    return entry[lang] || entry["en"] || key;
+  };
+
   // Fetch Trending World Cup Products for top carousel
   const trendingWorldCup = await prisma.product.findMany({
     where: { isWorldCup: true },
@@ -75,8 +85,8 @@ export default async function Home() {
     <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pb-12 md:pb-20">
       {/* 4. PROMO BANNER — Scannable on mobile */}
       <div className="bg-neutral-100 border-b border-neutral-200 py-3 md:py-2.5 text-center text-xs md:text-sm font-bold text-neutral-800 px-4">
-        <span className="block md:inline">🏆 <span className="text-neutral-900 font-black">STORE PROMO ACTIVE</span></span>
-        <span className="block md:inline md:ml-1 mt-0.5 md:mt-0">Use code <span className="font-bold text-kora">KORA10</span> for 10% off your entire order</span>
+        <span className="block md:inline">🏆 <span className="text-neutral-900 font-black">{t("promo_active")}</span></span>
+        <span className="block md:inline md:ms-1 mt-0.5 md:mt-0">{t("promo_code_text")}</span>
       </div>
 
       {/* 6. WORLD CUP HERO BANNER */}
@@ -91,15 +101,15 @@ export default async function Home() {
             className="absolute inset-0 w-full h-full object-cover pointer-events-none"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 md:via-slate-950/20 to-transparent z-10"></div>
-          <div className="absolute bottom-0 left-0 right-0 md:right-auto md:bottom-12 md:left-12 p-5 md:p-0 z-20 md:max-w-xl">
+          <div className="absolute bottom-0 left-0 right-0 md:right-auto md:bottom-12 ltr:md:left-12 rtl:md:right-12 p-5 md:p-0 z-20 md:max-w-xl text-start">
             <h2 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-3 tracking-tighter uppercase font-sans drop-shadow-md">
-              World Cup 26 is here
+              {t("hero_title")}
             </h2>
             <p className="text-slate-300 md:text-slate-200 text-xs md:text-sm mb-5 md:mb-6 max-w-[320px] md:max-w-md font-sans font-medium leading-relaxed drop-shadow-sm">
-              Official national jerseys, elite training apparel, and exclusive federation gear. Sourced direct.
+              {t("hero_desc")}
             </p>
             <Link href="/shop" className="mobile-cta-full md:inline-block bg-white text-slate-900 px-6 md:px-8 py-3.5 md:py-3 rounded-xl md:rounded-none font-bold text-sm md:text-sm hover:bg-kora hover:text-white hover:scale-105 transition-all shadow-lg uppercase tracking-wider">
-              Shop Now
+              {t("shop_now")}
             </Link>
           </div>
         </div>
@@ -119,10 +129,10 @@ export default async function Home() {
               />
             </div>
             <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors">
-              Argentina Away
+              {t("argentina_away_title")}
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
-              adidas Argentina Away kit with Lionel Messi official World Cup printing
+              {t("argentina_away_desc")}
             </p>
           </Link>
 
@@ -139,7 +149,7 @@ export default async function Home() {
               Brazil Away
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
-              Jordan Nike Brazil Away kit with Raphinha official World Cup printing
+              {t("brazil_away_desc")}
             </p>
           </Link>
 
@@ -156,7 +166,7 @@ export default async function Home() {
               Portugal
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
-              Puma Portugal Cristiano Ronaldo official home and away shirts
+              {t("portugal_desc")}
             </p>
           </Link>
 
@@ -173,7 +183,7 @@ export default async function Home() {
               Argentina
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
-              adidas Argentina kits with official kit printing available for every player
+              {t("argentina_desc")}
             </p>
           </Link>
 
@@ -188,7 +198,7 @@ export default async function Home() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-kora opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 md:h-4 md:w-4 bg-kora"></span>
             </span>
-            World Cup Spotlight
+            {t("world_cup_highlight")}
           </h2>
         </div>
         
@@ -201,22 +211,22 @@ export default async function Home() {
             <img 
               src="/assets/argentina_away_spotlight.png" 
               alt="Argentina Away Kit"
-              className="absolute right-0 top-0 h-[55%] md:h-full w-auto object-contain pointer-events-none z-0 group-hover:scale-102 transition-transform duration-700"
+              className="absolute ltr:right-0 rtl:left-0 top-0 h-[55%] md:h-full w-auto object-contain pointer-events-none z-0 group-hover:scale-102 transition-transform duration-700"
             />
             
             {/* Gradient overlay — bottom-up on mobile for text area, left-to-right on desktop */}
-            <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#d45372] via-[#d45372]/95 md:via-[#d45372]/90 to-transparent z-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-t md:ltr:bg-gradient-to-r md:rtl:bg-gradient-to-l from-[#d45372] via-[#d45372]/95 md:via-[#d45372]/90 to-transparent z-10"></div>
             
-            <div className="absolute bottom-0 left-0 right-0 md:right-auto md:top-1/2 md:-translate-y-1/2 md:left-12 p-5 md:p-0 z-20 md:max-w-lg">
-              <p className="text-pink-200 font-bold tracking-widest text-[10px] md:text-sm uppercase mb-1.5 md:mb-2.5">World Cup Highlight</p>
+            <div className="absolute bottom-0 left-0 right-0 md:right-auto md:top-1/2 md:-translate-y-1/2 ltr:md:left-12 rtl:md:right-12 p-5 md:p-0 z-20 md:max-w-lg text-start">
+              <p className="text-pink-200 font-bold tracking-widest text-[10px] md:text-sm uppercase mb-1.5 md:mb-2.5">{t("world_cup_highlight")}</p>
               <h3 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white mb-2 md:mb-3.5 leading-none tracking-tighter uppercase break-words font-sans">
-                Argentina Away Kit
+                {t("argentina_away_title")}
               </h3>
               <p className="text-pink-100 mb-4 md:mb-6 max-w-[280px] md:max-w-sm text-xs md:text-base line-clamp-2 md:line-clamp-3 font-sans font-medium">
-                {argentinaAwayKit.description || "Represent your nation on the world stage. Official premium federation apparel engineered for breathability and elite comfort."}
+                {argentinaAwayKit.description || t("spotlight_desc")}
               </p>
               <Link href={`/shop/${argentinaAwayKit.id}`} className="mobile-cta-full md:inline-block bg-white text-[#d45372] px-6 md:px-8 py-3 md:py-3 rounded-full font-bold text-xs md:text-sm hover:scale-105 transition-transform shadow-[0_0_20px_rgba(212,83,114,0.4)]">
-                Shop The National Kit
+                {t("shop_national_kit")}
               </Link>
             </div>
           </div>
@@ -228,16 +238,16 @@ export default async function Home() {
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 pb-3 md:pb-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
-              National Jerseys
+              {t("national_jerseys")}
             </h2>
-            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">The latest World Cup 2026 kit releases.</p>
+            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">{t("national_jerseys_sub")}</p>
           </div>
           <Link 
             href="/shop?category=Shirts" 
             className="text-[10px] md:text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
-            See All 
-            <span className="group-hover:translate-x-1 transition-transform">→</span>
+            {t("see_all")} 
+            <span className="group-hover:translate-x-1 transition-transform rtl:rotate-180">→</span>
           </Link>
         </div>
 
@@ -261,16 +271,16 @@ export default async function Home() {
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 pb-3 md:pb-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
-              Shoes
+              {t("shoes")}
             </h2>
-            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">Elite pitch boots and luxury streetwear sneakers.</p>
+            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">{t("shoes_sub")}</p>
           </div>
           <Link 
             href="/shop?category=Shoes" 
             className="text-[10px] md:text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
-            See All 
-            <span className="group-hover:translate-x-1 transition-transform">→</span>
+            {t("see_all")} 
+            <span className="group-hover:translate-x-1 transition-transform rtl:rotate-180">→</span>
           </Link>
         </div>
 
@@ -294,16 +304,16 @@ export default async function Home() {
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 pb-3 md:pb-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
-              Streetwear & Gear
+              {t("streetwear_gear")}
             </h2>
-            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">Premium performance socks and official club flags.</p>
+            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">{t("streetwear_gear_sub")}</p>
           </div>
           <Link 
             href="/shop?category=Accessories" 
             className="text-[10px] md:text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
-            See All 
-            <span className="group-hover:translate-x-1 transition-transform">→</span>
+            {t("see_all")} 
+            <span className="group-hover:translate-x-1 transition-transform rtl:rotate-180">→</span>
           </Link>
         </div>
 

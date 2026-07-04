@@ -28,7 +28,7 @@ export default async function DashboardPage() {
   }
 
   const safeUser = {
-    name: clerkUser?.firstName || "Vault Member",
+    name: clerkUser?.firstName || "Member",
     email: clerkUser?.emailAddresses[0]?.emailAddress || "",
     imageUrl: clerkUser?.imageUrl,
     memberSince: joinYear.slice(-2), // Turns "2024" into "24" for your UI!

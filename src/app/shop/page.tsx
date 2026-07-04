@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ShopPage() {
   
-  // 1. Fetch the fresh gear from the Vault
+  // 1. Fetch the fresh gear from the store
   const rawProducts = await prisma.product.findMany({
     orderBy: { createdAt: "desc" },
     include: {
@@ -28,7 +28,7 @@ export default async function ShopPage() {
 
   // 3. Pass the data to the UI
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white text-slate-500 flex items-center justify-center font-sans text-sm">Loading the Vault...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white text-slate-500 flex items-center justify-center font-sans text-sm">Loading the Shop...</div>}>
       <ShopUI products={safeProducts} />
     </Suspense>
   );

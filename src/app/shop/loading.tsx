@@ -8,7 +8,7 @@ export default function Loading() {
         <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-kora animate-spin"></div>
       </div>
       <h3 className="text-slate-900 font-extrabold uppercase tracking-widest text-[10px] mt-6 animate-pulse">
-        Unlocking the Vault...
+        Loading the Shop...
       </h3>
     </div>
   );

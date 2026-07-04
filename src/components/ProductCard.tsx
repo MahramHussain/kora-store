@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { CURRENCY } from "@/lib/constants";
+import { useTranslation } from "@/context/LanguageContext";
 
 import { FaStar } from "react-icons/fa";
 
@@ -63,6 +64,8 @@ export function ProductCard({ product }: { product: Product }) {
   // Show dots: on mobile always (if multiple images), on desktop only on hover
   const showDots = images.length > 1 && (isMobile || isHovered);
 
+  const { t } = useTranslation();
+
   return (
     <Link 
       href={`/shop/${product.id}`} 
@@ -73,13 +76,13 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="relative flex-1 bg-slate-50 flex items-center justify-center overflow-hidden">
         {product.stock === 0 ? (
           <div className="absolute top-3 left-3 md:top-4 md:left-4 px-2.5 md:px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest z-20 shadow-sm bg-rose-100 text-rose-800 border border-rose-200">
-            Sold Out
+            {t("sold_out")}
           </div>
         ) : product.tag ? (
           <div className={`absolute top-3 left-3 md:top-4 md:left-4 px-2.5 md:px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest z-20 shadow-sm ${
             product.tag === 'Latest' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'
           }`}>
-            {product.tag}
+            {t(product.tag.toLowerCase()) || product.tag}
           </div>
         ) : null}
         
@@ -100,7 +103,7 @@ export function ProductCard({ product }: { product: Product }) {
             />
           ))
         ) : (
-          <div className="text-slate-300 text-xs">No Image</div>
+          <div className="text-slate-300 text-xs">{t("no_image")}</div>
         )}
 
         {/* Dot indicators — always visible on mobile, hover-only on desktop */}
@@ -121,7 +124,13 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="p-3 sm:p-5 border-t border-slate-100 relative z-20 bg-white">
         <div className="flex justify-between items-start mb-2 md:mb-3">
           <div className="min-w-0 flex-1">
-            <p className="text-kora text-[10px] font-bold uppercase tracking-widest mb-1">{product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}</p>
+            <p className="text-kora text-[10px] font-bold uppercase tracking-widest mb-1">
+              {product.category === "Boots" 
+                ? t("category_shoes") 
+                : product.category === "Flags" 
+                ? t("category_accessories") 
+                : (t(`category_${product.category.toLowerCase().replace(" ", "_")}`) || product.category)}
+            </p>
             <h3 className="text-sm md:text-base font-bold text-slate-900 leading-tight line-clamp-1 font-sans">{product.name}</h3>
             {product.reviews && product.reviews.length > 0 && (() => {
               const avg = product.reviews.reduce((s, r) => s + r.rating, 0) / product.reviews.length;
@@ -136,7 +145,7 @@ export function ProductCard({ product }: { product: Product }) {
             })()}
           </div>
           <span className="text-base md:text-lg font-bold text-slate-900 ml-2 shrink-0 whitespace-nowrap font-sans">
-            {CURRENCY}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
+            {t("aed")}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
           </span>
         </div>
         <div className={`w-full text-center font-bold text-xs md:text-sm py-2 md:py-2.5 rounded-lg transition-colors border ${
@@ -144,7 +153,7 @@ export function ProductCard({ product }: { product: Product }) {
             ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed" 
             : "bg-slate-100 group-hover:bg-kora text-slate-700 group-hover:text-white border-slate-200 group-hover:border-kora"
         }`}>
-          {product.stock === 0 ? "Sold Out" : "View Gear"}
+          {product.stock === 0 ? t("sold_out") : t("view_gear")}
         </div>
       </div>
     </Link>

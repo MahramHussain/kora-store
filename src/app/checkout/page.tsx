@@ -8,6 +8,7 @@ import { useAuth, SignIn, SignUp } from "@clerk/nextjs";
 import { FaLock, FaCreditCard, FaPaypal, FaMoneyBillWave } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
 import dynamic from "next/dynamic";
+import { useTranslation } from "@/context/LanguageContext";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), {
   ssr: false,
@@ -21,6 +22,7 @@ const MapPicker = dynamic(() => import("@/components/MapPicker"), {
 export default function CheckoutPage() {
   const router = useRouter();
   const { cart, cartCount, clearCart } = useCart();
+  const { t } = useTranslation();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal" | "cod">("card");
 
@@ -96,20 +98,20 @@ export default function CheckoutPage() {
   const shippingCharge = (subtotal - discountAmount) > 200 ? 0 : 25;
   const finalTotal = subtotal - discountAmount + shippingCharge;
 
-  // Render Vault Sign-in Wall if not authenticated
+  // Render Sign-in Wall if not authenticated
   if (isLoaded && !isSignedIn) {
     return (
-      <main className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-kora selection:text-white pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden">
+      <main className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-kora selection:text-white pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden text-start">
         {/* Background radial accent */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-kora/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-        <div className="max-w-md w-full relative z-10">
+        <div className="max-w-md w-full relative z-10 text-center">
           <div className="text-center mb-10">
             <h1 className="text-4xl font-black text-slate-900 tracking-tighter mb-2 uppercase font-sans">
-              SECURE <span className="text-kora">VAULT.</span>
+              {t("secure_checkout_btn")}
             </h1>
             <p className="text-slate-500 font-medium font-sans">
-              {isLogin ? "Authenticate to secure your priority checkout." : "Register to join the ultimate football community."}
+              {isLogin ? t("authenticate_prompt") : t("create_account_shop")}
             </p>
           </div>
 
@@ -151,12 +153,12 @@ export default function CheckoutPage() {
 
           <div className="text-center mt-8 relative z-10 font-sans">
             <p className="text-slate-500 font-semibold">
-              {isLogin ? "Need a Vault account?" : "Already secured your spot?"}
+              {isLogin ? t("need_account") : t("already_secured_spot")}
               <button 
                 onClick={() => setIsLogin(!isLogin)} 
                 className="ml-2 text-slate-800 font-bold hover:text-kora transition-colors underline underline-offset-4"
               >
-                {isLogin ? "Sign Up" : "Sign In"}
+                {isLogin ? t("register") : t("sign_in")}
               </button>
             </p>
           </div>
@@ -268,18 +270,18 @@ export default function CheckoutPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-20 pb-16 px-4 sm:px-6 md:pt-24 md:pb-24">
+    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-20 pb-16 px-4 sm:px-6 md:pt-24 md:pb-24 text-start">
       <div className="max-w-6xl mx-auto">
         
         {/* Header */}
-        <div className="flex items-center gap-3 mb-10 border-b border-slate-200 pb-6">
+        <div className="flex items-center gap-3 mb-10 border-b border-slate-200 pb-6 text-start">
           <FaLock className="text-2xl text-kora" />
-          <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase">SECURE CHECKOUT</h1>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase">{t("secure_checkout_btn")}</h1>
         </div>
 
         {/* Error Banner */}
         {error && (
-          <div className="mb-8 p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3 text-rose-800 animate-fade-in shadow-sm font-sans">
+          <div className="mb-8 p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3 text-rose-800 animate-fade-in shadow-sm font-sans text-start">
             <div className="text-xl">⚠️</div>
             <div className="flex-1 text-sm font-bold uppercase tracking-wide">
               {error}
@@ -295,14 +297,14 @@ export default function CheckoutPage() {
             <form id="checkout-form" onSubmit={handlePlaceOrder} className="space-y-10">
               
               {/* 1. Payment Method (Moved to Top) */}
-              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
-                <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider">Payment Method</h2>
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm text-start">
+                <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider">{t("payment_method_title")}</h2>
                 
                 {hasPersonalizedItem && (
                   <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3 text-amber-800 animate-fade-in shadow-xs font-sans">
                     <div className="text-lg shrink-0 mt-0.5">⚠️</div>
                     <div className="flex-1 text-xs font-bold uppercase tracking-wider leading-relaxed">
-                      Cash on Delivery (COD) is disabled because your vault cart contains a custom-named shirt. Only online card payment via Ziina is accepted for custom-named items.
+                      {t("cod_warning_custom")}
                     </div>
                   </div>
                 )}
@@ -315,7 +317,7 @@ export default function CheckoutPage() {
                       paymentMethod === "card" ? "bg-kora/10 border-kora text-kora font-bold" : "bg-white border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300"
                     }`}
                   >
-                    <FaCreditCard /> Card
+                    <FaCreditCard /> {t("card_tab")}
                   </div>
                   <div 
                     onClick={() => setPaymentMethod("paypal")}
@@ -323,14 +325,14 @@ export default function CheckoutPage() {
                       paymentMethod === "paypal" ? "bg-kora/10 border-kora text-kora font-bold" : "bg-white border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300"
                     }`}
                   >
-                    <FaPaypal /> PayPal
+                    <FaPaypal /> {t("paypal_tab")}
                   </div>
                   {hasPersonalizedItem ? (
                     <div 
                       className="border rounded-xl py-3 flex justify-center items-center gap-2 bg-slate-100 border-slate-200 text-slate-300 cursor-not-allowed font-sans opacity-60"
-                      title="Cash on Delivery is unavailable for custom-named jerseys"
+                      title={t("cod_locked_title")}
                     >
-                      <FaMoneyBillWave /> COD (Locked)
+                      <FaMoneyBillWave /> {t("cod_locked")}
                     </div>
                   ) : (
                     <div 
@@ -339,27 +341,27 @@ export default function CheckoutPage() {
                         paymentMethod === "cod" ? "bg-kora/10 border-kora text-kora font-bold" : "bg-white border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300"
                       }`}
                     >
-                      <FaMoneyBillWave /> COD
+                      <FaMoneyBillWave /> {t("cod_tab")}
                     </div>
                   )}
                 </div>
 
                 {paymentMethod === "card" && (
-                  <div className="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm space-y-4 animate-fade-in-up">
+                  <div className="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm space-y-4 animate-fade-in-up text-start">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-kora">
                         <FaShieldAlt className="text-xl" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-slate-900 uppercase text-xs tracking-wider">Secured via Ziina</h3>
-                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">Encrypted Gateway</p>
+                        <h3 className="font-bold text-slate-900 uppercase text-xs tracking-wider">{t("secured_via_ziina")}</h3>
+                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">{t("encrypted_gateway")}</p>
                       </div>
                     </div>
                     <p className="text-slate-600 text-sm leading-relaxed font-medium">
-                      You will be securely redirected to **Ziina** (authorized by the Central Bank of the UAE) to complete your card, Apple Pay, or Google Pay transaction.
+                      {t("ziina_redirect_desc")}
                     </p>
                     <div className="flex items-center gap-2 pt-2 border-t border-slate-100 justify-center">
-                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Visa / Mastercard / Apple Pay / Google Pay</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t("ziina_methods")}</span>
                     </div>
                   </div>
                 )}
@@ -367,48 +369,48 @@ export default function CheckoutPage() {
                 {paymentMethod === "paypal" && (
                   <div className="text-center py-6 border border-dashed border-white/20 rounded-xl bg-white/5 animate-fade-in-up">
                     <FaPaypal className="text-4xl text-slate-600 mx-auto mb-3" />
-                    <h3 className="text-white font-bold mb-1">Work in Progress</h3>
-                    <p className="text-slate-400 text-sm">PayPal integration is currently under development. Please choose another method.</p>
+                    <h3 className="text-white font-bold mb-1">{t("wip_title")}</h3>
+                    <p className="text-slate-400 text-sm">{t("paypal_wip")}</p>
                   </div>
                 )}
 
                 {paymentMethod === "cod" && (
                   <div className="text-center py-6 border border-white/10 rounded-xl bg-[#05010F]/5 rounded-2xl animate-fade-in-up">
                     <FaMoneyBillWave className="text-4xl text-emerald-500/50 mx-auto mb-3" />
-                    <h3 className="text-slate-900 font-bold mb-1 uppercase">Cash on Delivery</h3>
-                    <p className="text-slate-500 text-sm">Pay seamlessly with cash when your secure drop arrives at your location.</p>
+                    <h3 className="text-slate-900 font-bold mb-1 uppercase">{t("cod_tab")}</h3>
+                    <p className="text-slate-500 text-sm">{t("cod_desc_info")}</p>
                   </div>
                 )}
               </div>
 
               {/* 2. Shipping Information (Moved to Bottom) */}
-              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
-                <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider">Shipping Location & Details</h2>
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm text-start">
+                <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider">{t("shipping_location_details")}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">First Name</label>
+                    <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t("first_name")}</label>
                     <input 
                       type="text" 
                       required 
                       value={shippingFirstName}
                       onChange={(e) => setShippingFirstName(e.target.value)}
                       className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" 
-                      placeholder="First Name" 
+                      placeholder={t("first_name")} 
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Last Name</label>
+                    <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t("last_name")}</label>
                     <input 
                       type="text" 
                       required 
                       value={shippingLastName}
                       onChange={(e) => setShippingLastName(e.target.value)}
                       className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" 
-                      placeholder="Last Name" 
+                      placeholder={t("last_name")} 
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Street Address</label>
+                    <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t("street_address")}</label>
                     <input 
                       type="text" 
                       required 
@@ -419,7 +421,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">City / Location</label>
+                    <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t("city_location")}</label>
                     <select 
                       required 
                       value={shippingCity}
@@ -435,7 +437,7 @@ export default function CheckoutPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">Phone Number</label>
+                    <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t("phone_number_label")}</label>
                     <input 
                       type="tel" 
                       required 
@@ -454,34 +456,34 @@ export default function CheckoutPage() {
           </div>
 
           {/* --- RIGHT SIDE: ORDER SUMMARY --- */}
-          <div className="w-full lg:w-[450px] shrink-0">
+          <div className="w-full lg:w-[450px] shrink-0 text-start">
             <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 sticky top-32 shadow-sm">
-              <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4 uppercase tracking-wider">In Your Vault</h2>
+              <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4 uppercase tracking-wider">{t("in_your_cart")}</h2>
               
-              <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide">
+              <div className="space-y-4 mb-6 max-h-[300px] overflow-y-auto ltr:pr-2 rtl:pl-2 scrollbar-hide text-start">
                 {cart.map((item, index) => (
                   <div key={index} className="flex gap-4">
                     <div className="w-16 h-16 shrink-0 bg-white border border-slate-100 rounded-lg p-2 shadow-sm">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                       <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
                     </div>
-                    <div className="flex-1 flex flex-col justify-center">
+                    <div className="flex-1 flex flex-col justify-center text-start">
                       <h3 className="font-bold text-slate-900 text-sm line-clamp-1">{item.name}</h3>
                       <p className="text-[11px] text-slate-500 mt-0.5">
-                        Size: <span className="font-semibold text-slate-800">{item.size}</span>
+                        {t("size_label")}: <span className="font-semibold text-slate-800">{item.size}</span>
                         {(item.customName || item.customNumber) && (
                           <>
                             <span className="mx-1 text-slate-300">•</span>
-                            Print: <span className="font-semibold text-kora">{item.customName || "—"} {item.customNumber ? `#${item.customNumber}` : ""}</span>
+                            {t("print_label")}: <span className="font-semibold text-kora">{item.customName || "—"} {item.customNumber ? `#${item.customNumber}` : ""}</span>
                           </>
                         )}
                         {item.patch && (
                           <>
                             <span className="mx-1 text-slate-300">•</span>
-                            Patch: <span className="font-semibold text-indigo-600">{item.patch}</span>
+                            {t("patch_label")}: <span className="font-semibold text-indigo-600">{item.patch}</span>
                           </>
                         )}
                       </p>
-                      <p className="text-[11px] text-slate-400 mt-0.5">Qty: {item.quantity}</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{t("qty")}: {item.quantity}</p>
                     </div>
                     <div className="font-bold text-kora text-sm flex items-center">
                       {item.price}
@@ -490,13 +492,13 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
-              <div className="space-y-3 mb-6 text-slate-600 text-sm border-t border-slate-200 pt-6">
+              <div className="space-y-3 mb-6 text-slate-600 text-sm border-t border-slate-200 pt-6 text-start">
                 
                 {/* PROMO CODE FIELD */}
                 <div className="flex gap-2 mb-4 relative">
                   <input 
                     type="text" 
-                    placeholder="Enter Promo Code" 
+                    placeholder={t("enter_promo_code")} 
                     value={promoCode}
                     onChange={(e) => setPromoCode(e.target.value)}
                     className="flex-1 bg-white border border-slate-200 rounded-xl py-2 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora uppercase transition-colors shadow-sm"
@@ -506,7 +508,7 @@ export default function CheckoutPage() {
                     type="button"
                     className="bg-kora hover:bg-purple-700 text-white font-bold text-xs py-2 px-4 rounded-xl transition-colors shadow-md shadow-kora/30"
                   >
-                    Apply
+                    {t("apply")}
                   </button>
                 </div>
                 {promoMessage && (
@@ -516,31 +518,31 @@ export default function CheckoutPage() {
                 )}
 
                 <div className="flex justify-between">
-                  <span>Subtotal</span>
+                  <span>{t("subtotal_label")}</span>
                   <span className="text-slate-900 font-bold">{CURRENCY}{subtotal.toFixed(2)}</span>
                 </div>
 
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-emerald-600">
-                    <span>Discount ({discountPercent * 100}%)</span>
+                    <span>{t("discount")} ({discountPercent * 100}%)</span>
                     <span className="font-bold">-{CURRENCY}{discountAmount.toFixed(2)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between">
-                  <span>Shipping (UAE Priority)</span>
+                  <span>{t("shipping_intel")}</span>
                   <span className="text-slate-900 font-bold">
-                    {shippingCharge === 0 ? "FREE" : `${CURRENCY}${shippingCharge.toFixed(2)}`}
+                    {shippingCharge === 0 ? t("free_label") : `${CURRENCY}${shippingCharge.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Estimated Taxes</span>
+                  <span>{t("estimated_taxes")}</span>
                   <span className="text-slate-900 font-bold">{CURRENCY}0.00</span>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center border-t border-slate-200 pt-6 mb-8">
-                <span className="font-bold text-slate-900 text-lg uppercase tracking-wider">Total</span>
+              <div className="flex justify-between items-center border-t border-slate-200 pt-6 mb-8 text-start">
+                <span className="font-bold text-slate-900 text-lg uppercase tracking-wider">{t("total_label")}</span>
                 <span className="text-4xl font-black text-slate-900 font-sans">{CURRENCY}{finalTotal.toFixed(2)}</span>
               </div>
 
@@ -557,10 +559,10 @@ export default function CheckoutPage() {
                 {isProcessing ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div> 
-                    Securing Order...
+                    {t("securing_order")}
                   </>
                 ) : (
-                  <>Place Order</>
+                  <>{t("place_order")}</>
                 )}
               </button>
               

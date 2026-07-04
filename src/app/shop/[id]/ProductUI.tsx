@@ -9,6 +9,7 @@ import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import { FiEdit, FiAward, FiThumbsUp, FiFilter, FiX, FiCheck, FiMessageSquare, FiTrash2, FiCornerDownRight, FiLock } from "react-icons/fi";
 import { useUser, SignInButton } from "@clerk/nextjs";
+import { useTranslation } from "@/context/LanguageContext";
 
 const JERSEYS: Record<
   string,
@@ -344,6 +345,7 @@ const LEFT_SLEEVE_PATCH_OPTIONS: CustomSelectOption[] = [
 ];
 
 export default function ProductUI({ product }: { product: any }) {
+  const { t, lang } = useTranslation();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
@@ -415,22 +417,23 @@ export default function ProductUI({ product }: { product: any }) {
     }));
 
     return (
-      <div className="space-y-6 mb-8">
+      <div className="space-y-6 mb-8 text-start">
         {/* Name & Number Printing Box */}
         <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-6 font-sans shadow-sm">
           <div className="flex items-start gap-4">
+            {/* Jersey Icon */}
             <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-sm shrink-0">
               <JerseyPrintIcon className="w-7 h-7 text-kora" />
             </div>
 
             <div>
-              <span className="text-[10px] font-extrabold uppercase text-kora tracking-widest bg-kora/10 px-2.5 py-0.5 rounded-sm">Bespoke Lab</span>
-              <h3 className="text-slate-900 font-extrabold text-base leading-tight mt-1">Name & Number printing</h3>
-              <p className="text-slate-400 text-xs mt-0.5">Add the name of your favorite player or any custom name available in official font</p>
+              <h3 className="text-slate-900 font-extrabold text-base leading-tight">{t("name_number_printing")}</h3>
+              <p className="text-slate-400 text-xs mt-1">Add the name of your favorite player or any custom name available in official font</p>
             </div>
           </div>
 
-          <div className="flex gap-3 mt-6">
+          {/* Toggles */}
+          <div className="flex gap-3 mt-5">
             <button
               type="button"
               onClick={() => {
@@ -501,14 +504,14 @@ export default function ProductUI({ product }: { product: any }) {
             <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
               <div className="flex gap-3">
                 <div className="flex-1">
-                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Name on Back</label>
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Name</label>
                   <input
                     type="text"
                     maxLength={15}
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value.toUpperCase())}
-                    placeholder="e.g. ADNAN"
-                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-990 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider text-slate-900"
+                    placeholder="e.g. CUSTOM NAME"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider text-slate-900"
                   />
                 </div>
                 <div className="w-24">
@@ -540,8 +543,8 @@ export default function ProductUI({ product }: { product: any }) {
                 <SleevePatchIcon className="w-7 h-7 text-kora" />
               </div>
               <div>
-                <h3 className="text-slate-900 font-extrabold text-base leading-tight">Sleeve Patches</h3>
-                <p className="text-slate-400 text-xs mt-0.5">Add the official sleeve patch</p>
+                <h3 className="text-slate-900 font-extrabold text-base leading-tight">{t("sleeve_patches")}</h3>
+                <p className="text-slate-400 text-xs mt-0.5">{t("sleeve_patches_desc")}</p>
               </div>
             </div>
             <div className="bg-white border border-slate-200/80 rounded-xl px-3.5 py-1.5 text-xs font-bold text-slate-900 shadow-xs">
@@ -556,7 +559,7 @@ export default function ProductUI({ product }: { product: any }) {
               onChange={setRightSleevePatch}
               options={RIGHT_SLEEVE_PATCH_OPTIONS}
               placeholder="Right Patch"
-              className="flex-1 min-w-0"
+              className="flex-1 min-w-0 text-start"
             />
 
             {/* Left Sleeve Dropdown */}
@@ -565,7 +568,7 @@ export default function ProductUI({ product }: { product: any }) {
               onChange={setLeftSleevePatch}
               options={LEFT_SLEEVE_PATCH_OPTIONS}
               placeholder="Left Patch"
-              className="flex-1 min-w-0"
+              className="flex-1 min-w-0 text-start"
             />
           </div>
         </div>
@@ -582,7 +585,7 @@ export default function ProductUI({ product }: { product: any }) {
     }));
 
     return (
-      <div className="space-y-4 mb-6">
+      <div className="space-y-4 mb-6 text-start">
         {/* Name & Number Printing Box */}
         <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-5 font-sans shadow-xs">
           <div className="flex items-start gap-4">
@@ -592,7 +595,7 @@ export default function ProductUI({ product }: { product: any }) {
             </div>
 
             <div>
-              <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">Name & Number printing</h3>
+              <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">{t("name_number_printing")}</h3>
               <p className="text-slate-400 text-xs mt-1">Add the name of your favorite player or any custom name available in official font</p>
             </div>
           </div>
@@ -707,8 +710,8 @@ export default function ProductUI({ product }: { product: any }) {
                 <SleevePatchIcon className="w-7 h-7 text-kora" />
               </div>
               <div>
-                <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">Sleeve Patches</h3>
-                <p className="text-slate-400 text-xs mt-1">Add the official sleeve patch</p>
+                <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">{t("sleeve_patches")}</h3>
+                <p className="text-slate-400 text-xs mt-1">{t("sleeve_patches_desc")}</p>
               </div>
             </div>
             <div className="bg-white border border-slate-200/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 shadow-xs">
@@ -723,7 +726,7 @@ export default function ProductUI({ product }: { product: any }) {
               onChange={setRightSleevePatch}
               options={RIGHT_SLEEVE_PATCH_OPTIONS}
               placeholder="Right Patch"
-              className="flex-1 min-w-0"
+              className="flex-1 min-w-0 text-start"
             />
 
             {/* Left Sleeve Dropdown */}
@@ -732,7 +735,7 @@ export default function ProductUI({ product }: { product: any }) {
               onChange={setLeftSleevePatch}
               options={LEFT_SLEEVE_PATCH_OPTIONS}
               placeholder="Left Patch"
-              className="flex-1 min-w-0"
+              className="flex-1 min-w-0 text-start"
             />
           </div>
         </div>
@@ -996,11 +999,11 @@ export default function ProductUI({ product }: { product: any }) {
           {/* Stock badge */}
           {product.stock === 0 ? (
             <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 bg-rose-500 text-white rounded-full shadow">
-              Sold Out
+              {t("sold_out")}
             </span>
           ) : product.stock <= 3 ? (
             <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 bg-amber-500 text-white rounded-full shadow animate-pulse">
-              Only {product.stock} left
+              {t("only_left").replace("{count}", String(product.stock))}
             </span>
           ) : null}
         </div>
@@ -1050,7 +1053,7 @@ export default function ProductUI({ product }: { product: any }) {
           </>
         ) : (
           <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 text-sm">
-            No Image Available
+            {t("no_image_available")}
           </div>
         )}
       </div>
@@ -1074,7 +1077,7 @@ export default function ProductUI({ product }: { product: any }) {
               <span className="text-xs font-black text-slate-700">{avgRatingDisplay}</span>
             ) : null}
             <span className="text-xs text-slate-400 font-medium">
-              ({product.reviews?.length || 0} reviews)
+              ({product.reviews?.length || 0} {t("reviews")})
             </span>
           </div>
         </div>
@@ -1082,19 +1085,19 @@ export default function ProductUI({ product }: { product: any }) {
         {/* Price + Stock */}
         <div className="flex items-center justify-between mb-5 pb-5 border-b border-slate-100">
           <span className="text-3xl font-black text-slate-900">
-            {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + printUpcharge}
+            {t("aed")}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + printUpcharge}
           </span>
           {product.stock === 0 ? (
             <span className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-full">
-              Sold Out
+              {t("sold_out")}
             </span>
           ) : product.stock <= 3 ? (
             <span className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-full animate-pulse">
-              Only {product.stock} left!
+              {t("only_left").replace("{count}", String(product.stock))}
             </span>
           ) : (
             <span className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
-              In Stock
+              {t("in_stock")}
             </span>
           )}
         </div>
@@ -1102,7 +1105,7 @@ export default function ProductUI({ product }: { product: any }) {
         {/* Style Variation Selector (Boots) */}
         {product.category === "Boots" && images.length > 1 && (
           <div className="mb-5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2.5">Style / Variation</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2.5">{t("style_variation_label")}</p>
             <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
               {images.map((img, i) => (
                 <button
@@ -1124,7 +1127,7 @@ export default function ProductUI({ product }: { product: any }) {
         {/* Thumbnail row for non-boots */}
         {product.category !== "Boots" && images.length > 1 && (
           <div className="mb-5">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2.5">Gallery</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2.5">{t("gallery_label")}</p>
             <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
               {images.map((img, i) => (
                 <button
@@ -1145,24 +1148,24 @@ export default function ProductUI({ product }: { product: any }) {
 
         {/* Size Selector */}
         <div className="mb-5">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Select Size</p>
+          <div className="flex items-center justify-between mb-3 text-start">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{t("select_size")}</p>
             {hasCustomSizeChart ? (
               <button
                 type="button"
                 onClick={() => setIsSizeChartOpen(true)}
                 className="text-[10px] font-bold text-kora uppercase tracking-wider cursor-pointer focus:outline-none"
               >
-                Size Guide →
+                {t("size_guide")} {lang === "ar" ? "←" : "→"}
               </button>
             ) : (
               <Link href="/faq" className="text-[10px] font-bold text-kora uppercase tracking-wider">
-                Size Guide →
+                {t("size_guide")} {lang === "ar" ? "←" : "→"}
               </Link>
             )}
           </div>
           {product.sizes && product.sizes.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 text-start">
               {product.sizes.map((size: string) => (
                 <button
                   key={size}
@@ -1181,7 +1184,7 @@ export default function ProductUI({ product }: { product: any }) {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-slate-500">One Size</p>
+            <p className="text-sm text-slate-500">{t("one_size")}</p>
           )}
         </div>
 
@@ -1191,83 +1194,83 @@ export default function ProductUI({ product }: { product: any }) {
         {/* Description */}
         <div className="mb-6">
           <p className="text-sm text-slate-500 leading-relaxed">
-            {product.description || "Premium gear sourced directly from Kora Store's exclusive vault."}
+            {product.description || t("premium_gear_sourced")}
           </p>
         </div>
 
         {/* Trust badges */}
         <div className="grid grid-cols-2 gap-2 mb-6">
-          <div className="pdp-trust-badge">
+          <div className="pdp-trust-badge text-start">
             <FaTruckFast className="text-kora text-base shrink-0" />
-            <span>UAE Delivery within 48 Hours</span>
+            <span>{t("uae_delivery_48")}</span>
           </div>
-          <div className="pdp-trust-badge">
+          <div className="pdp-trust-badge text-start">
             <FaShieldAlt className="text-kora text-base shrink-0" />
-            <span>7-Day Guarantee</span>
+            <span>{t("guarantee_7day")}</span>
           </div>
         </div>
 
         {/* ── Tabs: Details + Reviews ── */}
-        <div className="border-t border-slate-100 pt-6">
-          <div className="flex gap-6 border-b border-slate-100 mb-5">
+        <div className="border-t border-slate-100 pt-6 text-start">
+          <div className="flex gap-6 border-b border-slate-100 mb-5 text-start">
             <button
               onClick={() => setActiveTab("details")}
               className={`pdp-tab ${activeTab === "details" ? "pdp-tab-active" : ""}`}
             >
-              The Intel
+              {t("the_intel")}
             </button>
             <button
               onClick={() => setActiveTab("reviews")}
               className={`pdp-tab ${activeTab === "reviews" ? "pdp-tab-active" : ""}`}
             >
-              Reviews ({product.reviews?.length || 0})
+              {t("reviews")} ({product.reviews?.length || 0})
             </button>
           </div>
 
           {activeTab === "details" && (
-            <div className="text-slate-500 text-sm leading-relaxed space-y-6 pdp-mobile-animate">
-              <p>Every kit is rigorously quality-checked before dispatch. We bypass traditional retail to bring you absolute 1:1 specifications.</p>
-              <ul className="space-y-2.5">
-                <li className="flex gap-2"><span className="font-bold text-slate-800 shrink-0">Fit:</span> Standard athletic cut. Size up for Player Issue versions.</li>
-                <li className="flex gap-2"><span className="font-bold text-slate-800 shrink-0">Material:</span> 100% Recycled Polyester with advanced sweat-wicking tech.</li>
-                <li className="flex gap-2"><span className="font-bold text-slate-800 shrink-0">Care:</span> Hand Wash Only. Do not use washing machine or tumble dryer.</li>
+            <div className="text-slate-500 text-sm leading-relaxed space-y-6 pdp-mobile-animate text-start">
+              <p>{t("every_kit_checked")}</p>
+              <ul className="space-y-2.5 text-start">
+                <li className="flex gap-2"><span className="font-bold text-slate-800 shrink-0">{t("fit_label")}:</span> {t("fit_desc_mobile")}</li>
+                <li className="flex gap-2"><span className="font-bold text-slate-800 shrink-0">{t("material_label")}:</span> {t("material_desc_mobile")}</li>
+                <li className="flex gap-2"><span className="font-bold text-slate-800 shrink-0">{t("care_label")}:</span> {t("care_desc_mobile")}</li>
               </ul>
 
               {/* Mobile Policy & Care Details */}
-              <div className="grid grid-cols-1 gap-4 mt-6">
+              <div className="grid grid-cols-1 gap-4 mt-6 text-start">
                 {/* Wash Care Card */}
-                <div className="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl shadow-xs">
-                  <div className="flex items-center gap-3 mb-3">
+                <div className="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl shadow-xs text-start">
+                  <div className="flex items-center gap-3 mb-3 text-start">
                     <span className="p-2 bg-white border border-slate-200/50 rounded-xl text-kora text-base">🧼</span>
-                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">Wash & Care Instructions</h4>
+                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">{t("wash_instructions")}</h4>
                   </div>
-                  <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside">
-                    <li><strong className="text-slate-700">Hand wash only</strong> using cold water.</li>
-                    <li>Use a small amount of mild detergent.</li>
-                    <li>Wash gently. <strong className="text-slate-700">Do not scrub</strong> prints or logos.</li>
-                    <li><strong className="text-slate-700">Do not use</strong> a washing machine or tumble dryer.</li>
-                    <li>Air dry in the shade. Do not wring or twist.</li>
+                  <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside text-start">
+                    <li><strong className="text-slate-700">{t("wash_detail_1")}</strong></li>
+                    <li>{t("wash_detail_2")}</li>
+                    <li>{t("wash_detail_3")}</li>
+                    <li>{t("wash_detail_4")}</li>
+                    <li>{t("wash_detail_5")}</li>
                   </ul>
-                  <p className="text-[10px] text-kora/80 font-semibold italic mt-3 bg-purple-50/50 p-2 border border-purple-100/50 rounded-lg">
-                    *Player Version Jerseys: Require extra care due to lightweight performance fabric and heat-pressed details.
+                  <p className="text-[10px] text-kora/80 font-semibold italic mt-3 bg-purple-50/50 p-2 border border-purple-100/50 rounded-lg text-start">
+                    {t("player_version_care")}
                   </p>
                 </div>
 
                 {/* Return Policy Card */}
-                <div className="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl shadow-xs">
-                  <div className="flex items-center gap-3 mb-3">
+                <div className="bg-slate-50 border border-slate-200/60 p-5 rounded-2xl shadow-xs text-start">
+                  <div className="flex items-center gap-3 mb-3 text-start">
                     <span className="p-2 bg-white border border-slate-200/50 rounded-xl text-kora text-base">🛡️</span>
-                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">Vault Return Policy</h4>
+                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">{t("return_policy")}</h4>
                   </div>
-                  <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside">
-                    <li><strong className="text-rose-600">Custom Printed Jerseys:</strong> Jerseys with printed names or numbers are <strong className="text-rose-600">non-returnable and non-exchangeable</strong>.</li>
-                    <li><strong className="text-slate-700">Non-Printed Jerseys:</strong> Exchange only if unused, unwashed, in original packaging, and tags attached.</li>
-                    <li><strong className="text-slate-700">Exchange Fee:</strong> A flat 25 AED delivery fee applies to all exchange requests.</li>
-                    <li><strong className="text-slate-700">Refund Policy:</strong> Refund processed only if you receive a damaged item.</li>
+                  <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside text-start">
+                    <li>{t("policy_detail_1")}</li>
+                    <li>{t("policy_detail_2")}</li>
+                    <li>{t("policy_detail_3")}</li>
+                    <li>{t("policy_detail_4")}</li>
                   </ul>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-3 flex items-center justify-between border-t border-slate-200/60 pt-2.5">
-                    <span>⏱️ Claim Window: Within 48 hours</span>
-                    <span className="text-kora">3-4 days processing</span>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-3 flex items-center justify-between border-t border-slate-200/60 pt-2.5 text-start">
+                    <span>⏱️ {t("claim_window_title")}</span>
+                    <span className="text-kora">{t("processing_time_title")}</span>
                   </p>
                 </div>
               </div>
@@ -1277,11 +1280,11 @@ export default function ProductUI({ product }: { product: any }) {
           {activeTab === "reviews" && (
             <div className="space-y-6 pdp-mobile-animate">
               {/* Mobile Stats Summary */}
-              <div className="bg-slate-900 text-white rounded-3xl p-5 shadow-lg relative overflow-hidden">
+              <div className="bg-slate-900 text-white rounded-3xl p-5 shadow-lg relative overflow-hidden text-start">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-kora/20 rounded-full blur-2xl pointer-events-none"></div>
-                <div className="relative z-10 flex items-center justify-between">
+                <div className="relative z-10 flex items-center justify-between text-start">
                   <div>
-                    <span className="text-[9px] font-black uppercase text-kora tracking-widest block mb-0.5">Average Intel</span>
+                    <span className="text-[9px] font-black uppercase text-kora tracking-widest block mb-0.5">{t("average_intel_title")}</span>
                     <div className="flex items-baseline gap-2">
                       <span className="text-4xl font-black font-display leading-none">{avgRatingDisplay || "0.0"}</span>
                       <span className="text-xs text-slate-400 font-bold">/ 5.0</span>
@@ -1292,16 +1295,16 @@ export default function ProductUI({ product }: { product: any }) {
                       ))}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <span className="text-[9px] font-black uppercase text-kora tracking-widest block mb-0.5">TOTAL REVIEWS</span>
+                  <div className="text-right rtl:text-left">
+                    <span className="text-[9px] font-black uppercase text-kora tracking-widest block mb-0.5">{t("total_reviews_label")}</span>
                     <span className="text-2xl font-black font-display text-white block leading-none">{product.reviews?.length || 0}</span>
-                    <span className="text-[10px] text-slate-400 font-bold block mt-1">Verified Ratings</span>
+                    <span className="text-[10px] text-slate-400 font-bold block mt-1">{t("verified_ratings_label")}</span>
                   </div>
                 </div>
               </div>
 
               {/* Mobile Rating Filters (Horizontal Scrollable Chips) */}
-              <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1">
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1 text-start">
                 <button
                   onClick={() => setRatingFilter(null)}
                   className={`shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
@@ -1310,7 +1313,7 @@ export default function ProductUI({ product }: { product: any }) {
                       : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                   }`}
                 >
-                  All ({product.reviews?.length || 0})
+                  {t("all")} ({product.reviews?.length || 0})
                 </button>
                 {[5, 4, 3, 2, 1].map((rating) => {
                   const count = product.reviews ? product.reviews.filter((r: any) => r.rating === rating).length : 0;
@@ -1337,42 +1340,42 @@ export default function ProductUI({ product }: { product: any }) {
               {!clerkUser ? (
                 <div className="bg-slate-50 border border-dashed border-slate-200 rounded-3xl p-6 text-center shadow-xs">
                   <FiLock className="mx-auto text-slate-400 text-2xl mb-2" />
-                  <h3 className="text-sm font-bold text-slate-800 mb-1">Want to drop a review?</h3>
-                  <p className="text-xs text-slate-400 mb-4">You must be logged in to share your kit experience.</p>
+                  <h3 className="text-sm font-bold text-slate-800 mb-1">{t("want_review")}</h3>
+                  <p className="text-xs text-slate-400 mb-4">{t("review_login_desc")}</p>
                   <SignInButton mode="modal">
                     <button className="w-full bg-slate-900 active:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3 rounded-xl transition-all shadow-sm">
-                      Sign In to Review
+                      {t("sign_in_review")}
                     </button>
                   </SignInButton>
                 </div>
               ) : (
-                <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs relative overflow-hidden">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-black uppercase text-slate-900 tracking-wide">Drop a Review</h3>
-                    <span className="text-[9px] text-slate-400 uppercase tracking-widest font-bold">Tap stars to rate</span>
+                <div className="bg-white border border-slate-200 rounded-3xl p-5 shadow-xs relative overflow-hidden text-start">
+                  <div className="flex items-center justify-between mb-4 text-start">
+                    <h3 className="text-sm font-black uppercase text-slate-900 tracking-wide">{t("drop_review")}</h3>
+                    <span className="text-[9px] text-slate-400 uppercase tracking-widest font-bold">{t("tap_stars")}</span>
                   </div>
-                  <div className="mb-4"><StarPicker size="text-lg" /></div>
+                  <div className="mb-4 text-start"><StarPicker size="text-lg" /></div>
                   <textarea
                     value={reviewText}
                     onChange={(e) => setReviewText(e.target.value)}
-                    placeholder="How was the fit and quality? Add your experience to the vault."
-                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none text-xs"
+                    placeholder={t("review_textarea_placeholder")}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none text-xs text-start"
                   />
                   <button
                     onClick={handleSubmitReview}
                     disabled={isSubmitting || !reviewText.trim()}
-                    className="w-full bg-slate-900 active:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all disabled:opacity-40 shadow-md transform-gpu active:scale-95"
+                    className="w-full bg-slate-900 active:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3.5 rounded-xl transition-all disabled:opacity-40 shadow-md transform-gpu active:scale-95 text-center"
                   >
-                    {isSubmitting ? "Dropping Intel..." : "Submit Review"}
+                    {isSubmitting ? t("submitting_review") : t("submit_review")}
                   </button>
                 </div>
               )}
 
               {/* Active Filter Indicator */}
               {ratingFilter !== null && (
-                <div className="flex items-center justify-between bg-slate-100 border border-slate-200 px-4 py-2.5 rounded-xl">
+                <div className="flex items-center justify-between bg-slate-100 border border-slate-200 px-4 py-2.5 rounded-xl text-start">
                   <span className="text-xs text-slate-600 font-bold">
-                    Showing only {ratingFilter}-star reviews ({filteredReviews.length})
+                    {t("showing_only_stars").replace("{rating}", String(ratingFilter)).replace("{count}", String(filteredReviews.length))}
                   </span>
                   <button onClick={() => setRatingFilter(null)} className="text-slate-400 hover:text-slate-900">
                     <FiX className="text-base" />
@@ -1382,10 +1385,10 @@ export default function ProductUI({ product }: { product: any }) {
 
               {/* Reviews list */}
               {filteredReviews.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-4 text-start">
                   {filteredReviews.map((review: any) => {
                     const isReviewerAdmin = review.user?.email === "mahramh40@gmail.com" || review.user?.email === "korastore.ae@gmail.com";
-                    const reviewerName = isReviewerAdmin ? "Kora Store" : (review.user?.firstName || "Vault Member");
+                    const reviewerName = isReviewerAdmin ? "Kora Store" : (review.user?.firstName || "Customer");
                     const helpfulKey = review.id;
                     const votes = helpfulVotes[helpfulKey] || { yes: review.id.charCodeAt(0) % 6, voted: null };
 
@@ -1400,16 +1403,16 @@ export default function ProductUI({ product }: { product: any }) {
                     };
 
                     return (
-                      <div key={review.id} className="relative bg-white border border-slate-100 rounded-3xl p-5 shadow-xs overflow-hidden pdp-mobile-animate animate-fade-in-up">
+                      <div key={review.id} className="relative bg-white border border-slate-100 rounded-3xl p-5 shadow-xs overflow-hidden pdp-mobile-animate animate-fade-in-up text-start">
                         {review.hasPurchased && !isReviewerAdmin && (
                           <div className="absolute right-4 bottom-4 opacity-[0.03] pointer-events-none select-none hidden sm:block">
                             <span className="text-3xl font-black tracking-widest text-slate-900 uppercase border-[3px] border-slate-900 px-2 py-0.5 rounded-lg transform rotate-12 inline-block">
-                              VERIFIED ORDER
+                              {t("verified_order")}
                             </span>
                           </div>
                         )}
-                        <div className="flex justify-between items-start mb-3 relative z-10">
-                          <div className="flex items-center gap-3">
+                        <div className="flex justify-between items-start mb-3 relative z-10 text-start">
+                          <div className="flex items-center gap-3 text-start">
                             <AvatarDisplay
                               imageUrl={isReviewerAdmin ? "/icon.png" : review.user?.imageUrl}
                               name={reviewerName}
@@ -1417,15 +1420,15 @@ export default function ProductUI({ product }: { product: any }) {
                               customProfilePic={isReviewerAdmin ? null : review.user?.customProfilePic}
                               size="w-9 h-9"
                             />
-                            <div>
-                              <div className="flex items-center gap-1.5 flex-wrap">
+                            <div className="text-start">
+                              <div className="flex items-center gap-1.5 flex-wrap text-start">
                                 <p className="text-xs font-bold text-slate-900 flex items-center gap-0.5">
                                   {reviewerName}
                                   {isReviewerAdmin && <VerifiedTick />}
                                 </p>
                                 {review.hasPurchased && !isReviewerAdmin && (
                                   <span className="inline-flex items-center gap-0.5 text-[8px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-100">
-                                    <FiCheck className="stroke-[3px]" /> Verified
+                                    <FiCheck className="stroke-[3px]" /> {t("verified_purchaser_label")}
                                   </span>
                                 )}
                               </div>
@@ -1439,7 +1442,7 @@ export default function ProductUI({ product }: { product: any }) {
                             <span className="text-[10px] text-slate-400 font-medium">
                               {new Date(review.createdAt).toLocaleDateString()}
                               {review.edited && (
-                                <span className="text-[9px] text-slate-400 italic ml-1 select-none">(edited)</span>
+                                <span className="text-[9px] text-slate-400 italic ml-1 select-none">{t("edited_label")}</span>
                               )}
                             </span>
                             
@@ -1471,8 +1474,8 @@ export default function ProductUI({ product }: { product: any }) {
 
                         {/* Inline Review Edit Block */}
                         {isEditing ? (
-                          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 mb-3">
-                            <div className="flex items-center gap-1 mb-2">
+                          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 mb-3 text-start">
+                            <div className="flex items-center gap-1 mb-2 text-start">
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <button
                                   key={star}
@@ -1487,35 +1490,35 @@ export default function ProductUI({ product }: { product: any }) {
                             <textarea
                               value={editComment}
                               onChange={(e) => setEditComment(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-kora mb-3 resize-none h-20"
+                              className="w-full bg-white border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:border-kora mb-3 resize-none h-20 text-start"
                             />
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 text-start">
                               <button
                                 onClick={() => handleEditReview(review.id)}
                                 disabled={isEditingSubmitting || !editComment.trim()}
                                 className="bg-kora text-white text-[10px] font-bold uppercase py-2 px-4 rounded-xl shadow-xs disabled:opacity-50"
                               >
-                                {isEditingSubmitting ? "Saving..." : "Save"}
+                                {isEditingSubmitting ? t("saving_label") : t("save")}
                               </button>
                               <button
                                 onClick={() => setEditingReviewId(null)}
                                 className="bg-white border border-slate-200 text-slate-600 text-[10px] font-bold uppercase py-2 px-4 rounded-xl hover:border-slate-300"
                               >
-                                Cancel
+                                {t("cancel_label")}
                               </button>
                             </div>
                           </div>
                         ) : (
-                          <p className="text-xs text-slate-600 leading-relaxed mb-4">{review.comment}</p>
+                          <p className="text-xs text-slate-600 leading-relaxed mb-4 text-start">{review.comment}</p>
                         )}
 
                         {/* Official Admin Reply display */}
                         {review.adminReply && (
-                          <div className="mt-4 pl-3.5 border-l-2 border-kora/40 bg-slate-50 p-3 rounded-r-2xl relative overflow-hidden flex gap-2.5 items-start">
+                          <div className="mt-4 pl-3.5 border-l-2 border-kora/40 bg-slate-50 p-3 rounded-r-2xl relative overflow-hidden flex gap-2.5 items-start text-start">
                             <img src="/icon.png" alt="Kora Store" className="w-6 h-6 rounded-full border border-kora/30 object-cover shrink-0 mt-0.5" />
-                            <div className="flex-1">
-                              <div className="flex items-center gap-1 flex-wrap mb-1">
-                                <span className="text-[9px] font-black uppercase text-kora tracking-wider">OFFICIAL VAULT REPLY</span>
+                            <div className="flex-1 text-start">
+                              <div className="flex items-center gap-1 flex-wrap mb-1 text-start">
+                                <span className="text-[9px] font-black uppercase text-kora tracking-wider">{t("official_reply")}</span>
                                 <VerifiedTick />
                                 {isAdmin && (
                                   <button
@@ -1525,11 +1528,11 @@ export default function ProductUI({ product }: { product: any }) {
                                     }}
                                     className="text-[9px] text-slate-400 hover:text-kora font-bold uppercase underline ml-auto transition-colors"
                                   >
-                                    Edit Reply
+                                    {t("edit_reply")}
                                   </button>
                                 )}
                               </div>
-                              <p className="text-xs text-slate-700 leading-relaxed">{review.adminReply}</p>
+                              <p className="text-xs text-slate-700 leading-relaxed text-start">{review.adminReply}</p>
                             </div>
                           </div>
                         )}
@@ -1541,29 +1544,29 @@ export default function ProductUI({ product }: { product: any }) {
                               setReplyingReviewId(review.id);
                               setReplyText("");
                             }}
-                            className="inline-flex items-center gap-1 mt-3 text-[10px] text-slate-400 hover:text-kora font-bold uppercase transition-colors"
+                            className="inline-flex items-center gap-1 mt-3 text-[10px] text-slate-400 hover:text-kora font-bold uppercase transition-colors text-start"
                           >
                             <FiCornerDownRight className="text-[11px]" />
-                            <span>Reply to review</span>
+                            <span>{t("reply_to_review_label")}</span>
                           </button>
                         )}
 
                         {/* Admin Reply Text Editor */}
                         {replyingReviewId === review.id && (
-                          <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+                          <div className="mt-3 p-3 bg-slate-50 border border-slate-200 rounded-2xl text-start">
                             <textarea
                               value={replyText}
                               onChange={(e) => setReplyText(e.target.value)}
-                              placeholder="Type official shop reply..."
-                              className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-kora mb-2 resize-none h-16 bg-white"
+                              placeholder={t("type_reply_placeholder")}
+                              className="w-full border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-kora mb-2 resize-none h-16 bg-white text-start"
                             />
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 text-start">
                               <button
                                 onClick={() => handleReplyReview(review.id)}
                                 disabled={isReplyingSubmitting}
                                 className="bg-slate-900 hover:bg-kora text-white text-[10px] font-bold uppercase py-2 px-4 rounded-xl transition-all shadow-xs"
                               >
-                                {isReplyingSubmitting ? "Posting..." : "Post Reply"}
+                                {isReplyingSubmitting ? t("posting_label") : t("post_reply_label")}
                               </button>
                               {review.adminReply && (
                                 <button
@@ -1583,14 +1586,14 @@ export default function ProductUI({ product }: { product: any }) {
                                   }}
                                   className="bg-rose-50 border border-rose-200 text-rose-600 text-[10px] font-bold uppercase py-2 px-4 rounded-xl"
                                 >
-                                  Delete
+                                  {t("delete_label")}
                                 </button>
                               )}
                               <button
                                 onClick={() => setReplyingReviewId(null)}
                                 className="bg-white border border-slate-200 text-slate-600 text-[10px] font-bold uppercase py-2 px-4 rounded-xl"
                               >
-                                Cancel
+                                {t("cancel_label")}
                               </button>
                             </div>
                           </div>
@@ -1603,13 +1606,13 @@ export default function ProductUI({ product }: { product: any }) {
                 </div>
               ) : (
                 <div className="text-center py-10 border border-dashed border-slate-200 rounded-3xl bg-slate-50/50">
-                  <p className="text-xs text-slate-400 italic">No {ratingFilter ? `${ratingFilter}-star ` : ""}reviews found.</p>
+                  <p className="text-xs text-slate-400 italic">{t("no_reviews_matching")}</p>
                   {ratingFilter !== null && (
                     <button
                       onClick={() => setRatingFilter(null)}
                       className="mt-3 text-xs text-kora font-bold underline uppercase tracking-wider"
                     >
-                      Clear Filter
+                      {t("clear_filter_label")}
                     </button>
                   )}
                 </div>
@@ -1641,7 +1644,7 @@ export default function ProductUI({ product }: { product: any }) {
             </button>
           </div>
 
-          {/* Add to vault button */}
+          {/* Add to cart button */}
           <button
             onClick={handleAddToCart}
             disabled={product.stock === 0 || (!selectedSize && product.sizes?.length > 0) || isAdded}
@@ -1656,12 +1659,12 @@ export default function ProductUI({ product }: { product: any }) {
             }`}
           >
             {product.stock === 0
-              ? "Sold Out"
+              ? t("sold_out")
               : !selectedSize && product.sizes?.length > 0
-              ? "Select a Size"
+              ? t("select_size")
               : isAdded
-              ? "✓ Added to Vault!"
-              : "Add to Vault"}
+              ? `✓ ${t("added_to_cart")}`
+              : t("add_to_cart")}
           </button>
         </div>
       </div>
@@ -1672,27 +1675,27 @@ export default function ProductUI({ product }: { product: any }) {
   //  DESKTOP LAYOUT  (≥ 768px — completely unchanged from original)
   // ──────────────────────────────────────────────────────────────────────────
   const DesktopView = (
-    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-6 pb-24 px-8 relative overflow-hidden">
+    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-6 pb-24 px-8 relative overflow-hidden text-start">
       {/* Decorative gradient blobs for ambient background lighting */}
       <div className="absolute top-1/4 left-0 w-[500px] h-[500px] bg-kora/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
       <div className="absolute top-2/3 right-0 w-[500px] h-[500px] bg-pink-500/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
       <div className="max-w-7xl mx-auto">
         {/* Sleek Breadcrumb back button */}
-        <Link href="/shop" className="group inline-flex items-center gap-2.5 text-slate-400 hover:text-kora transition-colors mb-6 font-bold text-xs uppercase tracking-widest">
-          <FaChevronLeft className="transition-transform group-hover:-translate-x-1" />
-          <span>Back to Vault</span>
+        <Link href="/shop" className="group inline-flex items-center gap-2.5 text-slate-400 hover:text-kora transition-colors mb-6 font-bold text-xs uppercase tracking-widest text-start">
+          <FaChevronLeft className="transition-transform group-hover:-translate-x-1 rtl:rotate-180" />
+          <span>{t("back_to_shop")}</span>
         </Link>
 
         {/* Two Column Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-20 items-start mb-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 xl:gap-20 items-start mb-10 text-start">
           
           {/* LEFT: Image Showcase */}
           <div className="lg:col-span-7 flex gap-6 items-start sticky top-24">
             
             {/* Vertical thumbnails list */}
             {images.length > 1 && (
-              <div className="flex flex-col gap-3.5 shrink-0 scrollbar-hide max-h-[600px] overflow-y-auto pr-1">
+              <div className="flex flex-col gap-3.5 shrink-0 scrollbar-hide max-h-[600px] overflow-y-auto pr-1 text-start">
                 {images.map((img, i) => (
                   <button
                     key={i}
@@ -1715,10 +1718,10 @@ export default function ProductUI({ product }: { product: any }) {
             )}
 
             {/* Right side of Left Column: Main Showcase & Trust Badges */}
-            <div className="flex-1 flex flex-col gap-6">
+            <div className="flex-1 flex flex-col gap-6 text-start">
               {/* Main Showcase Box with Zoom-on-Hover */}
               <div 
-                className="w-full aspect-[4/5] bg-slate-50 rounded-[32px] border border-slate-200/60 flex items-center justify-center relative overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 p-0 cursor-zoom-in"
+                className="w-full aspect-[4/5] bg-slate-50 rounded-[32px] border border-slate-200/60 flex items-center justify-center relative overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 p-0 cursor-zoom-in text-start"
                 onMouseMove={handleMouseMove}
                 onMouseEnter={() => setIsZooming(true)}
                 onMouseLeave={() => setIsZooming(false)}
@@ -1739,33 +1742,33 @@ export default function ProductUI({ product }: { product: any }) {
                     }
                   />
                 ) : (
-                  <div className="relative z-10 text-slate-400 font-sans">No Image Available</div>
+                  <div className="relative z-10 text-slate-400 font-sans">{t("no_image_available")}</div>
                 )}
 
                 {/* Category pill indicator */}
-                <div className="absolute top-5 right-5 bg-white/90 backdrop-blur-xs border border-slate-200/50 rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-widest text-slate-600 shadow-xs z-20">
+                <div className="absolute top-5 ltr:right-5 rtl:left-5 bg-white/90 backdrop-blur-xs border border-slate-200/50 rounded-full px-4 py-1.5 text-[9px] font-black uppercase tracking-widest text-slate-600 shadow-xs z-20">
                   {categoryLabel}
                 </div>
               </div>
 
               {/* Trust Badges */}
-              <div className="flex flex-col gap-5 pt-6 border-t border-slate-100">
-                <div className="flex items-center gap-5 p-6 bg-slate-50 border border-slate-200/50 rounded-3xl shadow-xs">
-                  <div className="w-14 h-14 bg-white rounded-2xl border border-slate-200/50 flex items-center justify-center shrink-0 shadow-sm">
-                    <FaTruckFast className="text-2xl text-kora" />
+              <div className="grid grid-cols-2 gap-4 text-start">
+                <div className="bg-slate-50 border border-slate-200/60 rounded-3xl p-5 flex items-center gap-4 hover:border-kora/20 transition-all duration-300 group shadow-xs text-start">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-kora text-xl shadow-xs group-hover:scale-110 transition-transform shrink-0">
+                    <FaTruckFast />
                   </div>
                   <div>
-                    <span className="block text-[13px] font-black text-slate-800 uppercase tracking-widest leading-tight">UAE Delivery within 48 Hours</span>
-                    <span className="block text-xs text-slate-400 font-medium mt-1">Priority local shipping directly to your doorstep</span>
+                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-[11px]">{t("uae_delivery_48")}</h4>
+                    <p className="text-slate-400 text-xs mt-0.5">Local warehouse dispatch</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-5 p-6 bg-slate-50 border border-slate-200/50 rounded-3xl shadow-xs">
-                  <div className="w-14 h-14 bg-white rounded-2xl border border-slate-200/50 flex items-center justify-center shrink-0 shadow-sm">
-                    <FaShieldAlt className="text-2xl text-kora" />
+                <div className="bg-slate-50 border border-slate-200/60 rounded-3xl p-5 flex items-center gap-4 hover:border-kora/20 transition-all duration-300 group shadow-xs text-start">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-kora text-xl shadow-xs group-hover:scale-110 transition-transform shrink-0">
+                    <FaShieldAlt />
                   </div>
                   <div>
-                    <span className="block text-[13px] font-black text-slate-800 uppercase tracking-widest leading-tight">7-Day Satisfaction Guarantee</span>
-                    <span className="block text-xs text-slate-400 font-medium mt-1">Hassle-free vault returns and quality-checked replacements</span>
+                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-[11px]">{t("guarantee_7day")}</h4>
+                    <p className="text-slate-400 text-xs mt-0.5">Pre-shipping quality checks</p>
                   </div>
                 </div>
               </div>
@@ -1773,23 +1776,20 @@ export default function ProductUI({ product }: { product: any }) {
           </div>
 
           {/* RIGHT: Product Details & Purchase Actions */}
-          <div className="lg:col-span-5 flex flex-col">
+          <div className="lg:col-span-5 flex flex-col text-start">
             
             {/* Category tag */}
             <div className="mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-kora/10 border border-kora/20 text-kora text-[10px] font-black tracking-widest uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-kora animate-pulse"></span>
-                {categoryLabel}
-              </span>
+              <span className="text-kora text-[10px] font-bold uppercase tracking-widest mb-1.5">{categoryLabel}</span>
             </div>
 
             {/* Title */}
-            <h1 className="text-4xl xl:text-5xl font-black tracking-tight text-slate-900 mb-3.5 uppercase leading-none font-display">
+            <h1 className="text-3xl xl:text-4xl font-black tracking-tight text-slate-900 mb-3.5 uppercase leading-none font-display text-start">
               {product.name}
             </h1>
 
             {/* Ratings Header */}
-            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100">
+            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100 text-start">
               <div className="flex text-yellow-400 text-sm gap-0.5">
                 {[1, 2, 3, 4, 5].map((s) => (
                   <FaStar key={s} className={s <= Math.round(avgRating) ? "text-yellow-400 drop-shadow-[0_0_4px_rgba(250,204,21,0.4)]" : "text-slate-200"} />
@@ -1808,33 +1808,33 @@ export default function ProductUI({ product }: { product: any }) {
                 }}
                 className="text-xs text-slate-500 hover:text-kora font-bold underline underline-offset-4 transition-colors uppercase tracking-wider"
               >
-                ({product.reviews?.length || 0} Reviews)
+                ({product.reviews?.length || 0} {t("reviews")})
               </button>
             </div>
 
             {/* Pricing & Stock Status capsule */}
-            <div className="bg-slate-50 border border-slate-200/60 rounded-3xl p-5 mb-8 flex items-center justify-between shadow-xs">
+            <div className="bg-slate-50 border border-slate-200/60 rounded-3xl p-5 mb-8 flex items-center justify-between shadow-xs text-start">
               <div className="flex flex-col">
-                <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5">Price</span>
+                <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5">{t("price_label")}</span>
                 <span className="text-3xl font-extrabold text-slate-900 font-display">
-                  {CURRENCY}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + printUpcharge}
+                  {t("aed")}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + printUpcharge}
                 </span>
               </div>
               <div>
                 {product.stock === 0 ? (
                   <span className="inline-flex items-center gap-2 px-3.5 py-2 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider">
                     <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-                    Sold Out
+                    {t("sold_out")}
                   </span>
                 ) : product.stock <= 3 ? (
                   <span className="inline-flex items-center gap-2 px-3.5 py-2 bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider animate-pulse">
                     <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-                    Only {product.stock} Left
+                    {t("only_left").replace("{count}", String(product.stock))}
                   </span>
                 ) : (
                   <span className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-2xl text-[11px] font-extrabold uppercase tracking-wider">
                     <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    In Stock
+                    {t("in_stock")}
                   </span>
                 )}
               </div>
@@ -1842,7 +1842,7 @@ export default function ProductUI({ product }: { product: any }) {
 
             {/* Product Description */}
             <p className="text-slate-600 leading-relaxed text-sm font-sans mb-8">
-              {product.description || "Premium gear sourced directly from Kora Store's exclusive vault."}
+              {product.description || t("premium_gear_sourced")}
             </p>
 
             {/* Style Variation Selector (Boots) */}
@@ -1871,20 +1871,20 @@ export default function ProductUI({ product }: { product: any }) {
             )}
 
             {/* Size Selector */}
-            <div className="mb-8 font-sans">
+            <div className="mb-8 font-sans text-start">
               <div className="flex justify-between items-center mb-3.5">
-                <h3 className="text-slate-950 font-black uppercase tracking-wider text-xs">Select Size</h3>
+                <h3 className="text-slate-950 font-black uppercase tracking-wider text-xs">{t("select_size")}</h3>
                 {hasCustomSizeChart ? (
                   <button
                     type="button"
                     onClick={() => setIsSizeChartOpen(true)}
                     className="text-kora hover:text-purple-700 text-xs font-bold uppercase tracking-wider flex items-center gap-1 group cursor-pointer focus:outline-none"
                   >
-                    Size Guide <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                    {t("size_guide")} <span className="transition-transform group-hover:translate-x-0.5">→</span>
                   </button>
                 ) : (
                   <Link href="/faq" className="text-kora hover:text-purple-700 text-xs font-bold uppercase tracking-wider flex items-center gap-1 group">
-                    Size Guide <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                    {t("size_guide")} <span className="transition-transform group-hover:translate-x-0.5">→</span>
                   </Link>
                 )}
               </div>
@@ -1915,7 +1915,7 @@ export default function ProductUI({ product }: { product: any }) {
             {/* Custom Personalization (Shirts Only) */}
             {renderDesktopPersonalizationBox()}
 
-            {/* Add to Vault Row */}
+            {/* Add to Cart Row */}
             <div className="flex gap-4 mb-8 h-14 font-sans">
               {/* Quantity */}
               <div className={`flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-2xl px-2.5 w-32 shrink-0 shadow-sm ${product.stock === 0 ? "opacity-50 cursor-not-allowed" : ""}`}>
@@ -1936,7 +1936,7 @@ export default function ProductUI({ product }: { product: any }) {
                 </button>
               </div>
 
-              {/* Add to Vault button */}
+              {/* Add to Cart button */}
               <button
                 onClick={handleAddToCart}
                 disabled={product.stock === 0 || (!selectedSize && product.sizes?.length > 0) || isAdded}
@@ -1951,22 +1951,22 @@ export default function ProductUI({ product }: { product: any }) {
                 }`}
               >
                 {product.stock === 0 ? (
-                  <span>Sold Out</span>
+                  <span>{t("sold_out")}</span>
                 ) : !selectedSize && product.sizes?.length > 0 ? (
-                  <span>Select a Size</span>
+                  <span>{t("select_size")}</span>
                 ) : isAdded ? (
                   <>
                     <svg className="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>Added to Vault!</span>
+                    <span>{t("added_to_cart")}</span>
                   </>
                 ) : (
                   <>
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Add to Vault</span>
+                    <span>{t("add_to_cart")}</span>
                   </>
                 )}
               </button>
@@ -1978,15 +1978,15 @@ export default function ProductUI({ product }: { product: any }) {
         </div>
 
         {/* BOTTOM SECTION: DETAILS & REVIEWS TABS */}
-        <div id="reviews-section-ref" className="max-w-4xl mx-auto mt-10 pt-8 border-t border-slate-100">
-          <div className="flex gap-8 border-b border-slate-200 mb-8 font-bold uppercase">
+        <div id="reviews-section-ref" className="max-w-4xl mx-auto mt-10 pt-8 border-t border-slate-100 text-start">
+          <div className="flex gap-8 border-b border-slate-200 mb-8 font-bold uppercase text-start">
             <button
               onClick={() => setActiveTab("details")}
               className={`pb-4 text-sm tracking-widest transition-all border-b-2 font-black ${
                 activeTab === "details" ? "border-kora text-slate-900" : "border-transparent text-slate-400 hover:text-slate-600"
               }`}
             >
-              The Intel
+              {t("the_intel")}
             </button>
             <button
               onClick={() => setActiveTab("reviews")}
@@ -1994,79 +1994,79 @@ export default function ProductUI({ product }: { product: any }) {
                 activeTab === "reviews" ? "border-kora text-slate-900" : "border-transparent text-slate-400 hover:text-slate-600"
               }`}
             >
-              Reviews ({product.reviews?.length || 0})
+              {t("reviews")} ({product.reviews?.length || 0})
             </button>
           </div>
 
           <div className="min-h-[300px]">
             {activeTab === "details" && (
-              <div className="animate-fade-in-up space-y-8 font-sans">
-                <p className="text-slate-600 leading-relaxed text-sm">
-                  Every kit inside Kora Store is rigorously quality-checked before dispatch. We bypass traditional retail channels to bring you absolute 1:1 specifications.
+              <div className="animate-fade-in-up space-y-8 font-sans text-start">
+                <p className="text-slate-600 leading-relaxed text-sm text-start">
+                  {t("every_kit_checked_desktop")}
                 </p>
                 
                 {/* Specifications Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2">
-                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">FIT & CUT</span>
-                    <span className="text-slate-800 font-bold text-sm">Athletic Cut</span>
-                    <p className="text-slate-400 text-xs leading-normal">Standard athletic fit. Size up if selecting a Player Issue version for a looser fit.</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-start">
+                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2 text-start">
+                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">{t("fit_cut_title")}</span>
+                    <span className="text-slate-800 font-bold text-sm">{t("fit_cut_value")}</span>
+                    <p className="text-slate-400 text-xs leading-normal">{t("fit_cut_desc")}</p>
                   </div>
                   
-                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2">
-                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">MATERIAL</span>
-                    <span className="text-slate-800 font-bold text-sm">100% Polyester</span>
-                    <p className="text-slate-400 text-xs leading-normal">Recycled high-performance polyester with advanced sweat-wicking knit technology.</p>
+                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2 text-start">
+                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">{t("material_title")}</span>
+                    <span className="text-slate-800 font-bold text-sm">{t("material_value")}</span>
+                    <p className="text-slate-400 text-xs leading-normal">{t("material_desc")}</p>
                   </div>
                   
-                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2">
-                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">CARE</span>
-                    <span className="text-slate-800 font-bold text-sm">Hand Wash Only</span>
-                    <p className="text-slate-400 text-xs leading-normal">Wash cold, do not use washing machine or dryer. Shade dry only to preserve prints.</p>
+                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2 text-start">
+                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">{t("care_title")}</span>
+                    <span className="text-slate-800 font-bold text-sm">{t("care_value")}</span>
+                    <p className="text-slate-400 text-xs leading-normal">{t("care_desc")}</p>
                   </div>
                   
-                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2">
-                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">ORIGIN</span>
-                    <span className="text-slate-800 font-bold text-sm">Vault Standard</span>
-                    <p className="text-slate-400 text-xs leading-normal">Bypassing traditional retail margins to source the highest authentic grade direct.</p>
+                  <div className="p-5 bg-slate-50 border border-slate-200/60 rounded-2xl flex flex-col gap-2 text-start">
+                    <span className="text-[10px] font-black uppercase text-kora tracking-widest">{t("origin_title")}</span>
+                    <span className="text-slate-800 font-bold text-sm">{t("origin_value")}</span>
+                    <p className="text-slate-400 text-xs leading-normal">{t("origin_desc")}</p>
                   </div>
                 </div>
 
                 {/* Policy & Care Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 text-start">
                   {/* Wash Care Card */}
-                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs">
-                    <div className="flex items-center gap-3 mb-4">
+                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs text-start">
+                    <div className="flex items-center gap-3 mb-4 text-start">
                       <span className="p-2.5 bg-white border border-slate-200/50 rounded-xl text-kora text-lg">🧼</span>
-                      <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">Wash & Care Instructions</h4>
+                      <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">{t("wash_instructions")}</h4>
                     </div>
-                    <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside">
-                      <li><strong className="text-slate-700">Hand wash only</strong> using cold water.</li>
-                      <li>Use a small amount of mild detergent.</li>
-                      <li>Wash gently. <strong className="text-slate-700">Do not scrub</strong> the prints or logos.</li>
-                      <li><strong className="text-slate-700">Do not use</strong> a washing machine or tumble dryer.</li>
-                      <li>Air dry in the shade. Do not wring or twist the jersey.</li>
+                    <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside text-start">
+                      <li>{t("wash_detail_1")}</li>
+                      <li>{t("wash_detail_2")}</li>
+                      <li>{t("wash_detail_3")}</li>
+                      <li>{t("wash_detail_4")}</li>
+                      <li>{t("wash_detail_5")}</li>
                     </ul>
-                    <p className="text-[10px] text-kora/80 font-semibold italic mt-3.5 bg-purple-50/50 p-2.5 border border-purple-100/50 rounded-xl">
-                      *Player Version Jerseys: Require extra care due to lightweight performance fabric and heat-pressed details.
+                    <p className="text-[10px] text-kora/80 font-semibold italic mt-3.5 bg-purple-50/50 p-2.5 border border-purple-100/50 rounded-xl text-start">
+                      {t("player_version_care")}
                     </p>
                   </div>
 
                   {/* Return Policy Card */}
-                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs">
-                    <div className="flex items-center gap-3 mb-4">
+                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs text-start">
+                    <div className="flex items-center gap-3 mb-4 text-start">
                       <span className="p-2.5 bg-white border border-slate-200/50 rounded-xl text-kora text-lg">🛡️</span>
-                      <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">Vault Return Policy</h4>
+                      <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs">{t("return_policy")}</h4>
                     </div>
-                    <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside">
-                      <li><strong className="text-rose-600">Custom Printed Jerseys:</strong> Jerseys with printed names or numbers are <strong className="text-rose-600">non-returnable and non-exchangeable</strong>.</li>
-                      <li><strong className="text-slate-700">Non-Printed Jerseys:</strong> Exchange only if unused, unwashed, in original packaging, and tags attached.</li>
-                      <li><strong className="text-slate-700">Exchange Fee:</strong> A flat 25 AED delivery fee applies to all exchange requests.</li>
-                      <li><strong className="text-slate-700">Refund Policy:</strong> Refund processed only if you receive a damaged item.</li>
+                    <ul className="space-y-2 text-slate-500 text-xs leading-relaxed list-disc list-inside text-start">
+                      <li>{t("policy_detail_1")}</li>
+                      <li>{t("policy_detail_2")}</li>
+                      <li>{t("policy_detail_3")}</li>
+                      <li>{t("policy_detail_4")}</li>
                     </ul>
-                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-3.5 flex items-center justify-between border-t border-slate-200/60 pt-3">
-                      <span>⏱️ Claim Window: Within 48 hours</span>
-                      <span className="text-kora">3-4 days processing</span>
+                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-3.5 flex items-center justify-between border-t border-slate-200/60 pt-3 text-start">
+                      <span>⏱️ {t("claim_window_title")}</span>
+                      <span className="text-kora">{t("processing_time_title")}</span>
                     </p>
                   </div>
                 </div>
@@ -2081,7 +2081,7 @@ export default function ProductUI({ product }: { product: any }) {
                   
                   {/* Card 1: Average Score */}
                   <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl flex flex-col items-center justify-center text-center shadow-xs hover:border-kora/20 transition-all duration-300">
-                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1.5">AVERAGE INTEL</span>
+                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1.5">{t("average_intel_title")}</span>
                     <span className="text-6xl font-black text-slate-900 font-display mb-1.5">
                       {avgRatingDisplay || "0.0"}
                     </span>
@@ -2091,14 +2091,14 @@ export default function ProductUI({ product }: { product: any }) {
                       ))}
                     </div>
                     <span className="text-slate-500 text-[11px] font-bold uppercase tracking-wider">
-                      Based on {product.reviews?.length || 0} reviews
+                      {t("based_on_reviews").replace("{count}", String(product.reviews?.length || 0))}
                     </span>
                   </div>
 
                   {/* Card 2: Interactive Star Breakdown */}
-                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs hover:border-kora/20 transition-all duration-300 flex flex-col justify-center">
-                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-3.5 block text-center">RATING BREAKDOWN</span>
-                    <div className="space-y-2.5">
+                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs hover:border-kora/20 transition-all duration-300 flex flex-col justify-center text-start">
+                    <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-3.5 block text-center">{t("rating_breakdown_title")}</span>
+                    <div className="space-y-2.5 text-start">
                       {[5, 4, 3, 2, 1].map((rating) => {
                         const count = product.reviews ? product.reviews.filter((r: any) => r.rating === rating).length : 0;
                         const percent = product.reviews?.length ? (count / product.reviews.length) * 100 : 0;
@@ -2112,7 +2112,7 @@ export default function ProductUI({ product }: { product: any }) {
                               isActiveFilter ? "bg-kora/5 text-kora font-black animate-pulse" : ""
                             }`}
                           >
-                            <span className="w-3 shrink-0 text-left font-bold">{rating}</span>
+                            <span className="w-3 shrink-0 text-left rtl:text-right font-bold">{rating}</span>
                             <FaStar className={`text-[10px] ${isActiveFilter ? "text-kora" : "text-yellow-400"}`} />
                             <div className="flex-1 bg-slate-200 h-2 rounded-full overflow-hidden relative">
                               <div 
@@ -2122,7 +2122,7 @@ export default function ProductUI({ product }: { product: any }) {
                                 style={{ width: `${percent}%` }}
                               ></div>
                             </div>
-                            <span className="w-6 text-right shrink-0 font-medium">({count})</span>
+                            <span className="w-6 text-right rtl:text-left shrink-0 font-medium">({count})</span>
                           </button>
                         );
                       })}
@@ -2135,55 +2135,55 @@ export default function ProductUI({ product }: { product: any }) {
                 {!clerkUser ? (
                   <div className="bg-slate-50 border border-dashed border-slate-200 p-8 rounded-3xl text-center shadow-xs flex flex-col items-center justify-center min-h-[220px]">
                     <FiLock className="text-slate-400 text-3xl mb-3 animate-pulse" />
-                    <h3 className="text-base font-black uppercase text-slate-900 tracking-wide mb-1">Join the Vault to Review</h3>
-                    <p className="text-slate-400 text-xs mb-5 max-w-xs">Sign in to share your rating and order feedback with other members.</p>
+                    <h3 className="text-base font-black uppercase text-slate-900 tracking-wide mb-1">{t("sign_in_review")}</h3>
+                    <p className="text-slate-400 text-xs mb-5 max-w-xs">{t("review_login_desc")}</p>
                     <SignInButton mode="modal">
                       <button className="bg-slate-900 hover:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3 px-8 rounded-xl transition-all shadow-sm">
-                        Sign In to Review
+                        {t("sign_in_review")}
                       </button>
                     </SignInButton>
                   </div>
                 ) : (
-                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs relative overflow-hidden">
+                  <div className="bg-slate-50 border border-slate-200/60 p-6 rounded-3xl shadow-xs relative overflow-hidden text-start">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-kora/5 rounded-full blur-3xl pointer-events-none"></div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-base font-black uppercase text-slate-900 tracking-wide">Drop a Review</h3>
-                        <p className="text-slate-400 text-xs mt-0.5">Share your kit experience with the vault community.</p>
+                    <div className="flex items-center justify-between mb-4 text-start">
+                      <div className="text-start">
+                        <h3 className="text-base font-black uppercase text-slate-900 tracking-wide">{t("drop_review")}</h3>
+                        <p className="text-slate-400 text-xs mt-0.5">{t("drop_review_desc")}</p>
                       </div>
-                      <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Tap stars to rate</span>
+                      <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">{t("tap_stars")}</span>
                     </div>
-                    <div className="mb-4"><StarPicker size="text-xl" /></div>
+                    <div className="mb-4 text-start"><StarPicker size="text-xl" /></div>
                     <textarea
                       value={reviewText}
                       onChange={(e) => setReviewText(e.target.value)}
-                      placeholder="How was the fit and quality? Add your experience to the vault."
-                      className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none shadow-sm text-sm"
+                      placeholder={t("review_textarea_placeholder")}
+                      className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora mb-4 h-24 resize-none shadow-sm text-sm text-start"
                     />
                     <button
                       onClick={handleSubmitReview}
                       disabled={isSubmitting || !reviewText.trim()}
                       className="bg-slate-900 hover:bg-kora text-white font-bold text-xs uppercase tracking-widest py-3.5 px-8 rounded-2xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-kora/25 active:scale-95 transform-gpu"
                     >
-                      {isSubmitting ? "Dropping Intel..." : "Submit Review"}
+                      {isSubmitting ? t("submitting_review") : t("submit_review")}
                     </button>
                   </div>
                 )}
 
                 {/* Active Filter Indicator */}
                 {ratingFilter !== null && (
-                  <div className="flex items-center justify-between bg-slate-50 border border-kora/20 px-5 py-3 rounded-2xl">
+                  <div className="flex items-center justify-between bg-slate-50 border border-kora/20 px-5 py-3 rounded-2xl text-start">
                     <div className="flex items-center gap-2.5">
                       <FiFilter className="text-kora text-base" />
                       <span className="text-sm text-slate-700 font-bold">
-                        Showing only {ratingFilter}-star reviews ({filteredReviews.length} found)
+                        {t("showing_only_stars").replace("{rating}", String(ratingFilter)).replace("{count}", String(filteredReviews.length))}
                       </span>
                     </div>
                     <button
                       onClick={() => setRatingFilter(null)}
                       className="text-slate-400 hover:text-slate-900 text-xs font-bold uppercase tracking-wider flex items-center gap-1"
                     >
-                      Clear Filter <FiX className="text-base" />
+                      {t("clear_filter_label")} <FiX className="text-base" />
                     </button>
                   </div>
                 )}
@@ -2193,7 +2193,7 @@ export default function ProductUI({ product }: { product: any }) {
                   {filteredReviews.length > 0 ? (
                     filteredReviews.map((review: any) => {
                       const isReviewerAdmin = review.user?.email === "mahramh40@gmail.com" || review.user?.email === "korastore.ae@gmail.com";
-                      const reviewerName = isReviewerAdmin ? "Kora Store" : (review.user?.firstName || "Vault Member");
+                      const reviewerName = isReviewerAdmin ? "Kora Store" : (review.user?.firstName || "Customer");
                       const helpfulKey = review.id;
                       const votes = helpfulVotes[helpfulKey] || { yes: review.id.charCodeAt(0) % 6, voted: null };
 
@@ -2233,7 +2233,7 @@ export default function ProductUI({ product }: { product: any }) {
                                   </p>
                                   {review.hasPurchased && !isReviewerAdmin && (
                                     <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                                      <FiCheck className="stroke-[2px]" /> Verified Purchaser
+                                      <FiCheck className="stroke-[2px]" /> {t("verified_purchaser_label")}
                                     </span>
                                   )}
                                 </div>
@@ -2247,7 +2247,7 @@ export default function ProductUI({ product }: { product: any }) {
                               <span className="text-xs text-slate-400 font-sans font-medium">
                                 {new Date(review.createdAt).toLocaleDateString()}
                                 {review.edited && (
-                                  <span className="text-[10px] text-slate-400 italic ml-1.5 select-none">(edited)</span>
+                                  <span className="text-[10px] text-slate-400 italic ml-1.5 select-none">{t("edited_label")}</span>
                                 )}
                               </span>
 
@@ -2279,8 +2279,8 @@ export default function ProductUI({ product }: { product: any }) {
 
                           {/* Inline Review Edit Block */}
                           {isEditing ? (
-                            <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 mb-4 ml-14">
-                              <div className="flex items-center gap-1.5 mb-3">
+                            <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-5 mb-4 ml-14 text-start">
+                              <div className="flex items-center gap-1.5 mb-3 text-start">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                   <button
                                     key={star}
@@ -2295,35 +2295,35 @@ export default function ProductUI({ product }: { product: any }) {
                               <textarea
                                 value={editComment}
                                 onChange={(e) => setEditComment(e.target.value)}
-                                className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-sm text-slate-900 focus:outline-none focus:border-kora mb-3 resize-none h-24"
+                                className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-sm text-slate-900 focus:outline-none focus:border-kora mb-3 resize-none h-24 text-start"
                               />
-                              <div className="flex gap-3">
+                              <div className="flex gap-3 text-start">
                                 <button
                                   onClick={() => handleEditReview(review.id)}
                                   disabled={isEditingSubmitting || !editComment.trim()}
                                   className="bg-kora hover:bg-purple-700 text-white text-xs font-bold uppercase py-2.5 px-6 rounded-xl shadow-sm transition-colors disabled:opacity-50"
                                 >
-                                  {isEditingSubmitting ? "Saving..." : "Save Changes"}
+                                  {isEditingSubmitting ? t("saving_label") : t("save_changes_label")}
                                 </button>
                                 <button
                                   onClick={() => setEditingReviewId(null)}
-                                  className="bg-white border border-slate-200 text-slate-600 text-xs font-bold uppercase py-2.5 px-6 rounded-xl hover:border-slate-300 transition-colors"
+                                  className="bg-white border border-slate-205 text-slate-600 text-xs font-bold uppercase py-2.5 px-6 rounded-xl hover:border-slate-350 transition-colors"
                                 >
-                                  Cancel
+                                  {t("cancel_label")}
                                 </button>
                               </div>
                             </div>
                           ) : (
-                            <p className="text-slate-600 text-sm leading-relaxed pl-14 mb-4">{review.comment}</p>
+                            <p className="text-slate-600 text-sm leading-relaxed pl-14 mb-4 text-start">{review.comment}</p>
                           )}
 
                           {/* Official Admin Reply display */}
                           {review.adminReply && (
-                            <div className="mt-4 ml-14 pl-4 border-l-2 border-kora/40 bg-slate-50 p-4 rounded-r-2xl relative overflow-hidden flex gap-3.5 items-start animate-fade-in-up">
+                            <div className="mt-4 ml-14 pl-4 border-l-2 border-kora/40 bg-slate-50 p-4 rounded-r-2xl relative overflow-hidden flex gap-3.5 items-start animate-fade-in-up text-start">
                               <img src="/icon.png" alt="Kora Store" className="w-8 h-8 rounded-full border border-kora/30 object-cover shrink-0 mt-0.5" />
-                              <div className="flex-1">
-                                <div className="flex items-center gap-1.5 flex-wrap mb-1.5">
-                                  <span className="text-[10px] font-black uppercase text-kora tracking-widest">OFFICIAL VAULT REPLY</span>
+                              <div className="flex-1 text-start">
+                                <div className="flex items-center gap-1.5 flex-wrap mb-1.5 text-start">
+                                  <span className="text-[10px] font-black uppercase text-kora tracking-widest">{t("official_reply")}</span>
                                   <VerifiedTick />
                                   {isAdmin && (
                                     <button
@@ -2333,11 +2333,11 @@ export default function ProductUI({ product }: { product: any }) {
                                       }}
                                       className="text-xs text-slate-400 hover:text-kora font-bold uppercase underline ml-auto transition-colors"
                                     >
-                                      Edit Reply
+                                      {t("edit_reply")}
                                     </button>
                                   )}
                                 </div>
-                                <p className="text-xs text-slate-700 leading-relaxed">{review.adminReply}</p>
+                                <p className="text-xs text-slate-700 leading-relaxed text-start">{review.adminReply}</p>
                               </div>
                             </div>
                           )}
@@ -2349,29 +2349,29 @@ export default function ProductUI({ product }: { product: any }) {
                                 setReplyingReviewId(review.id);
                                 setReplyText("");
                               }}
-                              className="inline-flex items-center gap-1.5 mt-3 ml-14 text-xs text-slate-400 hover:text-kora font-bold uppercase transition-colors"
+                              className="inline-flex items-center gap-1.5 mt-3 ml-14 text-xs text-slate-400 hover:text-kora font-bold uppercase transition-colors text-start"
                             >
                               <FiCornerDownRight className="text-xs" />
-                              <span>Reply to review</span>
+                              <span>{t("reply_to_review_label")}</span>
                             </button>
                           )}
 
                           {/* Admin Reply Text Editor */}
                           {replyingReviewId === review.id && (
-                            <div className="mt-3 ml-14 p-4 bg-slate-50 border border-slate-200 rounded-3xl animate-fade-in-up">
+                            <div className="mt-3 ml-14 p-4 bg-slate-50 border border-slate-200 rounded-3xl animate-fade-in-up text-start">
                               <textarea
                                 value={replyText}
                                 onChange={(e) => setReplyText(e.target.value)}
-                                placeholder="Type official shop reply..."
-                                className="w-full border border-slate-200 rounded-2xl p-3.5 text-sm text-slate-900 focus:outline-none focus:border-kora mb-3 resize-none h-20 bg-white"
+                                placeholder={t("type_reply_placeholder")}
+                                className="w-full border border-slate-200 rounded-2xl p-3.5 text-sm text-slate-900 focus:outline-none focus:border-kora mb-3 resize-none h-20 bg-white text-start"
                               />
-                              <div className="flex gap-2">
+                              <div className="flex gap-2 text-start">
                                 <button
                                   onClick={() => handleReplyReview(review.id)}
                                   disabled={isReplyingSubmitting}
                                   className="bg-slate-900 hover:bg-kora text-white text-xs font-bold uppercase py-2.5 px-6 rounded-xl transition-all shadow-xs"
                                 >
-                                  {isReplyingSubmitting ? "Posting..." : "Post Reply"}
+                                  {isReplyingSubmitting ? t("posting_label") : t("post_reply_label")}
                                 </button>
                                 {review.adminReply && (
                                   <button
@@ -2391,14 +2391,14 @@ export default function ProductUI({ product }: { product: any }) {
                                     }}
                                     className="bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold uppercase py-2.5 px-6 rounded-xl"
                                   >
-                                    Delete
+                                    {t("delete_label")}
                                   </button>
                                 )}
                                 <button
                                   onClick={() => setReplyingReviewId(null)}
                                   className="bg-white border border-slate-200 text-slate-600 text-xs font-bold uppercase py-2.5 px-6 rounded-xl"
                                 >
-                                  Cancel
+                                  {t("cancel_label")}
                                 </button>
                               </div>
                             </div>

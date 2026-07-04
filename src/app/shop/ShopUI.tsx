@@ -6,6 +6,7 @@ import { ProductCard } from "@/components/ProductCard";
 import Link from "next/link";
 import { CURRENCY } from "@/lib/constants";
 import { useSearchParams } from "next/navigation";
+import { useTranslation } from "@/context/LanguageContext";
 
 const CATEGORIES = ["All", "World Cup", "Shoes", "Shirts", "Retro Kits", "Accessories"];
 const TEAMS = ["All Teams", "Argentina", "Brazil", "France", "Germany", "Portugal", "Spain", "Uruguay", "Arsenal", "Barcelona", "Real Madrid", "Manchester City", "Paris Saint-Germain", "Manchester United"];
@@ -70,6 +71,7 @@ function MiniCarousel({ images, alt, soldOut }: { images: string[]; alt: string;
 }
 
 export default function ShopUI({ products }: { products: any[] }) {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeTeam, setActiveTeam] = useState("All Teams");
@@ -213,25 +215,44 @@ export default function ShopUI({ products }: { products: any[] }) {
     (activeTeam !== "All Teams" ? 1 : 0) +
     (activeTag !== "All" ? 1 : 0);
 
+  const getCategoryLabel = (cat: string) => {
+    switch (cat) {
+      case "All": return t("all");
+      case "World Cup": return t("category_world_cup");
+      case "Shoes": return t("category_shoes");
+      case "Shirts": return t("category_shirts");
+      case "Retro Kits": return t("category_retro");
+      case "Accessories": return t("category_accessories");
+      default: return cat;
+    }
+  };
+
+  const getTeamLabel = (teamName: string) => {
+    const key = teamName.toLowerCase().replace(/\s+/g, "_").replace(/-/g, "_");
+    return t(key) || teamName;
+  };
+
   return (
     <main className="min-h-screen bg-white text-slate-900 font-sans pt-4 md:pt-8 pb-20 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
-
-        {/* ═══ MOBILE: Always-visible sticky search bar ═══ */}
-        <div className="sm:hidden sticky top-[57px] z-30 bg-white pb-3 pt-1 -mx-4 px-4">
-          <div className="relative">
-            <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
-            <input
+        
+        {/* ═══ MOBILE ONLY: Top Search Bar ═══ */}
+        <div className="block sm:hidden mb-4 relative z-10 text-start">
+          <div className="relative group">
+            <span className="absolute ltr:left-4 rtl:right-4 top-1/2 -translate-y-1/2 text-slate-400">
+              <FaSearch className="text-sm" />
+            </span>
+            <input 
               type="text"
-              placeholder="Search jerseys, boots..."
+              placeholder={t("search_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-9 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all font-sans"
+              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 ltr:pl-11 ltr:pr-10 rtl:pr-11 rtl:pl-10 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors font-sans text-sm shadow-sm text-start"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 active:text-slate-600"
+                className="absolute ltr:right-3 rtl:left-3 top-1/2 -translate-y-1/2 text-slate-400 active:text-slate-600"
               >
                 <FaXmark className="text-sm" />
               </button>
@@ -245,7 +266,7 @@ export default function ShopUI({ products }: { products: any[] }) {
             onClick={() => setIsFiltersOpen(!isFiltersOpen)}
             className="flex-1 flex items-center justify-center gap-2 bg-slate-50 border border-slate-200 rounded-xl py-3 text-sm font-bold text-slate-800 active:bg-slate-100 transition-colors shadow-sm"
           >
-            <FaFilter className="text-kora text-xs" /> {isFiltersOpen ? "Hide Filters & Search" : "Show Filters & Search"}
+            <FaFilter className="text-kora text-xs" /> {isFiltersOpen ? t("hide_filters") : t("show_filters")}
           </button>
         </div>
 
@@ -257,20 +278,20 @@ export default function ShopUI({ products }: { products: any[] }) {
               isFiltersOpen ? "sm:block" : "sm:hidden lg:block"
             }`}
           >
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6">
+            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 text-start">
               
               {/* Search Field */}
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-                  <FaSearch className="text-kora" /> Search
+                  <FaSearch className="text-kora" /> {t("search")}
                 </h3>
                 <div className="relative group">
                   <input 
                     type="text"
-                    placeholder="Search players, boots..."
+                    placeholder={t("search_placeholder")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all font-sans text-sm shadow-sm"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all font-sans text-sm shadow-sm text-start"
                   />
                 </div>
               </div>
@@ -279,7 +300,7 @@ export default function ShopUI({ products }: { products: any[] }) {
               {/* Categories Selector */}
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-                  <FaFilter className="text-kora" /> Categories
+                  <FaFilter className="text-kora" /> {t("categories")}
                 </h3>
                 <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 scrollbar-hide">
                   {CATEGORIES.map((category) => (
@@ -287,13 +308,13 @@ export default function ShopUI({ products }: { products: any[] }) {
                       key={category}
                       type="button"
                       onClick={() => setActiveCategory(category)}
-                      className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-left whitespace-nowrap lg:w-full border ${
+                      className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-start whitespace-nowrap lg:w-full border ${
                         activeCategory === category
                           ? "bg-kora border-kora text-white shadow-md shadow-kora/30"
                           : "bg-white text-slate-600 border-slate-200 hover:text-kora hover:border-kora"
                       }`}
                     >
-                      {category}
+                      {getCategoryLabel(category)}
                     </button>
                   ))}
                 </div>
@@ -308,12 +329,12 @@ export default function ShopUI({ products }: { products: any[] }) {
             {/* Active Filter Chips */}
             {(searchQuery || activeCategory !== "All" || activeTeam !== "All Teams" || activeTag !== "All") && (
               <div className="flex items-center gap-2 mb-6 font-sans overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 py-1 flex-wrap sm:flex-nowrap">
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider mr-1 shrink-0">Active Filters:</span>
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider mr-1 shrink-0">{t("active_filters")}</span>
                 
                 <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
                   {searchQuery && (
                     <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold uppercase tracking-wider">
-                      Search: &quot;{searchQuery}&quot;
+                      {t("search")}: &quot;{searchQuery}&quot;
                       <button 
                         onClick={() => setSearchQuery("")} 
                         className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-150 active:bg-slate-200 transition-colors"
@@ -326,7 +347,7 @@ export default function ShopUI({ products }: { products: any[] }) {
 
                   {activeCategory !== "All" && (
                     <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold uppercase tracking-wider">
-                      {activeCategory}
+                      {getCategoryLabel(activeCategory)}
                       <button 
                         onClick={() => setActiveCategory("All")} 
                         className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-150 active:bg-slate-200 transition-colors"
@@ -339,7 +360,7 @@ export default function ShopUI({ products }: { products: any[] }) {
 
                   {activeTeam !== "All Teams" && (
                     <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold uppercase tracking-wider">
-                      Team: {activeTeam}
+                      {t("team_label")}: {getTeamLabel(activeTeam)}
                       <button 
                         onClick={() => setActiveTeam("All Teams")} 
                         className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-150 active:bg-slate-200 transition-colors"
@@ -372,7 +393,7 @@ export default function ShopUI({ products }: { products: any[] }) {
                     }}
                     className="text-xs font-bold text-kora hover:text-purple-700 underline underline-offset-4 uppercase tracking-wider ml-1 shrink-0 py-1"
                   >
-                    Clear All
+                    {t("clear_all")}
                   </button>
                 </div>
               </div>
@@ -390,19 +411,19 @@ export default function ShopUI({ products }: { products: any[] }) {
                   <Link 
                     href={`/shop/${product.id}`} 
                     key={product.id}
-                    className="flex gap-3 p-2.5 bg-white border border-slate-200 active:border-kora rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.99] overflow-hidden"
+                    className="flex gap-3 p-2.5 bg-white border border-slate-200 active:border-kora rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.99] overflow-hidden text-start"
                   >
                     {/* Left: Product Image Carousel */}
                     <div className="w-28 h-28 shrink-0 bg-slate-50 border border-slate-100 rounded-xl overflow-hidden flex items-center justify-center relative">
                       {product.stock === 0 ? (
-                        <div className="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest z-10 bg-rose-100 text-rose-800 border border-rose-200">
-                          Sold Out
+                        <div className="absolute top-1.5 ltr:left-1.5 rtl:right-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest z-10 bg-rose-100 text-rose-800 border border-rose-200">
+                          {t("sold_out")}
                         </div>
                       ) : product.tag ? (
-                        <div className={`absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest z-10 ${
+                        <div className={`absolute top-1.5 ltr:left-1.5 rtl:right-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest z-10 ${
                           product.tag === 'Latest' ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-rose-100 text-rose-800 border border-rose-200'
                         }`}>
-                          {product.tag}
+                          {t(product.tag.toLowerCase()) || product.tag}
                         </div>
                       ) : null}
                       <MiniCarousel 
@@ -413,17 +434,17 @@ export default function ShopUI({ products }: { products: any[] }) {
                     </div>
 
                     {/* Right: Product Info */}
-                    <div className="flex-1 flex flex-col justify-between py-0.5 font-sans">
+                    <div className="flex-1 flex flex-col justify-between py-0.5 font-sans text-start">
                       <div>
-                        <p className="text-kora text-[9px] font-bold uppercase tracking-widest mb-1">{product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}</p>
+                        <p className="text-kora text-[9px] font-bold uppercase tracking-widest mb-1">{product.category === "Boots" ? t("category_shoes") : product.category === "Flags" ? t("category_accessories") : getCategoryLabel(product.category)}</p>
                         <h3 className="text-sm font-bold text-slate-900 leading-tight line-clamp-2">{product.name}</h3>
                       </div>
                       
                       <div className="flex items-end justify-between mt-2">
                         <div>
-                          <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wide">Price</span>
+                          <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wide">{t("price_label")}</span>
                           <span className="text-base font-black text-slate-900 leading-none">
-                            {CURRENCY}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
+                            {t("aed")}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
                           </span>
                         </div>
                         <div className={`text-[10px] font-bold px-3 py-1.5 rounded-lg border ${
@@ -431,7 +452,7 @@ export default function ShopUI({ products }: { products: any[] }) {
                             ? "bg-slate-100 text-slate-400 border-slate-200" 
                             : "bg-kora text-white border-kora shadow-sm"
                         }`}>
-                          {product.stock === 0 ? "Sold Out" : "View"}
+                          {product.stock === 0 ? t("sold_out") : t("view_gear")}
                         </div>
                       </div>
                     </div>
@@ -450,7 +471,7 @@ export default function ShopUI({ products }: { products: any[] }) {
             {displayProducts.length === 0 && (
               <div className="text-center py-16 md:py-24 border border-slate-200 rounded-2xl bg-slate-50 shadow-sm">
                 <div className="text-4xl mb-4 opacity-50">🏟️</div>
-                <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">The Vault is empty.</h3>
+                <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">{t("no_results")}</h3>
                 <button 
                   onClick={() => {
                     setSearchQuery("");
@@ -460,7 +481,7 @@ export default function ShopUI({ products }: { products: any[] }) {
                   }}
                   className="mt-6 px-6 py-3 bg-kora hover:bg-purple-700 text-white rounded-full font-bold text-xs transition-colors shadow-md shadow-kora/30"
                 >
-                  Reset Filters
+                  {t("reset_filters")}
                 </button>
               </div>
             )}
@@ -489,10 +510,10 @@ export default function ShopUI({ products }: { products: any[] }) {
             <div className="sm:hidden mobile-bottom-sheet">
               <div className="mobile-bottom-sheet-handle" />
               
-              <div className="p-5 space-y-5">
+              <div className="p-5 space-y-5 text-start">
                 {/* Header */}
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-black uppercase tracking-tight">Filters</h3>
+                  <h3 className="text-lg font-black uppercase tracking-tight">{t("filters")}</h3>
                   <button 
                     onClick={() => setIsBottomSheetOpen(false)}
                     className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 active:bg-slate-200"
@@ -503,7 +524,7 @@ export default function ShopUI({ products }: { products: any[] }) {
 
                 {/* Categories */}
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2.5">Category</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2.5">{t("categories")}</p>
                   <div className="flex gap-2 flex-wrap">
                     {CATEGORIES.map((category) => (
                       <button
@@ -516,7 +537,7 @@ export default function ShopUI({ products }: { products: any[] }) {
                             : "bg-white text-slate-600 border-slate-200 active:border-kora"
                         }`}
                       >
-                        {category}
+                        {getCategoryLabel(category)}
                       </button>
                     ))}
                   </div>
@@ -534,13 +555,13 @@ export default function ShopUI({ products }: { products: any[] }) {
                     }}
                     className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-wider border border-slate-200 text-slate-600 active:bg-slate-50"
                   >
-                    Clear All
+                    {t("clear_all")}
                   </button>
                   <button
                     onClick={() => setIsBottomSheetOpen(false)}
                     className="flex-1 py-3 rounded-xl text-xs font-bold uppercase tracking-wider bg-kora text-white border border-kora shadow-sm active:bg-purple-700"
                   >
-                    Show Results ({displayProducts.length})
+                    {t("show_results")} ({displayProducts.length})
                   </button>
                 </div>
               </div>

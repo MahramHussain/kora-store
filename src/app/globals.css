@@ -20,6 +20,27 @@
   .font-body {
     font-family: var(--font-inter), 'Inter', sans-serif;
   }
+
+  /* Arabic Font Overrides */
+  html[lang="ar"], 
+  html[lang="ar"] body, 
+  html[lang="ar"] h1, 
+  html[lang="ar"] h2, 
+  html[lang="ar"] h3, 
+  html[lang="ar"] h4, 
+  html[lang="ar"] h5, 
+  html[lang="ar"] h6, 
+  html[lang="ar"] p, 
+  html[lang="ar"] span, 
+  html[lang="ar"] a, 
+  html[lang="ar"] button, 
+  html[lang="ar"] input, 
+  html[lang="ar"] textarea,
+  html[lang="ar"] label,
+  html[lang="ar"] .font-display,
+  html[lang="ar"] .font-body {
+    font-family: var(--font-tajawal), 'Tajawal', sans-serif !important;
+  }
 }
 
 /* ==========================================================================

@@ -8,6 +8,7 @@ import { getProducts } from "@/app/admin/actions";
 import { FaBars, FaXmark, FaBoxOpen } from "react-icons/fa6";
 import { FiUser, FiShoppingBag, FiSearch, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { SignInButton, Show, useUser } from "@clerk/nextjs";
+import { useTranslation } from "@/context/LanguageContext";
 
 const JERSEYS: Record<
   string,
@@ -244,6 +245,7 @@ const nationalCategories = [
 ];
 
 export default function Navbar() {
+  const { language, setLanguage, t } = useTranslation();
   const pathname = usePathname();
   const router = useRouter();
   const { user: clerkUser } = useUser();
@@ -415,16 +417,16 @@ export default function Navbar() {
       <div className="relative w-full overflow-hidden bg-black text-white border-b border-neutral-900 py-2.5 text-xs md:text-[13px] font-bold select-none z-50">
         <div className="flex w-max animate-marquee whitespace-nowrap">
           <span className="mx-4">
-            USE CODE KORA10 FOR 10% OFF ON ORDER TOTAL &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
-            FREE SHIPPING ON ORDER TOTAL 200 AED &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
-            SHIPPING ALL OVER UAE WITHIN 1-2 DAYS &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
-            100+ POSITIVE REVIEWS &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+            {t("ticker_1")} &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            {t("ticker_2")} &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            {t("ticker_3")} &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            {t("ticker_4")} &nbsp;&nbsp;&bull;&nbsp;&nbsp;
           </span>
           <span className="mx-4">
-            USE CODE KORA10 FOR 10% OFF ON ORDER TOTAL &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
-            FREE SHIPPING ON ORDER TOTAL 200 AED &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
-            SHIPPING ALL OVER UAE WITHIN 1-2 DAYS &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
-            100+ POSITIVE REVIEWS &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+            {t("ticker_1")} &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            {t("ticker_2")} &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            {t("ticker_3")} &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
+            {t("ticker_4")} &nbsp;&nbsp;&bull;&nbsp;&nbsp;
           </span>
         </div>
       </div>
@@ -478,7 +480,7 @@ export default function Navbar() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-                  placeholder="Search entire store here..." 
+                  placeholder={t("search_placeholder")} 
                   className="w-full bg-white border border-neutral-200 rounded-none py-2.5 px-4 pr-10 text-sm text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all font-sans"
                 />
                 <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-kora transition-colors z-20">
@@ -509,8 +511,21 @@ export default function Navbar() {
 
           {/* Right Side Icons */}
           <div className="flex items-center gap-4 md:gap-5 shrink-0 z-10">
+            {/* Language Toggle */}
+            {!pathname?.startsWith("/admin") && (
+              <button 
+                onClick={() => setLanguage(language === "en" ? "ar" : "en")}
+                className="text-[10px] font-black uppercase tracking-widest text-purple-200 hover:text-white px-2 py-1 transition-colors flex items-center gap-1 border border-white/10 rounded-md bg-white/5"
+                title={language === "en" ? "Switch to Arabic" : "تغيير للإنجليزية"}
+              >
+                <span className={language === "en" ? "text-white font-extrabold" : ""}>EN</span>
+                <span className="text-purple-400">|</span>
+                <span className={language === "ar" ? "text-white font-extrabold" : ""}>العربية</span>
+              </button>
+            )}
+
             {/* Cart/Basket */}
-            <Link href="/cart" className="relative text-white hover:text-purple-200 transition-colors p-1" title="Shopping Cart">
+            <Link href="/cart" className="relative text-white hover:text-purple-200 transition-colors p-1" title={t("shopping_cart")}>
               <FiShoppingBag className="text-xl md:text-2xl" />
               {cartCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center border-2 border-kora shadow-md shadow-rose-600/35 transition-all duration-300 transform scale-110">
@@ -523,7 +538,7 @@ export default function Navbar() {
             <div className="flex items-center">
               <Show when="signed-out">
                 <SignInButton mode="modal">
-                  <button className="text-white hover:text-purple-200 transition-colors p-1" title="Sign In / Register">
+                  <button className="text-white hover:text-purple-200 transition-colors p-1" title={t("sign_in_register")}>
                     <FiUser className="text-xl md:text-2xl" />
                   </button>
                 </SignInButton>
@@ -532,7 +547,7 @@ export default function Navbar() {
                 <Link 
                   href="/account/dashboard" 
                   className="flex items-center justify-center hover:scale-105 transition-transform p-1" 
-                  title="Vault Dashboard"
+                  title={t("my_dashboard")}
                 >
                   <NavbarAvatar 
                     imageUrl={clerkUser?.imageUrl} 
@@ -556,7 +571,7 @@ export default function Navbar() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-                placeholder="Search entire store here..." 
+                placeholder={t("search_placeholder")} 
                 className="w-full bg-white border border-neutral-200 rounded-none py-2 px-4 pr-10 text-xs text-neutral-900 placeholder-neutral-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all font-sans"
               />
               <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-kora transition-colors z-20">
@@ -587,8 +602,8 @@ export default function Navbar() {
         <div className="hidden md:block bg-kora border-t border-purple-900/40 relative z-30">
           <div className="max-w-7xl mx-auto px-6 relative flex justify-center items-center gap-8 text-xs font-bold uppercase tracking-wider text-purple-100/90 py-3">
             
-            <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="hover:text-white transition-colors">Shop</Link>
-            <Link href="/shop?category=World Cup" onClick={(e) => handleFilterClick(e, { category: "World Cup" })} className="hover:text-white transition-colors">World Cup</Link>
+            <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="hover:text-white transition-colors">{t("shop")}</Link>
+            <Link href="/shop?category=World Cup" onClick={(e) => handleFilterClick(e, { category: "World Cup" })} className="hover:text-white transition-colors">{t("world_cup")}</Link>
             
             {/* Clubs Dropdown Menu */}
             <div 
@@ -597,7 +612,7 @@ export default function Navbar() {
               onMouseLeave={handleMouseLeave}
             >
               <button className="flex items-center gap-1 hover:text-white transition-colors uppercase font-bold py-1">
-                Club <FiChevronDown className={`text-xs text-purple-200 transition-colors ${activeDropdown === "clubs" ? "text-white" : ""}`} />
+                {t("club")} <FiChevronDown className={`text-xs text-purple-200 transition-colors ${activeDropdown === "clubs" ? "text-white" : ""}`} />
               </button>
               
               {/* Mega Dropdown */}
@@ -631,7 +646,7 @@ export default function Navbar() {
                         </Link>
                       ))}
                       <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="text-[9px] font-black uppercase text-purple-300/80 hover:text-white mt-1 flex items-center gap-0.5">
-                        View All <span>→</span>
+                        {t("view_all")} <span>→</span>
                       </Link>
                     </div>
                   </div>
@@ -640,19 +655,19 @@ export default function Navbar() {
                 {/* A-Z Club Teams Card */}
                 <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03),transparent)]" />
-                  <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">A-Z Club Teams</div>
+                  <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">{t("az_club_teams")}</div>
                   <div className="relative z-10 my-auto text-center">
-                    <span className="text-3xl font-black text-white tracking-tighter uppercase block">A <span className="text-purple-300">TO</span> Z</span>
+                    <span className="text-3xl font-black text-white tracking-tighter uppercase block">{t("a_to_z")}</span>
                   </div>
                   <div className="text-[9px] font-bold text-purple-200 group-hover/card:text-white transition-colors flex items-center gap-1 relative z-10">
-                    Browse All <span>→</span>
+                    {t("browse_all")} <span>→</span>
                   </div>
                 </Link>
 
                 {/* World Leagues Card */}
                 <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03),transparent)]" />
-                  <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">World Leagues</div>
+                  <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">{t("world_leagues")}</div>
                   <div className="relative z-10 grid grid-cols-3 gap-1 opacity-80 group-hover/card:opacity-95 transition-opacity">
                     <span className="text-[8px] font-black border border-purple-800/30 rounded-none p-0.5 text-center text-purple-200 bg-purple-900/50">EPL</span>
                     <span className="text-[8px] font-black border border-purple-800/30 rounded-none p-0.5 text-center text-purple-200 bg-purple-900/50">LIGA</span>
@@ -662,7 +677,7 @@ export default function Navbar() {
                     <span className="text-[8px] font-black border border-purple-800/30 rounded-none p-0.5 text-center text-purple-200 bg-purple-900/50">LIGUE</span>
                   </div>
                   <div className="text-[9px] font-bold text-purple-200 group-hover/card:text-white transition-colors flex items-center gap-1 relative z-10">
-                    Shop Leagues <span>→</span>
+                    {t("shop_leagues")} <span>→</span>
                   </div>
                 </Link>
 
@@ -676,7 +691,7 @@ export default function Navbar() {
               onMouseLeave={handleMouseLeave}
             >
               <button className="flex items-center gap-1 hover:text-white transition-colors uppercase font-bold py-1">
-                National <FiChevronDown className={`text-xs text-purple-200 transition-colors ${activeDropdown === "nationals" ? "text-white" : ""}`} />
+                {t("national")} <FiChevronDown className={`text-xs text-purple-200 transition-colors ${activeDropdown === "nationals" ? "text-white" : ""}`} />
               </button>
               
               {/* Mega Dropdown */}
@@ -721,21 +736,21 @@ export default function Navbar() {
                 {/* A-Z National Teams Card */}
                 <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="relative overflow-hidden rounded-none aspect-square bg-purple-950/40 border border-purple-800/40 group/card cursor-pointer flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition-shadow">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.03),transparent)]" />
-                  <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">A-Z National Teams</div>
+                  <div className="text-[9px] font-black text-purple-300 uppercase tracking-widest relative z-10">{t("az_national_teams")}</div>
                   <div className="relative z-10 my-auto text-center">
-                    <span className="text-3xl font-black text-white tracking-tighter uppercase block">A <span className="text-purple-300">TO</span> Z</span>
+                    <span className="text-3xl font-black text-white tracking-tighter uppercase block">{t("a_to_z")}</span>
                   </div>
                   <div className="text-[9px] font-bold text-purple-200 group-hover/card:text-white transition-colors flex items-center gap-1 relative z-10">
-                    Browse All <span>→</span>
+                    {t("browse_all")} <span>→</span>
                   </div>
                 </Link>
 
               </div>
             </div>
 
-            <Link href="/shop?category=Shoes" onClick={(e) => handleFilterClick(e, { category: "Shoes" })} className="hover:text-white transition-colors">Shoes</Link>
-            <Link href="/shop?category=Accessories" onClick={(e) => handleFilterClick(e, { category: "Accessories" })} className="hover:text-white transition-colors">Accessories</Link>
-            <Link href="/shop?category=Retro Kits" onClick={(e) => handleFilterClick(e, { category: "Retro Kits" })} className="hover:text-white transition-colors">Retro</Link>
+            <Link href="/shop?category=Shoes" onClick={(e) => handleFilterClick(e, { category: "Shoes" })} className="hover:text-white transition-colors">{t("shoes")}</Link>
+            <Link href="/shop?category=Accessories" onClick={(e) => handleFilterClick(e, { category: "Accessories" })} className="hover:text-white transition-colors">{t("accessories")}</Link>
+            <Link href="/shop?category=Retro Kits" onClick={(e) => handleFilterClick(e, { category: "Retro Kits" })} className="hover:text-white transition-colors">{t("retro")}</Link>
           </div>
         </div>
       </header>
@@ -775,7 +790,7 @@ export default function Navbar() {
             onClick={() => setIsMobileMenuOpen(false)} 
             className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
           >
-            Shop
+            {t("shop")}
           </Link>
           
           {/* World Cup */}
@@ -784,16 +799,16 @@ export default function Navbar() {
             onClick={() => setIsMobileMenuOpen(false)} 
             className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
           >
-            World Cup
+            {t("world_cup")}
           </Link>
 
           {/* Club Accordion */}
           <div className="border-b border-neutral-200">
             <button 
               onClick={() => setIsMobileClubsOpen(!isMobileClubsOpen)} 
-              className="w-full px-6 py-5 text-left text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex justify-between items-center transition-colors"
+              className="w-full px-6 py-5 text-start text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex justify-between items-center transition-colors"
             >
-              <span>Club</span>
+              <span>{t("club")}</span>
               {isMobileClubsOpen ? (
                 <FiChevronDown className="text-sm text-neutral-500 rotate-180 transition-transform duration-200" />
               ) : (
@@ -839,7 +854,7 @@ export default function Navbar() {
                             onClick={() => setIsMobileMenuOpen(false)}
                             className="px-12 py-2 flex items-center gap-1 text-[10px] font-black uppercase text-neutral-400 hover:text-kora"
                           >
-                            View All <span>→</span>
+                            {t("view_all")} <span>→</span>
                           </Link>
                         </div>
                       )}
@@ -854,9 +869,9 @@ export default function Navbar() {
           <div className="border-b border-neutral-200">
             <button 
               onClick={() => setIsMobileNationalOpen(!isMobileNationalOpen)} 
-              className="w-full px-6 py-5 text-left text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex justify-between items-center transition-colors"
+              className="w-full px-6 py-5 text-start text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex justify-between items-center transition-colors"
             >
-              <span>National</span>
+              <span>{t("national")}</span>
               {isMobileNationalOpen ? (
                 <FiChevronDown className="text-sm text-neutral-500 rotate-180 transition-transform duration-200" />
               ) : (
@@ -902,7 +917,7 @@ export default function Navbar() {
                             onClick={() => setIsMobileMenuOpen(false)}
                             className="px-12 py-2 flex items-center gap-1 text-[10px] font-black uppercase text-neutral-400 hover:text-kora"
                           >
-                            View All <span>→</span>
+                            {t("view_all")} <span>→</span>
                           </Link>
                         </div>
                       )}
@@ -919,7 +934,7 @@ export default function Navbar() {
             onClick={() => setIsMobileMenuOpen(false)} 
             className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
           >
-            Shoes
+            {t("shoes")}
           </Link>
 
           {/* Accessories */}
@@ -928,7 +943,7 @@ export default function Navbar() {
             onClick={() => setIsMobileMenuOpen(false)} 
             className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
           >
-            Accessories
+            {t("accessories")}
           </Link>
 
           {/* Retro */}
@@ -937,7 +952,7 @@ export default function Navbar() {
             onClick={() => setIsMobileMenuOpen(false)} 
             className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
           >
-            Retro
+            {t("retro")}
           </Link>
         </div>
 

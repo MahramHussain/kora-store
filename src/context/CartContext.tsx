@@ -33,7 +33,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const { isSignedIn, isLoaded } = useAuth();
 
-  // 1. Load the vault from local storage when the user boots the store
+  // 1. Load the cart from local storage when the user boots the store
   useEffect(() => {
     try {
       const storedCart = localStorage.getItem("kora_vault_cart");
@@ -41,7 +41,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         setCart(JSON.parse(storedCart));
       }
     } catch (error) {
-      console.error("Failed to load vault data:", error);
+      console.error("Failed to load cart data:", error);
     }
     setIsInitialized(true);
   }, []);

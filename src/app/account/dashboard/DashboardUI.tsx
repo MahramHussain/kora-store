@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { CURRENCY } from "@/lib/constants";
+import { useTranslation } from "@/context/LanguageContext";
 import {
   FiBox,
   FiShoppingBag,
@@ -141,10 +142,10 @@ function StatusBadge({ status }: { status: string }) {
 // ── ADAPTIVE STEP-BY-STEP PROGRESS TIMELINE ──
 function StatusTimeline({ status }: { status: string }) {
   const steps = [
-    { label: "Vault Secured", desc: "Order accepted" },
+    { label: "Order Confirmed", desc: "Order accepted" },
     { label: "Quality Checks", desc: "1:1 grade verified" },
-    { label: "Departed Vault", desc: "On way to Dubai hub" },
-    { label: "In Vault Locker", desc: "Delivered to address" }
+    { label: "Shipped", desc: "On way to Dubai hub" },
+    { label: "Delivered", desc: "Delivered to address" }
   ];
 
   let currentIdx = 0;
@@ -235,6 +236,7 @@ function StatusTimeline({ status }: { status: string }) {
 }
 
 export default function DashboardUI({ user, orders }: { user: any; orders: any[] }) {
+  const { t } = useTranslation();
   const router = useRouter();
   const { signOut } = useClerk();
   const { user: clerkUser } = useUser();
@@ -434,14 +436,14 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
   const totalSpent = totalSpentNum.toFixed(2);
   const xp = Math.min(1500, orderCount * 250 + Math.floor(totalSpentNum * 0.05));
 
-  let loyaltyRank = "Rookie Vault Collector";
+  let loyaltyRank = "Rookie Collector";
   let rankColorClass = "text-amber-600 bg-amber-500/10 border-amber-500/20";
-  let nextRank = "Vault Legend";
+  let nextRank = "Kora Legend";
   let xpNeeded = 500;
   let percent = (xp / 500) * 100;
 
   if (orderCount >= 2 && orderCount < 5) {
-    loyaltyRank = "Vault Legend";
+    loyaltyRank = "Kora Legend";
     rankColorClass = "text-kora bg-kora/10 border-kora/20";
     nextRank = "Elite Collector VIP";
     xpNeeded = 1250;
@@ -456,9 +458,9 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
   percent = Math.max(0, Math.min(100, percent));
 
   const navItems: { id: "overview" | "orders" | "settings"; label: string; icon: React.ReactNode; desc: string }[] = [
-    { id: "overview", label: "Overview", icon: <FiGrid className="w-5 h-5" />, desc: "Vault overview & stats" },
-    { id: "orders", label: "Order History", icon: <FiShoppingBag className="w-5 h-5" />, desc: "History & live tracking" },
-    { id: "settings", label: "Settings", icon: <FiSettings className="w-5 h-5" />, desc: "Security & personal details" },
+    { id: "overview", label: t("overview"), icon: <FiGrid className="w-5 h-5" />, desc: t("overview_desc") },
+    { id: "orders", label: t("order_history"), icon: <FiShoppingBag className="w-5 h-5" />, desc: t("order_history_desc") },
+    { id: "settings", label: t("settings"), icon: <FiSettings className="w-5 h-5" />, desc: t("settings_desc") },
   ];
 
   // Filter and search orders
@@ -510,7 +512,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                   {clerkUser?.emailAddresses[0]?.emailAddress || user.email}
                 </p>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">
-                  Vault Member since &apos;{user.memberSince}
+                  Member since &apos;{user.memberSince}
                 </p>
               </div>
             </div>
@@ -519,7 +521,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
             <div className="w-full lg:max-w-sm bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 backdrop-blur-md">
               <div className="flex justify-between items-end mb-2">
                 <div>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Vault Loyalty XP</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Loyalty XP</p>
                   <p className="text-lg font-black mt-0.5">{xp} <span className="text-xs text-slate-400 font-normal">/ {xpNeeded} XP</span></p>
                 </div>
                 <span className="text-[10px] text-purple-400 font-bold uppercase tracking-wider">
@@ -583,7 +585,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
             {/* PC Sidebar Navigation */}
             <div className="hidden lg:block bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm sticky top-28">
               <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-                <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest pl-2">Vault Navigation</p>
+                <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest pl-2">Navigation</p>
               </div>
               <nav className="p-3 space-y-1">
                 {navItems.map((item) => {
@@ -613,30 +615,30 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                 {(user.email === "mahramh40@gmail.com" || user.email === "korastore.ae@gmail.com") && (
                   <Link
                     href="/admin"
-                    className="flex items-center gap-3.5 w-full px-4 py-3.5 rounded-2xl text-left text-kora border border-dashed border-kora/20 hover:bg-kora/5 transition-all mt-3 font-bold"
+                    className="flex items-center gap-3.5 w-full px-4 py-3.5 rounded-2xl text-left text-kora border border-dashed border-kora/20 hover:bg-kora/5 transition-all mt-3 font-bold text-start"
                   >
                     <div className="p-1.5 rounded-lg bg-kora/10 text-kora">
                       <FiShield className="w-5 h-5" />
                     </div>
-                    <div>
-                      <p className="text-sm leading-none">Command Center</p>
-                      <p className="text-[10px] text-kora/70 mt-1 font-normal">Administrator portal</p>
+                    <div className="text-start">
+                      <p className="text-sm leading-none">{t("command_center")}</p>
+                      <p className="text-[10px] text-kora/70 mt-1 font-normal">{t("admin_portal_desc")}</p>
                     </div>
                   </Link>
                 )}
               </nav>
 
-              <div className="p-3 border-t border-slate-100">
+              <div className="p-3 border-t border-slate-100 text-start">
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-3.5 w-full px-4 py-3.5 rounded-2xl text-left font-bold text-sm text-rose-500 hover:bg-rose-50 transition-all group"
+                  className="flex items-center gap-3.5 w-full px-4 py-3.5 rounded-2xl text-left font-bold text-sm text-rose-500 hover:bg-rose-50 transition-all group text-start"
                 >
                   <div className="p-1.5 rounded-lg bg-rose-50 text-rose-500 group-hover:bg-rose-100">
                     <FiLogOut className="w-5 h-5" />
                   </div>
-                  <div>
-                    <p className="text-sm leading-none">Secure Logout</p>
-                    <p className="text-[10px] text-rose-400 mt-1 font-normal">Disconnect vault session</p>
+                  <div className="text-start">
+                    <p className="text-sm leading-none">{t("secure_logout")}</p>
+                    <p className="text-[10px] text-rose-400 mt-1 font-normal">{t("end_session_desc")}</p>
                   </div>
                 </button>
               </div>
@@ -644,68 +646,68 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
           </div>
 
           {/* ── 3. CONTENT AREA ── */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 text-start">
 
             {/* ── TAB: OVERVIEW ── */}
             {activeTab === "overview" && (
-              <div className="animate-fade-in-up space-y-6">
+              <div className="animate-fade-in-up space-y-6 text-start">
                 
                 {/* Stats cards grid */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-start">
                   {/* Card 1: Value */}
-                  <div className="bg-white border border-slate-200 rounded-3xl p-5 hover-lift relative overflow-hidden group">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-5 hover-lift relative overflow-hidden group text-start">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-kora/5 to-transparent rounded-full -z-0 pointer-events-none" />
                     <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-kora mb-4">
                       <FiCreditCard className="w-5 h-5" />
                     </div>
-                    <p className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Vault Portfolio</p>
+                    <p className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">{t("total_spent")}</p>
                     <p className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5">{CURRENCY}{totalSpent}</p>
-                    <p className="text-[10px] text-slate-400 font-medium mt-1">Total checkout sum</p>
+                    <p className="text-[10px] text-slate-400 font-medium mt-1">{t("total_spent_desc")}</p>
                   </div>
 
                   {/* Card 2: Drops */}
-                  <div className="bg-white border border-slate-200 rounded-3xl p-5 hover-lift relative overflow-hidden group">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-5 hover-lift relative overflow-hidden group text-start">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-blue-500/5 to-transparent rounded-full -z-0 pointer-events-none" />
                     <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4">
                       <FiBox className="w-5 h-5" />
                     </div>
-                    <p className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Secured Drops</p>
+                    <p className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">{t("secured_drops")}</p>
                     <p className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5">{orderCount}</p>
-                    <p className="text-[10px] text-slate-400 font-medium mt-1">Successful orders</p>
+                    <p className="text-[10px] text-slate-400 font-medium mt-1">{t("secured_drops_desc")}</p>
                   </div>
 
                   {/* Card 3: Loyalty level */}
-                  <div className="bg-white border border-slate-200 rounded-3xl p-5 hover-lift relative overflow-hidden group">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-5 hover-lift relative overflow-hidden group text-start">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-yellow-500/5 to-transparent rounded-full -z-0 pointer-events-none" />
                     <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 mb-4">
                       <FiAward className="w-5 h-5" />
                     </div>
-                    <p className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Vault Tier</p>
+                    <p className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">{t("loyalty_tier")}</p>
                     <p className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5 truncate">
                       {orderCount >= 5 ? "Elite" : orderCount >= 2 ? "Legend" : "Rookie"}
                     </p>
-                    <p className="text-[10px] text-slate-400 font-medium mt-1">Loyalty rank grade</p>
+                    <p className="text-[10px] text-slate-400 font-medium mt-1">{t("loyalty_tier_desc")}</p>
                   </div>
 
                   {/* Card 4: Address */}
-                  <div className="bg-white border border-slate-200 rounded-3xl p-5 hover-lift relative overflow-hidden group">
+                  <div className="bg-white border border-slate-200 rounded-3xl p-5 hover-lift relative overflow-hidden group text-start">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/5 to-transparent rounded-full -z-0 pointer-events-none" />
                     <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4">
                       <FiMapPin className="w-5 h-5" />
                     </div>
-                    <p className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">Shipping Region</p>
+                    <p className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">{t("shipping_region")}</p>
                     <p className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5 truncate">
-                      {orders[0]?.shippingCity || "UAE Vault"}
+                      {orders[0]?.shippingCity || "UAE"}
                     </p>
-                    <p className="text-[10px] text-slate-400 font-medium mt-1">Last delivery location</p>
+                    <p className="text-[10px] text-slate-400 font-medium mt-1">{t("shipping_region_desc")}</p>
                   </div>
                 </div>
 
                 {/* Latest Mission / Order Card */}
-                <div>
-                  <h2 className="text-sm font-extrabold text-slate-900 mb-4 uppercase tracking-wider flex items-center gap-2">
+                <div className="text-start">
+                  <h2 className="text-sm font-extrabold text-slate-900 mb-4 uppercase tracking-wider flex items-center gap-2 text-start">
                     <FiActivity className="text-kora w-4 h-4 animate-pulse" />
-                    Latest Active Drop
+                    {t("latest_active_drop")}
                   </h2>
 
                   {orders.length > 0 ? (
@@ -717,7 +719,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
                         <div>
                           <div className="flex items-center gap-2.5">
-                            <h3 className="font-black text-slate-900 text-lg">#VAULT-{orders[0].referenceNumber || orders[0].id.slice(-6).toUpperCase()}</h3>
+                            <h3 className="font-black text-slate-900 text-lg">#KORA-{orders[0].referenceNumber || orders[0].id.slice(-6).toUpperCase()}</h3>
                             <StatusBadge status={orders[0].status} />
                           </div>
                           <p className="text-slate-400 text-xs mt-1">
@@ -786,9 +788,9 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                       <div className="w-14 h-14 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4 border border-slate-100">
                         <FiBox className="text-2xl text-slate-300" />
                       </div>
-                      <p className="text-slate-400 text-sm font-semibold mb-4">Your vault inventory is empty. Secure your first gear drop.</p>
+                      <p className="text-slate-400 text-sm font-semibold mb-4">Your order history is empty. Place your first order to get started.</p>
                       <Link href="/shop" className="inline-flex bg-kora text-white font-extrabold px-7 py-3 rounded-full text-xs uppercase tracking-widest hover:bg-purple-700 transition-colors shadow-md shadow-kora/20">
-                        Shop The Vault
+                        Browse The Shop
                       </Link>
                     </div>
                   )}
@@ -803,7 +805,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                 {/* Header with Search and Filter tools */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white border border-slate-200 p-5 rounded-3xl shadow-sm">
                   <div>
-                    <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">Order Vault</h1>
+                    <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">Order History</h1>
                     <p className="text-slate-400 text-xs mt-0.5">{orders.length} total order drops registered</p>
                   </div>
 
@@ -864,7 +866,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                               </div>
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <h3 className="font-black text-slate-900 text-sm sm:text-base">#VAULT-{order.referenceNumber || order.id.slice(-6).toUpperCase()}</h3>
+                                  <h3 className="font-black text-slate-900 text-sm sm:text-base">#KORA-{order.referenceNumber || order.id.slice(-6).toUpperCase()}</h3>
                                   <StatusBadge status={order.status} />
                                 </div>
                                 <p className="text-slate-400 text-xs mt-1">
@@ -968,13 +970,13 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                   <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(#000_1px,transparent_1px)] bg-[size:10px_10px] pointer-events-none" />
                                   <div>
                                     <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                                      <FiMapPin className="text-kora w-4 h-4" /> Shipping Vault Address
+                                      <FiMapPin className="text-kora w-4 h-4" /> Shipping Address
                                     </h4>
                                     
                                     <div className="space-y-3.5">
                                       <div className="flex gap-3 text-xs">
                                         <span className="text-slate-400 w-20 shrink-0 font-bold uppercase tracking-wider text-[9px]">Recipient:</span>
-                                        <span className="text-slate-800 font-extrabold text-xs">{order.shippingName || "Vault Shopper"}</span>
+                                        <span className="text-slate-800 font-extrabold text-xs">{order.shippingName || "Customer"}</span>
                                       </div>
                                       <div className="flex gap-3 text-xs">
                                         <span className="text-slate-400 w-20 shrink-0 font-bold uppercase tracking-wider text-[9px]">Phone:</span>
@@ -1011,7 +1013,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                 <div className="bg-slate-50 border border-slate-200 border-dashed rounded-2xl p-5 relative">
                                   <div className="absolute top-0 left-0 right-0 h-1 bg-[linear-gradient(90deg,transparent_50%,#ffffff_50%)] bg-[size:10px_100%] pointer-events-none" />
                                   <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                                    <FiTag className="text-kora w-4 h-4" /> Vault Receipt Invoice
+                                    <FiTag className="text-kora w-4 h-4" /> Receipt Invoice
                                   </h4>
 
                                   <div className="space-y-2.5 text-xs">
@@ -1076,7 +1078,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
             {activeTab === "settings" && (
               <div className="animate-fade-in-up space-y-6">
                 <div className="bg-white border border-slate-200 p-5 rounded-3xl shadow-sm">
-                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">Vault Settings</h1>
+                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">Account Settings</h1>
                   <p className="text-slate-400 text-xs mt-0.5">Manage your personal customer profile and credentials.</p>
                 </div>
 
@@ -1309,7 +1311,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                     {/* Client Notification preferences card */}
                     <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm">
                       <h4 className="text-[11px] text-slate-900 font-extrabold uppercase tracking-widest mb-3 flex items-center gap-1.5">
-                        🔔 Vault Alerts & Drops
+                        🔔 Notifications & Alerts
                       </h4>
                       
                       <div className="space-y-4">

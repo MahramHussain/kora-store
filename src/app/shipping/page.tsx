@@ -4,20 +4,22 @@ import { useState } from "react";
 import Link from "next/link";
 import { FaTruckFast, FaArrowRotateLeft, FaBoxOpen } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
+import { useTranslation } from "@/context/LanguageContext";
 
 export default function ShippingReturnsPage() {
   const [activeTab, setActiveTab] = useState<"shipping" | "returns">("shipping");
+  const { t } = useTranslation();
 
   return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-16 pb-16 px-4 sm:px-6 md:pt-20 md:pb-20">
+    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-16 pb-16 px-4 sm:px-6 md:pt-20 md:pb-20 text-start">
       
       {/* Hero Section */}
-      <section className="max-w-4xl mx-auto text-center mb-10 mt-8 sm:mb-16 sm:mt-12">
+      <section className="max-w-4xl mx-auto text-center mb-10 mt-8 sm:mb-16 sm:mt-12 animate-fade-in-up">
         <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-6 tracking-tight uppercase">
-          LOGISTICS & <span className="text-transparent bg-clip-text bg-gradient-to-r from-kora to-purple-400">GUARANTEES.</span>
+          {t("logistics_guarantees")} <span className="text-transparent bg-clip-text bg-gradient-to-r from-kora to-purple-400">{t("logistics_span")}</span>
         </h1>
         <p className="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto font-sans">
-          We handle the logistics so you can handle the pitch. Fast local delivery across the Emirates and a no-nonsense return policy.
+          {t("logistics_desc")}
         </p>
       </section>
 
@@ -31,7 +33,7 @@ export default function ShippingReturnsPage() {
             }`}
           >
             <FaTruckFast className="text-sm sm:text-xl" />
-            Shipping Intel
+            {t("shipping_intel")}
           </button>
           
           <button
@@ -41,13 +43,13 @@ export default function ShippingReturnsPage() {
             }`}
           >
             <FaArrowRotateLeft className="text-sm sm:text-xl" />
-            Return Policy
+            {t("return_policy")}
           </button>
 
           {/* Animated Highlight Background */}
           <div 
-            className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-kora rounded-xl transition-transform duration-500 ease-out shadow-md shadow-kora/30 ${
-              activeTab === "shipping" ? "translate-x-0" : "translate-x-full left-1"
+            className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-kora rounded-xl transition-transform duration-500 ease-out shadow-md shadow-kora/30 ltr:left-1 rtl:right-1 ${
+              activeTab === "shipping" ? "translate-x-0" : "ltr:translate-x-full rtl:-translate-x-full"
             }`}
           ></div>
         </div>
@@ -58,16 +60,47 @@ export default function ShippingReturnsPage() {
         
         {/* SHIPPING CONTENT */}
         {activeTab === "shipping" && (
-          <div className="animate-fade-in-up space-y-6 sm:space-y-8 font-sans">
+          <div className="animate-fade-in-up space-y-6 sm:space-y-8 font-sans text-start">
+            
+            {/* Table of delivery times */}
+            <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+              <table className="w-full border-collapse text-[11px] sm:text-sm text-start">
+                <thead>
+                  <tr className="bg-slate-50 border-b border-slate-200">
+                    <th className="px-4 py-4 text-start font-black uppercase text-slate-800 tracking-wider">{t("emirate")}</th>
+                    <th className="px-4 py-4 text-start font-black uppercase text-slate-800 tracking-wider">{t("delivery_time")}</th>
+                    <th className="px-4 py-4 text-start font-black uppercase text-slate-800 tracking-wider">{t("shipping_fee")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium">
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="px-4 py-4 font-bold text-slate-900">{t("dxb_shj_ajm")}</td>
+                    <td className="px-4 py-4 text-slate-600">{t("business_days")}</td>
+                    <td className="px-4 py-4 text-kora font-extrabold">{t("flat_rate")}</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="px-4 py-4 font-bold text-slate-900">{t("auh_ad_alain")}</td>
+                    <td className="px-4 py-4 text-slate-600">{t("business_days")}</td>
+                    <td className="px-4 py-4 text-kora font-extrabold">{t("flat_rate")}</td>
+                  </tr>
+                  <tr className="hover:bg-slate-50/50">
+                    <td className="px-4 py-4 font-bold text-slate-900">{t("rak_fuj_uaq")}</td>
+                    <td className="px-4 py-4 text-slate-600">{t("business_days")}</td>
+                    <td className="px-4 py-4 text-kora font-extrabold">{t("flat_rate")}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-8 md:p-10 shadow-sm">
               <div className="flex items-start gap-4 sm:gap-6 mb-6 sm:mb-8 border-b border-slate-200 pb-6 sm:pb-8">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 bg-purple-100 rounded-xl flex items-center justify-center text-kora text-xl sm:text-2xl shadow-sm">
                   <FaTruckFast />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">UAE Priority Delivery</h3>
+                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">{t("priority_delivery_title")}</h3>
                   <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-sans">
-                    Because we stock our inventory locally in the UAE, we bypass the month-long waits of overseas dropshipping. Once your order is verified, it is processed and handed off to our local couriers. You can expect your gear at your door within <strong className="text-slate-900">48 hours</strong>.
+                    {t("priority_delivery_desc")}
                   </p>
                 </div>
               </div>
@@ -77,9 +110,9 @@ export default function ShippingReturnsPage() {
                   <FaBoxOpen />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">Order Tracking</h3>
+                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">{t("order_tracking")}</h3>
                   <p className="text-slate-600 leading-relaxed font-sans">
-                    As soon as your package leaves The Vault, you will receive a WhatsApp message and email containing your live tracking link. Our couriers will contact you directly on the day of delivery to confirm your drop-off window.
+                    {t("order_tracking_desc")}
                   </p>
                 </div>
               </div>
@@ -87,7 +120,7 @@ export default function ShippingReturnsPage() {
             
             <div className="bg-rose-50 border border-rose-200 rounded-2xl p-6 text-center shadow-sm">
               <p className="text-rose-600 font-medium font-sans">
-                <span className="font-bold">Note:</span> We currently do not offer international shipping. Kora Store is an exclusive service for residents of the United Arab Emirates.
+                {t("uae_only_note")}
               </p>
             </div>
           </div>
@@ -95,7 +128,7 @@ export default function ShippingReturnsPage() {
 
         {/* RETURNS CONTENT */}
         {activeTab === "returns" && (
-          <div className="animate-fade-in-up space-y-6 sm:space-y-8 font-sans">
+          <div className="animate-fade-in-up space-y-6 sm:space-y-8 font-sans text-start">
             <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-8 md:p-10 shadow-sm space-y-8">
               
               {/* Printed vs Non-printed jerseys rule */}
@@ -104,17 +137,17 @@ export default function ShippingReturnsPage() {
                   <FaShieldAlt />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">Printed vs Non-Printed Items</h3>
+                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">{t("printed_vs_non_printed")}</h3>
                   <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-sans mb-3">
-                    <strong className="text-rose-600 font-extrabold uppercase">Custom Printed Jerseys:</strong> Jerseys with printed names or numbers are <strong className="text-slate-900">non-returnable and non-exchangeable</strong> under any circumstances.
+                    {t("policy_detail_1")}
                   </p>
                   <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-sans">
-                    <strong className="text-slate-900 font-extrabold uppercase">Non-Printed Jerseys:</strong> Eligible for exchange only if:
+                    {t("policy_detail_2")}
                   </p>
                   <ul className="list-disc list-inside mt-2 space-y-1.5 text-xs sm:text-sm text-slate-500 font-sans">
-                    <li>Completely unused and unwashed</li>
-                    <li>Returned in their original packaging</li>
-                    <li>All original tags are attached</li>
+                    <li>{t("return_rule_1")}</li>
+                    <li>{t("return_rule_2")}</li>
+                    <li>{t("return_rule_3")}</li>
                   </ul>
                 </div>
               </div>
@@ -122,12 +155,12 @@ export default function ShippingReturnsPage() {
               {/* Exchange Fee */}
               <div className="flex items-start gap-4 sm:gap-6 border-b border-slate-200 pb-6">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 text-xl sm:text-2xl shadow-sm">
-                  <span className="font-extrabold text-sm sm:text-lg">AED</span>
+                  <span className="font-extrabold text-sm sm:text-lg">{t("aed")}</span>
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">Exchange Fee</h3>
+                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">{t("shipping_fee")}</h3>
                   <p className="text-xs sm:text-base text-slate-600 leading-relaxed font-sans">
-                    A flat <strong className="text-slate-900">25 AED delivery fee</strong> applies to all exchange requests to cover logistics and courier operations.
+                    {t("policy_detail_3")}
                   </p>
                 </div>
               </div>
@@ -138,16 +171,16 @@ export default function ShippingReturnsPage() {
                   <FaArrowRotateLeft />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">Refunds & Claims</h3>
+                  <h3 className="text-lg sm:text-2xl font-bold uppercase tracking-wider text-slate-900 mb-2">{t("refunds_claims")}</h3>
                   <ul className="space-y-3 text-xs sm:text-base text-slate-600 font-sans">
                     <li>
-                      <strong className="text-slate-900">Damaged Items Only:</strong> Refunds are processed <strong className="text-rose-600">only</strong> if you receive a damaged item.
+                      {t("policy_detail_4")}
                     </li>
                     <li>
-                      <strong className="text-slate-900">48-Hour Claim Window:</strong> All refund and exchange requests must be made within <strong className="text-slate-900">48 hours</strong> of receiving the order. Requests made after 48 hours will not be accepted.
+                      {t("claim_window")}
                     </li>
                     <li>
-                      <strong className="text-slate-900">Refund Processing:</strong> Once the returned item is received and inspected, refunds will be processed to your bank account within <strong className="text-slate-900">3-4 business days</strong> (or any bank account of your choice if you do not have your own).
+                      {t("refund_processing_desc")}
                     </li>
                   </ul>
                 </div>
@@ -156,9 +189,9 @@ export default function ShippingReturnsPage() {
 
             {/* Return Action CTA */}
             <div className="text-center mt-8">
-              <p className="text-slate-600 mb-4 font-sans">Need to initiate a return or swap a size?</p>
+              <p className="text-slate-600 mb-4 font-sans">{t("initiate_return_prompt")}</p>
               <Link href="mailto:support@korastore.com" className="inline-block bg-slate-900 text-white px-8 py-3 rounded-full font-bold uppercase tracking-widest text-sm hover:scale-105 hover:bg-kora transition-all shadow-md hover:shadow-kora/30">
-                Email Support
+                {t("email_support")}
               </Link>
             </div>
           </div>
