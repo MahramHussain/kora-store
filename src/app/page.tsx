@@ -109,37 +109,37 @@ export default async function Home() {
       <section className="w-full bg-white border-b border-neutral-100 py-12 md:py-16 px-4 md:px-6">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           
-          {/* Croatia */}
-          <Link href="/shop?q=Croatia" className="group flex flex-col items-center text-center">
+          {/* Argentina Away */}
+          <Link href="/shop?q=Argentina" className="group flex flex-col items-center text-center">
             <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white hover:shadow-md transition-shadow duration-300">
               <img 
-                src="/assets/croatia_jersey.png" 
-                alt="Croatia" 
+                src="/assets/argentina_away_messi.jpg" 
+                alt="Argentina Away" 
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
             <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors">
-              Croatia
+              Argentina Away
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
-              Nike Croatia with Luca Modrić official World Cup printing
+              adidas Argentina Away kit with Lionel Messi official World Cup printing
             </p>
           </Link>
 
-          {/* Germany */}
-          <Link href="/shop?q=Germany" className="group flex flex-col items-center text-center">
+          {/* Brazil Away */}
+          <Link href="/shop?q=Brazil" className="group flex flex-col items-center text-center">
             <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white hover:shadow-md transition-shadow duration-300">
               <img 
-                src="/assets/germany_jersey.png" 
-                alt="Germany" 
+                src="/assets/brazil_away_raphinha.jpg" 
+                alt="Brazil Away" 
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
             <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors">
-              Germany
+              Brazil Away
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
-              adidas Germany World Cup shirts with full squad personalisation available
+              Jordan Nike Brazil Away kit with Raphinha official World Cup printing
             </p>
           </Link>
 
@@ -194,7 +194,7 @@ export default async function Home() {
         
         {argentinaAwayKit && (
           <div 
-            className="relative w-full h-[400px] md:h-[400px] rounded-2xl overflow-hidden group border border-slate-200 hover:border-[#d45372]/50 transition-colors shadow-2xl"
+            className="relative w-full h-[420px] md:h-[460px] rounded-2xl overflow-hidden group border border-slate-200 hover:border-[#d45372]/50 transition-colors shadow-2xl"
             style={{ backgroundColor: '#d45372' }}
           >
             {/* Spotlight Banner Image — top area on mobile, right-aligned on desktop */}
@@ -208,11 +208,11 @@ export default async function Home() {
             <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#d45372] via-[#d45372]/95 md:via-[#d45372]/90 to-transparent z-10"></div>
             
             <div className="absolute bottom-0 left-0 right-0 md:right-auto md:top-1/2 md:-translate-y-1/2 md:left-12 p-5 md:p-0 z-20 md:max-w-lg">
-              <p className="text-pink-200 font-bold tracking-widest text-[10px] md:text-sm uppercase mb-1.5 md:mb-3">World Cup Highlight</p>
-              <h3 className="text-2xl md:text-5xl lg:text-6xl font-black text-white mb-2 md:mb-4 leading-none tracking-tighter uppercase break-words font-sans">
+              <p className="text-pink-200 font-bold tracking-widest text-[10px] md:text-sm uppercase mb-1.5 md:mb-2.5">World Cup Highlight</p>
+              <h3 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white mb-2 md:mb-3.5 leading-none tracking-tighter uppercase break-words font-sans">
                 Argentina Away Kit
               </h3>
-              <p className="text-pink-100 mb-4 md:mb-8 max-w-[280px] md:max-w-sm text-xs md:text-base line-clamp-2 md:line-clamp-3 font-sans font-medium">
+              <p className="text-pink-100 mb-4 md:mb-6 max-w-[280px] md:max-w-sm text-xs md:text-base line-clamp-2 md:line-clamp-3 font-sans font-medium">
                 {argentinaAwayKit.description || "Represent your nation on the world stage. Official premium federation apparel engineered for breathability and elite comfort."}
               </p>
               <Link href={`/shop/${argentinaAwayKit.id}`} className="mobile-cta-full md:inline-block bg-white text-[#d45372] px-6 md:px-8 py-3 md:py-3 rounded-full font-bold text-xs md:text-sm hover:scale-105 transition-transform shadow-[0_0_20px_rgba(212,83,114,0.4)]">
