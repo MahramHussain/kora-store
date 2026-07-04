@@ -2477,16 +2477,16 @@ export default function ProductUI({ product }: { product: any }) {
                       <th className="px-4 py-3.5">Size</th>
                       <th className="px-4 py-3.5">Height (in)</th>
                       <th className="px-4 py-3.5">Height (cm)</th>
-                      <th className="px-4 py-3.5">Width (in)</th>
-                      <th className="px-4 py-3.5">Width (cm)</th>
+                      <th className="px-4 py-3.5">Width (Chest) (in)</th>
+                      <th className="px-4 py-3.5">Width (Chest) (cm)</th>
                     </tr>
                   ) : (
                     <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-extrabold uppercase text-[10px] tracking-wider">
                       <th className="px-4 py-3.5">Size</th>
                       <th className="px-4 py-3.5">Length (in)</th>
-                      <th className="px-4 py-3.5">Width (in)</th>
+                      <th className="px-4 py-3.5">Width (Chest) (in)</th>
                       <th className="px-4 py-3.5">Length (cm)</th>
-                      <th className="px-4 py-3.5">Width (cm)</th>
+                      <th className="px-4 py-3.5">Width (Chest) (cm)</th>
                     </tr>
                   )}
                 </thead>
