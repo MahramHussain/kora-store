@@ -511,7 +511,7 @@ export default function ProductUI({ product }: { product: any }) {
                     maxLength={15}
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value.toUpperCase())}
-                    placeholder="e.g. CUSTOM NAME"
+                    placeholder={t("custom_name_placeholder")}
                     className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider text-slate-900 text-start"
                   />
                 </div>
@@ -679,7 +679,7 @@ export default function ProductUI({ product }: { product: any }) {
                     maxLength={15}
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value.toUpperCase())}
-                    placeholder="e.g. ADNAN"
+                    placeholder={t("custom_name_placeholder")}
                     className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider text-start"
                   />
                 </div>
