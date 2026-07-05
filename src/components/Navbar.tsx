@@ -515,7 +515,7 @@ export default function Navbar() {
             {!pathname?.startsWith("/admin") && (
               <button 
                 onClick={() => setLanguage(language === "en" ? "ar" : "en")}
-                className="text-[10px] font-black uppercase tracking-widest text-purple-200 hover:text-white px-2 py-1 transition-colors flex items-center gap-1 border border-white/10 rounded-md bg-white/5"
+                className="hidden md:flex text-[10px] font-black uppercase tracking-widest text-purple-200 hover:text-white px-2 py-1 transition-colors items-center gap-1 border border-white/10 rounded-md bg-white/5"
                 title={language === "en" ? "Switch to Arabic" : "تغيير للإنجليزية"}
               >
                 <span className={language === "en" ? "text-white font-extrabold" : ""}>EN</span>
@@ -954,6 +954,25 @@ export default function Navbar() {
           >
             {t("retro")}
           </Link>
+
+          {/* Language Toggle */}
+          {!pathname?.startsWith("/admin") && (
+            <div className="px-6 py-5 border-b border-neutral-200 flex items-center justify-between">
+              <span className="text-slate-900 font-display font-extrabold text-base">{language === "en" ? "Language" : "اللغة"}</span>
+              <button 
+                onClick={() => {
+                  setLanguage(language === "en" ? "ar" : "en");
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-[11px] font-black uppercase tracking-widest text-slate-700 border border-neutral-300 rounded-lg px-4 py-2 bg-slate-50 active:bg-neutral-100 transition-colors flex items-center gap-1.5 shadow-sm"
+                title={language === "en" ? "Switch to Arabic" : "تغيير للإنجليزية"}
+              >
+                <span className={language === "en" ? "text-kora font-extrabold" : ""}>EN</span>
+                <span className="text-slate-300">|</span>
+                <span className={language === "ar" ? "text-kora font-extrabold" : ""}>العربية</span>
+              </button>
+            </div>
+          )}
         </div>
 
       </div>

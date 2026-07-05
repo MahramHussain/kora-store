@@ -519,31 +519,31 @@ export default function CheckoutPage() {
 
                 <div className="flex justify-between">
                   <span>{t("subtotal_label")}</span>
-                  <span className="text-slate-900 font-bold">{CURRENCY}{subtotal.toFixed(2)}</span>
+                  <span className="text-slate-900 font-bold">{t("aed")}{subtotal.toFixed(2)}</span>
                 </div>
 
                 {discountAmount > 0 && (
                   <div className="flex justify-between text-emerald-600">
                     <span>{t("discount")} ({discountPercent * 100}%)</span>
-                    <span className="font-bold">-{CURRENCY}{discountAmount.toFixed(2)}</span>
+                    <span className="font-bold">-{t("aed")}{discountAmount.toFixed(2)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between">
                   <span>{t("shipping_intel")}</span>
                   <span className="text-slate-900 font-bold">
-                    {shippingCharge === 0 ? t("free_label") : `${CURRENCY}${shippingCharge.toFixed(2)}`}
+                    {shippingCharge === 0 ? t("free_label") : `${t("aed")}${shippingCharge.toFixed(2)}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>{t("estimated_taxes")}</span>
-                  <span className="text-slate-900 font-bold">{CURRENCY}0.00</span>
+                  <span className="text-slate-900 font-bold">{t("aed")}0.00</span>
                 </div>
               </div>
 
               <div className="flex justify-between items-center border-t border-slate-200 pt-6 mb-8 text-start">
                 <span className="font-bold text-slate-900 text-lg uppercase tracking-wider">{t("total_label")}</span>
-                <span className="text-4xl font-black text-slate-900 font-sans">{CURRENCY}{finalTotal.toFixed(2)}</span>
+                <span className="text-4xl font-black text-slate-900 font-sans">{t("aed")}{finalTotal.toFixed(2)}</span>
               </div>
 
               <button 

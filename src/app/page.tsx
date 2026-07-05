@@ -128,10 +128,10 @@ export default async function Home() {
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors">
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
               {t("argentina_away_title")}
             </h3>
-            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
+            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
               {t("argentina_away_desc")}
             </p>
           </Link>
@@ -145,10 +145,10 @@ export default async function Home() {
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors">
-              Brazil Away
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
+              {t("brazil_away_title")}
             </h3>
-            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
+            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
               {t("brazil_away_desc")}
             </p>
           </Link>
@@ -162,10 +162,10 @@ export default async function Home() {
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors">
-              Portugal
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
+              {t("portugal")}
             </h3>
-            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
+            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
               {t("portugal_desc")}
             </p>
           </Link>
@@ -179,10 +179,10 @@ export default async function Home() {
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors">
-              Argentina
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
+              {t("argentina")}
             </h3>
-            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px]">
+            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
               {t("argentina_desc")}
             </p>
           </Link>

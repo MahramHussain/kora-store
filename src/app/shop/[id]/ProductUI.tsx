@@ -170,6 +170,7 @@ type CustomSelectProps = {
 };
 
 function CustomSelect({ value, onChange, options, placeholder, className = "" }: CustomSelectProps) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -216,7 +217,7 @@ function CustomSelect({ value, onChange, options, placeholder, className = "" }:
       {isOpen && (
         <div className="absolute z-50 w-full mt-1.5 bg-white border border-slate-200/80 rounded-xl shadow-xl py-1 max-h-60 overflow-y-auto animate-fade-in origin-top">
           {options.length === 0 ? (
-            <div className="px-4 py-3 text-xs text-slate-400 italic text-center">No options available</div>
+            <div className="px-4 py-3 text-xs text-slate-400 italic text-center">{t("no_options_available")}</div>
           ) : (
             options.map((opt) => (
               <button
@@ -345,7 +346,7 @@ const LEFT_SLEEVE_PATCH_OPTIONS: CustomSelectOption[] = [
 ];
 
 export default function ProductUI({ product }: { product: any }) {
-  const { t, lang } = useTranslation();
+  const { t, language } = useTranslation();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
   const [isSizeChartOpen, setIsSizeChartOpen] = useState(false);
@@ -448,7 +449,7 @@ export default function ProductUI({ product }: { product: any }) {
                   : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-xs"
               }`}
             >
-              <span>Player Name (+15 {CURRENCY.trim().toLowerCase()})</span>
+              <span>{t("player_name_upcharge").replace("{currency}", t("aed"))}</span>
             </button>
 
             <button
@@ -465,7 +466,7 @@ export default function ProductUI({ product }: { product: any }) {
                   : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-xs"
               }`}
             >
-              <span>Custom Name (+25 {CURRENCY.trim().toLowerCase()})</span>
+              <span>{t("custom_name_upcharge").replace("{currency}", t("aed"))}</span>
             </button>
           </div>
 
@@ -473,8 +474,8 @@ export default function ProductUI({ product }: { product: any }) {
           {personalizationTab === "player" && (
             <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
               {presetPlayers.length > 0 ? (
-                <div>
-                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2.5 tracking-widest">Select Player Print</label>
+                <div className="text-start">
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2.5 tracking-widest text-start">{t("select_player_print")}</label>
                   <CustomSelect
                     value={selectedPresetPlayer ? JSON.stringify(selectedPresetPlayer) : ""}
                     onChange={(val) => {
@@ -490,11 +491,11 @@ export default function ProductUI({ product }: { product: any }) {
                       }
                     }}
                     options={playerOptions}
-                    placeholder="Select a player..."
+                    placeholder={t("select_a_player")}
                   />
                 </div>
               ) : (
-                <p className="text-[10px] text-slate-400 italic">No preset players available for this product.</p>
+                <p className="text-[10px] text-slate-400 italic text-start">{t("no_preset_players")}</p>
               )}
             </div>
           )}
@@ -502,20 +503,20 @@ export default function ProductUI({ product }: { product: any }) {
           {/* Custom Name Inputs */}
           {personalizationTab === "custom" && (
             <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Name</label>
+              <div className="flex gap-3 text-start">
+                <div className="flex-1 text-start">
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest text-start">{t("name")}</label>
                   <input
                     type="text"
                     maxLength={15}
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value.toUpperCase())}
                     placeholder="e.g. CUSTOM NAME"
-                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider text-slate-900"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider text-slate-900 text-start"
                   />
                 </div>
-                <div className="w-24">
-                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Number</label>
+                <div className="w-24 text-start">
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest text-start">{t("number")}</label>
                   <input
                     type="text"
                     maxLength={3}
@@ -526,39 +527,39 @@ export default function ProductUI({ product }: { product: any }) {
                   />
                 </div>
               </div>
-              <p className="text-[10px] text-slate-400 italic">Bespoke hot-pressed vinyl printing. Handcrafted in-house.</p>
-              <p className="text-[10px] text-kora font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3">
-                <span>✨ Custom Player Printing</span>
-                <span>+25 {CURRENCY.trim().toLowerCase()}</span>
+              <p className="text-[10px] text-slate-400 italic text-start">{t("custom_print_detail")}</p>
+              <p className="text-[10px] text-kora font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3 text-start">
+                <span>{t("custom_player_printing")}</span>
+                <span>{t("plus_25").replace("{currency}", t("aed"))}</span>
               </p>
             </div>
           )}
         </div>
 
         {/* Sleeve Patches Box */}
-        <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-6 font-sans shadow-sm">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+        <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-6 font-sans shadow-sm text-start">
+          <div className="flex items-center justify-between gap-4 text-start">
+            <div className="flex items-center gap-4 text-start">
               <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-sm shrink-0">
                 <SleevePatchIcon className="w-7 h-7 text-kora" />
               </div>
-              <div>
+              <div className="text-start">
                 <h3 className="text-slate-900 font-extrabold text-base leading-tight">{t("sleeve_patches")}</h3>
                 <p className="text-slate-400 text-xs mt-0.5">{t("sleeve_patches_desc")}</p>
               </div>
             </div>
             <div className="bg-white border border-slate-200/80 rounded-xl px-3.5 py-1.5 text-xs font-bold text-slate-900 shadow-xs">
-              +10 {CURRENCY.trim().toLowerCase()}
+              {t("plus_10").replace("{currency}", t("aed"))}
             </div>
           </div>
 
-          <div className="flex gap-3 mt-5">
+          <div className="flex gap-3 mt-5 text-start">
             {/* Right Sleeve Dropdown */}
             <CustomSelect
               value={rightSleevePatch}
               onChange={setRightSleevePatch}
               options={RIGHT_SLEEVE_PATCH_OPTIONS}
-              placeholder="Right Patch"
+              placeholder={t("right_patch")}
               className="flex-1 min-w-0 text-start"
             />
 
@@ -567,7 +568,7 @@ export default function ProductUI({ product }: { product: any }) {
               value={leftSleevePatch}
               onChange={setLeftSleevePatch}
               options={LEFT_SLEEVE_PATCH_OPTIONS}
-              placeholder="Left Patch"
+              placeholder={t("left_patch")}
               className="flex-1 min-w-0 text-start"
             />
           </div>
@@ -588,15 +589,15 @@ export default function ProductUI({ product }: { product: any }) {
       <div className="space-y-4 mb-6 text-start">
         {/* Name & Number Printing Box */}
         <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-5 font-sans shadow-xs">
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-4 text-start">
             {/* Jersey Icon */}
             <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-xs shrink-0">
               <JerseyPrintIcon className="w-7 h-7 text-kora" />
             </div>
 
-            <div>
+            <div className="text-start">
               <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">{t("name_number_printing")}</h3>
-              <p className="text-slate-400 text-xs mt-1">Add the name of your favorite player or any custom name available in official font</p>
+              <p className="text-slate-400 text-xs mt-1 text-start">{t("name_number_printing_desc")}</p>
             </div>
           </div>
 
@@ -616,7 +617,7 @@ export default function ProductUI({ product }: { product: any }) {
                   : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-sm hover:shadow-kora/10"
               }`}
             >
-              <span>Player Name (+15 {CURRENCY.trim().toLowerCase()})</span>
+              <span>{t("player_name_upcharge").replace("{currency}", t("aed"))}</span>
             </button>
 
             <button
@@ -633,7 +634,7 @@ export default function ProductUI({ product }: { product: any }) {
                   : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-sm hover:shadow-kora/10"
               }`}
             >
-              <span>Custom Name (+25 {CURRENCY.trim().toLowerCase()})</span>
+              <span>{t("custom_name_upcharge").replace("{currency}", t("aed"))}</span>
             </button>
           </div>
 
@@ -641,8 +642,8 @@ export default function ProductUI({ product }: { product: any }) {
           {personalizationTab === "player" && (
             <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
               {presetPlayers.length > 0 ? (
-                <div>
-                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2.5 tracking-widest">Select Player Print</label>
+                <div className="text-start">
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2.5 tracking-widest text-start">{t("select_player_print")}</label>
                   <CustomSelect
                     value={selectedPresetPlayer ? JSON.stringify(selectedPresetPlayer) : ""}
                     onChange={(val) => {
@@ -658,11 +659,11 @@ export default function ProductUI({ product }: { product: any }) {
                       }
                     }}
                     options={playerOptions}
-                    placeholder="Select a player..."
+                    placeholder={t("select_a_player")}
                   />
                 </div>
               ) : (
-                <p className="text-[10px] text-slate-400 italic">No preset players available for this product.</p>
+                <p className="text-[10px] text-slate-400 italic text-start">{t("no_preset_players")}</p>
               )}
             </div>
           )}
@@ -670,20 +671,20 @@ export default function ProductUI({ product }: { product: any }) {
           {/* Custom Name Inputs */}
           {personalizationTab === "custom" && (
             <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
-              <div className="flex gap-3">
-                <div className="flex-1">
-                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Name</label>
+              <div className="flex gap-3 text-start">
+                <div className="flex-1 text-start">
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest text-start">{t("name")}</label>
                   <input
                     type="text"
                     maxLength={15}
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value.toUpperCase())}
                     placeholder="e.g. ADNAN"
-                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-sm font-bold tracking-wider text-start"
                   />
                 </div>
-                <div className="w-24">
-                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest">Number</label>
+                <div className="w-24 text-start">
+                  <label className="block text-[9px] font-bold uppercase text-slate-400 mb-1.5 tracking-widest text-start">{t("number")}</label>
                   <input
                     type="text"
                     maxLength={3}
@@ -694,38 +695,39 @@ export default function ProductUI({ product }: { product: any }) {
                   />
                 </div>
               </div>
-              <p className="text-[10px] text-kora font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3">
-                <span>✨ Custom Player Printing</span>
-                <span>+25 {CURRENCY.trim().toLowerCase()}</span>
+              <p className="text-[10px] text-slate-400 italic text-start">{t("custom_print_detail")}</p>
+              <p className="text-[10px] text-kora font-black uppercase tracking-wider bg-purple-50 border border-purple-100/60 p-2.5 rounded-xl flex items-center justify-between mt-3 text-start">
+                <span>{t("custom_player_printing")}</span>
+                <span>{t("plus_25").replace("{currency}", t("aed"))}</span>
               </p>
             </div>
           )}
         </div>
 
         {/* Sleeve Patches Box */}
-        <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-5 font-sans shadow-xs">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
+        <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-5 font-sans shadow-xs text-start">
+          <div className="flex items-center justify-between gap-4 text-start">
+            <div className="flex items-center gap-4 text-start">
               <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-xs shrink-0">
                 <SleevePatchIcon className="w-7 h-7 text-kora" />
               </div>
-              <div>
+              <div className="text-start">
                 <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">{t("sleeve_patches")}</h3>
-                <p className="text-slate-400 text-xs mt-1">{t("sleeve_patches_desc")}</p>
+                <p className="text-slate-400 text-xs mt-1 text-start">{t("sleeve_patches_desc")}</p>
               </div>
             </div>
             <div className="bg-white border border-slate-200/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 shadow-xs">
-              +10 {CURRENCY.trim().toLowerCase()}
+              {t("plus_10").replace("{currency}", t("aed"))}
             </div>
           </div>
 
-          <div className="flex gap-3 mt-5">
+          <div className="flex gap-3 mt-5 text-start">
             {/* Right Sleeve Dropdown */}
             <CustomSelect
               value={rightSleevePatch}
               onChange={setRightSleevePatch}
               options={RIGHT_SLEEVE_PATCH_OPTIONS}
-              placeholder="Right Patch"
+              placeholder={t("right_patch")}
               className="flex-1 min-w-0 text-start"
             />
 
@@ -734,7 +736,7 @@ export default function ProductUI({ product }: { product: any }) {
               value={leftSleevePatch}
               onChange={setLeftSleevePatch}
               options={LEFT_SLEEVE_PATCH_OPTIONS}
-              placeholder="Left Patch"
+              placeholder={t("left_patch")}
               className="flex-1 min-w-0 text-start"
             />
           </div>
@@ -787,6 +789,11 @@ export default function ProductUI({ product }: { product: any }) {
         .catch(err => console.error("Error checking ban status:", err));
     }
   }, [clerkUser, router]);
+
+  // Scroll to top on mount to prevent page loading scrolled down
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   // Detect mobile
   useEffect(() => {
@@ -1156,11 +1163,11 @@ export default function ProductUI({ product }: { product: any }) {
                 onClick={() => setIsSizeChartOpen(true)}
                 className="text-[10px] font-bold text-kora uppercase tracking-wider cursor-pointer focus:outline-none"
               >
-                {t("size_guide")} {lang === "ar" ? "←" : "→"}
+                {t("size_guide")} {language === "ar" ? "←" : "→"}
               </button>
             ) : (
               <Link href="/faq" className="text-[10px] font-bold text-kora uppercase tracking-wider">
-                {t("size_guide")} {lang === "ar" ? "←" : "→"}
+                {t("size_guide")} {language === "ar" ? "←" : "→"}
               </Link>
             )}
           </div>
@@ -2462,31 +2469,31 @@ export default function ProductUI({ product }: { product: any }) {
             </button>
 
             {/* Header */}
-            <div className="mb-6">
-              <span className="text-[10px] font-black uppercase text-kora tracking-widest bg-kora/10 px-2.5 py-0.5 rounded-sm">Official Spec</span>
-              <h3 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight mt-1">{product.name} Size Chart</h3>
-              <p className="text-slate-400 text-xs mt-1">Detailed flat-lay measurements to help you find your perfect fit.</p>
+            <div className="mb-6 text-start">
+              <span className="text-[10px] font-black uppercase text-kora tracking-widest bg-kora/10 px-2.5 py-0.5 rounded-sm">{t("official_spec")}</span>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight mt-1 text-start">{product.name} {t("size_chart")}</h3>
+              <p className="text-slate-400 text-xs mt-1 text-start">{t("size_chart_desc")}</p>
             </div>
 
             {/* Table */}
-            <div className="overflow-x-auto border border-slate-200/60 rounded-2xl">
-              <table className="w-full border-collapse text-left text-xs sm:text-sm">
+            <div className="overflow-x-auto border border-slate-200/60 rounded-2xl text-start">
+              <table className="w-full border-collapse text-left rtl:text-right text-xs sm:text-sm">
                 <thead>
                   {isChartA ? (
-                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-extrabold uppercase text-[10px] tracking-wider">
-                      <th className="px-4 py-3.5">Size</th>
-                      <th className="px-4 py-3.5">Height (in)</th>
-                      <th className="px-4 py-3.5">Height (cm)</th>
-                      <th className="px-4 py-3.5">Width (Chest) (in)</th>
-                      <th className="px-4 py-3.5">Width (Chest) (cm)</th>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-extrabold uppercase text-[10px] tracking-wider text-start">
+                      <th className="px-4 py-3.5 text-start">{t("size_label")}</th>
+                      <th className="px-4 py-3.5 text-start">{t("height_in")}</th>
+                      <th className="px-4 py-3.5 text-start">{t("height_cm")}</th>
+                      <th className="px-4 py-3.5 text-start">{t("width_in")}</th>
+                      <th className="px-4 py-3.5 text-start">{t("width_cm")}</th>
                     </tr>
                   ) : (
-                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-extrabold uppercase text-[10px] tracking-wider">
-                      <th className="px-4 py-3.5">Size</th>
-                      <th className="px-4 py-3.5">Length (in)</th>
-                      <th className="px-4 py-3.5">Width (Chest) (in)</th>
-                      <th className="px-4 py-3.5">Length (cm)</th>
-                      <th className="px-4 py-3.5">Width (Chest) (cm)</th>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-400 font-extrabold uppercase text-[10px] tracking-wider text-start">
+                      <th className="px-4 py-3.5 text-start">{t("size_label")}</th>
+                      <th className="px-4 py-3.5 text-start">{t("length_in")}</th>
+                      <th className="px-4 py-3.5 text-start">{t("width_in")}</th>
+                      <th className="px-4 py-3.5 text-start">{t("length_cm")}</th>
+                      <th className="px-4 py-3.5 text-start">{t("width_cm")}</th>
                     </tr>
                   )}
                 </thead>
@@ -2573,8 +2580,8 @@ export default function ProductUI({ product }: { product: any }) {
             </div>
 
             {/* Footer info */}
-            <div className="mt-5 p-4 bg-slate-50 border border-slate-200/50 rounded-2xl text-[11px] text-slate-500 leading-relaxed">
-              <strong className="text-slate-800">Note:</strong> These measurements are taken when the jersey is laid flat. Sizing is standard athletic fit. If you prefer a looser style or select a Player Issue kit, we suggest ordering one size larger than your usual fit.
+            <div className="mt-5 p-4 bg-slate-50 border border-slate-200/50 rounded-2xl text-[11px] text-slate-500 leading-relaxed text-start">
+              <strong className="text-slate-800">{t("note_label")}:</strong> {t("size_chart_footer_note")}
             </div>
           </div>
         </div>

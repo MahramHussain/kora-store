@@ -73,14 +73,14 @@ export const translations = {
   "shop_now": { en: "Shop Now", ar: "تسوق الآن" },
 
   // Home Showcase
-  "argentina_away_desc": { en: "adidas Argentina Away kit with Lionel Messi official World Cup printing", ar: "طقم الأرجنتين الاحتياطي من أديداس مع طباعة ليونيل ميسي الرسمية لكأس العالم" },
-  "brazil_away_desc": { en: "Jordan Nike Brazil Away kit with Raphinha official World Cup printing", ar: "طقم البرازيل الاحتياطي من نايكي جوردان مع طباعة رافينيا الرسمية لكأس العالم" },
+  "argentina_away_desc": { en: "adidas Argentina Away kits with official kit printing available for every player", ar: "أطقم الأرجنتين الاحتياطية من أديداس مع توفر طباعة القمصان الرسمية لجميع اللاعبين" },
+  "brazil_away_desc": { en: "Jordan Nike Brazil Away kits with official kit printing available for every player", ar: "أطقم البرازيل الاحتياطية من نايكي جوردان مع توفر طباعة القمصان الرسمية لجميع اللاعبين" },
   "portugal_desc": { en: "Puma Portugal Cristiano Ronaldo official home and away shirts", ar: "قمصان البرتغال الرسمية الأساسية والاحتياطية لكريستيانو رونالدو من بوما" },
   "argentina_desc": { en: "adidas Argentina kits with official kit printing available for every player", ar: "أطقم الأرجنتين من أديداس مع توفر طباعة القمصان الرسمية لجميع اللاعبين" },
   
   // Spotlight
   "world_cup_highlight": { en: "World Cup Highlight", ar: "أبرز لقطات كأس العالم" },
-  "argentina_away_title": { en: "Argentina Away Kit", ar: "طقم الأرجنتين الاحتياطي" },
+  "argentina_away_title": { en: "Argentina Away", ar: "طقم الأرجنتين الاحتياطي" },
   "spotlight_desc": { en: "Represent your nation on the world stage. Official premium federation apparel engineered for breathability and elite comfort.", ar: "مثل منتخبك على الساحة العالمية. ملابس رسمية فاخرة للمنتخب مصممة للتهوية والراحة الفائقة." },
   "shop_national_kit": { en: "Shop The National Kit", ar: "تسوق طقم المنتخب" },
 
@@ -328,12 +328,10 @@ export const translations = {
   "size_label": { en: "Size", ar: "المقاس" },
   "print_label": { en: "Print", ar: "الطباعة" },
   "patch_label": { en: "Patch", ar: "الشارة" },
-  "order_summary": { en: "Order Summary", ar: "ملخص الطلب" },
   "subtotal_label": { en: "Subtotal", ar: "المجموع الفرعي" },
   "uae_delivery_label": { en: "UAE Local Delivery", ar: "شحن محلي بالإمارات" },
   "free_label": { en: "FREE", ar: "مجاناً" },
   "total_label": { en: "Total", ar: "الإجمالي" },
-  "secure_checkout_btn": { en: "SECURE CHECKOUT", ar: "الدفع الآمن" },
   "taxes_calculated_desc": { en: "Taxes calculated at checkout. All UAE orders delivered within 48 hours.", ar: "يتم احتساب الرسوم والضرائب عند الدفع. يتم توصيل جميع طلبات الإمارات خلال 48 ساعة." },
 
   // Checkout page specific
@@ -486,9 +484,7 @@ export const translations = {
   "care_title": { en: "CARE", ar: "العناية" },
   "care_value": { en: "Hand Wash Only", ar: "غسيل يدوي فقط" },
   "care_desc": { en: "Wash cold, do not use washing machine or dryer. Shade dry only to preserve prints.", ar: "غسيل بالماء البارد، لا تستخدم الغسالة أو المجفف. يجفف في الظل فقط للحفاظ على المطبوعات." },
-  "origin_title": { en: "ORIGIN", ar: "المصدر" },
   "origin_value": { en: "Kora Standard", ar: "معيار كورا" },
-  "origin_desc": { en: "Bypassing traditional retail margins to source the highest authentic grade direct.", ar: "تجاوز هوامش ربح التجزئة التقليدية للحصول على أعلى درجة أصلية مباشرة." },
   "claim_window_title": { en: "Claim Window: Within 48 hours", ar: "فترة الشكاوى: خلال 48 ساعة" },
   "processing_time_title": { en: "3-4 days processing", ar: "معالجة خلال 3-4 أيام" },
   "average_intel_title": { en: "Average Intel", ar: "متوسط التقييم" },
@@ -516,7 +512,6 @@ export const translations = {
   "save": { en: "Save", ar: "حفظ" },
   
   // Teams Translations
-  "all_teams": { en: "All Teams", ar: "كل الفرق" },
   "argentina": { en: "Argentina", ar: "الأرجنتين" },
   "brazil": { en: "Brazil", ar: "البرازيل" },
   "france": { en: "France", ar: "فرنسا" },
@@ -529,5 +524,37 @@ export const translations = {
   "real_madrid": { en: "Real Madrid", ar: "ريال مدريد" },
   "manchester_city": { en: "Manchester City", ar: "مانشستر سيتي" },
   "paris_saint_germain": { en: "Paris Saint-Germain", ar: "باريس سان جيرمان" },
-  "manchester_united": { en: "Manchester United", ar: "مانشستر يونايتد" }
+  "manchester_united": { en: "Manchester United", ar: "مانشستر يونايتد" },
+
+  // Product Personalization & Sleeve Patches
+  "player_name_upcharge": { en: "Player Name (+15 {currency})", ar: "اسم اللاعب (+15 {currency})" },
+  "custom_name_upcharge": { en: "Custom Name (+25 {currency})", ar: "اسم مخصص (+25 {currency})" },
+  "select_player_print": { en: "Select Player Print", ar: "اختر طباعة اللاعب" },
+  "name_number_printing_desc": { en: "Add the name of your favorite player or any custom name available in official font", ar: "أضف اسم لاعبك المفضل أو أي اسم مخصص بالخط الرسمي للقميص" },
+  "select_a_player": { en: "Select a player...", ar: "اختر لاعباً..." },
+  "no_preset_players": { en: "No preset players available for this product.", ar: "لا توجد أسماء لاعبين جاهزة لهذا المنتج." },
+  "custom_player_printing": { en: "Custom Player Printing", ar: "طباعة اسم ورقم مخصص" },
+  "custom_print_detail": { en: "Bespoke hot-pressed vinyl printing. Handcrafted in-house.", ar: "طباعة فينيل حرارية مخصصة. صُنعت يدوياً في متجرنا." },
+  "right_patch": { en: "Right Patch", ar: "الشارة اليمنى" },
+  "left_patch": { en: "Left Patch", ar: "الشارة اليسرى" },
+  "name": { en: "Name", ar: "الاسم" },
+  "number": { en: "Number", ar: "الرقم" },
+  "no_options_available": { en: "No options available", ar: "لا توجد خيارات متاحة" },
+  "plus_25": { en: "+25 {currency}", ar: "+25 {currency}" },
+  "plus_15": { en: "+15 {currency}", ar: "+15 {currency}" },
+  "plus_10": { en: "+10 {currency}", ar: "+10 {currency}" },
+  "brazil_away_title": { en: "Brazil Away", ar: "طقم البرازيل الاحتياطي" },
+  
+  // Size Chart Modal
+  "official_spec": { en: "Official Spec", ar: "المواصفات الرسمية" },
+  "size_chart": { en: "Size Chart", ar: "جدول المقاسات" },
+  "size_chart_desc": { en: "Detailed flat-lay measurements to help you find your perfect fit.", ar: "قياسات دقيقة لمساعدتك في العثور على مقاسك المثالي." },
+  "height_in": { en: "Height (in)", ar: "الارتفاع (بوصة)" },
+  "height_cm": { en: "Height (cm)", ar: "الارتفاع (سم)" },
+  "width_in": { en: "Width (Chest) (in)", ar: "العرض (الصدر) (بوصة)" },
+  "width_cm": { en: "Width (Chest) (cm)", ar: "العرض (الصدر) (سم)" },
+  "length_in": { en: "Length (in)", ar: "الطول (بوصة)" },
+  "length_cm": { en: "Length (cm)", ar: "الطول (سم)" },
+  "size_chart_footer_note": { en: "These measurements are taken when the jersey is laid flat. Sizing is standard athletic fit. If you prefer a looser style or select a Player Issue kit, we suggest ordering one size larger than your usual fit.", ar: "تؤخذ هذه القياسات عندما يكون القميص مفروداً بشكل مسطح. المقاسات تتبع القصة الرياضية القياسية. إذا كنت تفضل قصة أكثر اتساعاً أو اخترت نسخة اللاعبين (Player Issue)، نقترح طلب مقاس أكبر بدرجة واحدة من مقاسك المعتاد." },
+  "note_label": { en: "Note", ar: "ملاحظة" }
 };
