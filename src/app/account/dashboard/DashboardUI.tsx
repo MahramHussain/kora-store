@@ -116,36 +116,40 @@ function AvatarDisplay({
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, t }: { status: string; t: (key: string) => string }) {
   let cls = "";
   let icon = null;
+  let translatedStatus = status;
 
   if (status === "Delivered") {
     cls = "bg-emerald-50 text-emerald-700 border-emerald-200/60";
     icon = <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />;
+    translatedStatus = t("status_delivered");
   } else if (status === "Shipped") {
     cls = "bg-blue-50 text-blue-700 border-blue-200/60";
     icon = <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />;
+    translatedStatus = t("status_shipped");
   } else {
     cls = "bg-amber-50 text-amber-700 border-amber-200/60";
     icon = <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" style={{ animationDuration: "1.5s" }} />;
+    translatedStatus = t("status_processing");
   }
 
   return (
     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${cls}`}>
       {icon}
-      {status}
+      {translatedStatus}
     </span>
   );
 }
 
 // ── ADAPTIVE STEP-BY-STEP PROGRESS TIMELINE ──
-function StatusTimeline({ status }: { status: string }) {
+function StatusTimeline({ status, t }: { status: string; t: (key: string) => string }) {
   const steps = [
-    { label: "Order Confirmed", desc: "Order accepted" },
-    { label: "Quality Checks", desc: "1:1 grade verified" },
-    { label: "Shipped", desc: "On way to Dubai hub" },
-    { label: "Delivered", desc: "Delivered to address" }
+    { label: t("step_order_confirmed"), desc: t("step_order_accepted") },
+    { label: t("step_quality_checks"), desc: t("step_qc_verified") },
+    { label: t("step_shipped"), desc: t("step_on_way_hub") },
+    { label: t("step_delivered"), desc: t("step_delivered_address") }
   ];
 
   let currentIdx = 0;
@@ -236,7 +240,7 @@ function StatusTimeline({ status }: { status: string }) {
 }
 
 export default function DashboardUI({ user, orders }: { user: any; orders: any[] }) {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const router = useRouter();
   const { signOut } = useClerk();
   const { user: clerkUser } = useUser();
@@ -308,11 +312,11 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
 
     // Check size limit (e.g. 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setSaveStatus("❌ Image must be smaller than 5MB.");
+      setSaveStatus(t("image_too_large"));
       return;
     }
 
-    setSaveStatus("Optimizing photo...");
+    setSaveStatus(t("optimizing_photo"));
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = (event) => {
@@ -347,7 +351,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
           setSelectedAvatar("custom_upload");
           localStorage.setItem("kora_vault_avatar", "custom_upload");
           window.dispatchEvent(new Event("kora_avatar_update"));
-          setSaveStatus("✅ Profile photo uploaded & optimized!");
+          setSaveStatus(t("photo_uploaded"));
           setTimeout(() => setSaveStatus(""), 4000);
 
           fetch("/api/user/profile", {
@@ -364,7 +368,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
       };
     };
     reader.onerror = () => {
-      setSaveStatus("❌ Failed to process custom image.");
+      setSaveStatus(t("failed_process_image"));
     };
   };
 
@@ -378,7 +382,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
       window.dispatchEvent(new Event("kora_avatar_update"));
       nextAvatar = null;
     }
-    setSaveStatus("✅ Custom profile photo removed.");
+    setSaveStatus(t("custom_photo_removed"));
     setTimeout(() => setSaveStatus(""), 4000);
 
     try {
@@ -400,7 +404,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!clerkUser) {
-      setSaveStatus("❌ Session not loaded. Try again.");
+      setSaveStatus(t("session_not_loaded"));
       return;
     }
     setSaveStatus("Saving...");
@@ -419,14 +423,14 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
       });
       
       if (res.ok) {
-        setSaveStatus("✅ Profile updated successfully!");
+        setSaveStatus(t("profile_updated"));
       } else {
         const text = await res.text();
-        setSaveStatus(`❌ ${text || "Failed to update profile."}`);
+        setSaveStatus(`❌ ${text || t("failed_update_profile")}`);
       }
       setTimeout(() => setSaveStatus(""), 4000);
     } catch (err: any) {
-      setSaveStatus("❌ " + (err.errors?.[0]?.message || "Failed to update profile."));
+      setSaveStatus("❌ " + (err.errors?.[0]?.message || t("failed_update_profile")));
     }
   };
 
@@ -436,22 +440,22 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
   const totalSpent = totalSpentNum.toFixed(2);
   const xp = Math.min(1500, orderCount * 250 + Math.floor(totalSpentNum * 0.05));
 
-  let loyaltyRank = "Rookie Collector";
+  let loyaltyRank = t("rookie_collector");
   let rankColorClass = "text-amber-600 bg-amber-500/10 border-amber-500/20";
-  let nextRank = "Kora Legend";
+  let nextRank = t("kora_legend");
   let xpNeeded = 500;
   let percent = (xp / 500) * 100;
 
   if (orderCount >= 2 && orderCount < 5) {
-    loyaltyRank = "Kora Legend";
+    loyaltyRank = t("kora_legend");
     rankColorClass = "text-kora bg-kora/10 border-kora/20";
-    nextRank = "Elite Collector VIP";
+    nextRank = t("elite_collector_vip");
     xpNeeded = 1250;
     percent = ((xp - 500) / (1250 - 500)) * 100;
   } else if (orderCount >= 5) {
-    loyaltyRank = "Elite Collector VIP";
+    loyaltyRank = t("elite_collector_vip");
     rankColorClass = "text-yellow-600 bg-yellow-500/10 border-yellow-500/20 font-black shadow-sm shadow-yellow-500/5";
-    nextRank = "Max Rank Unlocked";
+    nextRank = t("max_rank_unlocked");
     xpNeeded = 1500;
     percent = 100;
   }
@@ -512,7 +516,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                   {clerkUser?.emailAddresses[0]?.emailAddress || user.email}
                 </p>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-1">
-                  Member since &apos;{user.memberSince}
+                  {t("member_since_prefix")} &apos;{user.memberSince}
                 </p>
               </div>
             </div>
@@ -521,7 +525,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
             <div className="w-full lg:max-w-sm bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 backdrop-blur-md">
               <div className="flex justify-between items-end mb-2">
                 <div>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Loyalty XP</p>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{t("loyalty_xp")}</p>
                   <p className="text-lg font-black mt-0.5">{xp} <span className="text-xs text-slate-400 font-normal">/ {xpNeeded} XP</span></p>
                 </div>
                 <span className="text-[10px] text-purple-400 font-bold uppercase tracking-wider">
@@ -535,7 +539,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                 />
               </div>
               <p className="text-[10px] text-slate-500 font-medium mt-2">
-                {orderCount >= 5 ? "🎖️ Ultimate Collector status achieved" : `💡 Spend more to unlock ${nextRank}`}
+                {orderCount >= 5 ? t("ultimate_collector_status") : t("spend_to_unlock").replace("{rank}", nextRank)}
               </p>
             </div>
           </div>
@@ -569,7 +573,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                   className="flex items-center gap-2 px-5 py-3 rounded-full font-bold text-xs uppercase tracking-wider whitespace-nowrap bg-white text-kora border border-kora/20 hover:bg-kora/5 transition-all"
                 >
                   <FiShield className="w-4 h-4" />
-                  Admin Portal
+                  {t("admin_portal")}
                 </Link>
               )}
 
@@ -578,14 +582,14 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                 className="flex items-center gap-2 px-5 py-3 rounded-full font-bold text-xs uppercase tracking-wider whitespace-nowrap bg-white text-rose-500 border border-rose-100 hover:bg-rose-50/50 transition-all"
               >
                 <FiLogOut className="w-4 h-4" />
-                Sign Out
+                {t("sign_out")}
               </button>
             </div>
 
             {/* PC Sidebar Navigation */}
             <div className="hidden lg:block bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm sticky top-28">
               <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-                <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest pl-2">Navigation</p>
+                <p className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest pl-2">{t("navigation")}</p>
               </div>
               <nav className="p-3 space-y-1">
                 {navItems.map((item) => {
@@ -684,7 +688,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                     </div>
                     <p className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest">{t("loyalty_tier")}</p>
                     <p className="text-xl sm:text-2xl font-black text-slate-900 mt-1.5 truncate">
-                      {orderCount >= 5 ? "Elite" : orderCount >= 2 ? "Legend" : "Rookie"}
+                      {orderCount >= 5 ? t("loyalty_elite") : orderCount >= 2 ? t("loyalty_legend") : t("loyalty_rookie")}
                     </p>
                     <p className="text-[10px] text-slate-400 font-medium mt-1">{t("loyalty_tier_desc")}</p>
                   </div>
@@ -720,21 +724,21 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                         <div>
                           <div className="flex items-center gap-2.5">
                             <h3 className="font-black text-slate-900 text-lg">#KORA-{orders[0].referenceNumber || orders[0].id.slice(-6).toUpperCase()}</h3>
-                            <StatusBadge status={orders[0].status} />
+                            <StatusBadge status={orders[0].status} t={t} />
                           </div>
                           <p className="text-slate-400 text-xs mt-1">
-                            Placed on {new Date(orders[0].createdAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                            {t("placed_on")} {new Date(orders[0].createdAt).toLocaleDateString(language === "ar" ? "ar-AE" : "en-US", { month: "long", day: "numeric", year: "numeric" })}
                           </p>
                         </div>
                         <div className="text-left sm:text-right shrink-0">
-                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Value</p>
+                          <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t("total_value")}</p>
                           <p className="font-black text-slate-900 text-xl mt-0.5">{CURRENCY}{parseFloat(orders[0].total).toFixed(2)}</p>
                         </div>
                       </div>
 
                       {/* Interactive Stepper */}
                       <div className="py-4">
-                        <StatusTimeline status={orders[0].status} />
+                        <StatusTimeline status={orders[0].status} t={t} />
                       </div>
 
                       {/* Items previews inside latest order */}
@@ -762,11 +766,11 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                           </div>
                           <div className="min-w-0 pl-1.5">
                             <p className="font-extrabold text-slate-800 text-sm truncate max-w-[200px] sm:max-w-md">
-                              {orders[0].items[0]?.product?.name || "Premium Gear"}
-                              {orders[0].items.length > 1 && ` & ${orders[0].items.length - 1} other item(s)`}
+                              {(orders[0].items[0]?.product?.id && t(orders[0].items[0].product.id) !== orders[0].items[0].product.id) ? t(orders[0].items[0].product.id) : (orders[0].items[0]?.product?.name || t("premium_gear"))}
+                              {orders[0].items.length > 1 && ` ${t("and_other_items").replace("{count}", String(orders[0].items.length - 1))}`}
                             </p>
                             <p className="text-[11px] text-slate-400 mt-0.5">
-                              Quantity: {orders[0].items.reduce((sum: number, i: any) => sum + i.quantity, 0)} units
+                              {t("quantity_units").replace("{count}", String(orders[0].items.reduce((sum: number, i: any) => sum + i.quantity, 0)))}
                             </p>
                           </div>
                         </div>
@@ -778,7 +782,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                           }}
                           className="flex items-center gap-2 bg-slate-900 text-white text-xs font-black uppercase tracking-widest px-5 py-3 rounded-full hover:bg-kora hover:shadow-lg hover:shadow-kora/25 transition-all duration-300 w-full sm:w-auto justify-center"
                         >
-                          Manage Drop
+                          {t("manage_drop")}
                           <FiArrowRight className="w-4 h-4" />
                         </button>
                       </div>
@@ -788,9 +792,9 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                       <div className="w-14 h-14 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4 border border-slate-100">
                         <FiBox className="text-2xl text-slate-300" />
                       </div>
-                      <p className="text-slate-400 text-sm font-semibold mb-4">Your order history is empty. Place your first order to get started.</p>
+                      <p className="text-slate-400 text-sm font-semibold mb-4">{t("order_history_empty")}</p>
                       <Link href="/shop" className="inline-flex bg-kora text-white font-extrabold px-7 py-3 rounded-full text-xs uppercase tracking-widest hover:bg-purple-700 transition-colors shadow-md shadow-kora/20">
-                        Browse The Shop
+                        {t("browse_the_shop")}
                       </Link>
                     </div>
                   )}
@@ -805,8 +809,8 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                 {/* Header with Search and Filter tools */}
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-white border border-slate-200 p-5 rounded-3xl shadow-sm">
                   <div>
-                    <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">Order History</h1>
-                    <p className="text-slate-400 text-xs mt-0.5">{orders.length} total order drops registered</p>
+                    <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">{t("order_history_title")}</h1>
+                    <p className="text-slate-400 text-xs mt-0.5">{t("total_drops_registered").replace("{count}", String(orders.length))}</p>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -814,7 +818,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                     <div className="relative flex-1 sm:w-64">
                       <input
                         type="text"
-                        placeholder="Search by order ID or gear..."
+                        placeholder={t("search_orders_placeholder")}
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full bg-slate-50 border border-slate-200/80 rounded-2xl py-2.5 pl-9 pr-4 text-xs font-semibold focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors"
@@ -829,10 +833,10 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                         onChange={(e: any) => setStatusFilter(e.target.value)}
                         className="appearance-none bg-slate-50 border border-slate-200/80 rounded-2xl py-2.5 pl-4 pr-10 text-xs font-bold text-slate-700 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors w-full cursor-pointer"
                       >
-                        <option value="all">All Drops</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
+                        <option value="all">{t("all_drops")}</option>
+                        <option value="processing">{t("processing_filter")}</option>
+                        <option value="shipped">{t("shipped_filter")}</option>
+                        <option value="delivered">{t("delivered_filter")}</option>
                       </select>
                       <FiChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none w-4 h-4" />
                     </div>
@@ -867,11 +871,11 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                               <div>
                                 <div className="flex items-center gap-2">
                                   <h3 className="font-black text-slate-900 text-sm sm:text-base">#KORA-{order.referenceNumber || order.id.slice(-6).toUpperCase()}</h3>
-                                  <StatusBadge status={order.status} />
+                                  <StatusBadge status={order.status} t={t} />
                                 </div>
                                 <p className="text-slate-400 text-xs mt-1">
-                                  {new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                                  {" · "}{order.items.reduce((acc: number, item: any) => acc + item.quantity, 0)} items
+                                  {new Date(order.createdAt).toLocaleDateString(language === "ar" ? "ar-AE" : "en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                  {" · "}{order.items.reduce((acc: number, item: any) => acc + item.quantity, 0)} {t("items_label")}
                                 </p>
                                 
                                 {/* Stacking bubble preview on collapsed */}
@@ -894,7 +898,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
 
                             <div className="flex items-center gap-4 sm:ml-auto w-full sm:w-auto justify-between sm:justify-start border-t sm:border-t-0 border-slate-100 pt-3 sm:pt-0">
                               <div className="text-left sm:text-right">
-                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Amount</p>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{t("total_amount")}</p>
                                 <p className="font-black text-slate-900 text-lg mt-0.5">{CURRENCY}{parseFloat(order.total).toFixed(2)}</p>
                               </div>
                               <div className={`w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100 hover:bg-kora hover:text-white transition-colors duration-300 text-slate-400 shrink-0 ${isExpanded ? "rotate-180 bg-kora text-white border-kora" : ""}`}>
@@ -909,13 +913,13 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                               
                               {/* Stepper tracking */}
                               <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest mb-1.5 flex items-center gap-2">
-                                <FiActivity className="w-3.5 h-3.5 text-kora" /> Delivery Status Progress
+                                <FiActivity className="w-3.5 h-3.5 text-kora" /> {t("delivery_status_progress")}
                               </h4>
-                              <StatusTimeline status={order.status} />
+                              <StatusTimeline status={order.status} t={t} />
 
                               {/* Items list */}
                               <div className="mb-6 mt-6">
-                                <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest mb-3">Secured Products</h4>
+                                <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest mb-3">{t("secured_products")}</h4>
                                 <div className="space-y-3">
                                   {order.items.map((item: any, idx: number) => (
                                     <div key={idx} className="flex justify-between items-center gap-4 bg-white border border-slate-200/80 rounded-2xl p-3.5 sm:p-4 hover:border-kora/20 transition-all duration-300">
@@ -924,21 +928,21 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                           <img src={item.product?.images?.[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png"} alt="Gear" className="w-full h-full object-contain" />
                                         </div>
                                         <div>
-                                          <p className="font-extrabold text-slate-900 text-sm">{item.product?.name || "Premium Gear"}</p>
+                                          <p className="font-extrabold text-slate-900 text-sm">{(item.product?.id && t(item.product.id) !== item.product.id) ? t(item.product.id) : (item.product?.name || t("premium_gear"))}</p>
                                           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-400 mt-1 font-medium">
-                                            <span>Size: <strong className="text-slate-700 font-extrabold">{item.size}</strong></span>
+                                            <span>{t("size_colon")} <strong className="text-slate-700 font-extrabold">{item.size}</strong></span>
                                             {item.playerName ? (
                                               <>
                                                 <span className="text-slate-200">|</span>
                                                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-kora font-bold text-[10px] border border-purple-100">
-                                                  Preset Player: {item.playerName} #{item.customNumber || ""}
+                                                  {t("preset_player_label")} {item.playerName} #{item.customNumber || ""}
                                                 </span>
                                               </>
                                             ) : (item.customName || item.customNumber) ? (
                                               <>
                                                 <span className="text-slate-200">|</span>
                                                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-50 text-kora font-bold text-[10px] border border-purple-100">
-                                                  Custom Print: {item.customName} {item.customNumber ? `#${item.customNumber}` : ""}
+                                                  {t("custom_print_label")} {item.customName} {item.customNumber ? `#${item.customNumber}` : ""}
                                                 </span>
                                               </>
                                             ) : null}
@@ -946,7 +950,15 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                               <>
                                                 <span className="text-slate-200">|</span>
                                                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-teal-50 text-teal-600 font-bold text-[10px] border border-teal-100">
-                                                  Patch: {item.patch}
+                                                  {t("patch_colon")} {item.patch}
+                                                </span>
+                                              </>
+                                            )}
+                                            {item.sellerNote && (
+                                              <>
+                                                <span className="text-slate-200">|</span>
+                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 font-bold text-[10px] border border-amber-200">
+                                                  {t("note_colon")} {item.sellerNote}
                                                 </span>
                                               </>
                                             )}
@@ -955,7 +967,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                       </div>
                                       <div className="text-right shrink-0">
                                         <p className="font-black text-slate-900 text-sm sm:text-base">{CURRENCY}{parseFloat(item.price).toFixed(2)}</p>
-                                        <p className="text-[10px] text-slate-400 font-bold mt-0.5">Qty: {item.quantity}</p>
+                                        <p className="text-[10px] text-slate-400 font-bold mt-0.5">{t("qty_colon")} {item.quantity}</p>
                                       </div>
                                     </div>
                                   ))}
@@ -970,41 +982,47 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                   <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(#000_1px,transparent_1px)] bg-[size:10px_10px] pointer-events-none" />
                                   <div>
                                     <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                                      <FiMapPin className="text-kora w-4 h-4" /> Shipping Address
+                                      <FiMapPin className="text-kora w-4 h-4" /> {t("shipping_address_label")}
                                     </h4>
                                     
                                     <div className="space-y-3.5">
                                       <div className="flex gap-3 text-xs">
-                                        <span className="text-slate-400 w-20 shrink-0 font-bold uppercase tracking-wider text-[9px]">Recipient:</span>
-                                        <span className="text-slate-800 font-extrabold text-xs">{order.shippingName || "Customer"}</span>
+                                        <span className="text-slate-400 w-20 shrink-0 font-bold uppercase tracking-wider text-[9px]">{t("recipient_colon")}</span>
+                                        <span className="text-slate-800 font-extrabold text-xs">{order.shippingName || t("customer_fallback")}</span>
                                       </div>
                                       <div className="flex gap-3 text-xs">
-                                        <span className="text-slate-400 w-20 shrink-0 font-bold uppercase tracking-wider text-[9px]">Phone:</span>
+                                        <span className="text-slate-400 w-20 shrink-0 font-bold uppercase tracking-wider text-[9px]">{t("phone_colon")}</span>
                                         <span className="text-slate-800 font-extrabold text-xs">{order.shippingPhone || "N/A"}</span>
                                       </div>
                                       <div className="flex gap-3 text-xs">
-                                        <span className="text-slate-400 w-20 shrink-0 font-bold uppercase tracking-wider text-[9px]">Address:</span>
+                                        <span className="text-slate-400 w-20 shrink-0 font-bold uppercase tracking-wider text-[9px]">{t("address_colon")}</span>
                                         <span className="text-slate-800 font-extrabold text-xs">
                                           {order.shippingStreet || "N/A"}, {order.shippingCity || "N/A"}
                                         </span>
                                       </div>
                                       <div className="flex gap-3 text-xs">
-                                        <span className="text-slate-400 w-20 shrink-0 font-bold uppercase tracking-wider text-[9px]">Payment:</span>
+                                        <span className="text-slate-400 w-20 shrink-0 font-bold uppercase tracking-wider text-[9px]">{t("payment_label")}</span>
                                         <span className="text-slate-800 font-extrabold text-xs uppercase flex items-center gap-1.5">
                                           <FiCreditCard className="w-3.5 h-3.5 text-slate-400" />
                                           {order.paymentMethod || "Card"}
                                         </span>
                                       </div>
+                                      {order.sellerNote && (
+                                        <div className="flex gap-3 text-xs">
+                                          <span className="text-slate-400 w-20 shrink-0 font-bold uppercase tracking-wider text-[9px]">{t("seller_note_label")}</span>
+                                          <span className="text-slate-800 font-extrabold text-xs italic">{order.sellerNote}</span>
+                                        </div>
+                                      )}
                                     </div>
                                   </div>
 
                                   {/* Quick support buttons */}
                                   <div className="pt-5 mt-5 border-t border-slate-100 flex flex-wrap gap-2">
                                     <button className="flex-1 min-w-[120px] bg-slate-900 hover:bg-kora text-white text-[10px] font-black uppercase tracking-wider py-2.5 px-4 rounded-xl transition-colors text-center">
-                                      Track Package
+                                      {t("track_package")}
                                     </button>
                                     <button className="flex-1 min-w-[120px] bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-black uppercase tracking-wider py-2.5 px-4 rounded-xl transition-colors text-center">
-                                      Get Help
+                                      {t("get_help")}
                                     </button>
                                   </div>
                                 </div>
@@ -1013,12 +1031,12 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                 <div className="bg-slate-50 border border-slate-200 border-dashed rounded-2xl p-5 relative">
                                   <div className="absolute top-0 left-0 right-0 h-1 bg-[linear-gradient(90deg,transparent_50%,#ffffff_50%)] bg-[size:10px_100%] pointer-events-none" />
                                   <h4 className="text-[10px] text-slate-400 font-extrabold uppercase tracking-widest mb-4 flex items-center gap-1.5">
-                                    <FiTag className="text-kora w-4 h-4" /> Receipt Invoice
+                                    <FiTag className="text-kora w-4 h-4" /> {t("receipt_invoice")}
                                   </h4>
 
                                   <div className="space-y-2.5 text-xs">
                                     <div className="flex justify-between text-slate-500 font-semibold">
-                                      <span>Items Subtotal</span>
+                                      <span>{t("items_subtotal")}</span>
                                       <span className="font-bold">{CURRENCY}{(parseFloat(order.total) - parseFloat(order.shippingFee || "25") + parseFloat(order.discountAmount || "0")).toFixed(2)}</span>
                                     </div>
                                     
@@ -1030,13 +1048,13 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                     )}
 
                                     <div className="flex justify-between text-slate-500 font-semibold">
-                                      <span>Delivery Charges</span>
+                                      <span>{t("delivery_charges")}</span>
                                       <span className="font-bold">{CURRENCY}{parseFloat(order.shippingFee || "25").toFixed(2)}</span>
                                     </div>
 
                                     {parseFloat(order.tax || "0") > 0 && (
                                       <div className="flex justify-between text-slate-500 font-semibold">
-                                        <span>VAT (5%)</span>
+                                        <span>{t("vat_5")}</span>
                                         <span className="font-bold">{CURRENCY}{parseFloat(order.tax).toFixed(2)}</span>
                                       </div>
                                     )}
@@ -1044,7 +1062,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                     <div className="h-px bg-slate-300 border-t border-dashed my-2" />
                                     
                                     <div className="flex justify-between items-center pt-1">
-                                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Net Total</span>
+                                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{t("net_total")}</span>
                                       <span className="text-xl sm:text-2xl font-black text-kora">{CURRENCY}{parseFloat(order.total).toFixed(2)}</span>
                                     </div>
                                   </div>
@@ -1060,13 +1078,13 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                       <div className="w-14 h-14 rounded-full bg-slate-50 flex items-center justify-center mx-auto mb-4 border border-slate-100">
                         <FiBox className="text-2xl text-slate-300" />
                       </div>
-                      <p className="text-slate-500 text-sm font-semibold mb-2">No matching order drops found.</p>
-                      <p className="text-slate-400 text-xs mb-4">Try clearing filters or checking other query strings.</p>
+                      <p className="text-slate-500 text-sm font-semibold mb-2">{t("no_matching_orders")}</p>
+                      <p className="text-slate-400 text-xs mb-4">{t("try_clearing_filters")}</p>
                       <button
                         onClick={() => { setStatusFilter("all"); setSearchQuery(""); }}
                         className="bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-[10px] uppercase tracking-wider px-5 py-2.5 rounded-xl transition-all"
                       >
-                        Reset Filters
+                        {t("reset_filters")}
                       </button>
                     </div>
                   )}
@@ -1078,8 +1096,8 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
             {activeTab === "settings" && (
               <div className="animate-fade-in-up space-y-6">
                 <div className="bg-white border border-slate-200 p-5 rounded-3xl shadow-sm">
-                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">Account Settings</h1>
-                  <p className="text-slate-400 text-xs mt-0.5">Manage your personal customer profile and credentials.</p>
+                  <h1 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">{t("account_settings_title")}</h1>
+                  <p className="text-slate-400 text-xs mt-0.5">{t("manage_profile_desc")}</p>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -1088,7 +1106,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                   <div className="lg:col-span-7 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm">
                     <form onSubmit={handleSave} className="space-y-5">
                       <div>
-                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">First Name</label>
+                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">{t("first_name_label")}</label>
                         <div className="relative">
                           <input
                             type="text"
@@ -1102,7 +1120,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                       </div>
 
                       <div>
-                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">Email Address</label>
+                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">{t("email_address_label")}</label>
                         <div className="relative">
                           <input
                             type="email"
@@ -1112,22 +1130,22 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                           />
                           <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-300 w-4.5 h-4.5" />
                         </div>
-                        <p className="text-[10px] text-slate-400 mt-1.5 font-medium pl-1">Email is locked and managed via Clerk authentication.</p>
+                        <p className="text-[10px] text-slate-400 mt-1.5 font-medium pl-1">{t("email_locked_desc")}</p>
                       </div>
 
                       {/* Gender Picker */}
                       <div>
-                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">Gender</label>
+                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">{t("gender_label")}</label>
                         <div className="relative">
                           <select
                             value={genderInput}
                             onChange={(e) => setGenderInput(e.target.value)}
                             className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-10 pr-4 text-sm text-slate-900 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm font-semibold appearance-none"
                           >
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
+                            <option value="">{t("select_gender")}</option>
+                            <option value="Male">{t("male")}</option>
+                            <option value="Female">{t("female")}</option>
+                            <option value="Other">{t("other_gender")}</option>
                           </select>
                           <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4.5 h-4.5 pointer-events-none" />
                         </div>
@@ -1135,11 +1153,11 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
 
                       {/* Phone Number */}
                       <div>
-                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">Phone Number</label>
+                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">{t("phone_number_settings")}</label>
                         <div className="relative">
                           <input
                             type="tel"
-                            placeholder="e.g. +971 50 123 4567"
+                            placeholder={t("phone_placeholder")}
                             value={phoneInput}
                             onChange={(e) => setPhoneInput(e.target.value)}
                             className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-10 pr-4 text-sm text-slate-900 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm font-semibold"
@@ -1150,11 +1168,11 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
 
                       {/* Default Delivery Location */}
                       <div>
-                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">Default Delivery Location</label>
+                        <label className="block text-slate-500 text-[10px] font-extrabold mb-2 uppercase tracking-widest">{t("default_delivery_location")}</label>
                         <div className="relative">
                           <input
                             type="text"
-                            placeholder="e.g. Apartment 12A, Downtown Dubai"
+                            placeholder={t("delivery_placeholder")}
                             value={locationInput}
                             onChange={(e) => setLocationInput(e.target.value)}
                             className="w-full bg-white border border-slate-200 rounded-2xl py-3 pl-10 pr-4 text-sm text-slate-900 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm font-semibold"
@@ -1183,9 +1201,9 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                           type="submit"
                           className="bg-kora hover:bg-purple-700 text-white font-extrabold py-3.5 px-8 rounded-full transition-all shadow-md shadow-kora/20 text-xs uppercase tracking-wider"
                         >
-                          Save Profile Changes
+                          {t("save_profile_changes")}
                         </button>
-                        <span className="text-[10px] text-slate-400 font-medium">Applies immediately</span>
+                        <span className="text-[10px] text-slate-400 font-medium">{t("applies_immediately")}</span>
                       </div>
                     </form>
                   </div>
@@ -1195,10 +1213,10 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                     {/* Football Avatar Selector */}
                     <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm">
                       <h4 className="text-[11px] text-slate-900 font-extrabold uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                        🏆 Select Football Jersey Avatar
+                        {t("select_jersey_avatar")}
                       </h4>
                       <p className="text-slate-400 text-xs leading-relaxed mb-4">
-                        Theme your profile picture bubble with premium 1:1 local jersey skins.
+                        {t("avatar_description")}
                       </p>
 
                       <div className="grid grid-cols-4 gap-3">
@@ -1219,7 +1237,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                               (clerkUser?.firstName || user.name).charAt(0)
                             )}
                           </div>
-                          <span className="text-[9px] font-bold text-slate-500 mt-1 truncate max-w-full">Default</span>
+                          <span className="text-[9px] font-bold text-slate-500 mt-1 truncate max-w-full">{t("default_avatar")}</span>
                         </button>
 
                         {/* Jersey selections */}
@@ -1245,10 +1263,10 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                       {/* Custom Upload Section */}
                       <div className="mt-6 pt-5 border-t border-slate-100">
                         <h4 className="text-[11px] text-slate-900 font-extrabold uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                          📸 Upload Custom Profile Pic
+                          {t("upload_custom_profile")}
                         </h4>
                         <p className="text-slate-400 text-xs leading-relaxed mb-4">
-                          Upload any photo of choice. It will be compressed to less than 15KB for instant page loads.
+                          {t("upload_description")}
                         </p>
 
                         <div className="flex items-center gap-4">
@@ -1287,7 +1305,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                               </svg>
-                              Upload Photo
+                              {t("upload_photo")}
                             </label>
                             
                             {customProfilePic && (
@@ -1300,7 +1318,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                                     : "bg-white text-slate-700 border border-slate-200 hover:border-slate-300"
                                 }`}
                               >
-                                Select Photo
+                                {t("select_photo")}
                               </button>
                             )}
                           </div>
@@ -1311,14 +1329,14 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                     {/* Client Notification preferences card */}
                     <div className="bg-white border border-slate-200 rounded-3xl p-5 sm:p-6 shadow-sm">
                       <h4 className="text-[11px] text-slate-900 font-extrabold uppercase tracking-widest mb-3 flex items-center gap-1.5">
-                        🔔 Notifications & Alerts
+                        {t("notifications_title")}
                       </h4>
                       
                       <div className="space-y-4">
                         <div className="flex items-center justify-between gap-4">
                           <div>
-                            <p className="text-xs font-bold text-slate-800">Email Notifications</p>
-                            <p className="text-[10px] text-slate-400 mt-0.5">Receive transaction invoices & delivery status alerts</p>
+                            <p className="text-xs font-bold text-slate-800">{t("email_notifications")}</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">{t("email_desc")}</p>
                           </div>
                           <button
                             onClick={() => setPrefEmail(!prefEmail)}
@@ -1330,8 +1348,8 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
 
                         <div className="flex items-center justify-between gap-4 border-t border-slate-100 pt-3">
                           <div>
-                            <p className="text-xs font-bold text-slate-800">Limited Gear Drops</p>
-                            <p className="text-[10px] text-slate-400 mt-0.5">Get early alerts on vintage Restocks & World Cup spotlights</p>
+                            <p className="text-xs font-bold text-slate-800">{t("limited_item_drops")}</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">{t("drops_alerts_desc")}</p>
                           </div>
                           <button
                             onClick={() => setPrefDrops(!prefDrops)}

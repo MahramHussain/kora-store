@@ -41,18 +41,18 @@ function SuccessContent() {
 
         if (!res.ok) {
           const errText = await res.text();
-          throw new Error(errText || "Verification failed");
+          throw new Error(errText || t("verification_failed"));
         }
 
         const data = await res.json();
         if (data.success) {
           clearCart();
         } else {
-          throw new Error(data.error || "Payment was not completed");
+          throw new Error(data.error || t("payment_not_completed"));
         }
       } catch (err: any) {
         console.error("Payment verification error:", err);
-        setError(err.message || "Something went wrong verifying your transaction.");
+        setError(err.message || t("checkout_verify_error"));
       } finally {
         setLoading(false);
       }

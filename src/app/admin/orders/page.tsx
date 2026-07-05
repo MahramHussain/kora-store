@@ -178,6 +178,11 @@ export default function AdminOrdersPage() {
                         📍 {order.shippingStreet}, {order.shippingCity}
                       </p>
                     )}
+                    {order.sellerNote && (
+                      <p className="text-amber-800 bg-amber-50 border border-amber-200/60 rounded-lg p-2.5 mt-2 font-bold text-[10px] uppercase tracking-wide italic">
+                        📝 Note: {order.sellerNote}
+                      </p>
+                    )}
                   </div>
 
                   {/* Ordered Items summary list */}
@@ -213,6 +218,11 @@ export default function AdminOrdersPage() {
                             {item.patch && (
                               <p className="text-[9px] text-teal-600 font-black uppercase mt-0.5 tracking-wider bg-teal-50 border border-teal-100 px-1.5 py-0.5 rounded inline-block ml-1">
                                 Patch: {item.patch}
+                              </p>
+                            )}
+                            {item.sellerNote && (
+                              <p className="text-[9px] text-amber-700 font-black uppercase mt-0.5 tracking-wider bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded inline-block ml-1">
+                                Note: {item.sellerNote}
                               </p>
                             )}
                           </div>

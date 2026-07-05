@@ -12,7 +12,7 @@ export default function CartPage() {
   const { cart, removeFromCart, updateQuantity } = useCart();
   const router = useRouter();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   
   // The state to open the fake card form
   const [showCardForm, setShowCardForm] = useState(false);
@@ -41,19 +41,19 @@ export default function CartPage() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          alert("Please log in to secure your gear.");
+          alert(t("authenticate_prompt"));
           router.push("/account"); 
           return;
         }
-        throw new Error("Checkout failed");
+        throw new Error(t("checkout_failed_error"));
       }
 
       // ---> ROUTED TO YOUR MASTERPIECE SUCCESS PAGE <---
       router.push("/success");
       
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert("Something went wrong processing your order.");
+      alert(error.message || t("checkout_failed_error"));
     } finally {
       setIsCheckingOut(false);
     }
@@ -64,7 +64,13 @@ export default function CartPage() {
       <div className="max-w-6xl mx-auto">
         
         <h1 className="text-4xl md:text-6xl font-black tracking-tighter mb-10 uppercase font-sans">
-          {t("your_store")} <span className="text-transparent bg-clip-text bg-gradient-to-r from-kora to-purple-400">{t("cart")}</span>
+          {language === "ar" ? (
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-kora to-purple-400">سلتك</span>
+          ) : (
+            <>
+              YOUR <span className="text-transparent bg-clip-text bg-gradient-to-r from-kora to-purple-400">CART</span>
+            </>
+          )}
         </h1>
 
         {cart.length === 0 ? (
@@ -91,7 +97,7 @@ export default function CartPage() {
                   
                   {/* Details */}
                   <div className="flex-1 flex flex-col justify-center py-1 sm:py-2 font-sans ltr:pr-6 rtl:pl-6 text-start">
-                    <h3 className="font-bold text-slate-900 text-sm sm:text-lg leading-tight line-clamp-2">{item.name}</h3>
+                    <h3 className="font-bold text-slate-900 text-sm sm:text-lg leading-tight line-clamp-2">{t(String(item.id)) !== String(item.id) ? t(String(item.id)) : item.name}</h3>
                     <p className="text-xs sm:text-sm text-slate-500 mt-1 flex flex-wrap items-center gap-y-1">
                       <span>{t("size_label")}: <span className="font-bold text-slate-900">{item.size}</span></span>
                       {(item.customName || item.customNumber) && (
@@ -106,20 +112,25 @@ export default function CartPage() {
                           <span>{t("patch_label")}: <span className="font-bold text-indigo-600">{item.patch}</span></span>
                         </>
                       )}
+                      {item.sellerNote && (
+                        <>
+                          <span className="mx-1 sm:mx-2 text-slate-300">•</span>
+                          <span>{t("note_label")}: <span className="font-bold text-slate-700 italic">{item.sellerNote}</span></span>
+                        </>
+                      )}
                     </p>
                     <p className="text-sm sm:text-base font-bold text-kora mt-1">{t("aed")}{parseFloat(item.price).toFixed(2)}</p>
                     
-                    {/* CART QUANTITY ADJUSTER */}
                     <div className="flex items-center gap-3 mt-3 bg-white w-max rounded-full p-1 border border-slate-200 shadow-sm">
                       <button 
-                        onClick={() => updateQuantity(item.id, item.size, item.image, item.customName, item.customNumber, item.quantity - 1, item.playerName, item.patch)} 
+                        onClick={() => updateQuantity(item.id, item.size, item.image, item.customName, item.customNumber, item.quantity - 1, item.playerName, item.patch, item.sellerNote)} 
                         className="w-7 h-7 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
                         −
                       </button>
                       <span className="font-bold text-slate-900 text-sm w-4 text-center">{item.quantity}</span>
                       <button 
-                        onClick={() => updateQuantity(item.id, item.size, item.image, item.customName, item.customNumber, item.quantity + 1, item.playerName, item.patch)} 
+                        onClick={() => updateQuantity(item.id, item.size, item.image, item.customName, item.customNumber, item.quantity + 1, item.playerName, item.patch, item.sellerNote)} 
                         className="w-7 h-7 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
                         +
@@ -129,7 +140,7 @@ export default function CartPage() {
 
                   {/* Remove Button */}
                   <button 
-                    onClick={() => removeFromCart(item.id, item.size, item.image, item.customName, item.customNumber, item.playerName, item.patch)}
+                    onClick={() => removeFromCart(item.id, item.size, item.image, item.customName, item.customNumber, item.playerName, item.patch, item.sellerNote)}
                     className="absolute top-2 ltr:right-2 rtl:left-2 sm:top-4 ltr:sm:right-4 rtl:sm:left-4 text-slate-400 hover:text-rose-600 transition-colors p-2"
                   >
                     <FaTrash />

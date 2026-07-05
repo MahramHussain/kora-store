@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaTruckFast, FaArrowRotateLeft, FaBoxOpen } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
@@ -9,6 +9,15 @@ import { useTranslation } from "@/context/LanguageContext";
 export default function ShippingReturnsPage() {
   const [activeTab, setActiveTab] = useState<"shipping" | "returns">("shipping");
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("tab") === "returns") {
+        setActiveTab("returns");
+      }
+    }
+  }, []);
 
   return (
     <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-16 pb-16 px-4 sm:px-6 md:pt-20 md:pb-20 text-start">

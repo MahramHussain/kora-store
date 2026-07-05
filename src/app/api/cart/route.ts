@@ -40,7 +40,8 @@ export async function GET(req: NextRequest) {
         customName: item.customName || undefined,
         customNumber: item.customNumber || undefined,
         playerName: item.playerName || undefined,
-        patch: item.patch || undefined
+        patch: item.patch || undefined,
+        sellerNote: item.sellerNote || undefined
       };
     });
 
@@ -77,7 +78,8 @@ export async function POST(req: NextRequest) {
             customName: item.customName || "",
             customNumber: item.customNumber || "",
             playerName: item.playerName || "",
-            patch: item.patch || ""
+            patch: item.patch || "",
+            sellerNote: item.sellerNote || ""
           }))
         });
       }

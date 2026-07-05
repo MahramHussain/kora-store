@@ -75,6 +75,7 @@ model Order {
   paymentIntentId String?  @unique
   trackingId      String?
   createdAt       DateTime @default(now())
+  sellerNote      String   @default("")
   
   // An order can have multiple different shirts/boots inside it
   items       OrderItem[]
@@ -97,6 +98,7 @@ model OrderItem {
   customNumber String  @default("")
   playerName   String  @default("")
   patch        String  @default("")
+  sellerNote   String  @default("")
 }
 
 model Review {
@@ -131,6 +133,7 @@ model CartItem {
   customNumber String   @default("")
   playerName   String   @default("")
   patch        String   @default("")
+  sellerNote   String   @default("")
 
-  @@unique([userId, productId, size, image, customName, customNumber, playerName, patch])
+  @@unique([userId, productId, size, image, customName, customNumber, playerName, patch, sellerNote])
 }

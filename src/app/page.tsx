@@ -69,6 +69,19 @@ export default async function Home() {
     return entry[lang] || entry["en"] || key;
   };
 
+  const formatTitle = (title: string) => {
+    const lastSpaceIdx = title.lastIndexOf(" ");
+    if (lastSpaceIdx === -1) return title;
+    return (
+      <>
+        {title.slice(0, lastSpaceIdx)}
+        <br className="md:hidden" />
+        <span className="hidden md:inline"> </span>
+        {title.slice(lastSpaceIdx + 1)}
+      </>
+    );
+  };
+
   // Fetch Trending World Cup Products for top carousel
   const trendingWorldCup = await prisma.product.findMany({
     where: { isWorldCup: true },
@@ -129,7 +142,7 @@ export default async function Home() {
               />
             </div>
             <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
-              {t("argentina_away_title")}
+              {formatTitle(t("argentina_away_title"))}
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
               {t("argentina_away_desc")}
@@ -146,7 +159,7 @@ export default async function Home() {
               />
             </div>
             <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
-              {t("brazil_away_title")}
+              {formatTitle(t("brazil_away_title"))}
             </h3>
             <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
               {t("brazil_away_desc")}

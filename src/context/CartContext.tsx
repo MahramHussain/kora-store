@@ -14,13 +14,14 @@ export type CartItem = {
   customNumber?: string;
   playerName?: string;
   patch?: string;
+  sellerNote?: string;
 };
 
 type CartContextType = {
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
-  removeFromCart: (id: string | number, size: string, image: string, customName?: string, customNumber?: string, playerName?: string, patch?: string) => void;
-  updateQuantity: (id: string | number, size: string, image: string, customName: string | undefined, customNumber: string | undefined, newQuantity: number, playerName?: string, patch?: string) => void;
+  removeFromCart: (id: string | number, size: string, image: string, customName?: string, customNumber?: string, playerName?: string, patch?: string, sellerNote?: string) => void;
+  updateQuantity: (id: string | number, size: string, image: string, customName: string | undefined, customNumber: string | undefined, newQuantity: number, playerName?: string, patch?: string, sellerNote?: string) => void;
   clearCart: () => void;
   cartCount: number;
 };
@@ -66,7 +67,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
                   (i.customName || "") === (localItem.customName || "") &&
                   (i.customNumber || "") === (localItem.customNumber || "") &&
                   (i.playerName || "") === (localItem.playerName || "") &&
-                  (i.patch || "") === (localItem.patch || "")
+                  (i.patch || "") === (localItem.patch || "") &&
+                  (i.sellerNote || "") === (localItem.sellerNote || "")
                 );
                 if (!existing) {
                   mergedCart.push(localItem);
@@ -108,7 +110,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           (item.customName || "") === (newItem.customName || "") &&
           (item.customNumber || "") === (newItem.customNumber || "") &&
           (item.playerName || "") === (newItem.playerName || "") &&
-          (item.patch || "") === (newItem.patch || "")
+          (item.patch || "") === (newItem.patch || "") &&
+          (item.sellerNote || "") === (newItem.sellerNote || "")
       );
 
       if (existingItem) {
@@ -119,7 +122,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           (item.customName || "") === (newItem.customName || "") &&
           (item.customNumber || "") === (newItem.customNumber || "") &&
           (item.playerName || "") === (newItem.playerName || "") &&
-          (item.patch || "") === (newItem.patch || "")
+          (item.patch || "") === (newItem.patch || "") &&
+          (item.sellerNote || "") === (newItem.sellerNote || "")
             ? { ...item, quantity: item.quantity + newItem.quantity }
             : item
         );
@@ -128,7 +132,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const removeFromCart = (id: string | number, size: string, image: string, customName?: string, customNumber?: string, playerName?: string, patch?: string) => {
+  const removeFromCart = (id: string | number, size: string, image: string, customName?: string, customNumber?: string, playerName?: string, patch?: string, sellerNote?: string) => {
     setCart((prevCart) => prevCart.filter((item) => 
       !(item.id === id && 
         item.size === size && 
@@ -136,16 +140,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
         (item.customName || "") === (customName || "") &&
         (item.customNumber || "") === (customNumber || "") &&
         (item.playerName || "") === (playerName || "") &&
-        (item.patch || "") === (patch || "")
+        (item.patch || "") === (patch || "") &&
+        (item.sellerNote || "") === (sellerNote || "")
       )
     ));
   };
 
   // THE NEW QUANTITY ENGINE
-  const updateQuantity = (id: string | number, size: string, image: string, customName: string | undefined, customNumber: string | undefined, newQuantity: number, playerName?: string, patch?: string) => {
+  const updateQuantity = (id: string | number, size: string, image: string, customName: string | undefined, customNumber: string | undefined, newQuantity: number, playerName?: string, patch?: string, sellerNote?: string) => {
     if (newQuantity <= 0) {
       // If they drop the quantity to 0, just remove it entirely
-      removeFromCart(id, size, image, customName, customNumber, playerName, patch);
+      removeFromCart(id, size, image, customName, customNumber, playerName, patch, sellerNote);
       return;
     }
     setCart((prevCart) =>
@@ -156,7 +161,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         (item.customName || "") === (customName || "") &&
         (item.customNumber || "") === (customNumber || "") &&
         (item.playerName || "") === (playerName || "") &&
-        (item.patch || "") === (patch || "")
+        (item.patch || "") === (patch || "") &&
+        (item.sellerNote || "") === (sellerNote || "")
           ? { ...item, quantity: newQuantity } 
           : item
       )

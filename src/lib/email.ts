@@ -11,6 +11,7 @@ interface EmailItem {
   customNumber?: string;
   playerName?: string;
   patch?: string;
+  sellerNote?: string;
 }
 
 interface SendOrderEmailParams {
@@ -23,6 +24,7 @@ interface SendOrderEmailParams {
   discount: string;
   total: string;
   shippingAddress: string;
+  sellerNote?: string;
 }
 
 export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
@@ -42,6 +44,9 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
         }
         if (item.patch) {
           printInfo += `<br/><span style="color: #0d9488; font-weight: bold; font-size: 12px;">Patch: ${item.patch}</span>`;
+        }
+        if (item.sellerNote) {
+          printInfo += `<br/><span style="color: #475569; font-style: italic; font-size: 12px;">Note: ${item.sellerNote}</span>`;
         }
         return `
           <tr>
@@ -134,6 +139,16 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
             <h3 style="margin: 0 0 8px 0; font-weight: 800; text-transform: uppercase; color: #0f172a; font-size: 11px; letter-spacing: 0.05em;">Delivery Destination</h3>
             <p style="margin: 0; color: #475569; line-height: 1.5;">${params.shippingAddress}</p>
           </div>
+
+          <!-- Seller Note (if present) -->
+          ${
+            params.sellerNote
+              ? `<div style="margin-top: 16px; background-color: #fffbeb; border: 1px solid #fef3c7; padding: 16px; border-radius: 16px; font-size: 13px;">
+                  <h3 style="margin: 0 0 8px 0; font-weight: 800; text-transform: uppercase; color: #b45309; font-size: 11px; letter-spacing: 0.05em;">Special Instructions / Requests</h3>
+                  <p style="margin: 0; color: #78350f; line-height: 1.5; font-style: italic;">${params.sellerNote}</p>
+                 </div>`
+              : ""
+          }
         </div>
 
         <!-- Footer -->

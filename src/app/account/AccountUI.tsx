@@ -100,7 +100,7 @@ export default function AccountUI({ user, orders, banned = false }: { user: any;
                     <div key={order.id} onClick={() => setExpandedOrderId(isExpanded ? null : order.id)} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-6 flex flex-col hover:border-kora/50 transition-all duration-300 cursor-pointer group">
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 text-start">
                         <div className="text-start">
-                          <div className="text-kora text-xs font-bold uppercase tracking-widest mb-1">Order #{order.referenceNumber || order.id.slice(-6).toUpperCase()}</div>
+                          <div className="text-kora text-xs font-bold uppercase tracking-widest mb-1">{t("order_prefix")} #{order.referenceNumber || order.id.slice(-6).toUpperCase()}</div>
                           <div className="text-slate-800 font-bold mb-2">{new Date(order.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
                           <div className="flex -space-x-3">
                             {order.items.slice(0, 3).map((item: any, idx: number) => (
@@ -167,9 +167,9 @@ export default function AccountUI({ user, orders, banned = false }: { user: any;
           </div>
 
           <h1 className="text-4xl xl:text-5xl font-black text-white uppercase tracking-tighter leading-tight mb-6">
-            YOUR GEAR.<br />
-            <span className="text-gradient-kora">YOUR STORE.</span><br />
-            <span style={{ WebkitTextStroke: "1.5px rgba(168,85,247,0.5)", WebkitTextFillColor: "transparent" }}>DELIVERED.</span>
+            {t("your_gear_title")}<br />
+            <span className="text-gradient-kora">{t("your_store_hero")}</span><br />
+            <span style={{ WebkitTextStroke: "1.5px rgba(168,85,247,0.5)", WebkitTextFillColor: "transparent" }}>{t("delivered_hero")}</span>
           </h1>
 
           <p className="text-slate-400 text-base leading-relaxed mb-10 max-w-sm">
@@ -179,9 +179,9 @@ export default function AccountUI({ user, orders, banned = false }: { user: any;
           {/* Trust pillars */}
           <div className="space-y-4">
             {[
-              { icon: <FaTruckFast className="text-purple-400" />, label: t("uae_delivery_48"), sub: "Local stock, zero delays" },
-              { icon: <FaShieldAlt className="text-purple-400" />, label: t("guarantee_7day"), sub: "Quality checked before dispatch" },
-              { icon: <FaCheckCircle className="text-purple-400" />, label: t("premium_quality_label"), sub: "1:1 grade sourced direct" },
+              { icon: <FaTruckFast className="text-purple-400" />, label: t("uae_delivery_48"), sub: t("local_stock_zero_delays") },
+              { icon: <FaShieldAlt className="text-purple-400" />, label: t("guarantee_7day"), sub: t("quality_checked_dispatch") },
+              { icon: <FaCheckCircle className="text-purple-400" />, label: t("premium_quality_label"), sub: t("one_to_one_sourced") },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-4 text-start">
                 <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-base shrink-0">

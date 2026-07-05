@@ -10,13 +10,18 @@ import { FaShieldAlt } from "react-icons/fa";
 import dynamic from "next/dynamic";
 import { useTranslation } from "@/context/LanguageContext";
 
+function MapPickerLoading() {
+  const { t } = useTranslation();
+  return (
+    <div className="w-full h-48 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-center text-xs font-bold uppercase text-slate-400 tracking-wider">
+      {t("loading_map")}
+    </div>
+  );
+}
+
 const MapPicker = dynamic(() => import("@/components/MapPicker"), {
   ssr: false,
-  loading: () => (
-    <div className="w-full h-48 rounded-2xl border border-slate-200 bg-slate-50 flex items-center justify-center text-xs font-bold uppercase text-slate-400 tracking-wider">
-      Loading Delivery Map...
-    </div>
-  )
+  loading: () => <MapPickerLoading />
 });
 
 export default function CheckoutPage() {
@@ -25,6 +30,8 @@ export default function CheckoutPage() {
   const { t } = useTranslation();
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal" | "cod">("card");
+  const [globalSellerNote, setGlobalSellerNote] = useState("");
+  const [agreedToPolicy, setAgreedToPolicy] = useState(false);
 
   const hasPersonalizedItem = cart.some(
     (item) => isCustomJersey(item)
@@ -84,13 +91,13 @@ export default function CheckoutPage() {
     const code = promoCode.trim().toUpperCase();
     if (code === "KORA10") {
       setDiscountPercent(0.10);
-      setPromoMessage("10% Off Applied!");
+      setPromoMessage(t("promo_10_applied"));
     } else if (code === "KORA20") {
       setDiscountPercent(0.20);
-      setPromoMessage("20% Off Applied!");
+      setPromoMessage(t("promo_20_applied"));
     } else {
       setDiscountPercent(0);
-      setPromoMessage("Invalid promo code.");
+      setPromoMessage(t("invalid_promo"));
     }
   };
 
@@ -187,7 +194,7 @@ export default function CheckoutPage() {
     // 1. Validate First Name and Last Name (Only letters, spaces, hyphens, and apostrophes)
     const nameRegex = /^[a-zA-Z\s'-]+$/;
     if (!nameRegex.test(shippingFirstName.trim())) {
-      setError("First Name can only contain letters, spaces, hyphens, or apostrophes.");
+      setError(t("firstname_validation_error"));
       setIsProcessing(false);
       if (typeof window !== "undefined") {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -195,7 +202,7 @@ export default function CheckoutPage() {
       return;
     }
     if (!nameRegex.test(shippingLastName.trim())) {
-      setError("Last Name can only contain letters, spaces, hyphens, or apostrophes.");
+      setError(t("lastname_validation_error"));
       setIsProcessing(false);
       if (typeof window !== "undefined") {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -209,7 +216,16 @@ export default function CheckoutPage() {
     const localUaePhoneRegex = /^0(?:5[024568]\d{7}|[234679]\d{7})$/;
 
     if (!uaePhoneRegex.test(cleanPhone) && !localUaePhoneRegex.test(cleanPhone)) {
-      setError("Please enter a valid UAE phone number (e.g. +971 50 123 4567 or 050 123 4567).");
+      setError(t("phone_validation_error"));
+      setIsProcessing(false);
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+
+    if (!agreedToPolicy) {
+      setError(t("exchange_policy_required_error") || "You must agree to the Exchange Policy to proceed.");
       setIsProcessing(false);
       if (typeof window !== "undefined") {
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -236,13 +252,14 @@ export default function CheckoutPage() {
           discountAmount: discountAmount,
           shippingFee: shippingCharge,
           tax: 0,
-          coordinates: locationCoords
+          coordinates: locationCoords,
+          sellerNote: globalSellerNote.trim()
         })
       });
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(errorText || "Checkout failed. Please inspect your cart.");
+        throw new Error(errorText || t("checkout_failed_inspect_cart"));
       }
 
       const orderData = await response.json();
@@ -259,7 +276,7 @@ export default function CheckoutPage() {
       }
     } catch (err: any) {
       console.error("[CHECKOUT_SUBMIT_ERROR]", err);
-      setError(err.message || "An unexpected error occurred. Please try again.");
+      setError(err.message || t("unexpected_error"));
       setIsProcessing(false);
       
       // Smoothly scroll to the top of the form so the error banner is visible
@@ -296,6 +313,18 @@ export default function CheckoutPage() {
             
             <form id="checkout-form" onSubmit={handlePlaceOrder} className="space-y-10">
               
+              {/* 0. Note for Seller (Optional) - Global */}
+              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm text-start animate-fade-in-up">
+                <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider">{t("note_for_seller_title")}</h2>
+                <textarea
+                  value={globalSellerNote}
+                  onChange={(e) => setGlobalSellerNote(e.target.value)}
+                  placeholder={t("note_for_seller_global_placeholder")}
+                  className="w-full bg-white border border-slate-200 rounded-2xl p-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-xs resize-none h-24 text-start font-sans"
+                  maxLength={1000}
+                />
+              </div>
+
               {/* 1. Payment Method (Moved to Top) */}
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm text-start">
                 <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider">{t("payment_method_title")}</h2>
@@ -417,7 +446,7 @@ export default function CheckoutPage() {
                       value={shippingStreetAddress}
                       onChange={(e) => setShippingStreetAddress(e.target.value)}
                       className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" 
-                      placeholder="Villa/Apartment, Street Name" 
+                      placeholder={t("villa_apartment_placeholder")} 
                     />
                   </div>
                   <div>
@@ -428,12 +457,13 @@ export default function CheckoutPage() {
                       onChange={(e) => setShippingCity(e.target.value)}
                       className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors appearance-none shadow-sm cursor-pointer"
                     >
-                      <option className="bg-white">Dubai</option>
-                      <option className="bg-white">Abu Dhabi</option>
-                      <option className="bg-white">Sharjah</option>
-                      <option className="bg-white">Fujairah</option>
-                      <option className="bg-white">Ajman</option>
-                      <option className="bg-white">Ras Al Khaimah</option>
+                      <option className="bg-white" value="Dubai">{t("dubai")}</option>
+                      <option className="bg-white" value="Abu Dhabi">{t("abu_dhabi")}</option>
+                      <option className="bg-white" value="Sharjah">{t("sharjah")}</option>
+                      <option className="bg-white" value="Fujairah">{t("fujairah")}</option>
+                      <option className="bg-white" value="Ajman">{t("ajman")}</option>
+                      <option className="bg-white" value="Ras Al Khaimah">{t("ras_al_khaimah")}</option>
+                      <option className="bg-white" value="Umm Al Quwain">{t("umm_al_quwain")}</option>
                     </select>
                   </div>
                   <div>
@@ -467,7 +497,7 @@ export default function CheckoutPage() {
                        <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
                     </div>
                     <div className="flex-1 flex flex-col justify-center text-start">
-                      <h3 className="font-bold text-slate-900 text-sm line-clamp-1">{item.name}</h3>
+                      <h3 className="font-bold text-slate-900 text-sm line-clamp-1">{t(String(item.id)) !== String(item.id) ? t(String(item.id)) : item.name}</h3>
                       <p className="text-[11px] text-slate-500 mt-0.5">
                         {t("size_label")}: <span className="font-semibold text-slate-800">{item.size}</span>
                         {(item.customName || item.customNumber) && (
@@ -541,9 +571,31 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center border-t border-slate-200 pt-6 mb-8 text-start">
+              <div className="flex justify-between items-center border-t border-slate-200 pt-6 mb-6 text-start">
                 <span className="font-bold text-slate-900 text-lg uppercase tracking-wider">{t("total_label")}</span>
                 <span className="text-4xl font-black text-slate-900 font-sans">{t("aed")}{finalTotal.toFixed(2)}</span>
+              </div>
+
+              {/* Exchange Policy Checkbox */}
+              <div className="mb-6 flex items-start gap-3 text-start">
+                <input
+                  type="checkbox"
+                  id="agree-exchange-policy"
+                  checked={agreedToPolicy}
+                  onChange={(e) => setAgreedToPolicy(e.target.checked)}
+                  className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 text-kora focus:ring-kora cursor-pointer"
+                />
+                <label htmlFor="agree-exchange-policy" className="text-xs text-slate-600 font-bold leading-normal select-none cursor-pointer">
+                  {t("exchange_policy_agree_pre")}{" "}
+                  <a
+                    href="/shipping?tab=returns"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-kora hover:underline font-extrabold"
+                  >
+                    {t("exchange_policy_link_text")}
+                  </a>
+                </label>
               </div>
 
               <button 

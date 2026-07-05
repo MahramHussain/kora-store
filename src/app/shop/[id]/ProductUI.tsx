@@ -370,6 +370,7 @@ export default function ProductUI({ product }: { product: any }) {
   const [customName, setCustomName] = useState("");
   const [customNumber, setCustomNumber] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [sellerNote, setSellerNote] = useState("");
   const { addToCart } = useCart();
   const { user: clerkUser } = useUser();
   const currentUserId = clerkUser?.id;
@@ -385,6 +386,7 @@ export default function ProductUI({ product }: { product: any }) {
   const hasFifaPatch = leftSleevePatch !== "" || rightSleevePatch !== "";
   const [selectedPresetPlayer, setSelectedPresetPlayer] = useState<{ name: string; number: string } | null>(null);
   const presetPlayers = getPresetPlayersForProduct(product.name);
+  const isKit = product.category === "Shirts" || product.category === "Retro Kits";
 
   const handleSelectPresetPlayer = (player: { name: string; number: string }) => {
     if (selectedPresetPlayer?.name === player.name) {
@@ -410,7 +412,7 @@ export default function ProductUI({ product }: { product: any }) {
   };
 
   const renderDesktopPersonalizationBox = () => {
-    if (product.category !== "Shirts") return null;
+    if (!isKit) return null;
 
     const playerOptions = presetPlayers.map((player: { name: string; number: string }) => ({
       value: JSON.stringify(player),
@@ -429,7 +431,7 @@ export default function ProductUI({ product }: { product: any }) {
 
             <div>
               <h3 className="text-slate-900 font-extrabold text-base leading-tight">{t("name_number_printing")}</h3>
-              <p className="text-slate-400 text-xs mt-1">Add the name of your favorite player or any custom name available in official font</p>
+              <p className="text-slate-400 text-xs mt-1">{t("name_number_printing_desc")}</p>
             </div>
           </div>
 
@@ -578,7 +580,7 @@ export default function ProductUI({ product }: { product: any }) {
   };
 
   const renderPersonalizationBox = () => {
-    if (product.category !== "Shirts") return null;
+    if (!isKit) return null;
 
     const playerOptions = presetPlayers.map((player: { name: string; number: string }) => ({
       value: JSON.stringify(player),
@@ -763,8 +765,8 @@ export default function ProductUI({ product }: { product: any }) {
     ? Math.round((positiveReviewsCount / product.reviews.length) * 100)
     : 100;
 
-  const isPreset = selectedPresetPlayer !== null;
-  const hasCustomPrint = customName.trim() !== "" || customNumber.trim() !== "";
+  const isPreset = isKit && selectedPresetPlayer !== null;
+  const hasCustomPrint = isKit && (customName.trim() !== "" || customNumber.trim() !== "");
   const printUpcharge = hasCustomPrint ? (isPreset ? 15 : 25) : 0;
 
   // Filter reviews based on current rating selection
@@ -838,10 +840,10 @@ export default function ProductUI({ product }: { product: any }) {
     const basePrice = parseFloat(product.price);
     const hasCustomPrint = finalName !== "" || finalNumber !== "";
     const isPreset = selectedPresetPlayer !== null;
-    const printUpcharge = hasCustomPrint ? (isPreset ? 15 : 25) : 0;
-    const finalPrice = basePrice + (hasFifaPatch ? 10 : 0) + printUpcharge;
+    const printUpcharge = isKit && hasCustomPrint ? (isPreset ? 15 : 25) : 0;
+    const finalPrice = basePrice + (isKit && hasFifaPatch ? 10 : 0) + printUpcharge;
 
-    const patchString = hasFifaPatch
+    const patchString = isKit && hasFifaPatch
       ? [
           leftSleevePatch ? `Left: ${leftSleevePatch}` : "",
           rightSleevePatch ? `Right: ${rightSleevePatch}` : ""
@@ -859,6 +861,7 @@ export default function ProductUI({ product }: { product: any }) {
       customNumber: finalNumber || undefined,
       playerName: selectedPresetPlayer?.name || undefined,
       patch: patchString || (hasFifaPatch ? "FIFA World Cup Badge Set" : undefined),
+      sellerNote: sellerNote.trim() || undefined,
     });
     
     setIsAdded(true);
@@ -868,6 +871,7 @@ export default function ProductUI({ product }: { product: any }) {
     setLeftSleevePatch("");
     setRightSleevePatch("");
     setPersonalizationTab("none");
+    setSellerNote("");
     setTimeout(() => setIsAdded(false), 2000);
   };
 
@@ -891,7 +895,7 @@ export default function ProductUI({ product }: { product: any }) {
   };
 
   const handleDeleteReview = async (reviewId: string) => {
-    if (!confirm("Are you sure you want to delete this review permanently?")) return;
+    if (!confirm(t("confirm_delete_review"))) return;
     try {
       const res = await fetch(`/api/reviews?reviewId=${reviewId}`, {
         method: "DELETE",
@@ -994,26 +998,25 @@ export default function ProductUI({ product }: { product: any }) {
   // ──────────────────────────────────────────────────────────────────────────
   const MobileView = (
     <div className="block md:hidden min-h-screen bg-slate-50 font-sans selection:bg-kora selection:text-white">
-      {/* ── Back button overlay ── */}
-      <div className="fixed top-0 left-0 right-0 z-40 px-4 pt-safe">
-        <div className="flex items-center justify-between py-3">
-          <Link
-            href="/shop"
-            className="w-10 h-10 rounded-full bg-white/80 backdrop-blur-sm shadow-sm border border-white/50 flex items-center justify-center text-slate-700 active:scale-90 transition-transform"
-          >
-            <FaChevronLeft className="text-sm" />
-          </Link>
-          {/* Stock badge */}
-          {product.stock === 0 ? (
-            <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 bg-rose-500 text-white rounded-full shadow">
-              {t("sold_out")}
-            </span>
-          ) : product.stock <= 3 ? (
-            <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 bg-amber-500 text-white rounded-full shadow animate-pulse">
-              {t("only_left").replace("{count}", String(product.stock))}
-            </span>
-          ) : null}
-        </div>
+      {/* ── Back button in normal flow ── */}
+      <div className="bg-white border-b border-slate-200/60 px-4 py-3.5 flex items-center justify-between font-sans">
+        <Link
+          href="/shop"
+          className="inline-flex items-center gap-2 text-xs font-black text-slate-500 hover:text-kora transition-colors uppercase tracking-wider"
+        >
+          <FaChevronLeft className="text-[10px]" />
+          <span>{t("back_to_shop")}</span>
+        </Link>
+        {/* Stock badge */}
+        {product.stock === 0 ? (
+          <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-1.5 bg-rose-500 text-white rounded-full shadow-xs">
+            {t("sold_out")}
+          </span>
+        ) : product.stock <= 3 ? (
+          <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-1.5 bg-amber-500 text-white rounded-full shadow-xs animate-pulse">
+            {t("only_left").replace("{count}", String(product.stock))}
+          </span>
+        ) : null}
       </div>
 
       {/* ── Full-bleed swipeable image gallery ── */}
@@ -1072,7 +1075,7 @@ export default function ProductUI({ product }: { product: any }) {
         <div className="mb-4">
           <span className="text-kora text-[10px] font-bold uppercase tracking-widest">{categoryLabel}</span>
           <h1 className="text-2xl font-black tracking-tight text-slate-900 leading-tight mt-1 uppercase">
-            {product.name}
+            {t(product.id) !== product.id ? t(product.id) : product.name}
           </h1>
           <div className="flex items-center gap-3 mt-2">
             <div className="flex text-yellow-400 text-xs gap-0.5">
@@ -1092,7 +1095,7 @@ export default function ProductUI({ product }: { product: any }) {
         {/* Price + Stock */}
         <div className="flex items-center justify-between mb-5 pb-5 border-b border-slate-100">
           <span className="text-3xl font-black text-slate-900">
-            {t("aed")}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + printUpcharge}
+            {t("aed")}{parseFloat(product.price) + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
           </span>
           {product.stock === 0 ? (
             <span className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-full">
@@ -1198,10 +1201,24 @@ export default function ProductUI({ product }: { product: any }) {
         {/* Custom Printing (Shirts only) */}
         {renderPersonalizationBox()}
 
+        {/* Note For Seller */}
+        <div className="mb-6 text-start">
+          <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+            {t("note_for_seller_title")}
+          </label>
+          <textarea
+            value={sellerNote}
+            onChange={(e) => setSellerNote(e.target.value)}
+            placeholder={t("note_for_seller_item_placeholder")}
+            className="w-full bg-white border border-slate-200 rounded-xl p-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-xs resize-none h-20 text-start"
+            maxLength={500}
+          />
+        </div>
+
         {/* Description */}
         <div className="mb-6">
           <p className="text-sm text-slate-500 leading-relaxed">
-            {product.description || t("premium_gear_sourced")}
+            {t(product.id + "_desc") !== product.id + "_desc" ? t(product.id + "_desc") : (product.description || t("premium_gear_sourced"))}
           </p>
         </div>
 
@@ -1275,10 +1292,10 @@ export default function ProductUI({ product }: { product: any }) {
                     <li>{t("policy_detail_3")}</li>
                     <li>{t("policy_detail_4")}</li>
                   </ul>
-                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-3 flex items-center justify-between border-t border-slate-200/60 pt-2.5 text-start">
+                  <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-3 flex flex-col gap-1.5 border-t border-slate-200/60 pt-2.5 text-start">
                     <span>⏱️ {t("claim_window_title")}</span>
-                    <span className="text-kora">{t("processing_time_title")}</span>
-                  </p>
+                    <span className="text-kora">📦 {t("processing_time_title")}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1759,23 +1776,23 @@ export default function ProductUI({ product }: { product: any }) {
               </div>
 
               {/* Trust Badges */}
-              <div className="grid grid-cols-2 gap-4 text-start">
-                <div className="bg-slate-50 border border-slate-200/60 rounded-3xl p-5 flex items-center gap-4 hover:border-kora/20 transition-all duration-300 group shadow-xs text-start">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-kora text-xl shadow-xs group-hover:scale-110 transition-transform shrink-0">
+              <div className="grid grid-cols-1 gap-4 text-start">
+                <div className="bg-slate-50 border border-slate-200/60 rounded-3xl py-7 px-6 flex items-center gap-5 hover:border-kora/20 transition-all duration-300 group shadow-xs text-start">
+                  <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-kora text-2xl shadow-xs group-hover:scale-110 transition-transform shrink-0">
                     <FaTruckFast />
                   </div>
                   <div>
-                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-[11px]">{t("uae_delivery_48")}</h4>
-                    <p className="text-slate-400 text-xs mt-0.5">Local warehouse dispatch</p>
+                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs sm:text-sm">{t("uae_delivery_48")}</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm mt-1">{t("local_warehouse_dispatch")}</p>
                   </div>
                 </div>
-                <div className="bg-slate-50 border border-slate-200/60 rounded-3xl p-5 flex items-center gap-4 hover:border-kora/20 transition-all duration-300 group shadow-xs text-start">
-                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-kora text-xl shadow-xs group-hover:scale-110 transition-transform shrink-0">
+                <div className="bg-slate-50 border border-slate-200/60 rounded-3xl py-7 px-6 flex items-center gap-5 hover:border-kora/20 transition-all duration-300 group shadow-xs text-start">
+                  <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-kora text-2xl shadow-xs group-hover:scale-110 transition-transform shrink-0">
                     <FaShieldAlt />
                   </div>
                   <div>
-                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-[11px]">{t("guarantee_7day")}</h4>
-                    <p className="text-slate-400 text-xs mt-0.5">Pre-shipping quality checks</p>
+                    <h4 className="text-slate-900 font-black uppercase tracking-wider text-xs sm:text-sm">{t("guarantee_7day")}</h4>
+                    <p className="text-slate-500 text-xs sm:text-sm mt-1">{t("pre_shipping_quality_checks")}</p>
                   </div>
                 </div>
               </div>
@@ -1792,7 +1809,7 @@ export default function ProductUI({ product }: { product: any }) {
 
             {/* Title */}
             <h1 className="text-3xl xl:text-4xl font-black tracking-tight text-slate-900 mb-3.5 uppercase leading-none font-display text-start">
-              {product.name}
+              {t(product.id) !== product.id ? t(product.id) : product.name}
             </h1>
 
             {/* Ratings Header */}
@@ -1824,7 +1841,7 @@ export default function ProductUI({ product }: { product: any }) {
               <div className="flex flex-col">
                 <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5">{t("price_label")}</span>
                 <span className="text-3xl font-extrabold text-slate-900 font-display">
-                  {t("aed")}{parseFloat(product.price) + (hasFifaPatch ? 10 : 0) + printUpcharge}
+                  {t("aed")}{parseFloat(product.price) + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
                 </span>
               </div>
               <div>
@@ -1849,14 +1866,14 @@ export default function ProductUI({ product }: { product: any }) {
 
             {/* Product Description */}
             <p className="text-slate-600 leading-relaxed text-sm font-sans mb-8">
-              {product.description || t("premium_gear_sourced")}
+              {t(product.id + "_desc") !== product.id + "_desc" ? t(product.id + "_desc") : (product.description || t("premium_gear_sourced"))}
             </p>
 
             {/* Style Variation Selector (Boots) */}
             {product.category === "Boots" && images.length > 0 && (
               <div className="mb-8 font-sans">
                 <h3 className="text-slate-950 font-black uppercase tracking-wider text-xs mb-3.5">
-                  Select Style / Variation
+                  {t("style_variation")}
                 </h3>
                 <div className="flex flex-wrap gap-3">
                   {images.map((img: string, i: number) => (
@@ -1921,6 +1938,20 @@ export default function ProductUI({ product }: { product: any }) {
 
             {/* Custom Personalization (Shirts Only) */}
             {renderDesktopPersonalizationBox()}
+
+            {/* Note For Seller */}
+            <div className="mb-8 text-start">
+              <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                {t("note_for_seller_title")}
+              </label>
+              <textarea
+                value={sellerNote}
+                onChange={(e) => setSellerNote(e.target.value)}
+                placeholder={t("note_for_seller_item_placeholder")}
+                className="w-full bg-white border border-slate-200 rounded-xl p-3.5 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors text-xs resize-none h-20 text-start"
+                maxLength={500}
+              />
+            </div>
 
             {/* Add to Cart Row */}
             <div className="flex gap-4 mb-8 h-14 font-sans">
@@ -2219,7 +2250,7 @@ export default function ProductUI({ product }: { product: any }) {
                           {review.hasPurchased && !isReviewerAdmin && (
                             <div className="absolute right-6 bottom-4 opacity-[0.03] pointer-events-none select-none">
                               <span className="text-4xl font-black tracking-widest text-slate-900 uppercase border-4 border-slate-900 px-3 py-1 rounded-xl transform rotate-12 inline-block">
-                                VERIFIED ORDER
+                                {t("verified_order")}
                               </span>
                             </div>
                           )}
@@ -2471,7 +2502,7 @@ export default function ProductUI({ product }: { product: any }) {
             {/* Header */}
             <div className="mb-6 text-start">
               <span className="text-[10px] font-black uppercase text-kora tracking-widest bg-kora/10 px-2.5 py-0.5 rounded-sm">{t("official_spec")}</span>
-              <h3 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight mt-1 text-start">{product.name} {t("size_chart")}</h3>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight mt-1 text-start">{t(product.id) !== product.id ? t(product.id) : product.name} {t("size_chart")}</h3>
               <p className="text-slate-400 text-xs mt-1 text-start">{t("size_chart_desc")}</p>
             </div>
 

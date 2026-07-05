@@ -512,5 +512,228 @@ export const translations = {
   "length_in": { en: "Length (in)", ar: "الطول (بوصة)" },
   "length_cm": { en: "Length (cm)", ar: "الطول (سم)" },
   "size_chart_footer_note": { en: "These measurements are taken when the jersey is laid flat. Sizing is standard athletic fit. If you prefer a looser style or select a Player Issue kit, we suggest ordering one size larger than your usual fit.", ar: "تؤخذ هذه القياسات عندما يكون القميص مفروداً بشكل مسطح. المقاسات تتبع القصة الرياضية القياسية. إذا كنت تفضل قصة أكثر اتساعاً أو اخترت نسخة اللاعبين (Player Issue)، نقترح طلب مقاس أكبر بدرجة واحدة من مقاسك المعتاد." },
-  "note_label": { en: "Note", ar: "ملاحظة" }
+  "note_label": { en: "Note", ar: "ملاحظة" },
+
+  // PDP note / print keys
+  "note_for_seller_title": { en: "NOTE FOR SELLER (optional)", ar: "ملاحظة للبائع (اختياري)" },
+  "note_for_seller_item_placeholder": { en: "Any special instructions for this item...", ar: "أي تعليمات خاصة بهذا المنتج..." },
+  "note_for_seller_global_placeholder": { en: "Any special requests or instructions...", ar: "أي طلبات أو تعليمات خاصة..." },
+  "exchange_policy_agree_pre": { en: "I agree to the", ar: "لقد اطلعت وأوافق على" },
+  "exchange_policy_link_text": { en: "Exchange Policy", ar: "سياسة الاستبدال" },
+  "exchange_policy_required_error": { en: "You must agree to the Exchange Policy to proceed.", ar: "يجب عليك الموافقة على سياسة الاستبدال للمتابعة." },
+  "size_label": { en: "Size", ar: "المقاس" },
+  "print_label": { en: "Print", ar: "الطباعة" },
+  "patch_label": { en: "Patch", ar: "الشارة" },
+
+  // StatusTimeline steps
+  "step_order_confirmed": { en: "Order Confirmed", ar: "تم تأكيد الطلب" },
+  "step_order_accepted": { en: "Order accepted", ar: "تم قبول الطلب" },
+  "step_quality_checks": { en: "Quality Checks", ar: "فحص الجودة" },
+  "step_qc_verified": { en: "1:1 grade verified", ar: "تم التحقق من درجة 1:1" },
+  "step_shipped": { en: "Shipped", ar: "تم الشحن" },
+  "step_on_way_hub": { en: "On way to Dubai hub", ar: "في الطريق إلى مركز دبي" },
+  "step_delivered": { en: "Delivered", ar: "تم التوصيل" },
+  "step_delivered_address": { en: "Delivered to address", ar: "تم التوصيل إلى العنوان" },
+
+  // Status badge translations
+  "status_processing": { en: "Processing", ar: "قيد المعالجة" },
+  "status_shipped": { en: "Shipped", ar: "تم الشحن" },
+  "status_delivered": { en: "Delivered", ar: "تم التوصيل" },
+
+  // Profile hero
+  "member_since_prefix": { en: "Member since", ar: "عضو منذ" },
+  "loyalty_xp": { en: "Loyalty XP", ar: "نقاط الولاء" },
+  "ultimate_collector_status": { en: "🎖️ Ultimate Collector status achieved", ar: "🎖️ تم تحقيق مرتبة الجامع المميز" },
+  "spend_to_unlock": { en: "💡 Spend more to unlock {rank}", ar: "💡 أنفق المزيد لفتح {rank}" },
+  "max_rank_unlocked": { en: "Max Rank Unlocked", ar: "تم فتح أعلى مرتبة" },
+
+  // Overview tab
+  "placed_on": { en: "Placed on", ar: "تم الطلب في" },
+  "and_other_items": { en: "& {count} other item(s)", ar: "و {count} منتجات أخرى" },
+  "quantity_units": { en: "Quantity: {count} units", ar: "الكمية: {count} وحدة" },
+  "manage_drop": { en: "Manage Drop", ar: "إدارة الطلب" },
+  "order_history_empty": { en: "Your order history is empty. Place your first order to get started.", ar: "سجل طلباتك فارغ. قم بتقديم أول طلب للبدء." },
+  "browse_the_shop": { en: "Browse The Shop", ar: "تصفح المتجر" },
+  "loyalty_elite": { en: "Elite", ar: "النخبة" },
+  "loyalty_legend": { en: "Legend", ar: "أسطورة" },
+  "loyalty_rookie": { en: "Rookie", ar: "مبتدئ" },
+  "premium_gear": { en: "Premium Gear", ar: "معدات فاخرة" },
+
+  // Orders tab
+  "order_history_title": { en: "Order History", ar: "سجل الطلبات" },
+  "total_drops_registered": { en: "{count} total order drops registered", ar: "{count} طلبات مسجلة" },
+  "search_orders_placeholder": { en: "Search by order ID or items...", ar: "البحث بمعرف الطلب أو المنتج..." },
+  "all_drops": { en: "All Drops", ar: "جميع الطلبات" },
+  "processing_filter": { en: "Processing", ar: "قيد المعالجة" },
+  "shipped_filter": { en: "Shipped", ar: "تم الشحن" },
+  "delivered_filter": { en: "Delivered", ar: "تم التوصيل" },
+  "total_amount": { en: "Total Amount", ar: "المبلغ الإجمالي" },
+  "items_label": { en: "items", ar: "منتجات" },
+  "delivery_status_progress": { en: "Delivery Status Progress", ar: "تقدم حالة التوصيل" },
+  "secured_products": { en: "Secured Products", ar: "المنتجات المؤمنة" },
+  "size_colon": { en: "Size:", ar: "المقاس:" },
+  "preset_player_label": { en: "Preset Player:", ar: "لاعب محدد:" },
+  "custom_print_label": { en: "Custom Print:", ar: "طباعة مخصصة:" },
+  "patch_colon": { en: "Patch:", ar: "الشارة:" },
+  "note_colon": { en: "Note:", ar: "ملاحظة:" },
+  "qty_colon": { en: "Qty:", ar: "الكمية:" },
+  "shipping_address_label": { en: "Shipping Address", ar: "عنوان الشحن" },
+  "recipient_colon": { en: "Recipient:", ar: "المستلم:" },
+  "phone_colon": { en: "Phone:", ar: "الهاتف:" },
+  "address_colon": { en: "Address:", ar: "العنوان:" },
+  "payment_label": { en: "Payment:", ar: "الدفع:" },
+  "seller_note_label": { en: "Seller Note:", ar: "ملاحظة البائع:" },
+  "track_package": { en: "Track Package", ar: "تتبع الشحنة" },
+  "get_help": { en: "Get Help", ar: "احصل على مساعدة" },
+  "items_subtotal": { en: "Items Subtotal", ar: "مجموع المنتجات" },
+  "delivery_charges": { en: "Delivery Charges", ar: "رسوم التوصيل" },
+  "vat_5": { en: "VAT (5%)", ar: "ضريبة القيمة المضافة (5%)" },
+  "net_total": { en: "Net Total", ar: "الإجمالي الصافي" },
+  "no_matching_orders": { en: "No matching order drops found.", ar: "لم يتم العثور على طلبات مطابقة." },
+  "try_clearing_filters": { en: "Try clearing filters or checking other query strings.", ar: "حاول مسح الفلاتر أو البحث بكلمات أخرى." },
+
+  // Settings tab
+  "account_settings_title": { en: "Account Settings", ar: "إعدادات الحساب" },
+  "manage_profile_desc": { en: "Manage your personal customer profile and credentials.", ar: "إدارة ملفك الشخصي وبيانات اعتمادك." },
+  "first_name_label": { en: "First Name", ar: "الاسم الأول" },
+  "email_address_label": { en: "Email Address", ar: "البريد الإلكتروني" },
+  "email_locked_desc": { en: "Email is locked and managed via Clerk authentication.", ar: "البريد الإلكتروني مقفل ويتم إدارته عبر نظام Clerk للتوثيق." },
+  "gender_label": { en: "Gender", ar: "الجنس" },
+  "select_gender": { en: "Select Gender", ar: "اختر الجنس" },
+  "male": { en: "Male", ar: "ذكر" },
+  "female": { en: "Female", ar: "أنثى" },
+  "other_gender": { en: "Other", ar: "آخر" },
+  "phone_number_settings": { en: "Phone Number", ar: "رقم الهاتف" },
+  "phone_placeholder": { en: "e.g. +971 50 123 4567", ar: "مثال: +971 50 123 4567" },
+  "default_delivery_location": { en: "Default Delivery Location", ar: "عنوان التوصيل الافتراضي" },
+  "delivery_placeholder": { en: "e.g. Apartment 12A, Downtown Dubai", ar: "مثال: شقة 12A، وسط دبي" },
+  "save_profile_changes": { en: "Save Profile Changes", ar: "حفظ تغييرات الملف الشخصي" },
+  "applies_immediately": { en: "Applies immediately", ar: "يتم التطبيق فوراً" },
+  "optimizing_photo": { en: "Optimizing photo...", ar: "جاري تحسين الصورة..." },
+  "photo_uploaded": { en: "✅ Profile photo uploaded & optimized!", ar: "✅ تم تحميل وتحسين صورة الملف الشخصي!" },
+  "image_too_large": { en: "❌ Image must be smaller than 5MB.", ar: "❌ يجب أن يكون حجم الصورة أقل من 5 ميغابايت." },
+  "failed_process_image": { en: "❌ Failed to process custom image.", ar: "❌ فشل في معالجة الصورة المخصصة." },
+  "custom_photo_removed": { en: "✅ Custom profile photo removed.", ar: "✅ تمت إزالة صورة الملف الشخصي المخصصة." },
+  "session_not_loaded": { en: "❌ Session not loaded. Try again.", ar: "❌ لم يتم تحميل الجلسة. حاول مرة أخرى." },
+  "profile_updated": { en: "✅ Profile updated successfully!", ar: "✅ تم تحديث الملف الشخصي بنجاح!" },
+  "failed_update_profile": { en: "Failed to update profile.", ar: "فشل في تحديث الملف الشخصي." },
+
+  // Avatar selector
+  "select_jersey_avatar": { en: "🏆 Select Football Jersey Avatar", ar: "🏆 اختر أفاتار قميص كرة قدم" },
+  "avatar_description": { en: "Theme your profile picture bubble with premium 1:1 local jersey skins.", ar: "خصص فقاعة صورة ملفك الشخصي بتصاميم قمصان محلية فاخرة 1:1." },
+  "default_avatar": { en: "Default", ar: "الافتراضي" },
+  "upload_custom_profile": { en: "📸 Upload Custom Profile Pic", ar: "📸 تحميل صورة ملف شخصي مخصصة" },
+  "upload_description": { en: "Upload any photo of choice. It will be compressed to less than 15KB for instant page loads.", ar: "حمّل أي صورة من اختيارك. سيتم ضغطها إلى أقل من 15 كيلوبايت لتحميل فوري للصفحة." },
+  "upload_photo": { en: "Upload Photo", ar: "تحميل صورة" },
+  "select_photo": { en: "Select Photo", ar: "اختيار الصورة" },
+
+  // Notifications
+  "limited_item_drops": { en: "Limited Item Drops", ar: "إصدارات محدودة" },
+  "drops_alerts_desc": { en: "Get early alerts on vintage Restocks & World Cup spotlights", ar: "احصل على تنبيهات مبكرة لإعادة توفير الأطقم الكلاسيكية وأبرز منتجات كأس العالم" },
+
+  // Account Page
+  "your_gear_title": { en: "YOUR GEAR.", ar: "عتادك." },
+  "your_store_hero": { en: "YOUR STORE.", ar: "متجرك." },
+  "delivered_hero": { en: "DELIVERED.", ar: "يصلك." },
+  "local_stock_zero_delays": { en: "Local stock, zero delays", ar: "مخزون محلي، بدون تأخير" },
+  "quality_checked_dispatch": { en: "Quality checked before dispatch", ar: "فحص جودة قبل الإرسال" },
+  "one_to_one_sourced": { en: "1:1 grade sourced direct", ar: "درجة 1:1 مستوردة مباشرة" },
+  "order_prefix": { en: "Order", ar: "طلب" },
+
+  // Checkout page
+  "villa_apartment_placeholder": { en: "Villa/Apartment, Street Name", ar: "فيلا/شقة، اسم الشارع" },
+  "promo_10_applied": { en: "10% Off Applied!", ar: "تم تطبيق خصم 10%!" },
+  "promo_20_applied": { en: "20% Off Applied!", ar: "تم تطبيق خصم 20%!" },
+  "invalid_promo": { en: "Invalid promo code.", ar: "كود خصم غير صالح." },
+  "firstname_validation_error": { en: "First Name can only contain letters, spaces, hyphens, or apostrophes.", ar: "الاسم الأول يمكن أن يحتوي على حروف ومسافات وشرطات فقط." },
+  "lastname_validation_error": { en: "Last Name can only contain letters, spaces, hyphens, or apostrophes.", ar: "الاسم الأخير يمكن أن يحتوي على حروف ومسافات وشرطات فقط." },
+  "phone_validation_error": { en: "Please enter a valid UAE phone number (e.g. +971 50 123 4567 or 050 123 4567).", ar: "يرجى إدخال رقم هاتف إماراتي صالح (مثال: +971 50 123 4567 أو 050 123 4567)." },
+
+  // ProductUI
+  "confirm_delete_review": { en: "Are you sure you want to delete this review permanently?", ar: "هل أنت متأكد من حذف هذا التقييم نهائياً؟" },
+  "customer_fallback": { en: "Customer", ar: "عميل" },
+  "checkout_failed_error": { en: "Something went wrong processing your order.", ar: "حدث خطأ ما أثناء معالجة طلبك." },
+  "checkout_verify_error": { en: "Something went wrong verifying your transaction.", ar: "حدث خطأ ما أثناء التحقق من معاملتك." },
+  "unexpected_error": { en: "An unexpected error occurred. Please try again.", ar: "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى." },
+  "verification_failed": { en: "Verification failed", ar: "فشل التحقق" },
+  "payment_not_completed": { en: "Payment was not completed", ar: "لم يكتمل الدفع" },
+  "checkout_failed_inspect_cart": { en: "Checkout failed. Please inspect your cart.", ar: "فشل الدفع. يرجى مراجعة محتويات سلتك." },
+
+  // UAE Cities for Shipping Dropdown
+  "dubai": { en: "Dubai", ar: "دبي" },
+  "abu_dhabi": { en: "Abu Dhabi", ar: "أبوظبي" },
+  "sharjah": { en: "Sharjah", ar: "الشارقة" },
+  "fujairah": { en: "Fujairah", ar: "الفجيرة" },
+  "ajman": { en: "Ajman", ar: "عجمان" },
+  "ras_al_khaimah": { en: "Ras Al Khaimah", ar: "رأس الخيمة" },
+  "umm_al_quwain": { en: "Umm Al Quwain", ar: "أم القيوين" },
+
+  // Trust Badges subtexts
+  "local_warehouse_dispatch": { en: "Local warehouse dispatch", ar: "شحن مباشر من مستودعنا المحلي" },
+  "pre_shipping_quality_checks": { en: "Pre-shipping quality checks", ar: "فحص الجودة قبل الشحن" },
+
+  // Product Localized Names & Descriptions
+  "brazil-away-kit": { en: "Brazil Away Kit (Player Version)", ar: "طقم البرازيل الاحتياطي (نسخة اللاعب)" },
+  "brazil-away-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. Vibrant blue combined with traditional green-yellow trim representing high energy play.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. أزرق نابض بالحياة مدمج مع حواف خضراء وصفراء تقليدية تمثل اللعب عالي الطاقة." },
+
+  "argentina-home-kit": { en: "Argentina Home Kit (Player Version)", ar: "طقم الأرجنتين الأساسي (نسخة اللاعب)" },
+  "argentina-home-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. The iconic Albiceleste light blue and white stripes. Features woven gold champion details and advanced breathability.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. خطوط الأرجنتين (البيسيليستي) الأيقونية باللونين الأزرق الفاتح والأبيض. تتميز بتفاصيل ذهبية منسوجة للبطل وتهوية متقدمة." },
+
+  "argentina-away-kit": { en: "Argentina Away Kit (Player Version)", ar: "طقم الأرجنتين الاحتياطي (نسخة اللاعب)" },
+  "argentina-away-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. The official Argentina away kit featuring modern accents, built for high-performance and absolute match comfort.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. طقم الأرجنتين الاحتياطي الرسمي الذي يتميز بلمسات عصرية، ومصمم للأداء العالي والراحة المطلقة في المباريات." },
+
+  "nike-lv-airforce": { en: "Nike LV Airforce", ar: "حذاء نايكي لويس فيتون إير فورس" },
+  "nike-lv-airforce_desc": { en: "Exclusive streetwear collaboration. Combining classic Air Force silhouette with luxury craftsmanship and custom leather finishes.", ar: "تعاون حصري لملابس الشارع. يجمع بين تصميم إير فورس الكلاسيكي والحرفية الفاخرة والتشطيبات الجلدية المخصصة." },
+
+  "nike-womens-casual": { en: "Nike Womens Casual", ar: "حذاء نايكي كاجوال نسائي" },
+  "nike-womens-casual_desc": { en: "Modern casual comfort for daily lifestyle wear. Cushioned footbed and iconic styling crafted specifically for her.", ar: "راحة كاجوال حديثة للارتداء اليومي. وسادة قدم مبطنة وتصميم أيقوني مصمم خصيصاً لها." },
+
+  "grip-socks": { en: "Non-Slip Elite Grip Socks", ar: "جوارب النخبة مانعة للانزلاق" },
+  "grip-socks_desc": { en: "Designed with internal and external grip pads to eliminate heel slippage, enhance agility, and lock down foot security inside boots.", ar: "مصممة ببطانات ثبات داخلية وخارجية لمنع انزلاق الكعب، وتعزيز المرونة، وتأمين ثبات القدم داخل الحذاء." },
+
+  "germany-home-kit": { en: "Germany Home Kit (Player Version)", ar: "طقم ألمانيا الأساسي (نسخة اللاعب)" },
+  "germany-home-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. Traditional white kit with striking black and national-color accents. Woven team crest for authentic pitch style.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. طقم ألمانيا الأساسي الأبيض التقليدي مع تفاصيل سوداء لافتة وألوان العلم الوطني. شعار الفريق منسوج لأسلوب حقيقي في الملعب." },
+
+  "spain-home-kit": { en: "Spain Home Kit (Player Version)", ar: "طقم إسبانيا الأساسي (نسخة اللاعب)" },
+  "spain-home-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. Classic bold red and yellow home kit of Spain. Showcases La Roja pride, built with lightweight stretch knit.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. طقم إسبانيا الأساسي الأحمر والأصفر الكلاسيكي الجريء. يظهر فخر لا روخا، مصنوع من نسيج مرن خفيف الوزن." },
+
+  "manchester-united-flag": { en: "Manchester United Official Flag", ar: "علم مانشستر يونايتد الرسمي" },
+  "manchester-united-flag_desc": { en: "Official Red Devils flag. Premium quality with the classic club crest for home matchdays and room decoration.", ar: "علم مانشستر يونايتد الرسمي. جودة ممتازة مع شعار النادي الكلاسيكي لأيام المباريات وتزيين الغرفة." },
+
+  "nike-everyday-socks": { en: "Nike Everyday Performance Socks", ar: "جوارب نايكي الرياضية اليومية" },
+  "nike-everyday-socks_desc": { en: "Classic dry fit crew socks providing arch band compression support and extra cushioning in key areas.", ar: "جوارب نايكي الكلاسيكية الجافة التي توفر دعماً مضغوطاً لقوس القدم وتوسيداً إضافياً في المناطق الرئيسية." },
+
+  "fc-barcelona-flag": { en: "FC Barcelona Official Club Flag", ar: "علم نادي برشلونة الرسمي" },
+  "fc-barcelona-flag_desc": { en: "Show your Blaugrana pride! Standard 3x5 ft flag featuring the iconic crest and colors of FC Barcelona.", ar: "أظهر فخرك بالبلاوغرانا! علم قياسي مقاس 3×5 أقدام يتميز بشعار وألوان نادي برشلونة الأيقونية." },
+
+  "real-madrid-flag": { en: "Real Madrid Official Club Flag", ar: "علم نادي ريال مدريد الرسمي" },
+  "real-madrid-flag_desc": { en: "Show your Madridista pride! High-quality flag featuring the legendary crest and colors of Real Madrid.", ar: "أظهر فخرك بالمدريديستا! علم عالي الجودة يتميز بشعار وألوان ريال مدريد الأسطورية." },
+
+  "manchester-city-flag": { en: "Manchester City Official Fan Flag", ar: "علم مشجعي مانشستر سيتي الرسمي" },
+  "manchester-city-flag_desc": { en: "Celebrate the sky blue champions! Durable fabric flag displaying the official Man City crest.", ar: "احتفل بأبطال اللون الأزرق السماوي! علم متين من القماش يعرض شعار مانشستر سيتي الرسمي." },
+
+  "brazil-home-kit": { en: "Brazil Home Kit (Player Version)", ar: "طقم البرازيل الأساسي (نسخة اللاعب)" },
+  "brazil-home-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. The classic yellow and green home kit of Seleção. Crafted from ultra-lightweight performance fibers.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. طقم البرازيل الأساسي الكلاسيكي باللونين الأصفر والأخضر. مصنوع من ألياف أداء خفيفة الوزن للغاية." },
+
+  "portugal-home-kit": { en: "Portugal Home Kit (Player Version)", ar: "طقم البرتغال الأساسي (نسخة اللاعب)" },
+  "portugal-home-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. Vibrant red and green home kit. Represents Portuguese national identity, engineered with sweat-wicking dry technology.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. طقم البرتغال الأساسي باللونين الأحمر والأخضر النابض بالحياة. يمثل الهوية الوطنية البرتغالية، ومصمم بتقنية طرد العرق الجاف." },
+
+  "nike-airforce1-highcut": { en: "Nike Air Force 1 Highcut", ar: "حذاء نايكي إير فورس 1 طويل الرقبة" },
+  "nike-airforce1-highcut_desc": { en: "The classic high-top hoops icon. Iconic strap closure, premium leather overlays, and durable rubber traction.", ar: "أيقونة كرة السلة الكلاسيكية ذات الرقبة العالية. حزام إغلاق أيقوني، وطبقات جلدية فاخرة، وثبات مطاطي متين." },
+
+  "portugal-away-kit": { en: "Portugal Away Kit (Player Version)", ar: "طقم البرتغال الاحتياطي (نسخة اللاعب)" },
+  "portugal-away-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. Modern clean white design with striking accents for the Portuguese national side.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. تصميم أبيض نظيف حديث مع تفاصيل بارزة للمنتخب البرتغالي." },
+
+  "france-home-kit": { en: "France Home Kit (Player Version)", ar: "طقم فرنسا الأساسي (نسخة اللاعب)" },
+  "france-home-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. Deep blue French home kit. Features gold details and elegant tricolor accents on the collar.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. طقم فرنسا الأساسي باللون الأزرق الداكن. يتميز بتفاصيل ذهبية ولمسات أنيقة بألوان العلم الفرنسي على الياقة." },
+
+  "spain-away-kit": { en: "Spain Away Kit (Player Version)", ar: "طقم إسبانيا الاحتياطي (نسخة اللاعب)" },
+  "spain-away-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. Modern beige base with soft details, representing the bright energy of the La Roja side.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. قاعدة بيج حديثة مع تفاصيل ناعمة، تمثل الطاقة المشرقة لمنتخب لا روخا." },
+
+  "france-away-kit": { en: "France Away Kit (Player Version)", ar: "طقم فرنسا الاحتياطي (نسخة اللاعب)" },
+  "france-away-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. Sleek light blue-green design with signature French details. Breathable and comfortable for daily wear and peak pitch activities.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. تصميم أنيق باللونين الأزرق الفاتح والأخضر مع تفاصيل فرنسية مميزة. مريح للتنفس ومناسب للارتداء اليومي وأنشطة الملعب." },
+
+  "uruguay-away-kit": { en: "Uruguay Away Kit (Player Version)", ar: "طقم الأوروغواي الاحتياطي (نسخة اللاعب)" },
+  "uruguay-away-kit_desc": { en: "The official Uruguay away kit. Standard white shirt with gold and sky blue accents celebrating their historic football legacy.", ar: "طقم الأوروغواي الاحتياطي الرسمي. قميص أبيض قياسي مع تفاصيل ذهبية وزرقاء سماوية تحتفي بإرثهم الكروي التاريخي." }
 };
+

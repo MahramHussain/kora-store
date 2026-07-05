@@ -100,12 +100,14 @@ export async function POST(req: NextRequest) {
           customNumber: item.customNumber || "",
           playerName: item.playerName || "",
           patch: item.patch || "",
+          sellerNote: item.sellerNote || "",
         })),
         subtotal: `${CURRENCY}${calculatedSubtotal.toFixed(2)}`,
         shippingFee: `${CURRENCY}${parseFloat(order.shippingFee.toString()).toFixed(2)}`,
         discount: `${CURRENCY}${parseFloat(order.discountAmount.toString()).toFixed(2)}`,
         total: `${CURRENCY}${parseFloat(order.total.toString()).toFixed(2)}`,
         shippingAddress: `${order.shippingStreet}, ${order.shippingCity}, UAE`,
+        sellerNote: order.sellerNote || "",
       };
 
       // A. Send confirmation to customer

@@ -35,7 +35,8 @@ export async function POST(req: Request) {
       discountAmount,
       shippingFee,
       tax,
-      coordinates
+      coordinates,
+      sellerNote
     } = body;
 
     if (!items || items.length === 0) {
@@ -172,6 +173,7 @@ export async function POST(req: Request) {
           shippingFee: new Prisma.Decimal(computedShippingFee),
           tax: new Prisma.Decimal(tax || 0),
           referenceNumber: referenceNumber,
+          sellerNote: sellerNote || "",
           items: {
             create: items.map((item: any) => ({
               productId: item.id,
@@ -183,6 +185,7 @@ export async function POST(req: Request) {
               customNumber: item.customNumber || "",
               playerName: item.playerName || "",
               patch: item.patch || "",
+              sellerNote: item.sellerNote || "",
             })),
           },
         },
@@ -263,12 +266,14 @@ export async function POST(req: Request) {
           customNumber: item.customNumber || "",
           playerName: item.playerName || "",
           patch: item.patch || "",
+          sellerNote: item.sellerNote || "",
         })),
         subtotal: `AED ${calculatedSubtotal.toFixed(2)}`,
         shippingFee: `AED ${parseFloat(order.shippingFee.toString()).toFixed(2)}`,
         discount: `AED ${parseFloat(order.discountAmount.toString()).toFixed(2)}`,
         total: `AED ${parseFloat(order.total.toString()).toFixed(2)}`,
         shippingAddress: `${shippingDetails.streetAddress}, ${shippingDetails.city}, UAE`,
+        sellerNote: order.sellerNote || "",
       };
 
       // A. Send confirmation to customer
