@@ -90,7 +90,6 @@ async function main() {
           tag: item.tag || null,
           stock: item.stock ?? 10,
           isWorldCup: item.isWorldCup ?? false,
-          gender: item.gender || "Unisex",
         },
         create: {
           id: item.id,
@@ -104,7 +103,6 @@ async function main() {
           tag: item.tag || null,
           stock: item.stock ?? 10,
           isWorldCup: item.isWorldCup ?? false,
-          gender: item.gender || "Unisex",
         },
       });
       console.log(`✓ [DATABASE] Product successfully synced (created/updated).`);

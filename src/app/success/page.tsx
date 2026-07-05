@@ -8,6 +8,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { useCart } from "@/context/CartContext";
 import { CURRENCY } from "@/lib/constants";
 import { useTranslation } from "@/context/LanguageContext";
+import { translations } from "@/lib/translations";
 
 function SuccessContent() {
   const [copied, setCopied] = useState(false);
