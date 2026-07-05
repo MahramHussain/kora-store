@@ -734,6 +734,13 @@ export const translations = {
   "france-away-kit_desc": { en: "Master quality Player version jersey. Rubber badge and other details 1:1. Sleek light blue-green design with signature French details. Breathable and comfortable for daily wear and peak pitch activities.", ar: "قميص نسخة اللاعب بجودة عالية جداً. الشعار المطاطي وباقي التفاصيل بمقاييس 1:1. تصميم أنيق باللونين الأزرق الفاتح والأخضر مع تفاصيل فرنسية مميزة. مريح للتنفس ومناسب للارتداء اليومي وأنشطة الملعب." },
 
   "uruguay-away-kit": { en: "Uruguay Away Kit (Player Version)", ar: "طقم الأوروغواي الاحتياطي (نسخة اللاعب)" },
-  "uruguay-away-kit_desc": { en: "The official Uruguay away kit. Standard white shirt with gold and sky blue accents celebrating their historic football legacy.", ar: "طقم الأوروغواي الاحتياطي الرسمي. قميص أبيض قياسي مع تفاصيل ذهبية وزرقاء سماوية تحتفي بإرثهم الكروي التاريخي." }
+  "uruguay-away-kit_desc": { en: "The official Uruguay away kit. Standard white shirt with gold and sky blue accents celebrating their historic football legacy.", ar: "طقم الأوروغواي الاحتياطي الرسمي. قميص أبيض قياسي مع تفاصيل ذهبية وزرقاء سماوية تحتفي بإرثهم الكروي التاريخي." },
+
+  // Search & Loading
+  "search": { en: "Search", ar: "البحث" },
+  "loading_shop": { en: "Loading the Shop...", ar: "جاري تحميل المتجر..." },
+  "loading": { en: "Loading...", ar: "جاري التحميل..." },
+  "loading_dashboard": { en: "Loading Dashboard...", ar: "جاري تحميل لوحة التحكم..." },
+  "loading_account": { en: "Loading Account...", ar: "جاري تحميل الحساب..." }
 };
 
