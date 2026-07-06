@@ -9,13 +9,21 @@ import { translations } from "@/lib/translations";
 async function WorldCupJerseySlider() {
   const products = await prisma.product.findMany({
     where: { isWorldCup: true },
-    orderBy: { createdAt: "desc" },
-    take: 6,
   });
+
+  // Sort: On Sale tag first, then by createdAt desc
+  products.sort((a, b) => {
+    const isSaleA = a.tag === "On Sale";
+    const isSaleB = b.tag === "On Sale";
+    if (isSaleA !== isSaleB) return isSaleA ? -1 : 1;
+    return b.createdAt.getTime() - a.createdAt.getTime();
+  });
+
+  const displayProducts = products.slice(0, 6);
 
   return (
     <>
-      {products.map((product) => (
+      {displayProducts.map((product) => (
         <div key={product.id} className="snap-start shrink-0 w-[220px] md:w-[300px]">
           <ProductCard product={{...product, price: product.price.toString()}} />
         </div>

@@ -181,8 +181,9 @@ export default function ShopUI({ products }: { products: any[] }) {
     return matchesSearch && matchesCategory && matchesTag && matchesTeam;
   });
 
-  // Sort display products: Category hierarchy: Shirts (1) -> Boots (2) -> Accessories (3) -> Others (4)
-  // Tag priority within category: Trending (1) -> Latest (2) -> Others (3)
+  // Sort display products: "On Sale" tags always appear first.
+  // Then follow standard Category hierarchy: Shirts (1) -> Boots (2) -> Accessories (3) -> Others (4)
+  // Then Tag priority within category: Trending (1) -> Latest (2) -> Others (3)
   const displayProducts = [...filteredProducts];
   const categoryPriority = (cat: string) => {
     if (cat === "Shirts") return 1;
@@ -192,16 +193,24 @@ export default function ShopUI({ products }: { products: any[] }) {
   };
 
   const tagPriority = (tag: string | null) => {
+    if (tag === "On Sale") return 0;
     if (tag === "Trending") return 1;
     if (tag === "Latest") return 2;
-    return 3; // Sale or null
+    return 3; // Other or null
   };
 
   displayProducts.sort((a, b) => {
+    // 1. Tag priority absolute top check for "On Sale"
+    const isSaleA = a.tag === "On Sale";
+    const isSaleB = b.tag === "On Sale";
+    if (isSaleA !== isSaleB) return isSaleA ? -1 : 1;
+
+    // 2. Category Priority
     const catA = categoryPriority(a.category);
     const catB = categoryPriority(b.category);
     if (catA !== catB) return catA - catB;
 
+    // 3. Tag Priority
     const tagA = tagPriority(a.tag);
     const tagB = tagPriority(b.tag);
     if (tagA !== tagB) return tagA - tagB;

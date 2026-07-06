@@ -1097,11 +1097,11 @@ export default function ProductUI({ product }: { product: any }) {
           <div className="flex items-baseline gap-2">
             {(product.team === "Germany" || product.team === "Uruguay") && (
               <span className="text-lg text-slate-400 line-through font-medium">
-                {t("aed")}{75 + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
+                {t("aed")}75
               </span>
             )}
             <span className="text-3xl font-black text-slate-900">
-              {t("aed")}{parseFloat(product.price) + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
+              {t("aed")}{parseFloat(product.price)}
             </span>
           </div>
           {product.stock === 0 ? (
@@ -1850,11 +1850,11 @@ export default function ProductUI({ product }: { product: any }) {
                 <div className="flex items-baseline gap-2">
                   {(product.team === "Germany" || product.team === "Uruguay") && (
                     <span className="text-lg text-slate-400 line-through font-semibold">
-                      {t("aed")}{75 + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
+                      {t("aed")}75
                     </span>
                   )}
                   <span className="text-3xl font-extrabold text-slate-900 font-display">
-                    {t("aed")}{parseFloat(product.price) + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
+                    {t("aed")}{parseFloat(product.price)}
                   </span>
                 </div>
               </div>

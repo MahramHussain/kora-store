@@ -11,6 +11,7 @@ export const translations = {
   "shopping_cart": { en: "Shopping Cart", ar: "سلة التسوق" },
   "back_to_shop": { en: "Back to Shop", ar: "العودة إلى المتجر" },
   "aed": { en: "AED", ar: "د.إ" },
+  "on sale": { en: "On Sale", ar: "تنزيلات" },
   "world_cup": { en: "World Cup", ar: "كأس العالم" },
   "club": { en: "Club", ar: "الأندية" },
   "national": { en: "National", ar: "المنتخبات" },

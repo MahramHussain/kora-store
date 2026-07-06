@@ -80,12 +80,24 @@ export function ProductCard({ product }: { product: Product }) {
             {t("sold_out")}
           </div>
         ) : product.tag ? (
-          <div className={`absolute top-3 left-3 md:top-4 md:left-4 px-2.5 md:px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest z-20 shadow-sm ${
-            product.tag === 'Latest' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'
-          }`}>
-            {t(product.tag.toLowerCase()) || product.tag}
-          </div>
+          product.tag === 'On Sale' ? (
+            <div className="absolute top-3 left-3 md:top-4 md:left-4 px-2.5 md:px-3 py-1.5 rounded-md text-[10px] font-extrabold uppercase tracking-widest z-20 shadow-md bg-gradient-to-r from-orange-500 to-rose-600 text-white border border-orange-400/30 flex items-center gap-1 animate-pulse">
+              <img 
+                src="/fire.gif" 
+                alt="Fire" 
+                className="w-3.5 h-3.5 object-contain"
+              />
+              <span>{t("on sale")}</span>
+            </div>
+          ) : (
+            <div className={`absolute top-3 left-3 md:top-4 md:left-4 px-2.5 md:px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest z-20 shadow-sm ${
+              product.tag === 'Latest' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'
+            }`}>
+              {t(product.tag.toLowerCase()) || product.tag}
+            </div>
+          )
         ) : null}
+
         
         {/* Dynamic Images — absolute overlay transitioning opacity for smooth, flicker-free hover animation */}
         {images.length > 0 ? (
