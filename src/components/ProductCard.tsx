@@ -12,6 +12,7 @@ interface Product {
   name: string;
   category: string;
   price: string | number;
+  team?: string | null;
   images?: string[];
   image?: string;
   tag?: string | null;
@@ -144,9 +145,16 @@ export function ProductCard({ product }: { product: Product }) {
               );
             })()}
           </div>
-          <span className="text-base md:text-lg font-bold text-slate-900 ml-2 shrink-0 whitespace-nowrap font-sans">
-            {t("aed")}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
-          </span>
+          <div className="flex items-center gap-1.5 ml-2 shrink-0 whitespace-nowrap font-sans">
+            {(product.team === "Germany" || product.team === "Uruguay") && (
+              <span className="text-xs text-slate-400 line-through font-medium">
+                {t("aed")}75
+              </span>
+            )}
+            <span className="text-base md:text-lg font-bold text-slate-900">
+              {t("aed")}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
+            </span>
+          </div>
         </div>
         <div className={`w-full text-center font-bold text-xs md:text-sm py-2 md:py-2.5 rounded-lg transition-colors border ${
           product.stock === 0 

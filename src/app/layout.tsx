@@ -3,6 +3,7 @@ import { Inter, Outfit, Tajawal } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer"; // <-- 1. IMPORT THE FOOTER
+import SaleToast from "@/components/SaleToast";
 import { ClerkProvider } from "@clerk/nextjs";
 import { CartProvider } from "@/context/CartContext";
 import { LanguageProvider, Language } from "@/context/LanguageContext";
@@ -95,6 +96,7 @@ export default async function RootLayout({
           <LanguageProvider initialLang={lang}>
             <CartProvider>
               <Navbar />
+              <SaleToast />
 
               {/* flex-grow makes the main content take up all available space */}
               <main className="flex-grow">

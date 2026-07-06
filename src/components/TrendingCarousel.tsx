@@ -72,8 +72,15 @@ export function TrendingCarousel({ products }: { products: any[] }) {
                   {item.name}
                 </h3>
                 
-                <p className="text-xl md:text-3xl font-bold text-slate-700 mb-4 md:mb-8 font-sans">
-                  {CURRENCY}{String(item.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
+                <p className="text-xl md:text-3xl font-bold text-slate-700 mb-4 md:mb-8 font-sans flex items-baseline gap-2 justify-center md:justify-start">
+                  {(item.team === "Germany" || item.team === "Uruguay") && (
+                    <span className="text-sm md:text-lg text-slate-400 line-through font-normal">
+                      {CURRENCY}75
+                    </span>
+                  )}
+                  <span>
+                    {CURRENCY}{String(item.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
+                  </span>
                 </p>
                 
                 <div>

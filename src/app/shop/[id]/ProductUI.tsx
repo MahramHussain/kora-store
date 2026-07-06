@@ -1094,9 +1094,16 @@ export default function ProductUI({ product }: { product: any }) {
 
         {/* Price + Stock */}
         <div className="flex items-center justify-between mb-5 pb-5 border-b border-slate-100">
-          <span className="text-3xl font-black text-slate-900">
-            {t("aed")}{parseFloat(product.price) + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
-          </span>
+          <div className="flex items-baseline gap-2">
+            {(product.team === "Germany" || product.team === "Uruguay") && (
+              <span className="text-lg text-slate-400 line-through font-medium">
+                {t("aed")}{75 + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
+              </span>
+            )}
+            <span className="text-3xl font-black text-slate-900">
+              {t("aed")}{parseFloat(product.price) + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
+            </span>
+          </div>
           {product.stock === 0 ? (
             <span className="text-xs font-bold uppercase tracking-wider px-3 py-1.5 bg-rose-50 text-rose-600 border border-rose-200 rounded-full">
               {t("sold_out")}
@@ -1840,9 +1847,16 @@ export default function ProductUI({ product }: { product: any }) {
             <div className="bg-slate-50 border border-slate-200/60 rounded-3xl p-5 mb-8 flex items-center justify-between shadow-xs text-start">
               <div className="flex flex-col">
                 <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5">{t("price_label")}</span>
-                <span className="text-3xl font-extrabold text-slate-900 font-display">
-                  {t("aed")}{parseFloat(product.price) + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
-                </span>
+                <div className="flex items-baseline gap-2">
+                  {(product.team === "Germany" || product.team === "Uruguay") && (
+                    <span className="text-lg text-slate-400 line-through font-semibold">
+                      {t("aed")}{75 + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
+                    </span>
+                  )}
+                  <span className="text-3xl font-extrabold text-slate-900 font-display">
+                    {t("aed")}{parseFloat(product.price) + (isKit && hasFifaPatch ? 10 : 0) + (isKit ? printUpcharge : 0)}
+                  </span>
+                </div>
               </div>
               <div>
                 {product.stock === 0 ? (

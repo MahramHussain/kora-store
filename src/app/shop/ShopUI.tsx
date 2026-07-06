@@ -443,9 +443,16 @@ export default function ShopUI({ products }: { products: any[] }) {
                       <div className="flex items-end justify-between mt-2">
                         <div>
                           <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wide">{t("price_label")}</span>
-                          <span className="text-base font-black text-slate-900 leading-none">
-                            {t("aed")}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
-                          </span>
+                          <div className="flex items-baseline gap-1">
+                            {(product.team === "Germany" || product.team === "Uruguay") && (
+                              <span className="text-xs text-slate-400 line-through leading-none font-medium">
+                                {t("aed")}75
+                              </span>
+                            )}
+                            <span className="text-base font-black text-slate-900 leading-none">
+                              {t("aed")}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
+                            </span>
+                          </div>
                         </div>
                         <div className={`text-[10px] font-bold px-3 py-1.5 rounded-lg border ${
                           product.stock === 0 
