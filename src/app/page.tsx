@@ -25,7 +25,7 @@ async function WorldCupJerseySlider() {
     <>
       {displayProducts.map((product) => (
         <div key={product.id} className="snap-start shrink-0 w-[220px] md:w-[300px]">
-          <ProductCard product={{...product, price: product.price.toString()}} />
+          <ProductCard product={{...product, price: product.price.toString(), originalPrice: product.originalPrice ? product.originalPrice.toString() : null}} />
         </div>
       ))}
     </>
@@ -43,7 +43,7 @@ async function ShoesSlider() {
     <>
       {products.map((product) => (
         <div key={product.id} className="snap-start shrink-0 w-[220px] md:w-[300px]">
-          <ProductCard product={{...product, price: product.price.toString()}} />
+          <ProductCard product={{...product, price: product.price.toString(), originalPrice: product.originalPrice ? product.originalPrice.toString() : null}} />
         </div>
       ))}
     </>
@@ -61,7 +61,7 @@ async function StreetwearAndGearSlider() {
     <>
       {products.map((product) => (
         <div key={product.id} className="snap-start shrink-0 w-[220px] md:w-[300px]">
-          <ProductCard product={{...product, price: product.price.toString()}} />
+          <ProductCard product={{...product, price: product.price.toString(), originalPrice: product.originalPrice ? product.originalPrice.toString() : null}} />
         </div>
       ))}
     </>

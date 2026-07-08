@@ -70,7 +70,8 @@ export async function getProducts() {
     
     return products.map(product => ({
       ...product,
-      price: product.price.toString()
+      price: product.price.toString(),
+      originalPrice: product.originalPrice ? product.originalPrice.toString() : null
     }));
   } catch (error) {
     console.error("Failed to fetch products:", error);
@@ -132,6 +133,7 @@ export async function updateProduct(
     images: string[]; 
     stock?: number;
     isWorldCup?: boolean;
+    originalPrice: number | null;
   }
 ) {
   try {
@@ -155,9 +157,10 @@ export async function updateProduct(
         images: resolvedImages,
         stock: data.stock !== undefined ? data.stock : undefined,
         isWorldCup: data.isWorldCup !== undefined ? data.isWorldCup : undefined,
+        originalPrice: data.originalPrice,
       },
     });
-    return { success: true, product: { ...updatedProduct, price: updatedProduct.price.toString() } };
+    return { success: true, product: { ...updatedProduct, price: updatedProduct.price.toString(), originalPrice: updatedProduct.originalPrice ? updatedProduct.originalPrice.toString() : null } };
   } catch (error) {
     console.error("Failed to update product:", error);
     return { success: false, error: "Failed to save product changes" };

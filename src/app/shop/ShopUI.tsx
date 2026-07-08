@@ -453,9 +453,9 @@ export default function ShopUI({ products }: { products: any[] }) {
                         <div>
                           <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wide">{t("price_label")}</span>
                           <div className="flex items-baseline gap-1">
-                            {(product.team === "Germany" || product.team === "Uruguay") && (
+                            {product.originalPrice && (
                               <span className="text-xs text-slate-400 line-through leading-none font-medium">
-                                {t("aed")}75
+                                {t("aed")}{parseFloat(product.originalPrice).toFixed(0)}
                               </span>
                             )}
                             <span className="text-base font-black text-slate-900 leading-none">

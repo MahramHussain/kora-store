@@ -22,6 +22,7 @@ export default async function ShopPage() {
     ...product,
     id: product.id, 
     price: product.price.toString(),
+    originalPrice: product.originalPrice ? product.originalPrice.toString() : null,
     createdAt: product.createdAt.toISOString(),
   }));
 

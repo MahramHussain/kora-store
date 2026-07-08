@@ -90,6 +90,7 @@ async function main() {
           tag: item.tag || null,
           stock: item.stock ?? 10,
           isWorldCup: item.isWorldCup ?? false,
+          originalPrice: item.originalPrice ? new Prisma.Decimal(item.originalPrice) : null,
         },
         create: {
           id: item.id,
@@ -103,6 +104,7 @@ async function main() {
           tag: item.tag || null,
           stock: item.stock ?? 10,
           isWorldCup: item.isWorldCup ?? false,
+          originalPrice: item.originalPrice ? new Prisma.Decimal(item.originalPrice) : null,
         },
       });
       console.log(`✓ [DATABASE] Product successfully synced (created/updated).`);

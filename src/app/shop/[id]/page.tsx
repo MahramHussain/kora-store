@@ -44,6 +44,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const safeProduct = {
     ...rawProduct,
     price: rawProduct.price.toString(),
+    originalPrice: rawProduct.originalPrice ? rawProduct.originalPrice.toString() : null,
     createdAt: rawProduct.createdAt?.toISOString() || null,
     reviews: rawProduct.reviews?.map((review: any) => ({
       ...review,

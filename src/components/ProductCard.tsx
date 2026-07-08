@@ -13,6 +13,7 @@ interface Product {
   category: string;
   price: string | number;
   team?: string | null;
+  originalPrice?: string | null;
   images?: string[];
   image?: string;
   tag?: string | null;
@@ -158,9 +159,9 @@ export function ProductCard({ product }: { product: Product }) {
             })()}
           </div>
           <div className="flex items-center gap-1.5 ml-2 shrink-0 whitespace-nowrap font-sans">
-            {(product.team === "Germany" || product.team === "Uruguay") && (
+            {product.originalPrice && (
               <span className="text-xs text-slate-400 line-through font-medium">
-                {t("aed")}75
+                {t("aed")}{parseFloat(product.originalPrice).toFixed(0)}
               </span>
             )}
             <span className="text-base md:text-lg font-bold text-slate-900">

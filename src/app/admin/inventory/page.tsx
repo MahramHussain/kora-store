@@ -64,7 +64,10 @@ export default function AdminInventoryPage() {
       description: productToEdit.description || "",
       images: formattedImages,
       stock: parseInt(productToEdit.stock) || 0,
-      isWorldCup: !!productToEdit.isWorldCup
+      isWorldCup: !!productToEdit.isWorldCup,
+      originalPrice: productToEdit.isSale && productToEdit.originalPrice
+        ? parseFloat(productToEdit.originalPrice)
+        : null
     };
 
     const res = await updateProduct(productToEdit.id, updatedData);
@@ -207,7 +210,7 @@ export default function AdminInventoryPage() {
 
                         <td className="p-4 text-right space-x-3">
                           <button 
-                            onClick={() => { setProductToEdit({ ...product }); setEditModalOpen(true); }}
+                            onClick={() => { setProductToEdit({ ...product, isSale: product.originalPrice !== null && product.originalPrice !== undefined && product.originalPrice !== "" }); setEditModalOpen(true); }}
                             className="text-xs font-black text-kora hover:text-purple-700 uppercase tracking-widest transition-colors"
                           >
                             Edit
@@ -270,7 +273,7 @@ export default function AdminInventoryPage() {
                   {/* Mobile actions */}
                   <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
                     <button 
-                      onClick={() => { setProductToEdit({ ...product }); setEditModalOpen(true); }}
+                      onClick={() => { setProductToEdit({ ...product, isSale: product.originalPrice !== null && product.originalPrice !== undefined && product.originalPrice !== "" }); setEditModalOpen(true); }}
                       className="flex-1 py-2.5 bg-kora/5 hover:bg-kora/10 text-kora font-bold text-xs uppercase tracking-wider rounded-xl transition-colors text-center border border-kora/10"
                     >
                       Edit
@@ -361,6 +364,63 @@ export default function AdminInventoryPage() {
                       <option value="Accessories">Accessories</option>
                     </select>
                   </div>
+                </div>
+
+                {/* Sale Settings Segment */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-4">
+                  <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                    <input 
+                      type="checkbox" 
+                      checked={!!productToEdit.isSale} 
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setProductToEdit({
+                          ...productToEdit,
+                          isSale: checked,
+                          originalPrice: checked ? (productToEdit.originalPrice || productToEdit.price || "75") : null,
+                          tag: checked ? "On Sale" : (productToEdit.tag === "On Sale" ? null : productToEdit.tag)
+                        });
+                      }}
+                      className="rounded text-kora focus:ring-kora h-4 w-4 border-slate-300"
+                    />
+                    <span className="text-xs font-black text-slate-800 uppercase tracking-wide">Product is On Sale</span>
+                  </label>
+
+                  {productToEdit.isSale && (
+                    <div className="grid grid-cols-2 gap-3 border-t border-slate-200/60 pt-3.5 animate-fade-in space-y-0.5">
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Striked Price ({CURRENCY.trim()})</label>
+                        <input 
+                          required type="number" step="0.01" 
+                          value={productToEdit.originalPrice || ""} 
+                          onChange={e => setProductToEdit({...productToEdit, originalPrice: e.target.value})} 
+                          className="w-full bg-white border border-slate-200 rounded-xl p-3 text-slate-900 focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-mono font-bold transition-all" 
+                          placeholder="e.g. 75"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">New Sale Price ({CURRENCY.trim()})</label>
+                        <input 
+                          required type="number" step="0.01" 
+                          value={productToEdit.price || ""} 
+                          onChange={e => setProductToEdit({...productToEdit, price: e.target.value})} 
+                          className="w-full bg-white border border-slate-200 rounded-xl p-3 text-slate-900 focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-mono font-bold transition-all" 
+                          placeholder="e.g. 49"
+                        />
+                      </div>
+                      <div className="col-span-2 pt-2">
+                        <label className="flex items-center gap-2 cursor-pointer select-none">
+                          <input 
+                            type="checkbox" 
+                            checked={productToEdit.tag === "On Sale"} 
+                            onChange={e => setProductToEdit({...productToEdit, tag: e.target.checked ? "On Sale" : null})} 
+                            className="rounded text-kora focus:ring-kora h-4 w-4 border-slate-300"
+                          />
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Apply "On Sale" tag badge</span>
+                        </label>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

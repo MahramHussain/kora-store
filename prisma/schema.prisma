@@ -47,6 +47,7 @@ model Product {
   tag         String?  // e.g., "Trending", "Latest"
   stock       Int      @default(10)
   isWorldCup  Boolean  @default(false)
+  originalPrice Decimal?
   createdAt   DateTime @default(now())
   
   // Links to order history and carts

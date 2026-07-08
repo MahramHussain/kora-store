@@ -50,7 +50,7 @@
     "name": "Brazil Away Kit",
     "category": "Shirts",
     "team": "Brazil",
-    "price": 75,
+    "price": 59,
     "description": "The official Brazil away kit. Vibrant blue combined with traditional green-yellow trim representing high energy play.",
     "images": [
       "/assets/wc26 jerseys/Brazil Away Kit/6e830f83.webp",
@@ -63,9 +63,10 @@
       "L",
       "XL"
     ],
-    "tag": "Trending",
+    "tag": "On Sale",
     "stock": 10,
     "isWorldCup": true,
+    "originalPrice": 75,
     "gender": "Unisex"
   },
   {
@@ -73,7 +74,7 @@
     "name": "Brazil Home Kit",
     "category": "Shirts",
     "team": "Brazil",
-    "price": 75,
+    "price": 59,
     "description": "The classic yellow and green home kit of Seleção. Crafted from ultra-lightweight performance fibers.",
     "images": [
       "/assets/wc26 jerseys/Brazil Home Kit/9fd33626.jpg",
@@ -85,9 +86,10 @@
       "L",
       "XL"
     ],
-    "tag": "Latest",
+    "tag": "On Sale",
     "stock": 8,
     "isWorldCup": true,
+    "originalPrice": 75,
     "gender": "Unisex"
   },
   {
@@ -155,6 +157,7 @@
     "tag": "On Sale",
     "stock": 9,
     "isWorldCup": true,
+    "originalPrice": 75,
     "gender": "Unisex"
   },
   {
@@ -271,6 +274,7 @@
     "tag": "On Sale",
     "stock": 6,
     "isWorldCup": true,
+    "originalPrice": 75,
     "gender": "Unisex"
   },
   {

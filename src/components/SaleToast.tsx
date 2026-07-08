@@ -47,8 +47,8 @@ export default function SaleToast() {
   if (!isRendered) return null;
 
   // Multi-lingual support
-  const textEn = "Germany & Uruguay kits are now on sale for just AED 49!";
-  const textAr = "قمصان ألمانيا وأوروغواي متوفرة الآن للبيع مقابل 49 درهم فقط!";
+  const textEn = "LEGENDARY FLASH SALE: Elite Brazil Kits are now on sale for just AED 59! Also, grab Germany & Uruguay Kits for only AED 49. Strictly limited stock!";
+  const textAr = "تنزيلات أسطورية: قمصان البرازيل المتميزة متوفرة الآن مقابل 59 درهم فقط! واحصل أيضاً على قمصان ألمانيا وأوروغواي مقابل 49 درهم فقط. الكمية محدودة جداً!";
   const linkTextEn = "Shop Sale";
   const linkTextAr = "تسوق العرض";
 

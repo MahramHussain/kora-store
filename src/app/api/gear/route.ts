@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     
     // 2. Grab all the data sent from your Admin Dashboard
-    const { name, category, team, price, description, tag, images, sizes, stock, isWorldCup } = body;
+    const { name, category, team, price, description, tag, images, sizes, stock, isWorldCup, originalPrice } = body;
 
     // 3. Resolve images recursively in the public directory on the server
     const resolvedImages = (Array.isArray(images) ? images : [])
@@ -34,7 +34,8 @@ export async function POST(req: Request) {
         images: resolvedImages,
         sizes,
         stock: stock !== undefined ? parseInt(stock) : 10,
-        isWorldCup: !!isWorldCup
+        isWorldCup: !!isWorldCup,
+        originalPrice: originalPrice ? parseFloat(originalPrice) : null
       }
     });
 

@@ -1095,9 +1095,9 @@ export default function ProductUI({ product }: { product: any }) {
         {/* Price + Stock */}
         <div className="flex items-center justify-between mb-5 pb-5 border-b border-slate-100">
           <div className="flex items-baseline gap-2">
-            {(product.team === "Germany" || product.team === "Uruguay") && (
+            {product.originalPrice && (
               <span className="text-lg text-slate-400 line-through font-medium">
-                {t("aed")}75
+                {t("aed")}{parseFloat(product.originalPrice).toFixed(0)}
               </span>
             )}
             <span className="text-3xl font-black text-slate-900">
@@ -1848,9 +1848,9 @@ export default function ProductUI({ product }: { product: any }) {
               <div className="flex flex-col">
                 <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-0.5">{t("price_label")}</span>
                 <div className="flex items-baseline gap-2">
-                  {(product.team === "Germany" || product.team === "Uruguay") && (
+                  {product.originalPrice && (
                     <span className="text-lg text-slate-400 line-through font-semibold">
-                      {t("aed")}75
+                      {t("aed")}{parseFloat(product.originalPrice).toFixed(0)}
                     </span>
                   )}
                   <span className="text-3xl font-extrabold text-slate-900 font-display">

@@ -73,9 +73,9 @@ export function TrendingCarousel({ products }: { products: any[] }) {
                 </h3>
                 
                 <p className="text-xl md:text-3xl font-bold text-slate-700 mb-4 md:mb-8 font-sans flex items-baseline gap-2 justify-center md:justify-start">
-                  {(item.team === "Germany" || item.team === "Uruguay") && (
+                  {item.originalPrice && (
                     <span className="text-sm md:text-lg text-slate-400 line-through font-normal">
-                      {CURRENCY}75
+                      {CURRENCY}{parseFloat(item.originalPrice).toFixed(0)}
                     </span>
                   )}
                   <span>
