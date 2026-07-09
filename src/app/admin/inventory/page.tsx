@@ -18,6 +18,32 @@ export default function AdminInventoryPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("All");
 
+  const openEditModal = (product: any) => {
+    const sizeStocksMap: Record<string, number> = {};
+    if (product.sizeStocks) {
+      product.sizeStocks.forEach((s: any) => {
+        sizeStocksMap[s.size] = s.quantity;
+      });
+    }
+    const sizes = Array.isArray(product.sizes) 
+      ? product.sizes 
+      : typeof product.sizes === "string" 
+        ? product.sizes.split(",").map((s: string) => s.trim()).filter(Boolean)
+        : [];
+    sizes.forEach((size: string) => {
+      if (sizeStocksMap[size] === undefined) {
+        sizeStocksMap[size] = product.stock;
+      }
+    });
+
+    setProductToEdit({
+      ...product,
+      sizeStocksMap,
+      isSale: product.originalPrice !== null && product.originalPrice !== undefined && product.originalPrice !== ""
+    });
+    setEditModalOpen(true);
+  };
+
   useEffect(() => {
     async function fetchProducts() {
       const productsData = await getProducts();
@@ -50,20 +76,29 @@ export default function AdminInventoryPage() {
         : []
     ).filter(Boolean);
 
+    const currentSizes = Array.isArray(productToEdit.sizes) 
+      ? productToEdit.sizes 
+      : typeof productToEdit.sizes === "string" 
+        ? productToEdit.sizes.split(",").map((s: string) => s.trim()).filter(Boolean)
+        : [];
+
+    const sizeStocks: Record<string, number> = {};
+    currentSizes.forEach((size: string) => {
+      sizeStocks[size] = productToEdit.sizeStocksMap?.[size] !== undefined 
+        ? parseInt(productToEdit.sizeStocksMap[size] as any) || 0 
+        : 10;
+    });
+
     const updatedData = {
       name: productToEdit.name,
       price: parseFloat(productToEdit.price),
       category: productToEdit.category,
       team: productToEdit.team || null,
       tag: productToEdit.tag || null,
-      sizes: Array.isArray(productToEdit.sizes) 
-        ? productToEdit.sizes 
-        : typeof productToEdit.sizes === "string" 
-          ? productToEdit.sizes.split(",").map((s: string) => s.trim()).filter(Boolean)
-          : [],
+      sizes: currentSizes,
       description: productToEdit.description || "",
       images: formattedImages,
-      stock: parseInt(productToEdit.stock) || 0,
+      sizeStocks,
       isWorldCup: !!productToEdit.isWorldCup,
       originalPrice: productToEdit.isSale && productToEdit.originalPrice
         ? parseFloat(productToEdit.originalPrice)
@@ -204,13 +239,24 @@ export default function AdminInventoryPage() {
                         {/* Stock indicator badge */}
                         <td className="p-4">
                           <StockBadge stockCount={stockCount} />
+                          <div className="flex flex-wrap gap-1 mt-1.5 max-w-[240px]">
+                            {product.sizeStocks && product.sizeStocks.length > 0 ? (
+                              product.sizeStocks.map((s: any) => (
+                                <span key={s.id} className="bg-slate-50 border border-slate-200/50 rounded-lg px-1.5 py-0.5 font-mono text-[9px] text-slate-500 font-bold">
+                                  {s.size}: <span className={s.quantity === 0 ? "text-rose-500 font-extrabold" : "text-slate-800 font-black"}>{s.quantity}</span>
+                                </span>
+                              ))
+                            ) : (
+                              <span className="text-[9px] text-slate-400 italic">No per-size stock</span>
+                            )}
+                          </div>
                         </td>
 
                         <td className="p-4 text-slate-900 font-black">{CURRENCY}{parseFloat(product.price).toFixed(2)}</td>
 
                         <td className="p-4 text-right space-x-3">
                           <button 
-                            onClick={() => { setProductToEdit({ ...product, isSale: product.originalPrice !== null && product.originalPrice !== undefined && product.originalPrice !== "" }); setEditModalOpen(true); }}
+                            onClick={() => openEditModal(product)}
                             className="text-xs font-black text-kora hover:text-purple-700 uppercase tracking-widest transition-colors"
                           >
                             Edit
@@ -267,13 +313,25 @@ export default function AdminInventoryPage() {
                         </span>
                         <StockBadge stockCount={stockCount} />
                       </div>
+
+                      <div className="flex flex-wrap gap-1 mt-2.5">
+                        {product.sizeStocks && product.sizeStocks.length > 0 ? (
+                          product.sizeStocks.map((s: any) => (
+                            <span key={s.id} className="bg-slate-50 border border-slate-200/50 rounded-lg px-1.5 py-0.5 font-mono text-[9px] text-slate-500 font-bold">
+                              {s.size}: <span className={s.quantity === 0 ? "text-rose-500 font-extrabold" : "text-slate-800 font-black"}>{s.quantity}</span>
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-[9px] text-slate-400 italic">No per-size stock</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                   
                   {/* Mobile actions */}
                   <div className="flex gap-2 mt-4 pt-3 border-t border-slate-100">
                     <button 
-                      onClick={() => { setProductToEdit({ ...product, isSale: product.originalPrice !== null && product.originalPrice !== undefined && product.originalPrice !== "" }); setEditModalOpen(true); }}
+                      onClick={() => openEditModal(product)}
                       className="flex-1 py-2.5 bg-kora/5 hover:bg-kora/10 text-kora font-bold text-xs uppercase tracking-wider rounded-xl transition-colors text-center border border-kora/10"
                     >
                       Edit
@@ -423,17 +481,44 @@ export default function AdminInventoryPage() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Stock Level</label>
-                    <input 
-                      required type="number" min="0"
-                      value={productToEdit.stock !== undefined ? productToEdit.stock : 10} 
-                      onChange={e => setProductToEdit({...productToEdit, stock: e.target.value})} 
-                      className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
-                    />
+                {/* Per-Size Stock Editor Grid */}
+                <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Stock Per Size</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {(Array.isArray(productToEdit.sizes)
+                      ? productToEdit.sizes
+                      : typeof productToEdit.sizes === "string"
+                        ? productToEdit.sizes.split(",").map((s: string) => s.trim()).filter(Boolean)
+                        : []
+                    ).map((size: string) => {
+                      const qty = productToEdit.sizeStocksMap?.[size] !== undefined ? productToEdit.sizeStocksMap[size] : 0;
+                      return (
+                        <div key={size} className="bg-white border border-slate-200 rounded-xl p-2.5 flex items-center justify-between shadow-xs">
+                          <span className="text-[11px] font-black text-slate-900 uppercase ml-1 shrink-0">{size}</span>
+                          <input
+                            type="number"
+                            min="0"
+                            value={qty}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 0;
+                              setProductToEdit({
+                                ...productToEdit,
+                                sizeStocksMap: {
+                                  ...productToEdit.sizeStocksMap,
+                                  [size]: val
+                                }
+                              });
+                            }}
+                            className="w-14 bg-slate-50 border border-slate-200 rounded-lg p-1 text-center text-xs font-mono font-bold focus:bg-white focus:border-kora outline-none shrink-0"
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
-                  <div className="flex items-end">
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-center">
                     <label className="flex items-center gap-2 cursor-pointer bg-slate-50/80 hover:bg-slate-100/60 border border-slate-200 rounded-xl p-3 w-full select-none transition-colors h-[42px]">
                       <input 
                         type="checkbox" 

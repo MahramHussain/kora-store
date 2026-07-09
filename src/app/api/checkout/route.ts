@@ -114,15 +114,38 @@ export async function POST(req: Request) {
       // A. Inventory Check & Lock
       for (const item of items) {
         const dbProduct = await tx.product.findUnique({
-          where: { id: item.id }
+          where: { id: item.id },
+          include: { sizeStocks: true }
         });
 
         if (!dbProduct) {
           throw new Error(`Product not found: ${item.name}`);
         }
 
-        if (dbProduct.stock < item.quantity) {
-          throw new Error(`Insufficient stock for product ${dbProduct.name}`);
+        // Find size-specific stock if sizeStocks are initialized
+        if (dbProduct.sizeStocks && dbProduct.sizeStocks.length > 0) {
+          const sizeStockMatch = dbProduct.sizeStocks.find((s: any) => s.size === item.size);
+          if (!sizeStockMatch) {
+            throw new Error(`Size ${item.size} is unavailable for product ${dbProduct.name}`);
+          }
+          if (sizeStockMatch.quantity < item.quantity) {
+            throw new Error(`Insufficient stock for size ${item.size} of product ${dbProduct.name}`);
+          }
+
+          // Decrement specific SizeStock quantity
+          await tx.sizeStock.update({
+            where: { id: sizeStockMatch.id },
+            data: {
+              quantity: {
+                decrement: item.quantity
+              }
+            }
+          });
+        } else {
+          // Fallback to old global stock check
+          if (dbProduct.stock < item.quantity) {
+            throw new Error(`Insufficient stock for product ${dbProduct.name}`);
+          }
         }
 
         // B. Decrement Product Stock

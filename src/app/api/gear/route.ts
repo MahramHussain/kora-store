@@ -15,12 +15,17 @@ export async function POST(req: Request) {
     const body = await req.json();
     
     // 2. Grab all the data sent from your Admin Dashboard
-    const { name, category, team, price, description, tag, images, sizes, stock, isWorldCup, originalPrice } = body;
+    const { name, category, team, price, description, tag, images, sizes, sizeStocks, isWorldCup, originalPrice } = body;
 
     // 3. Resolve images recursively in the public directory on the server
     const resolvedImages = (Array.isArray(images) ? images : [])
       .map((img: string) => resolveImageFilename(img))
       .filter(Boolean);
+
+    // Calculate total stock as the sum of all size stocks
+    const totalStock = sizeStocks && typeof sizeStocks === "object"
+      ? Object.values(sizeStocks).reduce((acc: number, val: any) => acc + (parseInt(val) || 0), 0)
+      : (body.stock !== undefined ? parseInt(body.stock) : 10);
 
     // 4. Safely create the product
     const newProduct = await prisma.product.create({
@@ -33,9 +38,15 @@ export async function POST(req: Request) {
         tag: tag || null,
         images: resolvedImages,
         sizes,
-        stock: stock !== undefined ? parseInt(stock) : 10,
+        stock: totalStock,
         isWorldCup: !!isWorldCup,
-        originalPrice: originalPrice ? parseFloat(originalPrice) : null
+        originalPrice: originalPrice ? parseFloat(originalPrice) : null,
+        sizeStocks: sizeStocks && typeof sizeStocks === "object" ? {
+          create: Object.entries(sizeStocks).map(([size, quantity]) => ({
+            size,
+            quantity: parseInt(quantity as string) || 0
+          }))
+        } : undefined
       }
     });
 

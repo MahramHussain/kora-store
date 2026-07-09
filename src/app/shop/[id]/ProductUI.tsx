@@ -379,6 +379,15 @@ export default function ProductUI({ product }: { product: any }) {
   const [isAdded, setIsAdded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  const getSizeStock = (size: string): number => {
+    if (!product.sizeStocks || product.sizeStocks.length === 0) {
+      return product.stock;
+    }
+    const match = product.sizeStocks.find((s: any) => s.size === size);
+    return match ? match.quantity : 0;
+  };
+  const activeSizeStock = selectedSize ? getSizeStock(selectedSize) : product.stock;
+
   // Personalization states
   const [personalizationTab, setPersonalizationTab] = useState<"none" | "custom" | "player">("none");
   const [leftSleevePatch, setLeftSleevePatch] = useState("");
@@ -805,6 +814,16 @@ export default function ProductUI({ product }: { product: any }) {
     return () => window.removeEventListener("resize", check);
   }, []);
 
+  // Limit quantity if selected size changes or activeSizeStock updates
+  useEffect(() => {
+    if (selectedSize) {
+      const maxStock = getSizeStock(selectedSize);
+      if (quantity > maxStock) {
+        setQuantity(Math.max(1, maxStock));
+      }
+    }
+  }, [selectedSize]);
+
   // Sync gallery scroll to activeImageIndex (for thumbnail clicks on mobile)
   const scrollToSlide = useCallback((idx: number) => {
     const el = galleryRef.current;
@@ -1183,25 +1202,37 @@ export default function ProductUI({ product }: { product: any }) {
           </div>
           {product.sizes && product.sizes.length > 0 ? (
             <div className="flex flex-wrap gap-2 text-start">
-              {product.sizes.map((size: string) => (
-                <button
-                  key={size}
-                  onClick={() => product.stock > 0 && setSelectedSize(size)}
-                  disabled={product.stock === 0}
-                  className={`pdp-size-pill px-3 ${
-                    product.stock === 0
-                      ? "pdp-size-pill-disabled"
-                      : selectedSize === size
-                      ? "pdp-size-pill-active"
-                      : ""
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
+              {product.sizes.map((size: string) => {
+                const sizeStock = getSizeStock(size);
+                const isSoldOut = sizeStock === 0;
+                return (
+                  <button
+                    key={size}
+                    onClick={() => !isSoldOut && setSelectedSize(size)}
+                    disabled={isSoldOut}
+                    className={`px-3.5 py-2 flex flex-col items-center justify-center min-w-[60px] h-14 border rounded-xl transition-all duration-300 ${
+                      isSoldOut
+                        ? "opacity-35 bg-slate-50 border-slate-200 text-slate-300 cursor-not-allowed line-through"
+                        : selectedSize === size
+                        ? "bg-kora border-kora text-white shadow-md shadow-kora/25 scale-[1.02]"
+                        : "bg-white border-slate-200 text-slate-700 hover:border-kora/50 hover:text-kora hover:shadow-xs"
+                    }`}
+                  >
+                    <span className="font-extrabold text-sm uppercase">{size}</span>
+                    <span className={`text-[8px] mt-0.5 font-bold uppercase ${selectedSize === size ? "text-white/80" : sizeStock <= 3 ? "text-amber-500 font-extrabold" : "text-slate-400"}`}>
+                      {isSoldOut ? "Out" : `${sizeStock}`}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           ) : (
             <p className="text-sm text-slate-500">{t("one_size")}</p>
+          )}
+          {selectedSize && (
+            <p className="text-[10px] text-slate-400 font-semibold mt-2.5">
+              Stock available for size {selectedSize}: <span className="font-bold text-slate-800">{getSizeStock(selectedSize)} units</span>
+            </p>
           )}
         </div>
 
@@ -1667,8 +1698,8 @@ export default function ProductUI({ product }: { product: any }) {
             </button>
             <span className="w-8 text-center font-black text-slate-900 text-sm">{product.stock === 0 ? 0 : quantity}</span>
             <button
-              onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-              disabled={product.stock === 0 || quantity >= product.stock}
+              onClick={() => setQuantity(Math.min(activeSizeStock, quantity + 1))}
+              disabled={product.stock === 0 || quantity >= activeSizeStock}
               className="w-10 h-12 flex items-center justify-center text-slate-500 text-lg font-bold active:bg-slate-50 transition-colors disabled:opacity-30"
             >
               +
@@ -1678,7 +1709,7 @@ export default function ProductUI({ product }: { product: any }) {
           {/* Add to cart button */}
           <button
             onClick={handleAddToCart}
-            disabled={product.stock === 0 || (!selectedSize && product.sizes?.length > 0) || isAdded}
+            disabled={product.stock === 0 || (product.sizes?.length > 0 && (!selectedSize || getSizeStock(selectedSize) === 0)) || isAdded}
             className={`flex-1 h-12 rounded-xl font-bold text-sm uppercase tracking-widest transition-all ${
               product.stock === 0
                 ? "bg-slate-100 text-slate-400 cursor-not-allowed"
@@ -1691,7 +1722,7 @@ export default function ProductUI({ product }: { product: any }) {
           >
             {product.stock === 0
               ? t("sold_out")
-              : !selectedSize && product.sizes?.length > 0
+              : (product.sizes?.length > 0 && !selectedSize)
               ? t("select_size")
               : isAdded
               ? `✓ ${t("added_to_cart")}`
@@ -1928,26 +1959,38 @@ export default function ProductUI({ product }: { product: any }) {
               </div>
               <div className="flex flex-wrap gap-2.5">
                 {product.sizes && product.sizes.length > 0 ? (
-                  product.sizes.map((size: string) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      disabled={product.stock === 0}
-                      className={`w-14 h-12 rounded-xl font-bold text-sm border transition-all duration-300 relative flex items-center justify-center ${
-                        product.stock === 0
-                          ? "bg-slate-50 border-slate-200 text-slate-300 cursor-not-allowed"
-                          : selectedSize === size
-                          ? "bg-kora border-kora text-white shadow-md shadow-kora/25 scale-[1.02]"
-                          : "bg-white border-slate-200 text-slate-600 hover:border-kora/50 hover:text-kora shadow-sm hover:scale-[1.02]"
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))
+                  product.sizes.map((size: string) => {
+                    const sizeStock = getSizeStock(size);
+                    const isSoldOut = sizeStock === 0;
+                    return (
+                      <button
+                        key={size}
+                        onClick={() => !isSoldOut && setSelectedSize(size)}
+                        disabled={isSoldOut}
+                        className={`w-16 h-14 rounded-xl font-bold border transition-all duration-300 flex flex-col items-center justify-center ${
+                          isSoldOut
+                            ? "opacity-35 bg-slate-50 border-slate-200 text-slate-300 cursor-not-allowed line-through"
+                            : selectedSize === size
+                            ? "bg-kora border-kora text-white shadow-md shadow-kora/25 scale-[1.02]"
+                            : "bg-white border-slate-200 text-slate-600 hover:border-kora/50 hover:text-kora shadow-sm hover:scale-[1.02]"
+                        }`}
+                      >
+                        <span className="font-extrabold text-sm uppercase">{size}</span>
+                        <span className={`text-[8px] mt-0.5 font-bold uppercase ${selectedSize === size ? "text-white/80" : sizeStock <= 3 ? "text-amber-500 font-extrabold" : "text-slate-400"}`}>
+                          {isSoldOut ? "Out" : `${sizeStock}`}
+                        </span>
+                      </button>
+                    );
+                  })
                 ) : (
                   <span className="text-slate-500 text-sm font-bold bg-slate-100 px-4 py-2 rounded-xl">One Size</span>
                 )}
               </div>
+              {selectedSize && (
+                <p className="text-[10px] text-slate-400 font-medium mt-3.5">
+                  Stock available for size {selectedSize}: <span className="font-bold text-slate-800">{getSizeStock(selectedSize)} units</span>
+                </p>
+              )}
             </div>
 
             {/* Custom Personalization (Shirts Only) */}
@@ -1980,8 +2023,8 @@ export default function ProductUI({ product }: { product: any }) {
                 </button>
                 <span className="font-bold text-slate-900 text-sm">{product.stock === 0 ? 0 : quantity}</span>
                 <button
-                  onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                  disabled={product.stock === 0 || quantity >= product.stock}
+                  onClick={() => setQuantity(Math.min(activeSizeStock, quantity + 1))}
+                  disabled={product.stock === 0 || quantity >= activeSizeStock}
                   className="w-9 h-9 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-white rounded-xl transition-all text-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   +
@@ -1991,7 +2034,7 @@ export default function ProductUI({ product }: { product: any }) {
               {/* Add to Cart button */}
               <button
                 onClick={handleAddToCart}
-                disabled={product.stock === 0 || (!selectedSize && product.sizes?.length > 0) || isAdded}
+                disabled={product.stock === 0 || (product.sizes?.length > 0 && (!selectedSize || getSizeStock(selectedSize) === 0)) || isAdded}
                 className={`flex-1 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-md h-full flex items-center justify-center gap-2 transform-gpu active:scale-98 ${
                   product.stock === 0
                     ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none"

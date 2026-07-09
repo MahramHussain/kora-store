@@ -66,6 +66,9 @@ export async function getProducts() {
   try {
     const products = await prisma.product.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        sizeStocks: true
+      }
     });
     
     return products.map(product => ({
@@ -132,6 +135,7 @@ export async function updateProduct(
     description: string; 
     images: string[]; 
     stock?: number;
+    sizeStocks?: Record<string, number>;
     isWorldCup?: boolean;
     originalPrice: number | null;
   }
@@ -144,23 +148,52 @@ export async function updateProduct(
       .map((img: string) => resolveImageFilename(img))
       .filter(Boolean);
 
-    const updatedProduct = await prisma.product.update({
-      where: { id: productId },
-      data: {
-        name: data.name,
-        price: data.price,
-        category: data.category,
-        team: data.team || null,
-        tag: data.tag || null,
-        sizes: data.sizes,
-        description: data.description,
-        images: resolvedImages,
-        stock: data.stock !== undefined ? data.stock : undefined,
-        isWorldCup: data.isWorldCup !== undefined ? data.isWorldCup : undefined,
-        originalPrice: data.originalPrice,
-      },
+    // Calculate total stock if sizeStocks is provided
+    let totalStock = data.stock;
+    if (data.sizeStocks && typeof data.sizeStocks === "object") {
+      totalStock = Object.values(data.sizeStocks).reduce((acc: number, val: any) => acc + (parseInt(val as any) || 0), 0);
+    }
+
+    // Run updates in transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Delete old sizeStocks
+      if (data.sizeStocks && typeof data.sizeStocks === "object") {
+        await tx.sizeStock.deleteMany({
+          where: { productId }
+        });
+        
+        // 2. Create new sizeStocks
+        await tx.sizeStock.createMany({
+          data: Object.entries(data.sizeStocks).map(([size, quantity]) => ({
+            productId,
+            size,
+            quantity: parseInt(quantity as any) || 0
+          }))
+        });
+      }
+
+      // 3. Update the product
+      const updatedProduct = await tx.product.update({
+        where: { id: productId },
+        data: {
+          name: data.name,
+          price: data.price,
+          category: data.category,
+          team: data.team || null,
+          tag: data.tag || null,
+          sizes: data.sizes,
+          description: data.description,
+          images: resolvedImages,
+          stock: totalStock !== undefined ? totalStock : undefined,
+          isWorldCup: data.isWorldCup !== undefined ? data.isWorldCup : undefined,
+          originalPrice: data.originalPrice,
+        },
+      });
+
+      return updatedProduct;
     });
-    return { success: true, product: { ...updatedProduct, price: updatedProduct.price.toString(), originalPrice: updatedProduct.originalPrice ? updatedProduct.originalPrice.toString() : null } };
+
+    return { success: true, product: { ...result, price: result.price.toString(), originalPrice: result.originalPrice ? result.originalPrice.toString() : null } };
   } catch (error) {
     console.error("Failed to update product:", error);
     return { success: false, error: "Failed to save product changes" };

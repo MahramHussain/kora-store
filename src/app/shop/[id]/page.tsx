@@ -3,7 +3,7 @@ import ProductUI from "./ProductUI";
 import { notFound } from "next/navigation";
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  
+  // Re-compilation trigger for updated Prisma Client schema
   const { id } = await params;
 
   // 1. Fetch reviews along with the user profiles to display correct custom/google avatars
@@ -15,6 +15,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           user: true,
         },
       },
+      sizeStocks: true,
     },
   });
 

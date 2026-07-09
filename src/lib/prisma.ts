@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 
+// Force next.js to re-read updated prisma schema
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 // Prisma 7 requires this new Adapter pattern to talk to Vercel/Neon
