@@ -91,6 +91,11 @@ async function main() {
           stock: item.stock ?? 10,
           isWorldCup: item.isWorldCup ?? false,
           originalPrice: item.originalPrice ? new Prisma.Decimal(item.originalPrice) : null,
+          brand: item.brand || null,
+          gender: item.gender || null,
+          subCategory: item.subCategory || null,
+          soleplate: item.soleplate || null,
+          colorway: item.colorway || null,
         },
         create: {
           id: item.id,
@@ -105,6 +110,11 @@ async function main() {
           stock: item.stock ?? 10,
           isWorldCup: item.isWorldCup ?? false,
           originalPrice: item.originalPrice ? new Prisma.Decimal(item.originalPrice) : null,
+          brand: item.brand || null,
+          gender: item.gender || null,
+          subCategory: item.subCategory || null,
+          soleplate: item.soleplate || null,
+          colorway: item.colorway || null,
         },
       });
       console.log(`✓ [DATABASE] Product successfully synced (created/updated).`);

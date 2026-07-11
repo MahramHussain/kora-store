@@ -102,7 +102,12 @@ export default function AdminInventoryPage() {
       isWorldCup: !!productToEdit.isWorldCup,
       originalPrice: productToEdit.isSale && productToEdit.originalPrice
         ? parseFloat(productToEdit.originalPrice)
-        : null
+        : null,
+      brand: productToEdit.brand || null,
+      gender: productToEdit.gender || null,
+      subCategory: productToEdit.subCategory || null,
+      soleplate: productToEdit.soleplate || null,
+      colorway: productToEdit.colorway || null
     };
 
     const res = await updateProduct(productToEdit.id, updatedData);
@@ -531,19 +536,22 @@ export default function AdminInventoryPage() {
                   </div>
                 </div>
 
+                {/* Global properties: Gender and Tag */}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Team</label>
-                    <input 
-                      type="text" 
-                      value={productToEdit.team || ""} 
-                      onChange={e => setProductToEdit({...productToEdit, team: e.target.value || null})} 
-                      className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
-                      placeholder="None"
-                    />
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Target Gender</label>
+                    <select 
+                      value={productToEdit.gender || "Unisex"} 
+                      onChange={e => setProductToEdit({...productToEdit, gender: e.target.value})} 
+                      className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora outline-none text-xs cursor-pointer font-bold transition-all"
+                    >
+                      <option value="Unisex">Unisex</option>
+                      <option value="Men">Men</option>
+                      <option value="Women">Women</option>
+                    </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Tag</label>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Display Tag</label>
                     <select 
                       value={productToEdit.tag || ""} 
                       onChange={e => setProductToEdit({...productToEdit, tag: e.target.value || null})} 
@@ -556,6 +564,99 @@ export default function AdminInventoryPage() {
                     </select>
                   </div>
                 </div>
+
+                {/* Category specific attributes */}
+                {(productToEdit.category === "Shirts" || productToEdit.category === "Retro Kits") && (
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Club / National Team</label>
+                    <input 
+                      type="text" 
+                      value={productToEdit.team || ""} 
+                      onChange={e => setProductToEdit({...productToEdit, team: e.target.value || null})} 
+                      className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
+                      placeholder="e.g., Real Madrid"
+                    />
+                  </div>
+                )}
+
+                {productToEdit.category === "Boots" && (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Brand</label>
+                      <input 
+                        type="text" 
+                        value={productToEdit.brand || ""} 
+                        onChange={e => setProductToEdit({...productToEdit, brand: e.target.value || null})} 
+                        className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
+                        placeholder="e.g., Nike"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Soleplate</label>
+                      <select 
+                        value={productToEdit.soleplate || "FG"} 
+                        onChange={e => setProductToEdit({...productToEdit, soleplate: e.target.value})} 
+                        className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora outline-none text-xs cursor-pointer font-bold transition-all"
+                      >
+                        <option value="FG">FG</option>
+                        <option value="SG">SG</option>
+                        <option value="AG">AG</option>
+                        <option value="TF">TF</option>
+                        <option value="IN">IN</option>
+                        <option value="Casual">Casual</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Colorway</label>
+                      <input 
+                        type="text" 
+                        value={productToEdit.colorway || ""} 
+                        onChange={e => setProductToEdit({...productToEdit, colorway: e.target.value || null})} 
+                        className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
+                        placeholder="Colorway"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {(productToEdit.category === "Accessories" || productToEdit.category === "Flags") && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Sub-Category</label>
+                      <select 
+                        value={productToEdit.subCategory || "Socks"} 
+                        onChange={e => setProductToEdit({...productToEdit, subCategory: e.target.value})} 
+                        className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora outline-none text-xs cursor-pointer font-bold transition-all"
+                      >
+                        <option value="Socks">Socks</option>
+                        <option value="Flags">Flags</option>
+                        <option value="Bags">Bags</option>
+                        <option value="Souvenirs">Souvenirs</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Brand (Optional)</label>
+                      <input 
+                        type="text" 
+                        value={productToEdit.brand || ""} 
+                        onChange={e => setProductToEdit({...productToEdit, brand: e.target.value || null})} 
+                        className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
+                        placeholder="None"
+                      />
+                    </div>
+                    <div className="col-span-2">
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Club / Team (Optional)</label>
+                      <input 
+                        type="text" 
+                        value={productToEdit.team || ""} 
+                        onChange={e => setProductToEdit({...productToEdit, team: e.target.value || null})} 
+                        className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
+                        placeholder="None"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Product Images</label>

@@ -44,7 +44,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm text-purple-100/90 font-medium tracking-wider">
               <li className="flex items-center gap-3 hover:text-white transition-colors cursor-pointer group">
                 <FaEnvelope className="text-xl group-hover:scale-110 transition-transform text-purple-300 group-hover:text-white" /> 
-                <span>support@korastore.com</span>
+                <span>support@korastore.ae</span>
               </li>
               <li className="flex items-center gap-3 hover:text-emerald-300 transition-colors cursor-pointer group">
                 <a href="https://wa.me/971564245926" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
@@ -74,7 +74,7 @@ export default function Footer() {
             </p>
             {/* Social Icons Row */}
             <div className="flex justify-center gap-4 pt-2">
-              <a href="mailto:support@korastore.com" className="mobile-footer-social-btn text-purple-200 border-purple-800 hover:text-white" aria-label="Email Support">
+              <a href="mailto:support@korastore.ae" className="mobile-footer-social-btn text-purple-200 border-purple-800 hover:text-white" aria-label="Email Support">
                 <FaEnvelope className="text-lg" />
               </a>
               <a href="https://wa.me/971564245926" target="_blank" rel="noopener noreferrer" className="mobile-footer-social-btn text-purple-200 border-purple-800 hover:text-emerald-300" aria-label="WhatsApp">
@@ -119,7 +119,7 @@ export default function Footer() {
                 <ul className="pb-4 space-y-3 pl-1 text-xs font-medium tracking-wider text-purple-200/90">
                   <li className="flex items-center gap-3 py-1">
                     <FaEnvelope className="text-sm text-purple-300" />
-                    <span>support@korastore.com</span>
+                    <span>support@korastore.ae</span>
                   </li>
                   <li className="flex items-center gap-3 py-1 hover:text-emerald-300 transition-colors cursor-pointer">
                     <a href="https://wa.me/971564245926" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
@@ -159,8 +159,8 @@ export default function Footer() {
         <div className="text-center text-xs text-purple-200/80 pt-8 border-t border-purple-900/40 flex flex-col md:flex-row justify-between items-center gap-4 font-medium">
           <p>&copy; {new Date().getFullYear()} Kora Store. {t("all_rights_reserved")}</p>
           <div className="flex gap-6">
-            <span className="hover:text-white cursor-pointer transition-colors active:text-white">{t("terms")}</span>
-            <span className="hover:text-white cursor-pointer transition-colors active:text-white">{t("privacy")}</span>
+            <Link href="/terms" className="hover:text-white transition-colors active:text-white">{t("terms")}</Link>
+            <Link href="/privacy" className="hover:text-white transition-colors active:text-white">{t("privacy")}</Link>
           </div>
         </div>
 

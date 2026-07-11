@@ -1094,7 +1094,9 @@ export default function ProductUI({ product }: { product: any }) {
         <div className="mb-4">
           <span className="text-kora text-[10px] font-bold uppercase tracking-widest">{categoryLabel}</span>
           <h1 className="text-2xl font-black tracking-tight text-slate-900 leading-tight mt-1 uppercase">
-            {t(product.id) !== product.id ? t(product.id) : product.name}
+            {t(product.id) !== product.id 
+              ? t(product.id) 
+              : (language === "ar" && product.nameAr ? product.nameAr : product.name)}
           </h1>
           <div className="flex items-center gap-3 mt-2">
             <div className="flex text-yellow-400 text-xs gap-0.5">
@@ -1256,7 +1258,9 @@ export default function ProductUI({ product }: { product: any }) {
         {/* Description */}
         <div className="mb-6">
           <p className="text-sm text-slate-500 leading-relaxed">
-            {t(product.id + "_desc") !== product.id + "_desc" ? t(product.id + "_desc") : (product.description || t("premium_gear_sourced"))}
+            {t(product.id + "_desc") !== product.id + "_desc" 
+              ? t(product.id + "_desc") 
+              : (language === "ar" && product.descriptionAr ? product.descriptionAr : (product.description || t("premium_gear_sourced")))}
           </p>
         </div>
 
@@ -1847,7 +1851,9 @@ export default function ProductUI({ product }: { product: any }) {
 
             {/* Title */}
             <h1 className="text-3xl xl:text-4xl font-black tracking-tight text-slate-900 mb-3.5 uppercase leading-none font-display text-start">
-              {t(product.id) !== product.id ? t(product.id) : product.name}
+              {t(product.id) !== product.id 
+                ? t(product.id) 
+                : (language === "ar" && product.nameAr ? product.nameAr : product.name)}
             </h1>
 
             {/* Ratings Header */}
@@ -1911,7 +1917,9 @@ export default function ProductUI({ product }: { product: any }) {
 
             {/* Product Description */}
             <p className="text-slate-600 leading-relaxed text-sm font-sans mb-8">
-              {t(product.id + "_desc") !== product.id + "_desc" ? t(product.id + "_desc") : (product.description || t("premium_gear_sourced"))}
+              {t(product.id + "_desc") !== product.id + "_desc" 
+                ? t(product.id + "_desc") 
+                : (language === "ar" && product.descriptionAr ? product.descriptionAr : (product.description || t("premium_gear_sourced")))}
             </p>
 
             {/* Style Variation Selector (Boots) */}
@@ -2559,7 +2567,11 @@ export default function ProductUI({ product }: { product: any }) {
             {/* Header */}
             <div className="mb-6 text-start">
               <span className="text-[10px] font-black uppercase text-kora tracking-widest bg-kora/10 px-2.5 py-0.5 rounded-sm">{t("official_spec")}</span>
-              <h3 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight mt-1 text-start">{t(product.id) !== product.id ? t(product.id) : product.name} {t("size_chart")}</h3>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight mt-1 text-start">
+                {t(product.id) !== product.id 
+                  ? t(product.id) 
+                  : (language === "ar" && product.nameAr ? product.nameAr : product.name)} {t("size_chart")}
+              </h3>
               <p className="text-slate-400 text-xs mt-1 text-start">{t("size_chart_desc")}</p>
             </div>
 

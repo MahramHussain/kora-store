@@ -767,8 +767,10 @@ export default function Navbar() {
 
       {/* Slide-over panel */}
       <div 
-        className={`fixed top-0 bottom-0 left-0 w-[300px] max-w-[85vw] bg-white z-50 md:hidden shadow-2xl flex flex-col transition-transform duration-300 ease-in-out transform ${
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-0 bottom-0 w-[300px] max-w-[85vw] bg-white z-50 md:hidden shadow-2xl flex flex-col transition-transform duration-300 ease-in-out transform ${
+          language === "ar"
+            ? `right-0 ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`
+            : `left-0 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`
         }`}
       >
         {/* Drawer Header */}

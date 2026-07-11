@@ -10,6 +10,8 @@ import { FaStar } from "react-icons/fa";
 interface Product {
   id: string;
   name: string;
+  nameAr?: string | null;
+  descriptionAr?: string | null;
   category: string;
   price: string | number;
   team?: string | null;
@@ -66,7 +68,7 @@ export function ProductCard({ product }: { product: Product }) {
   // Show dots: on mobile always (if multiple images), on desktop only on hover
   const showDots = images.length > 1 && (isMobile || isHovered);
 
-  const { t } = useTranslation();
+  const { language, t } = useTranslation();
 
   return (
     <Link 
@@ -145,7 +147,11 @@ export function ProductCard({ product }: { product: Product }) {
                 ? t("category_accessories") 
                 : (t(`category_${product.category.toLowerCase().replace(" ", "_")}`) || product.category)}
             </p>
-            <h3 className="text-sm md:text-base font-bold text-slate-900 leading-tight line-clamp-1 font-sans">{product.name}</h3>
+            <h3 className="text-sm md:text-base font-bold text-slate-900 leading-tight line-clamp-1 font-sans">
+              {t(product.id) !== product.id 
+                ? t(product.id) 
+                : (language === "ar" && product.nameAr ? product.nameAr : product.name)}
+            </h3>
             {product.reviews && product.reviews.length > 0 && (() => {
               const avg = product.reviews.reduce((s, r) => s + r.rating, 0) / product.reviews.length;
               return (

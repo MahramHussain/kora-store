@@ -186,7 +186,7 @@ export default function AdminOrdersPage() {
                   </div>
 
                   {/* Ordered Items summary list */}
-                  <div className="mb-4 space-y-2 max-h-36 overflow-y-auto pr-1 scrollbar-hide">
+                  <div className="mb-4 space-y-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-hide">
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">Ordered Items</span>
                     {order.items && order.items.map((item: any, idx: number) => (
                       <div key={idx} className="flex justify-between items-center bg-slate-50/50 border border-slate-100 p-2.5 rounded-xl text-xs gap-3">

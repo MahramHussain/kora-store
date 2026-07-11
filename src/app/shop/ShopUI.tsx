@@ -7,6 +7,7 @@ import Link from "next/link";
 import { CURRENCY } from "@/lib/constants";
 import { useSearchParams } from "next/navigation";
 import { useTranslation } from "@/context/LanguageContext";
+import { translations } from "@/lib/translations";
 
 const CATEGORIES = ["All", "World Cup", "Shoes", "Shirts", "Retro Kits", "Accessories"];
 const TEAMS = ["All Teams", "Argentina", "Brazil", "France", "Germany", "Portugal", "Spain", "Uruguay", "Arsenal", "Barcelona", "Real Madrid", "Manchester City", "Paris Saint-Germain", "Manchester United"];
@@ -71,7 +72,7 @@ function MiniCarousel({ images, alt, soldOut }: { images: string[]; alt: string;
 }
 
 export default function ShopUI({ products }: { products: any[] }) {
-  const { t } = useTranslation();
+  const { language, t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeTeam, setActiveTeam] = useState("All Teams");
@@ -169,7 +170,33 @@ export default function ShopUI({ products }: { products: any[] }) {
   };
 
   const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = (() => {
+      const query = searchQuery.toLowerCase().trim();
+      if (!query) return true;
+
+      const staticEntry = (translations as any)[product.id];
+      const nameEn = (product.name || "").toLowerCase();
+      const nameAr = (product.nameAr || "").toLowerCase();
+      const staticEn = (staticEntry?.en || "").toLowerCase();
+      const staticAr = (staticEntry?.ar || "").toLowerCase();
+
+      const descriptionEn = (product.description || "").toLowerCase();
+      const descriptionAr = (product.descriptionAr || "").toLowerCase();
+      const descStaticEn = ((translations as any)[product.id + "_desc"]?.en || "").toLowerCase();
+      const descStaticAr = ((translations as any)[product.id + "_desc"]?.ar || "").toLowerCase();
+
+      const categoryEn = (product.category || "").toLowerCase();
+
+      return nameEn.includes(query) || 
+             nameAr.includes(query) || 
+             staticEn.includes(query) || 
+             staticAr.includes(query) ||
+             descriptionEn.includes(query) ||
+             descriptionAr.includes(query) ||
+             descStaticEn.includes(query) ||
+             descStaticAr.includes(query) ||
+             categoryEn.includes(query);
+    })();
     const matchesCategory = activeCategory === "All" || 
       (activeCategory === "Shoes" && product.category === "Boots") ||
       (activeCategory === "World Cup" && product.isWorldCup) ||
@@ -446,7 +473,11 @@ export default function ShopUI({ products }: { products: any[] }) {
                     <div className="flex-1 flex flex-col justify-between py-0.5 font-sans text-start">
                       <div>
                         <p className="text-kora text-[9px] font-bold uppercase tracking-widest mb-1">{product.category === "Boots" ? t("category_shoes") : product.category === "Flags" ? t("category_accessories") : getCategoryLabel(product.category)}</p>
-                        <h3 className="text-sm font-bold text-slate-900 leading-tight line-clamp-2">{product.name}</h3>
+                        <h3 className="text-sm font-bold text-slate-900 leading-tight line-clamp-2">
+                          {t(product.id) !== product.id 
+                            ? t(product.id) 
+                            : (language === "ar" && product.nameAr ? product.nameAr : product.name)}
+                        </h3>
                       </div>
                       
                       <div className="flex items-end justify-between mt-2">

@@ -48,6 +48,13 @@ model Product {
   stock       Int      @default(10)
   isWorldCup  Boolean  @default(false)
   originalPrice Decimal?
+  nameAr        String?
+  descriptionAr String?
+  brand         String?
+  gender        String?
+  subCategory   String?
+  soleplate     String?
+  colorway      String?
   createdAt   DateTime @default(now())
   
   // Links to order history and carts

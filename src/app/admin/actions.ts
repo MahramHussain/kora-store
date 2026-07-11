@@ -138,6 +138,11 @@ export async function updateProduct(
     sizeStocks?: Record<string, number>;
     isWorldCup?: boolean;
     originalPrice: number | null;
+    brand?: string | null;
+    gender?: string | null;
+    subCategory?: string | null;
+    soleplate?: string | null;
+    colorway?: string | null;
   }
 ) {
   try {
@@ -187,6 +192,11 @@ export async function updateProduct(
           stock: totalStock !== undefined ? totalStock : undefined,
           isWorldCup: data.isWorldCup !== undefined ? data.isWorldCup : undefined,
           originalPrice: data.originalPrice,
+          brand: data.brand || null,
+          gender: data.gender || null,
+          subCategory: data.subCategory || null,
+          soleplate: data.soleplate || null,
+          colorway: data.colorway || null,
         },
       });
 

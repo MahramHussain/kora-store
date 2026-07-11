@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { resolveImageFilename } from "@/lib/resolveImage";
+import { translateToArabic } from "@/lib/translate";
 
 export async function POST(req: Request) {
   try {
@@ -15,7 +16,13 @@ export async function POST(req: Request) {
     const body = await req.json();
     
     // 2. Grab all the data sent from your Admin Dashboard
-    const { name, category, team, price, description, tag, images, sizes, sizeStocks, isWorldCup, originalPrice } = body;
+    const { name, category, team, price, description, tag, images, sizes, sizeStocks, isWorldCup, originalPrice, brand, gender, subCategory, soleplate, colorway } = body;
+
+    // Run Arabic translations in parallel for maximum performance
+    const [nameAr, descriptionAr] = await Promise.all([
+      translateToArabic(name),
+      description ? translateToArabic(description) : Promise.resolve(null)
+    ]);
 
     // 3. Resolve images recursively in the public directory on the server
     const resolvedImages = (Array.isArray(images) ? images : [])
@@ -31,6 +38,8 @@ export async function POST(req: Request) {
     const newProduct = await prisma.product.create({
       data: {
         name,
+        nameAr: nameAr || null,
+        descriptionAr: descriptionAr || null,
         category,
         team: team || null,
         price: parseFloat(price),
@@ -41,6 +50,11 @@ export async function POST(req: Request) {
         stock: totalStock,
         isWorldCup: !!isWorldCup,
         originalPrice: originalPrice ? parseFloat(originalPrice) : null,
+        brand: brand || null,
+        gender: gender || null,
+        subCategory: subCategory || null,
+        soleplate: soleplate || null,
+        colorway: colorway || null,
         sizeStocks: sizeStocks && typeof sizeStocks === "object" ? {
           create: Object.entries(sizeStocks).map(([size, quantity]) => ({
             size,

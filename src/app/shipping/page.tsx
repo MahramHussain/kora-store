@@ -199,7 +199,7 @@ export default function ShippingReturnsPage() {
             {/* Return Action CTA */}
             <div className="text-center mt-8">
               <p className="text-slate-600 mb-4 font-sans">{t("initiate_return_prompt")}</p>
-              <Link href="mailto:support@korastore.com" className="inline-block bg-slate-900 text-white px-8 py-3 rounded-full font-bold uppercase tracking-widest text-sm hover:scale-105 hover:bg-kora transition-all shadow-md hover:shadow-kora/30">
+              <Link href="mailto:support@korastore.ae" className="inline-block bg-slate-900 text-white px-8 py-3 rounded-full font-bold uppercase tracking-widest text-sm hover:scale-105 hover:bg-kora transition-all shadow-md hover:shadow-kora/30">
                 {t("email_support")}
               </Link>
             </div>

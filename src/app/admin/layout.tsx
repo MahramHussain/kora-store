@@ -164,14 +164,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-xs">💰</div>
                         <span className="text-xs text-slate-500 font-semibold">Revenue</span>
                       </div>
-                      <span className="text-sm font-black text-emerald-600">AED {stats.totalEarnings.toFixed(2)}</span>
+                      <span className="text-sm font-black text-emerald-600 whitespace-nowrap shrink-0 text-right">AED {stats.totalEarnings.toFixed(2)}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center text-xs">💎</div>
                         <span className="text-xs text-slate-500 font-semibold">Valuation</span>
                       </div>
-                      <span className="text-sm font-black text-slate-900">AED {stats.totalValue.toFixed(2)}</span>
+                      <span className="text-sm font-black text-slate-900 whitespace-nowrap shrink-0 text-right">AED {stats.totalValue.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
