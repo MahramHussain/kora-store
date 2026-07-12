@@ -221,7 +221,7 @@ export default async function RootLayout({
         </head>
         {/* Added flexbox magic here to push the footer to the bottom */}
         <body className={`${inter.variable} ${outfit.variable} ${inter.className} bg-white text-slate-900 antialiased flex flex-col min-h-screen selection:bg-kora selection:text-white`}>
-          <LanguageProvider initialLang={lang}>
+          <LanguageProvider initialLang={(lang === "ar" ? "ar" : "en") as Language}>
             <CartProvider>
               <Navbar />
               <SaleToast />

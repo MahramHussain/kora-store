@@ -7,7 +7,7 @@ import { FaChevronLeft, FaStar, FaTruckFast } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
-import { FiEdit, FiAward, FiThumbsUp, FiFilter, FiX, FiCheck, FiMessageSquare, FiTrash2, FiCornerDownRight, FiLock } from "react-icons/fi";
+import { FiEdit, FiAward, FiThumbsUp, FiFilter, FiX, FiCheck, FiMessageSquare, FiTrash2, FiCornerDownRight, FiLock, FiAlertTriangle } from "react-icons/fi";
 import { useUser, SignInButton } from "@clerk/nextjs";
 import { useTranslation } from "@/context/LanguageContext";
 
@@ -354,6 +354,14 @@ export default function ProductUI({ product }: { product: any }) {
   const isChartA = ["PORTUGAL HOME", "PORTUGAL AWAY", "SPAIN AWAY", "FRANCE HOME"].includes(normalizedName);
   const isChartB = ["ARGENTINA HOME", "ARGENTINA AWAY", "FRANCE AWAY", "SPAIN HOME", "BRAZIL AWAY", "URUGUAY AWAY"].includes(normalizedName);
   const hasCustomSizeChart = isChartA || isChartB;
+  const isBrazilOrFranceHome = 
+    normalizedName === "BRAZIL HOME" || 
+    normalizedName === "FRANCE HOME" ||
+    product.id === "brazil-home-kit" ||
+    product.id === "france-home-kit" ||
+    product.name?.toLowerCase().includes("brazil home") ||
+    product.name?.toLowerCase().includes("france home");
+  const showWarning = product.category === "Shirts" && !isBrazilOrFranceHome;
   const [activeTab, setActiveTab] = useState<"details" | "reviews">("details");
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
   const [helpfulVotes, setHelpfulVotes] = useState<Record<string, { yes: number; voted: 'yes' | null }>>({});
@@ -1231,6 +1239,22 @@ export default function ProductUI({ product }: { product: any }) {
           ) : (
             <p className="text-sm text-slate-500">{t("one_size")}</p>
           )}
+
+          {/* Sizing Warning */}
+          {showWarning && (
+            <div className="mt-3.5 bg-amber-50/50 border border-amber-200/60 rounded-2xl p-3.5 flex items-start gap-2.5 font-sans animate-fade-in">
+              <FiAlertTriangle className="w-4.5 h-4.5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="text-start rtl:text-right">
+                <p className="text-xs font-bold text-amber-800 leading-tight">
+                  {t("player_version_warning_title")}
+                </p>
+                <p className="text-[11px] text-amber-700/90 mt-1 leading-normal font-medium">
+                  {t("player_version_warning_desc")}
+                </p>
+              </div>
+            </div>
+          )}
+
           {selectedSize && (
             <p className="text-[10px] text-slate-400 font-semibold mt-2.5">
               Stock available for size {selectedSize}: <span className="font-bold text-slate-800">{getSizeStock(selectedSize)} units</span>
@@ -1994,6 +2018,22 @@ export default function ProductUI({ product }: { product: any }) {
                   <span className="text-slate-500 text-sm font-bold bg-slate-100 px-4 py-2 rounded-xl">One Size</span>
                 )}
               </div>
+
+              {/* Sizing Warning */}
+              {showWarning && (
+                <div className="mt-4 bg-amber-50/50 border border-amber-200/60 rounded-2xl p-4 flex items-start gap-3 font-sans animate-fade-in">
+                  <FiAlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                  <div className="text-start rtl:text-right">
+                    <p className="text-xs font-black text-amber-800 leading-tight uppercase tracking-wider">
+                      {t("player_version_warning_title")}
+                    </p>
+                    <p className="text-[11px] text-amber-700/90 mt-1 leading-normal font-medium">
+                      {t("player_version_warning_desc")}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {selectedSize && (
                 <p className="text-[10px] text-slate-400 font-medium mt-3.5">
                   Stock available for size {selectedSize}: <span className="font-bold text-slate-800">{getSizeStock(selectedSize)} units</span>

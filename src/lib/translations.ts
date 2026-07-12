@@ -175,6 +175,8 @@ export const translations = {
   "add_to_cart": { en: "Add to Cart", ar: "إضافة إلى السلة" },
   "select_size": { en: "Select a Size", ar: "اختر المقاس" },
   "size_guide": { en: "Size Guide", ar: "دليل المقاسات" },
+  "player_version_warning_title": { en: "Sizing Caution: Slim Fit Jersey", ar: "تنبيه المقاس: قصة ضيقة" },
+  "player_version_warning_desc": { en: "If you choose a Player Version jersey, we advise ordering one size larger than your usual size because player version jerseys are slim fit (e.g. if you normally wear M, we recommend buying L).", ar: "إذا اخترت نسخة اللاعبين (Player Version)، ننصحك بطلب مقاس أكبر بدرجة واحدة من مقاسك المعتاد نظراً لأن قصة القميص ضيقة (مثال: إذا كان مقاسك المعتاد M، ننصح بطلب L)." },
   "style_variation": { en: "Select Style / Variation", ar: "اختر الطراز / الشكل" },
   "custom_name": { en: "Custom Name", ar: "الاسم المخصص" },
   "custom_number": { en: "Custom Number", ar: "الرقم المخصص" },
