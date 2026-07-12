@@ -123,9 +123,9 @@ export default async function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 md:via-slate-950/20 to-transparent z-10"></div>
           <div className="absolute bottom-0 left-0 right-0 md:right-auto md:bottom-12 ltr:md:left-12 rtl:md:right-12 p-5 md:p-0 z-20 md:max-w-xl text-start">
-            <h2 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-3 tracking-tighter uppercase font-sans drop-shadow-md">
+            <h1 className="text-2xl md:text-5xl font-black text-white mb-2 md:mb-3 tracking-tighter uppercase font-sans drop-shadow-md">
               {t("hero_title")}
-            </h2>
+            </h1>
             <p className="text-slate-300 md:text-slate-200 text-xs md:text-sm mb-5 md:mb-6 max-w-[320px] md:max-w-md font-sans font-medium leading-relaxed drop-shadow-sm">
               {t("hero_desc")}
             </p>
@@ -351,6 +351,81 @@ export default async function Home() {
             <StreetwearAndGearSlider />
           </Suspense>
         </ScrollSlider>
+      </section>
+
+      {/* 10. SEO TEXT CONTENT SECTION (Bilingual) */}
+      <section className="border-t border-slate-100 bg-slate-50/50 py-16 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto text-start">
+          {lang === "ar" ? (
+            // ARABIC SEO SECTION
+            <div dir="rtl" className="space-y-10 font-sans">
+              <div className="max-w-3xl">
+                <span className="text-[10px] font-black uppercase tracking-widest text-kora block mb-2">أفضل متجر كرة قدم في الإمارات</span>
+                <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight uppercase leading-tight">
+                  كورة ستور — وجهتك الأولى لشراء مستلزمات وقمصان كرة القدم في دبي والإمارات
+                </h2>
+                <p className="text-sm text-slate-500 leading-relaxed font-semibold mt-4">
+                  مرحباً بكم في متجر كورة (Kora Store)، متجر كرة القدم الأول عبر الإنترنت في دولة الإمارات العربية المتحدة. نحن نوفر لعشاق المستديرة الساحرة تشكيلة واسعة من قمصان الأندية والمنتخبات، أحذية كرة القدم الاحترافية، والإكسسوارات عالية الجودة. نحن نستورد منتجاتنا مباشرة لنتجاوز هوامش ربح التجزئة الضخمة ونقدم لك الجودة التي تستحقها بأسعار لا تقبل المنافسة.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
+                <div className="space-y-3">
+                  <h3 className="text-lg font-black text-slate-900">أطقم قمصان مخصصة ومطبوعة بالكامل</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                    سواء كنت تبحث عن أطقم الدوري الإنجليزي الممتاز، الدوري الإسباني، أو قمصان كأس العالم، نوفر لك نسخ اللاعبين (Player Edition) ونسخ الجماهير الفاخرة. استمتع بخدمة طباعة الأسماء والأرقام الرسمية والشارات الأصلية لتصميم قميصك الخاص تماماً كما يرتديه أبطالك في الملعب.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-lg font-black text-slate-900">أحذية كرة قدم فاخرة (Soccer Boots)</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                    ارتقِ بأدائك في الملعب مع أحذية كرة القدم الفاخرة المتاحة لدينا في دبي وأبوظبي. نوفر أحذية رياضية مصممة للسرعة، الثبات، والتحكم بالكرة على العشب الطبيعي أو الملاعب الاصطناعية (Turf)، لتضمن التميز في كل مباراة.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-lg font-black text-slate-900">توصيل سريع لكافة إمارات الدولة</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                    مخزوننا متوفر محلياً بالكامل داخل مستودعاتنا في دولة الإمارات. استمتع بتوصيل سريع وموثوق في غضون 1 إلى 2 أيام عمل إلى دبي، أبوظبي، الشارقة، العين، عجمان، رأس الخيمة، الفجيرة وأم القيوين. كل طلب يخضع لفحص دقيق لضمان جودته قبل شحنه إليك.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            // ENGLISH SEO SECTION
+            <div className="space-y-10">
+              <div className="max-w-3xl">
+                <span className="text-[10px] font-black uppercase tracking-widest text-kora block mb-2">Leading Football Shop in UAE</span>
+                <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight uppercase leading-tight">
+                  Kora Store — UAE's Premier Online Football Store for Jerseys &amp; Boots
+                </h2>
+                <p className="text-sm text-slate-500 leading-relaxed font-semibold mt-4">
+                  Welcome to Kora Store, your absolute destination for premium football culture in the United Arab Emirates. As the leading online football store in the UAE, we are dedicated to bringing fans the absolute highest-grade current-season jerseys, custom name printing, professional boots, and iconic retro collections. By cutting out corporate middlemen and sourcing directly, we provide top-tier sport gear at unmatched prices.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
+                <div className="space-y-3">
+                  <h3 className="text-lg font-black text-slate-900">Premium Jerseys &amp; Custom Sourcing</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                    Browse our expansive collection of club kits from the Premier League, La Liga, Serie A, and Champions League, alongside national team jerseys. We feature professional custom name &amp; number printing and official sleeve badges (Champions League, World Cup) so you can represent your favourite player or your own name with pitch-perfect quality.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-lg font-black text-slate-900">Elite Football Boots in Dubai &amp; Abu Dhabi</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                    Step onto the pitch equipped with the best cleats and turf shoes in the UAE. Our selection of football boots is built for high-performance traction, elite touch, and maximum comfort, helping you perform at your best on firm ground, artificial grass, and indoor courts.
+                  </p>
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-lg font-black text-slate-900">Express Shipping Across the Emirates</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                    We do not dropship. We maintain 100% local stock in our UAE warehouse, allowing us to offer express 1 to 2 business day delivery directly to your doorstep in Dubai, Abu Dhabi, Sharjah, Ajman, Al Ain, Fujairah, and Ras Al Khaimah. Every product goes through rigorous pre-shipping quality checks.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </section>
     </main>
   );
