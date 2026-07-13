@@ -473,7 +473,7 @@ export const translations = {
   "cancel_label": { en: "Cancel", ar: "إلغاء" },
   "no_reviews_matching": { en: "No reviews found.", ar: "لم يتم العثور على تقييمات." },
   "clear_filter_label": { en: "Clear Filter", ar: "مسح الفلتر" },
-  "view_gear": { en: "View Gear", ar: "عرض التفاصيل" },
+  "view_gear": { en: "View Item", ar: "عرض المنتج" },
   "trending": { en: "Trending", ar: "شائع" },
   "no_image": { en: "No Image", ar: "لا توجد صورة" },
   "cart": { en: "Cart", ar: "السلة" },

@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer"; // <-- 1. IMPORT THE FOOTER
 import SaleToast from "@/components/SaleToast";
+import PageTransitionLoader from "@/components/PageTransitionLoader";
 import { ClerkProvider } from "@clerk/nextjs";
 import { CartProvider } from "@/context/CartContext";
 import { LanguageProvider, Language } from "@/context/LanguageContext";
@@ -223,6 +224,7 @@ export default async function RootLayout({
         <body className={`${inter.variable} ${outfit.variable} ${inter.className} bg-white text-slate-900 antialiased flex flex-col min-h-screen selection:bg-kora selection:text-white`}>
           <LanguageProvider initialLang={(lang === "ar" ? "ar" : "en") as Language}>
             <CartProvider>
+              <PageTransitionLoader />
               <Navbar />
               <SaleToast />
 

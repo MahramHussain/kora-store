@@ -9,6 +9,9 @@ import { translations } from "@/lib/translations";
 async function WorldCupJerseySlider() {
   const products = await prisma.product.findMany({
     where: { isWorldCup: true },
+    // Fetch only the top 24 latest products to avoid loading the entire catalog in memory
+    take: 24,
+    orderBy: { createdAt: "desc" },
   });
 
   // Sort: On Sale tag first, then by createdAt desc
