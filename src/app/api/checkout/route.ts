@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import { isCustomJersey } from "@/lib/constants";
+import { getPromoDiscount } from "@/lib/promo";
 
 export async function POST(req: Request) {
   try {
@@ -103,7 +104,17 @@ export async function POST(req: Request) {
       const numericPrice = parseFloat(item.price.toString().replace(/[^0-9.]/g, ''));
       return acc + (numericPrice * item.quantity);
     }, 0);
-    const actualDiscount = parseFloat(discountAmount || 0);
+
+    // Validate promo code and calculate actual discount on the server
+    let actualDiscount = 0;
+    if (promoCode) {
+      const discountPercent = getPromoDiscount(promoCode);
+      if (discountPercent === 0) {
+        return new NextResponse("Invalid promo code.", { status: 400 });
+      }
+      actualDiscount = calculatedSubtotal * discountPercent;
+    }
+
     const netSubtotal = calculatedSubtotal - actualDiscount;
     const computedShippingFee = netSubtotal > 200 ? 0 : 25;
     const computedTotal = netSubtotal + computedShippingFee + parseFloat(tax || 0);

@@ -87,15 +87,35 @@ export default function CheckoutPage() {
     return total + (numericPrice * item.quantity);
   }, 0);
 
-  const handleApplyPromo = () => {
-    const code = promoCode.trim().toUpperCase();
-    if (code === "KORA10") {
-      setDiscountPercent(0.10);
-      setPromoMessage(t("promo_10_applied"));
-    } else if (code === "KORA20") {
-      setDiscountPercent(0.20);
-      setPromoMessage(t("promo_20_applied"));
-    } else {
+  const handleApplyPromo = async () => {
+    const code = promoCode.trim();
+    if (!code) {
+      setDiscountPercent(0);
+      setPromoMessage(t("invalid_promo"));
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/promo/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to validate promo code.");
+      }
+
+      const data = await response.json();
+      if (data.valid) {
+        setDiscountPercent(data.discountPercent);
+        setPromoMessage(t(data.messageKey));
+      } else {
+        setDiscountPercent(0);
+        setPromoMessage(t(data.messageKey || "invalid_promo"));
+      }
+    } catch (err) {
+      console.error(err);
       setDiscountPercent(0);
       setPromoMessage(t("invalid_promo"));
     }
