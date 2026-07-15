@@ -5,6 +5,7 @@ import { ProductCard, ProductSkeletonCard } from "@/components/ProductCard";
 import { ScrollSlider } from "@/components/ScrollSlider";
 import { cookies } from "next/headers";
 import { translations } from "@/lib/translations";
+import SpotlightButton from "@/components/SpotlightButton";
 
 async function WorldCupJerseySlider() {
   const products = await prisma.product.findMany({
@@ -210,7 +211,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 7. LATEST WORLD CUP MATCHUP SPOTLIGHT BANNER */}
+      {/* 7. LATEST WORLD CUP CAMPAIGN SPOTLIGHT BANNER */}
       <section className="px-4 md:px-6 mb-10 md:mb-16 max-w-7xl mx-auto w-full">
         <div className="flex justify-between items-end mb-4 md:mb-6">
           <h2 className="text-xl md:text-2xl font-bold flex items-center gap-3 md:gap-4 uppercase tracking-tight">
@@ -222,167 +223,87 @@ export default async function Home() {
           </h2>
         </div>
 
-        {/* MOBILE VIEW MATCHUP BANNER */}
-        <div 
-          className="block md:hidden relative w-full h-[450px] rounded-3xl overflow-hidden group/mob border border-slate-800 shadow-2xl flex flex-col items-center justify-between p-6 text-center select-none"
-        >
-          {/* Background image */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover/mob:scale-102 z-0"
-            style={{ backgroundImage: `url('/assets/matchup_bg.png')` }}
-          />
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/60 z-10 pointer-events-none" />
+        <div className="flex flex-col gap-8 md:gap-12">
+          {/* Argentina Campaign Spotlight Banner */}
+          <div className="relative w-full rounded-3xl overflow-hidden border border-slate-800/80 shadow-2xl bg-slate-950 flex flex-col md:flex-row min-h-[480px] md:min-h-[520px]">
+            {/* Background Glows for Premium Vibe */}
+            <div className="absolute top-0 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none z-0" />
+            <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none z-0" />
 
-          {/* Subtitle / Header */}
-          <div className="relative z-30 pt-2">
-            <span className="text-[9px] font-black tracking-[0.25em] text-purple-300 uppercase drop-shadow-md">
-              {t("world_cup_highlight")}
-            </span>
-          </div>
-
-          {/* Teams / VS */}
-          <div className="relative z-30 flex flex-col items-center justify-center my-auto w-full">
-            <h3 className="text-4xl font-black text-white tracking-widest uppercase drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] font-sans">
-              {t("france")}
-            </h3>
-
-            <div className="flex items-center justify-center my-3">
-              {/* France Flag */}
-              <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-white/90 shadow-[0_0_15px_rgba(0,0,0,0.5)] flex relative shrink-0">
-                <div className="w-1/3 h-full bg-[#002654]"></div>
-                <div className="w-1/3 h-full bg-white"></div>
-                <div className="w-1/3 h-full bg-[#ED2939]"></div>
-                <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-white/10" />
-              </div>
-
-              {/* VS */}
-              <div className="mx-4 px-4 py-1.5 rounded-xl bg-slate-950 border border-slate-800 shadow-[0_4px_10px_rgba(0,0,0,0.6)] text-white font-black text-xs tracking-widest uppercase flex items-center justify-center">
-                <span className="bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent animate-pulse">{t("vs")}</span>
-              </div>
-
-              {/* Spain Flag */}
-              <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-white/90 shadow-[0_0_15px_rgba(0,0,0,0.5)] flex flex-col relative shrink-0">
-                <div className="h-[27%] w-full bg-[#C1272D]"></div>
-                <div className="h-[46%] w-full bg-[#FCD116] flex items-center justify-center">
-                  <div className="w-2.5 h-3 bg-[#C1272D]/20 rounded-xs border border-[#C1272D]/40" />
-                </div>
-                <div className="h-[27%] w-full bg-[#C1272D]"></div>
-                <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-white/10" />
-              </div>
+            {/* Image Column */}
+            <div className="w-full md:w-1/2 relative h-[320px] md:h-auto overflow-hidden group z-10 shrink-0">
+              <img 
+                src="/assets/messi_highlight.png" 
+                alt="Messi Argentina World Cup campaign" 
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-105"
+              />
+              {/* Gradient Overlay for seamless blending into dark content column */}
+              <div className="absolute inset-0 bg-gradient-to-t ltr:md:bg-gradient-to-r rtl:md:bg-gradient-to-l from-slate-950 via-slate-950/20 to-transparent z-15 pointer-events-none" />
             </div>
 
-            <h3 className="text-4xl font-black text-white tracking-widest uppercase drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)] font-sans">
-              {t("spain")}
-            </h3>
-          </div>
-
-          {/* Subtitle and CTAs */}
-          <div className="relative z-30 w-full flex flex-col items-center gap-3">
-            <p className="text-[10px] font-extrabold tracking-[0.25em] text-slate-200 uppercase drop-shadow-md">
-              {t("matchup_subtitle")}
-            </p>
-            <div className="flex flex-row gap-3 w-full justify-center">
-              <Link 
-                href="/shop?q=France" 
-                className="flex-grow bg-blue-600/90 text-white font-extrabold text-[10px] tracking-wider uppercase py-3 px-2 rounded-xl text-center shadow-lg active:scale-95"
-              >
-                {t("shop_france")}
-              </Link>
-              <Link 
-                href="/shop?q=Spain" 
-                className="flex-grow bg-red-600/90 text-white font-extrabold text-[10px] tracking-wider uppercase py-3 px-2 rounded-xl text-center shadow-lg active:scale-95"
-              >
-                {t("shop_spain")}
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* DESKTOP VIEW MATCHUP BANNER */}
-        <div 
-          className="hidden md:flex relative w-full aspect-[16/9] md:h-auto rounded-[32px] overflow-hidden group/desk border border-slate-800/80 shadow-2xl flex-row select-none"
-        >
-          {/* Background image */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover/desk:scale-[1.01] z-0"
-            style={{ backgroundImage: `url('/assets/matchup_bg.png')` }}
-          />
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-slate-950/40 z-10 pointer-events-none" />
-
-          {/* Subtitle / Header absolute top */}
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-30 pointer-events-none text-center">
-            <span className="text-[10px] font-black tracking-[0.3em] text-purple-300 uppercase bg-slate-950/60 backdrop-blur-xs px-5 py-2 rounded-full border border-white/5 shadow-md">
-              {t("matchup_subtitle")}
-            </span>
-          </div>
-
-          {/* Left half (France) */}
-          <div className="w-1/2 h-full relative z-20 group/france transition-all duration-500 cursor-pointer overflow-hidden flex flex-col items-center justify-between py-14 px-10">
-            {/* Hover Tint */}
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-900/30 to-transparent opacity-0 group-hover/france:opacity-100 transition-opacity duration-500 pointer-events-none" />
-            
-            <span className="relative z-30 text-xs font-black tracking-widest text-blue-300 opacity-60 group-hover/france:opacity-100 transition-opacity uppercase">
-              {t("france")} Issue
-            </span>
-
-            <div className="relative z-30 flex flex-col items-center gap-6 my-auto">
-              <h3 className="text-6xl lg:text-7xl font-black text-white tracking-widest uppercase transition-transform duration-500 group-hover/france:scale-105 drop-shadow-[0_6px_16px_rgba(0,0,0,0.6)] font-sans">
-                {t("france")}
+            {/* Text Column */}
+            <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-14 relative z-20 text-start">
+              {/* Campaign Tag */}
+              <span className="text-[10px] font-black tracking-[0.35em] text-amber-400 uppercase mb-4 inline-block drop-shadow-md">
+                {t("campaign_spotlight")}
+              </span>
+              
+              {/* Title */}
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-white tracking-tight uppercase leading-tight font-sans mb-4 md:mb-6 drop-shadow-lg">
+                {t("messi_spotlight_title")}
               </h3>
-              <div className="w-20 h-20 rounded-[22px] overflow-hidden border-2 border-white/90 shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex relative transition-transform duration-500 group-hover/france:scale-110">
-                <div className="w-1/3 h-full bg-[#002654]"></div>
-                <div className="w-1/3 h-full bg-white"></div>
-                <div className="w-1/3 h-full bg-[#ED2939]"></div>
-                <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-white/10" />
+              
+              {/* Description */}
+              <p className="text-slate-300 text-sm md:text-base lg:text-lg mb-6 md:mb-8 font-sans font-medium leading-relaxed max-w-md">
+                {t("messi_spotlight_subtitle")}
+              </p>
+              
+              {/* Button */}
+              <div>
+                <SpotlightButton query="Argentina" theme="gold" />
               </div>
             </div>
-
-            <Link 
-              href="/shop?q=France" 
-              className="relative z-30 bg-blue-600 text-white font-extrabold text-xs tracking-wider uppercase py-4 px-8 rounded-2xl hover:bg-blue-500 hover:scale-105 transition-all shadow-[0_4px_25px_rgba(37,99,235,0.4)] group-hover/france:shadow-[0_4px_35px_rgba(37,99,235,0.6)]"
-            >
-              {t("shop_france")}
-            </Link>
           </div>
 
-          {/* Absolute Center Divider */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none flex items-center justify-center">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-b from-slate-800 to-slate-950 border border-slate-700/60 shadow-[0_10px_30px_rgba(0,0,0,0.8)] flex items-center justify-center text-white font-black text-lg tracking-wider uppercase animate-pulse">
-              <span className="bg-gradient-to-b from-white to-slate-400 bg-clip-text text-transparent">{t("vs")}</span>
+          {/* Spain Campaign Spotlight Banner */}
+          <div className="relative w-full rounded-3xl overflow-hidden border border-slate-800/80 shadow-2xl bg-slate-950 flex flex-col md:flex-row-reverse min-h-[480px] md:min-h-[520px]">
+            {/* Background Glows for Premium Vibe */}
+            <div className="absolute top-0 left-1/4 w-80 h-80 bg-red-500/10 rounded-full blur-3xl pointer-events-none z-0" />
+            <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none z-0" />
+
+            {/* Image Column */}
+            <div className="w-full md:w-1/2 relative h-[320px] md:h-auto overflow-hidden group z-10 shrink-0">
+              <img 
+                src="/assets/spain_highlight.jpg" 
+                alt="Spain World Cup final campaign" 
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-[1000ms] ease-out group-hover:scale-105"
+              />
+              {/* Gradient Overlay for seamless blending into dark content column */}
+              <div className="absolute inset-0 bg-gradient-to-t ltr:md:bg-gradient-to-l rtl:md:bg-gradient-to-r from-slate-950 via-slate-950/20 to-transparent z-15 pointer-events-none" />
             </div>
-          </div>
 
-          {/* Right half (Spain) */}
-          <div className="w-1/2 h-full relative z-20 group/spain transition-all duration-500 cursor-pointer overflow-hidden flex flex-col items-center justify-between py-14 px-10">
-            {/* Hover Tint */}
-            <div className="absolute inset-0 bg-gradient-to-l from-red-900/30 to-transparent opacity-0 group-hover/spain:opacity-100 transition-opacity duration-500 pointer-events-none" />
-            
-            <span className="relative z-30 text-xs font-black tracking-widest text-red-300 opacity-60 group-hover/spain:opacity-100 transition-opacity uppercase">
-              {t("spain")} Issue
-            </span>
-
-            <div className="relative z-30 flex flex-col items-center gap-6 my-auto">
-              <h3 className="text-6xl lg:text-7xl font-black text-white tracking-widest uppercase transition-transform duration-500 group-hover/spain:scale-105 drop-shadow-[0_6px_16px_rgba(0,0,0,0.6)] font-sans">
-                {t("spain")}
+            {/* Text Column */}
+            <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-14 relative z-20 text-start">
+              {/* Campaign Tag */}
+              <span className="text-[10px] font-black tracking-[0.35em] text-red-500 uppercase mb-4 inline-block drop-shadow-md">
+                {t("campaign_spotlight")}
+              </span>
+              
+              {/* Title */}
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-white tracking-tight uppercase leading-tight font-sans mb-4 md:mb-6 drop-shadow-lg">
+                {t("spain_spotlight_title")}
               </h3>
-              <div className="w-20 h-20 rounded-[22px] overflow-hidden border-2 border-white/90 shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex flex-col relative transition-transform duration-500 group-hover/spain:scale-110">
-                <div className="h-[27%] w-full bg-[#C1272D]"></div>
-                <div className="h-[46%] w-full bg-[#FCD116] flex items-center justify-center">
-                  <div className="w-3.5 h-4 bg-[#C1272D]/20 rounded-xs border border-[#C1272D]/40" />
-                </div>
-                <div className="h-[27%] w-full bg-[#C1272D]"></div>
-                <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-white/10" />
+              
+              {/* Description */}
+              <p className="text-slate-300 text-sm md:text-base lg:text-lg mb-6 md:mb-8 font-sans font-medium leading-relaxed max-w-md">
+                {t("spain_spotlight_subtitle")}
+              </p>
+              
+              {/* Button */}
+              <div>
+                <SpotlightButton query="Spain" theme="red" />
               </div>
             </div>
-
-            <Link 
-              href="/shop?q=Spain" 
-              className="relative z-30 bg-red-600 text-white font-extrabold text-xs tracking-wider uppercase py-4 px-8 rounded-2xl hover:bg-red-500 hover:scale-105 transition-all shadow-[0_4px_25px_rgba(220,38,38,0.4)] group-hover/spain:shadow-[0_4px_35px_rgba(220,38,38,0.6)]"
-            >
-              {t("shop_spain")}
-            </Link>
           </div>
         </div>
       </section>

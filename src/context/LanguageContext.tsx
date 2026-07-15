@@ -19,6 +19,11 @@ export function LanguageProvider({ children, initialLang }: { children: React.Re
   const pathname = usePathname();
 
   const setLanguage = (lang: Language) => {
+    // Trigger brief loading loader
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("trigger-loader", { detail: { duration: 600 } }));
+    }
+
     setLanguageState(lang);
     // Set cookie that Next.js Server Components can read
     document.cookie = `lang=${lang}; path=/; max-age=31536000; SameSite=Lax`;

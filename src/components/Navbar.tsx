@@ -414,8 +414,8 @@ export default function Navbar() {
   return (
     <>
       {/* 1. FLOWING TICKER BANNER (Desktop & Mobile) */}
-      <div className="relative w-full overflow-hidden bg-black text-white border-b border-neutral-900 py-2.5 text-xs md:text-[13px] font-bold select-none z-50">
-        <div className="flex w-max animate-marquee whitespace-nowrap">
+      <div dir="ltr" className="relative w-full overflow-hidden bg-black text-white border-b border-neutral-900 py-2.5 text-xs md:text-[13px] font-bold select-none z-50">
+        <div key={language} className="flex w-max animate-marquee whitespace-nowrap">
           <span className="mx-4">
             {t("ticker_1")} &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
             {t("ticker_2")} &nbsp;&nbsp;&bull;&nbsp;&nbsp; 
