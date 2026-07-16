@@ -510,6 +510,7 @@ export const translations = {
   "no_preset_players": { en: "No preset players available for this product.", ar: "لا توجد أسماء لاعبين جاهزة لهذا المنتج." },
   "custom_player_printing": { en: "Custom Player Printing", ar: "طباعة اسم ورقم مخصص" },
   "custom_print_detail": { en: "Bespoke hot-pressed vinyl printing. Handcrafted in-house.", ar: "طباعة فينيل حرارية مخصصة. صُنعت يدوياً في متجرنا." },
+  "custom_name_delivery_note": { en: "Note: Custom names take 4 to 5 days to deliver.", ar: "ملاحظة: الأسماء المخصصة تستغرق من 4 إلى 5 أيام للتوصيل." },
   "right_patch": { en: "Right Patch", ar: "الشارة اليمنى" },
   "left_patch": { en: "Left Patch", ar: "الشارة اليسرى" },
   "name": { en: "Name", ar: "الاسم" },
