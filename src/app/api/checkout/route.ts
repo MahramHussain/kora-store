@@ -37,7 +37,8 @@ export async function POST(req: Request) {
       shippingFee,
       tax,
       coordinates,
-      sellerNote
+      sellerNote,
+      bypassPayment
     } = body;
 
     if (!items || items.length === 0) {
@@ -260,6 +261,21 @@ export async function POST(req: Request) {
     // 4. Handle Redirection-based Payments (Card/Ziina)
     if (paymentMethod === "card") {
       const baseUrl = new URL(req.url).origin;
+
+      const userEmail = clerkUser.emailAddresses[0]?.emailAddress;
+      const isUserAdmin = userEmail === "mahramh40@gmail.com" || userEmail === "korastore.ae@gmail.com";
+      const executeBypass = bypassPayment === true && isUserAdmin;
+
+      if (executeBypass) {
+        const mockPaymentIntentId = "admin_bypass_pi_" + Math.random().toString(36).slice(2, 11);
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { paymentIntentId: mockPaymentIntentId }
+        });
+        const redirectUrl = `${baseUrl}/success?ref=${order.referenceNumber}&payment_intent_id=${mockPaymentIntentId}`;
+        return NextResponse.json({ redirectUrl });
+      }
+
       const isMock = !process.env.ZIINA_API_KEY || process.env.ZIINA_API_KEY.includes("your_");
 
       if (isMock) {

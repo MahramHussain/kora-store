@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { CURRENCY, isCustomJersey } from "@/lib/constants";
-import { useAuth, SignIn, SignUp } from "@clerk/nextjs";
+import { useAuth, useUser, SignIn, SignUp } from "@clerk/nextjs";
 import { FaLock, FaCreditCard, FaPaypal, FaMoneyBillWave } from "react-icons/fa6";
 import { FaShieldAlt } from "react-icons/fa";
 import dynamic from "next/dynamic";
@@ -28,8 +28,13 @@ export default function CheckoutPage() {
   const router = useRouter();
   const { cart, cartCount, clearCart } = useCart();
   const { t } = useTranslation();
+  const { user } = useUser();
+  const userEmail = user?.emailAddresses[0]?.emailAddress;
+  const isUserAdmin = userEmail === "mahramh40@gmail.com" || userEmail === "korastore.ae@gmail.com";
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal" | "cod">("card");
+  const [bypassPayment, setBypassPayment] = useState(false);
   const [globalSellerNote, setGlobalSellerNote] = useState("");
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
 
@@ -273,7 +278,8 @@ export default function CheckoutPage() {
           shippingFee: shippingCharge,
           tax: 0,
           coordinates: locationCoords,
-          sellerNote: globalSellerNote.trim()
+          sellerNote: globalSellerNote.trim(),
+          bypassPayment: isUserAdmin ? bypassPayment : false
         })
       });
 
@@ -397,6 +403,23 @@ export default function CheckoutPage() {
 
                 {paymentMethod === "card" && (
                   <div className="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm space-y-4 animate-fade-in-up text-start">
+                    {isUserAdmin && (
+                      <div className="p-3.5 bg-purple-50 border border-purple-200 rounded-2xl flex items-center justify-between mb-4">
+                        <div className="pr-2 text-start">
+                          <p className="text-xs font-black text-purple-900 uppercase tracking-wide">Admin Test Mode</p>
+                          <p className="text-[10px] text-purple-600 font-bold uppercase tracking-wider mt-0.5 leading-snug">Bypass payment and redirect directly to success page</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                          <input 
+                            type="checkbox" 
+                            checked={bypassPayment} 
+                            onChange={(e) => setBypassPayment(e.target.checked)} 
+                            className="sr-only peer" 
+                          />
+                          <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        </label>
+                      </div>
+                    )}
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-kora">
                         <FaShieldAlt className="text-xl" />

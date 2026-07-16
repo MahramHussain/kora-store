@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import { CURRENCY } from "@/lib/constants";
+import { currentUser } from "@clerk/nextjs/server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,9 +36,20 @@ export async function POST(req: NextRequest) {
 
     let isPaid = false;
 
-    // Check if Mock payment or Live payment
+    // Check if Mock payment or Live payment or Admin bypass
     if (paymentIntentId.startsWith("mock_pi_")) {
       isPaid = true;
+    } else if (paymentIntentId.startsWith("admin_bypass_pi_")) {
+      const clerkUser = await currentUser();
+      const userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
+      const isUserAdmin = userEmail === "mahramh40@gmail.com" || userEmail === "korastore.ae@gmail.com";
+      const isOrderOwnerAdmin = order.user.email === "mahramh40@gmail.com" || order.user.email === "korastore.ae@gmail.com";
+
+      if (isUserAdmin && isOrderOwnerAdmin) {
+        isPaid = true;
+      } else {
+        return new NextResponse("Unauthorized. Admin bypass restricted.", { status: 403 });
+      }
     } else {
       if (!process.env.ZIINA_API_KEY) {
         return new NextResponse("Ziina API credentials missing on server", { status: 500 });
