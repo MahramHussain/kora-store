@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
 import fs from "fs";
 import path from "path";
+import sharp from "sharp";
 
 export async function POST(req: Request) {
   try {
@@ -23,22 +24,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Invalid file type. Only images are allowed." }, { status: 400 });
     }
 
-    // 3. Convert file to buffer
-    const buffer = Buffer.from(await file.arrayBuffer());
+    // 3. Process image with sharp (resize and convert to WebP)
+    const arrayBuffer = await file.arrayBuffer();
+    const optimizedBuffer = await sharp(Buffer.from(arrayBuffer))
+      .resize({ width: 1200, height: 1200, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 80 })
+      .toBuffer();
 
-    // 4. Generate unique filename to avoid overwrites
+    // 4. Generate unique filename to avoid overwrites (forcing webp extension)
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const fileExtension = path.extname(file.name) || ".png";
-    const baseName = path.basename(file.name, fileExtension).replace(/[^a-zA-Z0-9]/g, "_");
-    const uniqueFilename = `${baseName}-${uniqueSuffix}${fileExtension}`;
+    const originalExtension = path.extname(file.name) || ".png";
+    const baseName = path.basename(file.name, originalExtension).replace(/[^a-zA-Z0-9]/g, "_");
+    const uniqueFilename = `${baseName}-${uniqueSuffix}.webp`;
 
     // 5. Ensure upload directory exists
     const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
     await fs.promises.mkdir(uploadDir, { recursive: true });
 
-    // 6. Write file to disk
+    // 6. Write optimized file to disk
     const filePath = path.join(uploadDir, uniqueFilename);
-    await fs.promises.writeFile(filePath, buffer);
+    await fs.promises.writeFile(filePath, optimizedBuffer);
 
     // 7. Return URL
     const relativeUrl = `/uploads/products/${uniqueFilename}`;
@@ -49,3 +54,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: "Failed to upload image" }, { status: 500 });
   }
 }
+
