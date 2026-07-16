@@ -361,7 +361,7 @@ export async function POST(req: Request) {
       }
 
       // C. Send notification alert to store admins
-      const adminEmails = ["korastore.ae@gmail.com", "mahramh40@gmail.com"];
+      const adminEmails = ["korastore.ae@gmail.com"];
       for (const email of adminEmails) {
         await sendOrderConfirmationEmail({
           ...emailParams,
