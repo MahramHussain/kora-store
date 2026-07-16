@@ -84,8 +84,8 @@ export const translations = {
   // Spotlight
   "world_cup_highlight": { en: "World Cup Highlight", ar: "أبرز لقطات كأس العالم" },
   "campaign_spotlight": { en: "Campaign Spotlight", ar: "حملة خاصة" },
-  "messi_spotlight_title": { en: "Can Argentina do it again? Can Messi reach another World Cup final?", ar: "هل تستطيع الأرجنتين فعلها مجدداً؟ هل يستطيع ميسي الوصول إلى نهائي كأس عالم آخر؟" },
-  "messi_spotlight_subtitle": { en: "Show support by buying your kit now.", ar: "أظهر دعمك واشترِ قميصك الآن." },
+  "messi_spotlight_title": { en: "Argentina have reached the final!", ar: "الأرجنتين تتأهل إلى النهائي!" },
+  "messi_spotlight_subtitle": { en: "Buy the kit now before the final to support your team.", ar: "اشترِ الطقم الآن قبل النهائي لدعم فريقك." },
   "spain_spotlight_title": { en: "Spain are through to the final! Support La Roja on the grandest stage.", ar: "إسبانيا تتأهل إلى النهائي! ادعم الماتادور الإسباني في الساحة الكبرى." },
   "spain_spotlight_subtitle": { en: "Support them by getting their kit now.", ar: "أظهر دعمك واشترِ طقم منتخب إسبانيا الآن." },
   "argentina_away_title": { en: "Argentina Away", ar: "طقم الأرجنتين الاحتياطي" },
