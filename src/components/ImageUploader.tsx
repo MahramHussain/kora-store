@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { FiUploadCloud, FiTrash2, FiLoader, FiPlus } from "react-icons/fi";
+import { FiUploadCloud, FiTrash2, FiLoader, FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 interface ImageUploaderProps {
   images: string[];
@@ -12,6 +12,51 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
   const [isDragging, setIsDragging] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState<{ id: string; name: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", index.toString());
+  };
+
+  const handleDragOverItem = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+
+    const reorderedImages = [...images];
+    const draggedItem = reorderedImages[draggedIndex];
+    reorderedImages.splice(draggedIndex, 1);
+    reorderedImages.splice(index, 0, draggedItem);
+
+    setDraggedIndex(index);
+    onChange(reorderedImages);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
+  const handleDropItem = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    setDraggedIndex(null);
+  };
+
+  const handleMoveImage = (index: number, direction: "left" | "right") => {
+    if (direction === "left" && index > 0) {
+      const updated = [...images];
+      const temp = updated[index];
+      updated[index] = updated[index - 1];
+      updated[index - 1] = temp;
+      onChange(updated);
+    } else if (direction === "right" && index < images.length - 1) {
+      const updated = [...images];
+      const temp = updated[index];
+      updated[index] = updated[index + 1];
+      updated[index + 1] = temp;
+      onChange(updated);
+    }
+  };
 
   const handleFiles = async (files: FileList) => {
     const validFiles = Array.from(files).filter(file => file.type.startsWith("image/"));
@@ -143,27 +188,72 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
           {images.map((img, idx) => (
             <div
               key={idx}
-              className="relative aspect-square rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 group shadow-2xs hover:shadow-sm hover:border-slate-300 transition-all"
+              draggable
+              onDragStart={(e) => handleDragStart(e, idx)}
+              onDragOver={(e) => handleDragOverItem(e, idx)}
+              onDragEnd={handleDragEnd}
+              onDrop={(e) => handleDropItem(e, idx)}
+              className={`relative aspect-square rounded-xl overflow-hidden border border-slate-200/60 bg-slate-50 group shadow-2xs hover:shadow-sm hover:border-slate-300 transition-all cursor-grab active:cursor-grabbing ${
+                draggedIndex === idx ? "opacity-40 border-kora border-2 scale-95" : ""
+              }`}
             >
               <img
                 src={getDisplayUrl(img)}
                 alt={`Uploaded ${idx + 1}`}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover select-none pointer-events-none"
                 referrerPolicy="no-referrer"
               />
               
-              {/* Overlay with delete button */}
-              <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all">
+              {/* Order index badge */}
+              <div className="absolute top-2 left-2 bg-slate-950/75 backdrop-blur-xs text-white font-sans font-black text-[9px] px-2 py-0.5 rounded-lg select-none uppercase tracking-wider shadow-sm z-10 border border-white/5">
+                {idx === 0 ? "Main" : idx + 1}
+              </div>
+
+              {/* Responsive Overlay Controls */}
+              <div className="absolute bottom-0 left-0 right-0 bg-slate-950/80 backdrop-blur-xs flex items-center justify-around py-2 px-3 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200 z-10 border-t border-white/5">
+                {/* Move Left */}
+                <button
+                  type="button"
+                  disabled={idx === 0}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMoveImage(idx, "left");
+                  }}
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center text-white bg-white/10 hover:bg-white/20 transition-all ${
+                    idx === 0 ? "opacity-30 cursor-not-allowed" : "active:scale-95 cursor-pointer"
+                  }`}
+                  title="Move Left"
+                >
+                  <FiChevronLeft className="text-sm font-bold" />
+                </button>
+
+                {/* Remove */}
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleRemoveImage(idx);
                   }}
-                  className="w-9 h-9 rounded-full bg-white text-rose-600 border border-slate-200/50 flex items-center justify-center shadow-md hover:bg-rose-50 hover:scale-105 transition-all"
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-rose-400 bg-white/10 hover:bg-rose-500/20 active:scale-95 transition-all cursor-pointer"
                   title="Remove Image"
                 >
-                  <FiTrash2 className="text-base" />
+                  <FiTrash2 className="text-sm" />
+                </button>
+
+                {/* Move Right */}
+                <button
+                  type="button"
+                  disabled={idx === images.length - 1}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMoveImage(idx, "right");
+                  }}
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center text-white bg-white/10 hover:bg-white/20 transition-all ${
+                    idx === images.length - 1 ? "opacity-30 cursor-not-allowed" : "active:scale-95 cursor-pointer"
+                  }`}
+                  title="Move Right"
+                >
+                  <FiChevronRight className="text-sm font-bold" />
                 </button>
               </div>
             </div>
