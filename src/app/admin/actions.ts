@@ -67,7 +67,8 @@ export async function getProducts() {
     const products = await prisma.product.findMany({
       orderBy: { createdAt: "desc" },
       include: {
-        sizeStocks: true
+        sizeStocks: true,
+        playerStocks: true
       }
     });
     
@@ -143,6 +144,7 @@ export async function updateProduct(
     subCategory?: string | null;
     soleplate?: string | null;
     colorway?: string | null;
+    playerStocks?: Array<{ name: string; number: string; stock: number }>;
   }
 ) {
   try {
@@ -173,6 +175,22 @@ export async function updateProduct(
             productId,
             size,
             quantity: parseInt(quantity as any) || 0
+          }))
+        });
+      }
+
+      // 2.5. Update playerStocks
+      if (data.playerStocks && Array.isArray(data.playerStocks)) {
+        await tx.playerStock.deleteMany({
+          where: { productId }
+        });
+        
+        await tx.playerStock.createMany({
+          data: data.playerStocks.map((p) => ({
+            productId,
+            playerName: p.name.toUpperCase().trim(),
+            playerNumber: p.number.trim(),
+            quantity: parseInt(p.stock as any) || 0
           }))
         });
       }

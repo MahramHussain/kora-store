@@ -126,7 +126,7 @@ export async function POST(req: Request) {
       for (const item of items) {
         const dbProduct = await tx.product.findUnique({
           where: { id: item.id },
-          include: { sizeStocks: true }
+          include: { sizeStocks: true, playerStocks: true }
         });
 
         if (!dbProduct) {
@@ -156,6 +156,28 @@ export async function POST(req: Request) {
           // Fallback to old global stock check
           if (dbProduct.stock < item.quantity) {
             throw new Error(`Insufficient stock for product ${dbProduct.name}`);
+          }
+        }
+
+        // Check player name stock if a preset player name is chosen
+        if (item.playerName && dbProduct.playerStocks && dbProduct.playerStocks.length > 0) {
+          const playerStockMatch = dbProduct.playerStocks.find(
+            (s: any) => s.playerName.toUpperCase() === item.playerName.toUpperCase()
+          );
+          if (playerStockMatch) {
+            if (playerStockMatch.quantity < item.quantity) {
+              throw new Error(`Insufficient stock for player ${item.playerName} of product ${dbProduct.name}`);
+            }
+
+            // Decrement specific PlayerStock quantity
+            await tx.playerStock.update({
+              where: { id: playerStockMatch.id },
+              data: {
+                quantity: {
+                  decrement: item.quantity
+                }
+              }
+            });
           }
         }
 

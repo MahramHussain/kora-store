@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { CURRENCY } from "@/lib/constants";
+import { useState, useEffect } from "react";
+import { CURRENCY, PRESET_PLAYERS } from "@/lib/constants";
 import ImageUploader from "@/components/ImageUploader";
+
+const getPresetPlayersForProduct = (productName: string) => {
+  const normalized = productName.toUpperCase().replace(/\s+KIT.*$/i, "").trim();
+  return PRESET_PLAYERS[normalized] || [];
+};
 
 export default function AdminPage() {
   const [status, setStatus] = useState("");
@@ -28,6 +33,25 @@ export default function AdminPage() {
     "XL": { checked: true, stock: 10 },
     "XXL": { checked: false, stock: 10 }
   });
+
+  // Player stocks state
+  const [playerStocks, setPlayerStocks] = useState<Array<{ name: string; number: string; stock: number }>>([]);
+
+  // Sync default player stocks when name changes
+  useEffect(() => {
+    const preset = getPresetPlayersForProduct(name);
+    if (preset.length > 0) {
+      setPlayerStocks(
+        preset.map(p => ({
+          name: p.name,
+          number: p.number,
+          stock: 10
+        }))
+      );
+    } else {
+      setPlayerStocks([]);
+    }
+  }, [name]);
 
   // Tab 2: Shoes Specifics
   const [brand, setBrand] = useState("");
@@ -152,6 +176,7 @@ export default function AdminPage() {
           images,
           sizes: selectedSizes,
           sizeStocks,
+          playerStocks,
           isWorldCup,
           gender,
           // Tab-specific details
@@ -172,6 +197,7 @@ export default function AdminPage() {
         setDescription("");
         setTag("Latest");
         setImages([]);
+        setPlayerStocks([]);
         setIsWorldCup(false);
         setGender("Unisex");
         setTeam("");
@@ -570,6 +596,91 @@ export default function AdminPage() {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* TAB 1: PLAYER STOCKS MANAGEMENT */}
+            {activeTab === "shirts" && (
+              <div className="space-y-4 border-t border-slate-100 pt-5 animate-fade-in">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Player Name Stocks</label>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Manage player prints and their respective stock levels</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPlayerStocks([...playerStocks, { name: "", number: "", stock: 10 }])}
+                    className="py-1.5 px-3 bg-purple-50 hover:bg-purple-100/80 text-purple-700 font-extrabold text-[10px] uppercase tracking-wider rounded-lg transition-colors border border-purple-200/50 flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>➕ Add Player</span>
+                  </button>
+                </div>
+
+                {playerStocks.length === 0 ? (
+                  <p className="text-[10px] text-slate-400 italic bg-slate-50/50 border border-slate-200/40 rounded-xl p-3 text-center">No player prints added. Click "Add Player" to add custom prints.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {playerStocks.map((player, idx) => (
+                      <div key={idx} className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center bg-slate-50/50 border border-slate-200/60 rounded-xl p-2.5">
+                        <div className="flex-1">
+                          <input
+                            required
+                            type="text"
+                            placeholder="NAME (e.g. MESSI)"
+                            value={player.name}
+                            onChange={(e) => {
+                              const newList = [...playerStocks];
+                              newList[idx].name = e.target.value.toUpperCase();
+                              setPlayerStocks(newList);
+                            }}
+                            className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-purple-500"
+                          />
+                        </div>
+                        <div className="flex gap-2.5 items-center">
+                          <div className="w-20">
+                            <input
+                              required
+                              type="text"
+                              placeholder="NUMBER"
+                              value={player.number}
+                              onChange={(e) => {
+                                const newList = [...playerStocks];
+                                newList[idx].number = e.target.value.replace(/[^0-9]/g, "");
+                                setPlayerStocks(newList);
+                              }}
+                              className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs font-bold text-center text-slate-800 focus:outline-none focus:border-purple-500"
+                            />
+                          </div>
+                          <div className="w-24">
+                            <input
+                              required
+                              type="number"
+                              min="0"
+                              placeholder="STOCK"
+                              value={player.stock}
+                              onChange={(e) => {
+                                const newList = [...playerStocks];
+                                newList[idx].stock = parseInt(e.target.value) || 0;
+                                setPlayerStocks(newList);
+                              }}
+                              className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs font-mono font-bold text-center text-slate-800 focus:outline-none focus:border-purple-500"
+                            />
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPlayerStocks(playerStocks.filter((_, i) => i !== idx));
+                            }}
+                            className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg border border-rose-200/40 transition-colors cursor-pointer shrink-0 font-bold text-xs h-[38px] flex items-center justify-center"
+                            title="Remove Player"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

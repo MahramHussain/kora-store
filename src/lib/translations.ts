@@ -1,6 +1,8 @@
 export const translations = {
   // Navigation & Common
   "home": { en: "Home", ar: "الرئيسية" },
+  "out_of_stock": { en: "Out of Stock", ar: "نفذت الكمية" },
+  "player_out_of_stock": { en: "Selected player print is out of stock.", ar: "طباعة اللاعب المحددة نفذت من المخزون." },
   "shop": { en: "Shop", ar: "المتجر" },
   "about": { en: "About", ar: "من نحن" },
   "shipping": { en: "Shipping", ar: "الشحن" },

@@ -1,9 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CURRENCY } from "@/lib/constants";
+import { CURRENCY, PRESET_PLAYERS } from "@/lib/constants";
 import { getProducts, deleteProduct, updateProduct } from "../actions";
 import ImageUploader from "@/components/ImageUploader";
+
+const getPresetPlayersForProduct = (productName: string) => {
+  const normalized = productName.toUpperCase().replace(/\s+KIT.*$/i, "").trim();
+  return PRESET_PLAYERS[normalized] || [];
+};
 
 export default function AdminInventoryPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -36,9 +41,31 @@ export default function AdminInventoryPage() {
       }
     });
 
+    // Load playerStocks
+    const playerStocksList: Array<{ name: string; number: string; stock: number }> = [];
+    if (product.playerStocks && product.playerStocks.length > 0) {
+      product.playerStocks.forEach((p: any) => {
+        playerStocksList.push({
+          name: p.playerName,
+          number: p.playerNumber,
+          stock: p.quantity
+        });
+      });
+    } else {
+      const presets = getPresetPlayersForProduct(product.name);
+      presets.forEach((p: any) => {
+        playerStocksList.push({
+          name: p.name,
+          number: p.number,
+          stock: 10
+        });
+      });
+    }
+
     setProductToEdit({
       ...product,
       sizeStocksMap,
+      playerStocks: playerStocksList,
       isSale: product.originalPrice !== null && product.originalPrice !== undefined && product.originalPrice !== ""
     });
     setEditModalOpen(true);
@@ -99,6 +126,7 @@ export default function AdminInventoryPage() {
       description: productToEdit.description || "",
       images: formattedImages,
       sizeStocks,
+      playerStocks: productToEdit.playerStocks || [],
       isWorldCup: !!productToEdit.isWorldCup,
       originalPrice: productToEdit.isSale && productToEdit.originalPrice
         ? parseFloat(productToEdit.originalPrice)
@@ -521,6 +549,95 @@ export default function AdminInventoryPage() {
                     })}
                   </div>
                 </div>
+
+                {/* Dynamic Player Name Stocks Editor */}
+                {(productToEdit.category === "Shirts" || productToEdit.category === "Retro Kits") && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 animate-fade-in">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Player Name Stocks</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentPlayers = productToEdit.playerStocks || [];
+                          setProductToEdit({
+                            ...productToEdit,
+                            playerStocks: [...currentPlayers, { name: "", number: "", stock: 10 }]
+                          });
+                        }}
+                        className="py-1 px-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 font-extrabold text-[9px] uppercase tracking-wider rounded-lg transition-colors border border-purple-200/50 flex items-center gap-1 cursor-pointer"
+                      >
+                        ➕ Add Player
+                      </button>
+                    </div>
+
+                    {(!productToEdit.playerStocks || productToEdit.playerStocks.length === 0) ? (
+                      <p className="text-[10px] text-slate-400 italic text-center py-2">No player prints configured. Click "Add Player" to add custom prints.</p>
+                    ) : (
+                      <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        {productToEdit.playerStocks.map((player: any, idx: number) => (
+                          <div key={idx} className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center bg-white border border-slate-200/80 rounded-xl p-2 shadow-xs">
+                            <div className="flex-1">
+                              <input
+                                required
+                                type="text"
+                                placeholder="NAME"
+                                value={player.name}
+                                onChange={(e) => {
+                                  const newList = [...productToEdit.playerStocks];
+                                  newList[idx].name = e.target.value.toUpperCase();
+                                  setProductToEdit({ ...productToEdit, playerStocks: newList });
+                                }}
+                                className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-purple-500"
+                              />
+                            </div>
+                            <div className="flex gap-2 items-center">
+                              <div className="w-14">
+                                <input
+                                  required
+                                  type="text"
+                                  placeholder="NO."
+                                  value={player.number}
+                                  onChange={(e) => {
+                                    const newList = [...productToEdit.playerStocks];
+                                    newList[idx].number = e.target.value.replace(/[^0-9]/g, "");
+                                    setProductToEdit({ ...productToEdit, playerStocks: newList });
+                                  }}
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2 text-xs font-bold text-center text-slate-800 focus:outline-none focus:border-purple-500"
+                                />
+                              </div>
+                              <div className="w-16">
+                                <input
+                                  required
+                                  type="number"
+                                  min="0"
+                                  placeholder="STOCK"
+                                  value={player.stock}
+                                  onChange={(e) => {
+                                    const newList = [...productToEdit.playerStocks];
+                                    newList[idx].stock = parseInt(e.target.value) || 0;
+                                    setProductToEdit({ ...productToEdit, playerStocks: newList });
+                                  }}
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2 text-xs font-mono font-bold text-center text-slate-800 focus:outline-none focus:border-purple-500"
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newList = productToEdit.playerStocks.filter((_: any, i: number) => i !== idx);
+                                  setProductToEdit({ ...productToEdit, playerStocks: newList });
+                                }}
+                                className="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg border border-rose-200/40 transition-colors cursor-pointer text-xs font-bold h-[30px] flex items-center justify-center"
+                                title="Remove Player"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex items-center">

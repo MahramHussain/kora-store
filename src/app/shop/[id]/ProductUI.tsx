@@ -159,6 +159,7 @@ type CustomSelectOption = {
   value: string;
   label: string;
   image?: string;
+  disabled?: boolean;
 };
 
 type CustomSelectProps = {
@@ -223,12 +224,16 @@ function CustomSelect({ value, onChange, options, placeholder, className = "" }:
               <button
                 key={opt.value}
                 type="button"
+                disabled={opt.disabled}
                 onClick={() => {
+                  if (opt.disabled) return;
                   onChange(opt.value);
                   setIsOpen(false);
                 }}
                 className={`w-full text-left px-4 py-2 flex items-center gap-2.5 text-xs font-bold transition-colors ${
-                  opt.value === value
+                  opt.disabled
+                    ? "bg-slate-50 opacity-40 cursor-not-allowed text-slate-400"
+                    : opt.value === value
                     ? "bg-kora text-white"
                     : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                 }`}
@@ -403,6 +408,9 @@ export default function ProductUI({ product }: { product: any }) {
   const hasFifaPatch = leftSleevePatch !== "" || rightSleevePatch !== "";
   const [selectedPresetPlayer, setSelectedPresetPlayer] = useState<{ name: string; number: string } | null>(null);
   const presetPlayers = getPresetPlayersForProduct(product.name);
+  const resolvedPlayers = product.playerStocks && product.playerStocks.length > 0
+    ? product.playerStocks.map((ps: any) => ({ name: ps.playerName, number: ps.playerNumber }))
+    : presetPlayers;
   const isKit = product.category === "Shirts" || product.category === "Retro Kits";
 
   const handleSelectPresetPlayer = (player: { name: string; number: string }) => {
@@ -431,10 +439,16 @@ export default function ProductUI({ product }: { product: any }) {
   const renderDesktopPersonalizationBox = () => {
     if (!isKit) return null;
 
-    const playerOptions = presetPlayers.map((player: { name: string; number: string }) => ({
-      value: JSON.stringify(player),
-      label: `${player.name} (#${player.number})`
-    }));
+    const playerOptions = resolvedPlayers.map((player: { name: string; number: string }) => {
+      const stockMatch = product.playerStocks?.find((s: any) => s.playerName === player.name);
+      const stockQty = stockMatch !== undefined ? stockMatch.quantity : 10;
+      const isOutOfStock = stockQty <= 0;
+      return {
+        value: JSON.stringify(player),
+        label: `${player.name} (#${player.number})${isOutOfStock ? ` - ${t("out_of_stock") || "Out of Stock"}` : ""}`,
+        disabled: isOutOfStock
+      };
+    });
 
     return (
       <div className="space-y-6 mb-8 text-start">
@@ -492,7 +506,7 @@ export default function ProductUI({ product }: { product: any }) {
           {/* Player Name Select Dropdown */}
           {personalizationTab === "player" && (
             <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
-              {presetPlayers.length > 0 ? (
+              {resolvedPlayers.length > 0 ? (
                 <div className="text-start">
                   <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2.5 tracking-widest text-start">{t("select_player_print")}</label>
                   <CustomSelect
@@ -599,10 +613,16 @@ export default function ProductUI({ product }: { product: any }) {
   const renderPersonalizationBox = () => {
     if (!isKit) return null;
 
-    const playerOptions = presetPlayers.map((player: { name: string; number: string }) => ({
-      value: JSON.stringify(player),
-      label: `${player.name} (#${player.number})`
-    }));
+    const playerOptions = resolvedPlayers.map((player: { name: string; number: string }) => {
+      const stockMatch = product.playerStocks?.find((s: any) => s.playerName === player.name);
+      const stockQty = stockMatch !== undefined ? stockMatch.quantity : 10;
+      const isOutOfStock = stockQty <= 0;
+      return {
+        value: JSON.stringify(player),
+        label: `${player.name} (#${player.number})${isOutOfStock ? ` - ${t("out_of_stock") || "Out of Stock"}` : ""}`,
+        disabled: isOutOfStock
+      };
+    });
 
     return (
       <div className="space-y-4 mb-6 text-start">
@@ -660,7 +680,7 @@ export default function ProductUI({ product }: { product: any }) {
           {/* Player Dropdown */}
           {personalizationTab === "player" && (
             <div className="mt-5 pt-5 border-t border-slate-200/60 space-y-4 animate-fade-in-up">
-              {presetPlayers.length > 0 ? (
+              {resolvedPlayers.length > 0 ? (
                 <div className="text-start">
                   <label className="block text-[9px] font-bold uppercase text-slate-400 mb-2.5 tracking-widest text-start">{t("select_player_print")}</label>
                   <CustomSelect
@@ -853,6 +873,15 @@ export default function ProductUI({ product }: { product: any }) {
 
   const handleAddToCart = () => {
     if (!selectedSize) return;
+
+    if (selectedPresetPlayer) {
+      const stockMatch = product.playerStocks?.find((s: any) => s.playerName === selectedPresetPlayer.name);
+      const stockQty = stockMatch !== undefined ? stockMatch.quantity : 10;
+      if (stockQty <= 0) {
+        alert(t("player_out_of_stock") || `${selectedPresetPlayer.name} is out of stock.`);
+        return;
+      }
+    }
     
     let finalName = "";
     let finalNumber = "";

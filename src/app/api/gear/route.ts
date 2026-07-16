@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     
     // 2. Grab all the data sent from your Admin Dashboard
-    const { name, category, team, price, description, tag, images, sizes, sizeStocks, isWorldCup, originalPrice, brand, gender, subCategory, soleplate, colorway } = body;
+    const { name, category, team, price, description, tag, images, sizes, sizeStocks, playerStocks, isWorldCup, originalPrice, brand, gender, subCategory, soleplate, colorway } = body;
 
     // Run Arabic translations in parallel for maximum performance
     const [nameAr, descriptionAr] = await Promise.all([
@@ -59,6 +59,13 @@ export async function POST(req: Request) {
           create: Object.entries(sizeStocks).map(([size, quantity]) => ({
             size,
             quantity: parseInt(quantity as string) || 0
+          }))
+        } : undefined,
+        playerStocks: playerStocks && Array.isArray(playerStocks) ? {
+          create: playerStocks.map((p: any) => ({
+            playerName: p.name.toUpperCase().trim(),
+            playerNumber: p.number.trim(),
+            quantity: parseInt(p.stock as string) || 0
           }))
         } : undefined
       }
