@@ -112,7 +112,17 @@ export default function AccountUI({ user, orders, banned = false }: { user: any;
                         </div>
                         <div className="flex flex-col sm:items-end gap-2 shrink-0 text-start">
                           <div className="text-slate-900 font-black text-2xl">{CURRENCY}{parseFloat(order.total).toFixed(2)}</div>
-                          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${order.status === "Processing" ? "order-status-processing" : order.status === "Shipped" ? "order-status-shipped" : "order-status-delivered"}`}>{order.status}</span>
+                          <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                            (order.status || "").toUpperCase() === "PROCESSING" ? "order-status-processing" :
+                            (order.status || "").toUpperCase() === "SHIPPED" ? "order-status-shipped" :
+                            (order.status || "").toUpperCase() === "DELIVERED" ? "order-status-delivered" :
+                            "bg-slate-100 text-slate-700 border-slate-200"
+                          }`}>{
+                            (order.status || "").toUpperCase() === "PROCESSING" ? t("status_processing") :
+                            (order.status || "").toUpperCase() === "SHIPPED" ? t("status_shipped") :
+                            (order.status || "").toUpperCase() === "DELIVERED" ? t("status_delivered") :
+                            order.status
+                          }</span>
                         </div>
                       </div>
                     </div>

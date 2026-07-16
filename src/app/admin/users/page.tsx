@@ -506,8 +506,8 @@ export default function AdminUsersPage() {
                           <p className="text-[10px] text-slate-400 mt-0.5">{new Date(o.createdAt).toLocaleDateString()}</p>
                         </div>
                         <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded ${
-                          o.status === "Delivered" ? "bg-emerald-50 text-emerald-600" :
-                          o.status === "Shipped" ? "bg-blue-50 text-blue-600" : "bg-amber-50 text-amber-600"
+                          (o.status || "").toUpperCase() === "DELIVERED" ? "bg-emerald-50 text-emerald-600" :
+                          (o.status || "").toUpperCase() === "SHIPPED" ? "bg-blue-50 text-blue-600" : "bg-amber-50 text-amber-600"
                         }`}>
                           {o.status}
                         </span>

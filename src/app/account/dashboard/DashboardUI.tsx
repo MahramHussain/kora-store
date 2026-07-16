@@ -120,12 +120,13 @@ function StatusBadge({ status, t }: { status: string; t: (key: string) => string
   let cls = "";
   let icon = null;
   let translatedStatus = status;
+  const upperStatus = (status || "").toUpperCase();
 
-  if (status === "Delivered") {
+  if (upperStatus === "DELIVERED") {
     cls = "bg-emerald-50 text-emerald-700 border-emerald-200/60";
     icon = <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />;
     translatedStatus = t("status_delivered");
-  } else if (status === "Shipped") {
+  } else if (upperStatus === "SHIPPED") {
     cls = "bg-blue-50 text-blue-700 border-blue-200/60";
     icon = <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />;
     translatedStatus = t("status_shipped");
@@ -153,8 +154,9 @@ function StatusTimeline({ status, t }: { status: string; t: (key: string) => str
   ];
 
   let currentIdx = 0;
-  if (status === "Shipped") currentIdx = 2;
-  if (status === "Delivered") currentIdx = 3;
+  const upperStatus = (status || "").toUpperCase();
+  if (upperStatus === "SHIPPED") currentIdx = 2;
+  if (upperStatus === "DELIVERED") currentIdx = 3;
 
   return (
     <div className="w-full py-6 px-4 bg-slate-50/50 border border-slate-100 rounded-2xl my-4">

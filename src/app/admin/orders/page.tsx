@@ -114,10 +114,11 @@ export default function AdminOrdersPage() {
             // Format status colors
             let statusCls = "bg-amber-50 text-amber-700 border-amber-200/60";
             let accentGradient = "from-amber-400 to-orange-500";
-            if (order.status === "DELIVERED") {
+            const upperStatus = (order.status || "").toUpperCase();
+            if (upperStatus === "DELIVERED") {
               statusCls = "bg-emerald-50 text-emerald-700 border-emerald-200/60";
               accentGradient = "from-emerald-400 to-teal-500";
-            } else if (order.status === "SHIPPED") {
+            } else if (upperStatus === "SHIPPED") {
               statusCls = "bg-blue-50 text-blue-700 border-blue-200/60";
               accentGradient = "from-blue-400 to-indigo-500";
             }
@@ -136,7 +137,7 @@ export default function AdminOrdersPage() {
                       <span className="text-sm font-black text-slate-900 uppercase font-mono truncate">{order.referenceNumber || `REF-${order.id.slice(-4).toUpperCase()}`}</span>
                       <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border mt-2 w-fit ${statusCls}`}>
                         <span className={`w-1.5 h-1.5 rounded-full ${
-                          order.status === "DELIVERED" ? "bg-emerald-500" : order.status === "SHIPPED" ? "bg-blue-500" : "bg-amber-500"
+                          upperStatus === "DELIVERED" ? "bg-emerald-500" : upperStatus === "SHIPPED" ? "bg-blue-500" : "bg-amber-500"
                         }`} />
                         {order.status}
                       </span>
@@ -238,7 +239,7 @@ export default function AdminOrdersPage() {
                   <div>
                     <label className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 group-hover:text-kora transition-colors">Fulfillment Status</label>
                     <select 
-                      value={order.status.toUpperCase()}
+                      value={(order.status || "").toUpperCase()}
                       onChange={(e) => handleUpdateOrder(order.id, e.target.value, order.trackingId || "")}
                       className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-xs text-slate-800 focus:bg-white focus:border-kora outline-none cursor-pointer font-bold transition-all"
                     >
@@ -256,7 +257,7 @@ export default function AdminOrdersPage() {
                         const newTrackingId = e.target.value;
                         setOrders(orders.map(o => o.id === order.id ? { ...o, trackingId: newTrackingId } : o));
                       }}
-                      onBlur={(e) => handleUpdateOrder(order.id, order.status, e.target.value)}
+                      onBlur={(e) => handleUpdateOrder(order.id, order.status || "", e.target.value)}
                       placeholder="Enter courier tracking #"
                       className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-xs text-slate-800 focus:bg-white focus:border-kora outline-none transition-all font-mono"
                     />
