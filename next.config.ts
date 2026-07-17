@@ -12,6 +12,18 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  async rewrites() {
+    return [
+      {
+        source: "/assets/stats.js",
+        destination: "https://cloud.umami.is/script.js",
+      },
+      {
+        source: "/api/stats-send",
+        destination: "https://cloud.umami.is/api/send",
+      },
+    ];
+  },
 };
 
 export default nextConfig; 

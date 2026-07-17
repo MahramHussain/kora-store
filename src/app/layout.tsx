@@ -223,8 +223,9 @@ export default async function RootLayout({
             <script
               async
               defer
-              src={process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL || "https://cloud.umami.is/script.js"}
+              src="/assets/stats.js"
               data-website-id={process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID}
+              data-host-url="/api/stats-send"
             />
           )}
         </head>
