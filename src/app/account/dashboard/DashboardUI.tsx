@@ -483,7 +483,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
   });
 
   return (
-    <main className="min-h-screen bg-slate-50/70 text-slate-800 font-sans selection:bg-kora selection:text-white pt-20 pb-16 px-4 sm:px-6 md:pt-24 md:pb-24">
+    <main className="min-h-screen bg-slate-50/70 dark:bg-[#020617] text-slate-800 dark:text-slate-100 font-sans selection:bg-kora selection:text-white pt-20 pb-16 px-4 sm:px-6 md:pt-24 md:pb-24">
       <div className="max-w-7xl mx-auto flex flex-col gap-6 md:gap-8">
         
         {/* ── 1. PREMIUM GLASSMORPHIC PROFILE HERO BANNER ── */}
@@ -553,7 +553,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
           {/* Navigation - PC Sidebar / Mobile Tab bar */}
           <div className="w-full lg:w-72 shrink-0">
             {/* Mobile Tab-bar (horizontal scrolling navigation) */}
-            <div className="lg:hidden w-full overflow-x-auto scrollbar-hide py-1.5 -mx-4 px-4 sticky top-16 z-30 bg-slate-50/90 backdrop-blur-md border-b border-slate-200/50 flex gap-2">
+            <div className="lg:hidden w-full overflow-x-auto scrollbar-hide py-1.5 -mx-4 px-4 sticky top-16 z-30 bg-slate-50/90 dark:bg-[#020617]/95 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/80 flex gap-2">
               {navItems.map((item) => (
                 <button
                   key={item.id}
@@ -561,7 +561,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                   className={`flex items-center gap-2 px-5 py-3 rounded-full font-bold text-xs uppercase tracking-wider whitespace-nowrap border transition-all duration-300 ${
                     activeTab === item.id
                       ? "bg-kora text-white border-kora shadow-md shadow-kora/20"
-                      : "bg-white text-slate-600 border-slate-200 hover:text-slate-900"
+                      : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-200 border-slate-200 dark:border-slate-800 hover:text-slate-900 dark:hover:text-white"
                   }`}
                 >
                   {item.icon}
@@ -572,7 +572,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
               {(user.email === "mahramh40@gmail.com" || user.email === "korastore.ae@gmail.com") && (
                 <Link
                   href="/admin"
-                  className="flex items-center gap-2 px-5 py-3 rounded-full font-bold text-xs uppercase tracking-wider whitespace-nowrap bg-white text-kora border border-kora/20 hover:bg-kora/5 transition-all"
+                  className="flex items-center gap-2 px-5 py-3 rounded-full font-bold text-xs uppercase tracking-wider whitespace-nowrap bg-white dark:bg-slate-900 text-kora dark:text-purple-300 border border-kora/20 dark:border-kora/40 hover:bg-kora/5 dark:hover:bg-kora/15 transition-all"
                 >
                   <FiShield className="w-4 h-4" />
                   {t("admin_portal")}
@@ -581,7 +581,7 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
 
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 px-5 py-3 rounded-full font-bold text-xs uppercase tracking-wider whitespace-nowrap bg-white text-rose-500 border border-rose-100 hover:bg-rose-50/50 transition-all"
+                className="flex items-center gap-2 px-5 py-3 rounded-full font-bold text-xs uppercase tracking-wider whitespace-nowrap bg-white dark:bg-slate-900 text-rose-500 border border-rose-100 dark:border-rose-950/40 hover:bg-rose-50/50 dark:hover:bg-rose-950/20 transition-all"
               >
                 <FiLogOut className="w-4 h-4" />
                 {t("sign_out")}

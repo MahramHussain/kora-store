@@ -78,7 +78,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <main className="min-h-screen bg-slate-50/50 text-slate-800 pt-20 pb-20 px-4 sm:px-6 font-sans">
+    <main className="min-h-screen bg-slate-50/50 dark:bg-[#020617] text-slate-800 dark:text-slate-100 pt-20 pb-20 px-4 sm:px-6 font-sans">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
 
