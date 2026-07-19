@@ -142,7 +142,7 @@ export default async function Home() {
           
           {/* Argentina Away */}
           <Link href="/shop?q=Argentina" className="group flex flex-col items-center text-center">
-            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-slate-900/50 hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-[#020617] hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
               <img 
                 src="/assets/argentina_away_messi.jpg" 
                 alt="Argentina Away" 
@@ -159,7 +159,7 @@ export default async function Home() {
 
           {/* Brazil Away */}
           <Link href="/shop?q=Brazil" className="group flex flex-col items-center text-center">
-            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-slate-900/50 hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-[#020617] hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
               <img 
                 src="/assets/brazil_away_raphinha.jpg" 
                 alt="Brazil Away" 
@@ -176,7 +176,7 @@ export default async function Home() {
 
           {/* Portugal */}
           <Link href="/shop?q=Portugal" className="group flex flex-col items-center text-center">
-            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-slate-900/50 hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-[#020617] hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
               <img 
                 src="/assets/portugal_jersey.png" 
                 alt="Portugal" 
@@ -193,7 +193,7 @@ export default async function Home() {
 
           {/* Argentina */}
           <Link href="/shop?q=Argentina" className="group flex flex-col items-center text-center">
-            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-slate-900/50 hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-[#020617] hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
               <img 
                 src="/assets/argentina_jersey.png" 
                 alt="Argentina" 

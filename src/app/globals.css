@@ -1224,4 +1224,13 @@ html:not(.dark) * {
 }
 .dark .text-amber-800 {
   color: #f59e0b !important; /* amber-500 */
+}
+
+/* Trust badge mobile labels in dark mode */
+.dark .pdp-trust-badge {
+  background-color: #0f172a !important; /* slate-900 */
+  border-color: #1e293b !important; /* slate-800 */
+}
+.dark .pdp-trust-badge span {
+  color: #cbd5e1 !important; /* silver text */
 }
