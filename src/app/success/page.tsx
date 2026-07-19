@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { FaCopy, FaBoxOpen, FaArrowRight } from "react-icons/fa6";
-import { FaCheckCircle } from "react-icons/fa"; 
+import { FaCheckCircle, FaWhatsapp } from "react-icons/fa"; 
 import { useCart } from "@/context/CartContext";
 import { CURRENCY } from "@/lib/constants";
 import { useTranslation } from "@/context/LanguageContext";
@@ -13,7 +13,7 @@ import { translations } from "@/lib/translations";
 function SuccessContent() {
   const [copied, setCopied] = useState(false);
   const searchParams = useSearchParams();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { clearCart } = useCart();
   
   // Extract reference number and payment intent from URL parameters
@@ -22,43 +22,60 @@ function SuccessContent() {
   const trackingNumber = rawRef ? `KORA-TRK-${rawRef.split('-')[1] || '9827345'}` : "KORA-TRK-9827345";
   const paymentIntentId = searchParams.get("payment_intent_id");
 
-  const [loading, setLoading] = useState(!!paymentIntentId);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [order, setOrder] = useState<any>(null);
 
   useEffect(() => {
-    if (!paymentIntentId || !rawRef) return;
+    if (!rawRef) {
+      setLoading(false);
+      return;
+    }
 
-    const verifyPayment = async () => {
+    const loadOrderAndVerify = async () => {
       try {
-        const res = await fetch("/api/checkout/verify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            referenceNumber: rawRef,
-            paymentIntentId
-          })
-        });
+        setLoading(true);
+        // 1. Verify payment if paymentIntentId is present
+        if (paymentIntentId) {
+          const res = await fetch("/api/checkout/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              referenceNumber: rawRef,
+              paymentIntentId
+            })
+          });
 
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(errText || t("verification_failed"));
+          if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(errText || t("verification_failed"));
+          }
+
+          const data = await res.json();
+          if (data.success) {
+            clearCart();
+          } else {
+            throw new Error(data.error || t("payment_not_completed"));
+          }
         }
 
-        const data = await res.json();
-        if (data.success) {
-          clearCart();
-        } else {
-          throw new Error(data.error || t("payment_not_completed"));
+        // 2. Fetch full order details
+        const detailsRes = await fetch(`/api/orders/details?ref=${rawRef}`);
+        if (detailsRes.ok) {
+          const detailsData = await detailsRes.json();
+          if (detailsData.success) {
+            setOrder(detailsData.order);
+          }
         }
       } catch (err: any) {
-        console.error("Payment verification error:", err);
+        console.error("Order load/verification error:", err);
         setError(err.message || t("checkout_verify_error"));
       } finally {
         setLoading(false);
       }
     };
 
-    verifyPayment();
+    loadOrderAndVerify();
   }, [paymentIntentId, rawRef, clearCart]);
 
   const handleCopy = () => {
@@ -66,6 +83,72 @@ function SuccessContent() {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  // WhatsApp Link Builder
+  const whatsAppLink = (() => {
+    const phone = "971564245926";
+    const ref = rawRef || "8829";
+    const isAr = language === "ar";
+    let text = "";
+
+    if (isAr) {
+      text = `مرحباً كورة ستور! لدي استفسار بخصوص طلبي.\n\n`;
+      text += `*رقم الطلب:* #${ref.toUpperCase()}\n`;
+      if (order) {
+        text += `*الاسم:* ${order.shippingName || "—"}\n`;
+        text += `*العنوان:* ${order.shippingStreet || ""}, ${order.shippingCity || ""}\n`;
+        text += `*الهاتف:* ${order.shippingPhone || ""}\n`;
+        text += `*المجموع الإجمالي:* AED ${parseFloat(order.total).toFixed(2)}\n\n`;
+        text += `*المنتجات:*\n`;
+        order.items.forEach((item: any, idx: number) => {
+          text += `${idx + 1}. ${item.name} (${item.size}) x${item.quantity} - AED ${parseFloat(item.price).toFixed(2)}\n`;
+          if (item.playerName) {
+            text += `   - طباعة اسم لاعب: ${item.playerName} #${item.customNumber || ""}\n`;
+          } else if (item.customName || item.customNumber) {
+            text += `   - طباعة مخصصة: ${item.customName || "—"} #${item.customNumber || ""}\n`;
+          }
+          if (item.patch) {
+            text += `   - الشارة: ${item.patch}\n`;
+          }
+          if (item.sellerNote) {
+            text += `   - ملاحظة: ${item.sellerNote}\n`;
+          }
+        });
+        if (order.sellerNote) {
+          text += `\n*ملاحظة البائع:* ${order.sellerNote}\n`;
+        }
+      }
+    } else {
+      text = `Hello KoraStore! I have a question regarding my order.\n\n`;
+      text += `*Order Reference:* #${ref.toUpperCase()}\n`;
+      if (order) {
+        text += `*Customer Name:* ${order.shippingName || "—"}\n`;
+        text += `*Address:* ${order.shippingStreet || ""}, ${order.shippingCity || ""}, UAE\n`;
+        text += `*Phone:* ${order.shippingPhone || ""}\n`;
+        text += `*Total Amount:* AED ${parseFloat(order.total).toFixed(2)}\n\n`;
+        text += `*Items:*\n`;
+        order.items.forEach((item: any, idx: number) => {
+          text += `${idx + 1}. ${item.name} (${item.size}) x${item.quantity} - AED ${parseFloat(item.price).toFixed(2)}\n`;
+          if (item.playerName) {
+            text += `   - Preset Player: ${item.playerName} #${item.customNumber || ""}\n`;
+          } else if (item.customName || item.customNumber) {
+            text += `   - Custom Print: ${item.customName || "—"} #${item.customNumber || ""}\n`;
+          }
+          if (item.patch) {
+            text += `   - Patch: ${item.patch}\n`;
+          }
+          if (item.sellerNote) {
+            text += `   - Note: ${item.sellerNote}\n`;
+          }
+        });
+        if (order.sellerNote) {
+          text += `\n*Seller Note:* ${order.sellerNote}\n`;
+        }
+      }
+    }
+
+    return `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+  })();
 
   if (loading) {
     return (
@@ -126,7 +209,7 @@ function SuccessContent() {
         </p>
  
         {/* The Tracking Card */}
-        <div className="w-full bg-white border border-slate-200 rounded-3xl p-8 shadow-xl mb-10 relative overflow-hidden text-start">
+        <div className="w-full bg-white border border-slate-200 rounded-3xl p-8 shadow-xl mb-6 relative overflow-hidden text-start">
           <div className="absolute top-0 ltr:right-0 rtl:left-0 w-32 h-32 bg-kora/5 rounded-bl-full blur-2xl"></div>
           
           <div className="flex items-center gap-3 mb-6 pb-6 border-b border-slate-100 text-start">
@@ -153,6 +236,36 @@ function SuccessContent() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* WhatsApp Support Card */}
+        <div className="w-full bg-gradient-to-br from-emerald-500/10 to-emerald-500/0 border border-emerald-500/20 rounded-3xl p-8 shadow-lg mb-10 text-start relative overflow-hidden">
+          <div className="absolute top-0 ltr:right-0 rtl:left-0 w-32 h-32 bg-emerald-500/5 rounded-bl-full blur-xl pointer-events-none"></div>
+          
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative z-10">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600 font-bold shrink-0">
+                  <FaWhatsapp className="text-2xl" />
+                </div>
+                <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight">
+                  {t("whatsapp_support_title")}
+                </h3>
+              </div>
+              <p className="text-slate-500 text-sm font-semibold max-w-md">
+                {t("whatsapp_support_desc")}
+              </p>
+            </div>
+            
+            <a
+              href={whatsAppLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto bg-[#25D366] hover:bg-[#20ba5a] text-white font-black uppercase tracking-widest text-xs py-4 px-8 rounded-full flex items-center justify-center gap-3 transition-all hover:scale-[1.03] shadow-md shadow-emerald-600/20 active:scale-[0.98] shrink-0"
+            >
+              <FaWhatsapp className="text-lg" /> {t("whatsapp_support_btn")}
+            </a>
           </div>
         </div>
  

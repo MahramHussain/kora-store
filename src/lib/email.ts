@@ -68,6 +68,36 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
 
   const isAdmin = params.toEmail === "mahramh40@gmail.com" || params.toEmail === "korastore.ae@gmail.com";
 
+  // Build the WhatsApp query URL for the customer email
+  const whatsappPhone = "971564245926";
+  let whatsappText = `Hello KoraStore! I have a question regarding my order.\n\n`;
+  whatsappText += `*Order Reference:* #${params.referenceNumber}\n`;
+  whatsappText += `*Customer Name:* ${params.customerName}\n`;
+  whatsappText += `*Address:* ${params.shippingAddress}\n`;
+  whatsappText += `*Total Amount:* ${params.total}\n\n`;
+  whatsappText += `*Items:*\n`;
+
+  params.items.forEach((item, idx) => {
+    whatsappText += `${idx + 1}. ${item.name} (${item.size}) x${item.quantity} - ${item.price}\n`;
+    if (item.playerName) {
+      whatsappText += `   - Preset Player: ${item.playerName} #${item.customNumber || ""}\n`;
+    } else if (item.customName || item.customNumber) {
+      whatsappText += `   - Custom Print: ${item.customName || "—"} #${item.customNumber || ""}\n`;
+    }
+    if (item.patch) {
+      whatsappText += `   - Patch: ${item.patch}\n`;
+    }
+    if (item.sellerNote) {
+      whatsappText += `   - Note: ${item.sellerNote}\n`;
+    }
+  });
+
+  if (params.sellerNote) {
+    whatsappText += `\n*Seller Note:* ${params.sellerNote}\n`;
+  }
+
+  const whatsappLink = `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(whatsappText)}`;
+
   const emailHtml = `
     <div style="font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; padding: 32px 16px; color: #334155; line-height: 1.5;">
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 24px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
@@ -133,6 +163,25 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
               </tr>
             </table>
           </div>
+
+          <!-- WhatsApp Support CTA (Only for Customers) -->
+          ${
+            !isAdmin
+              ? `
+                <div style="margin-top: 32px; background-color: #f0fdf4; border: 1px dashed #bbf7d0; padding: 24px; border-radius: 16px; text-align: center;">
+                  <h4 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 800; color: #166534; text-transform: uppercase; letter-spacing: 0.05em;">
+                    Any Questions? Message here
+                  </h4>
+                  <p style="margin: 0 0 16px 0; font-size: 12px; color: #475569; line-height: 1.5;">
+                    If you have any queries about your order, sizing, or delivery details, click below to message us directly on WhatsApp with your order details pre-filled.
+                  </p>
+                  <a href="${whatsappLink}" target="_blank" style="display: inline-block; background-color: #25D366; color: #ffffff; font-size: 11px; font-weight: 900; text-decoration: none; text-transform: uppercase; letter-spacing: 0.05em; padding: 12px 24px; border-radius: 9999px; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);">
+                    Message on WhatsApp
+                  </a>
+                </div>
+              `
+              : ""
+          }
 
           <!-- Shipping Address -->
           <div style="margin-top: 32px; background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 16px; border-radius: 16px; font-size: 13px;">

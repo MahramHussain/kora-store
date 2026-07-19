@@ -401,6 +401,9 @@ export const translations = {
   "copied_label": { en: "Copied!", ar: "تم النسخ!" },
   "copy_label": { en: "Copy", ar: "نسخ" },
   "loading_transmission_details": { en: "Loading Transmission Details...", ar: "جاري تحميل تفاصيل الإرسال..." },
+  "whatsapp_support_title": { en: "Any Questions? Message here", ar: "لديك أي أسئلة؟ تواصل معنا" },
+  "whatsapp_support_desc": { en: "Need to change sizes, update delivery details, or have custom print queries? Chat with our team instantly on WhatsApp.", ar: "هل تحتاج إلى تغيير المقاسات، تحديث تفاصيل التوصيل، أو لديك استفسارات حول الطباعة المخصصة؟ تحدث مع فريقنا فوراً على الواتساب." },
+  "whatsapp_support_btn": { en: "Message Support", ar: "مراسلة الدعم" },
 
   // Shop page specific
   "active_filters": { en: "Active Filters:", ar: "الفلاتر النشطة:" },
