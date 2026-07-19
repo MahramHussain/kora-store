@@ -6,9 +6,10 @@ import { useState, useRef, useEffect } from "react";
 import { useCart } from "@/context/CartContext";
 import { getProducts } from "@/app/admin/actions";
 import { FaBars, FaXmark, FaBoxOpen } from "react-icons/fa6";
-import { FiUser, FiShoppingBag, FiSearch, FiChevronDown, FiChevronRight } from "react-icons/fi";
+import { FiUser, FiShoppingBag, FiSearch, FiChevronDown, FiChevronRight, FiSun, FiMoon } from "react-icons/fi";
 import { SignInButton, Show, useUser } from "@clerk/nextjs";
 import { useTranslation } from "@/context/LanguageContext";
+import { useTheme } from "@/context/ThemeContext";
 
 const JERSEYS: Record<
   string,
@@ -249,9 +250,15 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user: clerkUser } = useUser();
+  const { theme, toggleTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [customProfilePic, setCustomProfilePic] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleAvatarUpdate = () => {
@@ -523,6 +530,19 @@ export default function Navbar() {
                 <span className={language === "ar" ? "text-white font-extrabold" : ""}>العربية</span>
               </button>
             )}
+
+            {/* Dark Mode Toggle (Desktop only) */}
+            <button 
+              onClick={toggleTheme}
+              className="hidden md:flex text-white hover:text-purple-200 transition-colors p-1"
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              {mounted && theme === "dark" ? (
+                <FiSun className="text-xl md:text-2xl text-amber-400 animate-pulse" />
+              ) : (
+                <FiMoon className="text-xl md:text-2xl" />
+              )}
+            </button>
 
             {/* Cart/Basket */}
             <Link href="/cart" className="relative text-white hover:text-purple-200 transition-colors p-1" title={t("shopping_cart")}>
@@ -972,6 +992,35 @@ export default function Navbar() {
                 <span className={language === "en" ? "text-kora font-extrabold" : ""}>EN</span>
                 <span className="text-slate-300">|</span>
                 <span className={language === "ar" ? "text-kora font-extrabold" : ""}>العربية</span>
+              </button>
+            </div>
+          )}
+
+          {/* Dark Mode Toggle (Mobile only) */}
+          {!pathname?.startsWith("/admin") && (
+            <div className="px-6 py-5 border-b border-neutral-200 flex items-center justify-between">
+              <span className="text-slate-900 font-display font-extrabold text-base">
+                {mounted && theme === "dark" ? (language === "en" ? "Dark Mode" : "الوضع الداكن") : (language === "en" ? "Light Mode" : "الوضع المضيء")}
+              </span>
+              <button 
+                onClick={() => {
+                  toggleTheme();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-[11px] font-black uppercase tracking-widest text-slate-700 border border-neutral-300 rounded-lg px-4 py-2 bg-slate-50 active:bg-neutral-100 transition-colors flex items-center gap-1.5 shadow-sm"
+                title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              >
+                {mounted && theme === "dark" ? (
+                  <>
+                    <FiSun className="text-sm text-amber-500 animate-pulse" />
+                    <span>{language === "en" ? "Light" : "مضيء"}</span>
+                  </>
+                ) : (
+                  <>
+                    <FiMoon className="text-sm text-kora" />
+                    <span>{language === "en" ? "Dark" : "داكن"}</span>
+                  </>
+                )}
               </button>
             </div>
           )}

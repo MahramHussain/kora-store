@@ -103,10 +103,10 @@ export default async function Home() {
 
 
   return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pb-12 md:pb-20">
+    <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans selection:bg-kora selection:text-white pb-12 md:pb-20 transition-colors duration-300">
       {/* 4. PROMO BANNER — Scannable on mobile */}
-      <div className="bg-neutral-100 border-b border-neutral-200 py-3 md:py-2.5 text-center text-xs md:text-sm font-bold text-neutral-800 px-4">
-        <span className="block md:inline">🏆 <span className="text-neutral-900 font-black">{t("promo_active")}</span></span>
+      <div className="bg-neutral-100 dark:bg-slate-900 border-b border-neutral-200 dark:border-slate-800 py-3 md:py-2.5 text-center text-xs md:text-sm font-bold text-neutral-800 dark:text-slate-300 px-4">
+        <span className="block md:inline">🏆 <span className="text-neutral-900 dark:text-slate-100 font-black">{t("promo_active")}</span></span>
         <span className="block md:inline md:ms-1 mt-0.5 md:mt-0">{t("promo_code_text")}</span>
       </div>
 
@@ -137,73 +137,73 @@ export default async function Home() {
       </section>
 
       {/* 6.5 BRANDED KITS SHOWCASE ROW */}
-      <section className="w-full bg-white border-b border-neutral-100 py-12 md:py-16 px-4 md:px-6">
+      <section className="w-full bg-white dark:bg-slate-950 border-b border-neutral-100 dark:border-slate-800 py-12 md:py-16 px-4 md:px-6">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           
           {/* Argentina Away */}
           <Link href="/shop?q=Argentina" className="group flex flex-col items-center text-center">
-            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white hover:shadow-md transition-shadow duration-300">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-slate-900/50 hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
               <img 
                 src="/assets/argentina_away_messi.jpg" 
                 alt="Argentina Away" 
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 dark:text-slate-100 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
               {formatTitle(t("argentina_away_title"))}
             </h3>
-            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
+            <p className="text-xs text-neutral-500 dark:text-slate-400 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
               {t("argentina_away_desc")}
             </p>
           </Link>
 
           {/* Brazil Away */}
           <Link href="/shop?q=Brazil" className="group flex flex-col items-center text-center">
-            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white hover:shadow-md transition-shadow duration-300">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-slate-900/50 hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
               <img 
                 src="/assets/brazil_away_raphinha.jpg" 
                 alt="Brazil Away" 
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 dark:text-slate-100 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
               {formatTitle(t("brazil_away_title"))}
             </h3>
-            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
+            <p className="text-xs text-neutral-500 dark:text-slate-400 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
               {t("brazil_away_desc")}
             </p>
           </Link>
 
           {/* Portugal */}
           <Link href="/shop?q=Portugal" className="group flex flex-col items-center text-center">
-            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white hover:shadow-md transition-shadow duration-300">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-slate-900/50 hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
               <img 
                 src="/assets/portugal_jersey.png" 
                 alt="Portugal" 
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 dark:text-slate-100 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
               {t("portugal")}
             </h3>
-            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
+            <p className="text-xs text-neutral-500 dark:text-slate-400 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
               {t("portugal_desc")}
             </p>
           </Link>
 
           {/* Argentina */}
           <Link href="/shop?q=Argentina" className="group flex flex-col items-center text-center">
-            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white hover:shadow-md transition-shadow duration-300">
+            <div className="w-full aspect-square overflow-hidden flex items-center justify-center p-0 mb-4 bg-white dark:bg-slate-900/50 hover:shadow-md transition-shadow duration-300 border border-transparent dark:border-slate-800 rounded-2xl">
               <img 
                 src="/assets/argentina_jersey.png" 
                 alt="Argentina" 
                 className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
               />
             </div>
-            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
+            <h3 className="text-lg md:text-xl font-black uppercase tracking-tight text-neutral-900 dark:text-slate-100 mb-1.5 group-hover:text-kora transition-colors min-h-[3.5rem] flex items-center justify-center">
               {t("argentina")}
             </h3>
-            <p className="text-xs text-neutral-500 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
+            <p className="text-xs text-neutral-500 dark:text-slate-400 font-medium leading-relaxed max-w-[240px] min-h-[4.5rem] flex items-start justify-center">
               {t("argentina_desc")}
             </p>
           </Link>
@@ -310,16 +310,16 @@ export default async function Home() {
 
       {/* 8. WORLD CUP JERSEYS (Horizontal Slider) */}
       <section className="px-4 md:px-6 mb-10 md:mb-16 max-w-7xl mx-auto w-full">
-        <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 pb-3 md:pb-4">
+        <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
               {t("national_jerseys")}
             </h2>
-            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">{t("national_jerseys_sub")}</p>
+            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1 md:mt-2">{t("national_jerseys_sub")}</p>
           </div>
           <Link 
             href="/shop?category=Shirts" 
-            className="text-[10px] md:text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
+            className="text-[10px] md:text-xs font-bold text-kora dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 dark:border-purple-800/40 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
             {t("see_all")} 
             <span className="group-hover:translate-x-1 transition-transform rtl:rotate-180">→</span>
@@ -343,16 +343,16 @@ export default async function Home() {
 
       {/* 8.5 SHOES (Horizontal Slider) */}
       <section className="px-4 md:px-6 mb-10 md:mb-16 max-w-7xl mx-auto w-full">
-        <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 pb-3 md:pb-4">
+        <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
               {t("shoes")}
             </h2>
-            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">{t("shoes_sub")}</p>
+            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1 md:mt-2">{t("shoes_sub")}</p>
           </div>
           <Link 
             href="/shop?category=Shoes" 
-            className="text-[10px] md:text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
+            className="text-[10px] md:text-xs font-bold text-kora dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 dark:border-purple-800/40 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
             {t("see_all")} 
             <span className="group-hover:translate-x-1 transition-transform rtl:rotate-180">→</span>
@@ -376,16 +376,16 @@ export default async function Home() {
 
       {/* 9. STREETWEAR, ACCESSORIES & FLAGS (Horizontal Slider) */}
       <section className="px-4 md:px-6 mb-16 md:mb-24 max-w-7xl mx-auto w-full">
-        <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 pb-3 md:pb-4">
+        <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
               {t("streetwear_gear")}
             </h2>
-            <p className="text-xs md:text-sm text-slate-500 mt-1 md:mt-2">{t("streetwear_gear_sub")}</p>
+            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1 md:mt-2">{t("streetwear_gear_sub")}</p>
           </div>
           <Link 
             href="/shop?category=Accessories" 
-            className="text-[10px] md:text-xs font-bold text-kora hover:text-purple-700 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
+            className="text-[10px] md:text-xs font-bold text-kora dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 dark:border-purple-800/40 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
             {t("see_all")} 
             <span className="group-hover:translate-x-1 transition-transform rtl:rotate-180">→</span>

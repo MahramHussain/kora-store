@@ -831,4 +831,361 @@ a[href="/"] *,
 a[href="/"] span,
 a[href="/"] div {
   font-family: var(--font-outfit), 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* ==========================================================================
+   Kora Store Premium Dark Mode Styles
+   ========================================================================== */
+
+/* 1. Fluid transition when toggling modes */
+html.dark,
+html.dark *,
+html:not(.dark),
+html:not(.dark) * {
+  transition-property: background-color, border-color, fill, stroke, box-shadow;
+  transition-duration: 250ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 2. Custom components dark-mode overrides */
+.dark body {
+  background-color: #020617 !important; /* deep slate-955 */
+  color: #f1f5f9 !important; /* slate-100 */
+}
+
+/* Scrollbar styles for dark mode */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #020617;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Custom premium card dark-mode override */
+.dark .card-premium {
+  background: #0b0f19 !important; /* deep card fill */
+  border-color: #1e293b !important;
+}
+.dark .card-premium:hover {
+  border-color: rgba(168, 85, 247, 0.4) !important;
+  box-shadow: 0 4px 24px rgba(168, 85, 247, 0.08) !important;
+}
+
+/* Custom stats card dark-mode override */
+.dark .stat-card {
+  background: #0b0f19 !important;
+  border-color: #1e293b !important;
+}
+.dark .stat-card::before {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%) !important;
+}
+
+/* Clerk Authentication Popover Dark Mode Adjustments */
+.dark .cl-card {
+  background-color: #0b0f19 !important;
+  border-color: #1e293b !important;
+}
+.dark .cl-headerTitle {
+  color: #ffffff !important;
+}
+.dark .cl-headerSubtitle {
+  color: #94a3b8 !important;
+}
+.dark .cl-dividerLine {
+  background-color: #1e293b !important;
+}
+.dark .cl-dividerText {
+  color: #475569 !important;
+}
+.dark .cl-formLabelTitle {
+  color: #cbd5e1 !important;
+}
+.dark .cl-formButtonPrimary {
+  background-color: #5E0683 !important;
+}
+.dark .cl-formButtonPrimary:hover {
+  background-color: #7809a7 !important;
+}
+.dark .cl-identityPreviewText {
+  color: #cbd5e1 !important;
+}
+
+/* Mobile Drawer Menu Dark Mode Overrides */
+.dark div.fixed.w-\[300px\] {
+  background-color: #020617 !important; /* slate-955 bg */
+  border-color: #1e293b !important;
+}
+.dark div.fixed.w-\[300px\] .border-b {
+  border-color: #1e293b !important;
+}
+.dark div.fixed.w-\[300px\] .bg-white {
+  background-color: #020617 !important;
+}
+.dark div.fixed.w-\[300px\] .text-slate-900 {
+  color: #f1f5f9 !important;
+}
+.dark div.fixed.w-\[300px\] a {
+  color: #f1f5f9 !important;
+}
+.dark div.fixed.w-\[300px\] a:hover {
+  background-color: #0f172a !important; /* slate-900 */
+}
+.dark div.fixed.w-\[300px\] button {
+  color: #f1f5f9 !important;
+}
+.dark div.fixed.w-\[300px\] button:hover {
+  background-color: #0f172a !important;
+}
+.dark div.fixed.w-\[300px\] .bg-neutral-50 {
+  background-color: #090d16 !important; /* deep dark accordion */
+}
+.dark div.fixed.w-\[300px\] .border-neutral-100 {
+  border-color: #1e293b !important;
+}
+.dark div.fixed.w-\[300px\] .text-neutral-700 {
+  color: #cbd5e1 !important;
+}
+.dark div.fixed.w-\[300px\] .border-neutral-200 {
+  border-color: #1e293b !important;
+}
+.dark div.fixed.w-\[300px\] .bg-slate-50 {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+.dark div.fixed.w-\[300px\] .border-neutral-300 {
+  border-color: #1e293b !important;
+}
+
+/* ==========================================================================
+   Comprehensive Layout and Component Dark Mode Overrides
+   ========================================================================== */
+
+/* Dark Mode Inputs, Dropdowns, Selects, and Textareas */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark select,
+.dark textarea {
+  background-color: #0b0f19 !important;
+  color: #f1f5f9 !important;
+  border-color: #1e293b !important;
+}
+.dark input::placeholder {
+  color: #475569 !important;
+}
+.dark label {
+  color: #cbd5e1 !important;
+}
+
+/* Background Overrides */
+.dark :not(button):not(a):not([role="button"]):not(.btn).bg-white {
+  background-color: #020617 !important;
+}
+.dark :not(button):not(a):not([role="button"]):not(.btn).bg-slate-50,
+.dark :not(button):not(a):not([role="button"]):not(.btn).bg-slate-100,
+.dark :not(button):not(a):not([role="button"]):not(.btn).bg-slate-200,
+.dark :not(button):not(a):not([role="button"]):not(.btn).bg-neutral-50,
+.dark :not(button):not(a):not([role="button"]):not(.btn).bg-neutral-100,
+.dark :not(button):not(a):not([role="button"]):not(.btn).bg-neutral-200,
+.dark :not(button):not(a):not([role="button"]):not(.btn).bg-gray-50,
+.dark :not(button):not(a):not([role="button"]):not(.btn).bg-gray-100 {
+  background-color: #0b0f19 !important;
+}
+.dark :not(button):not(a):not([role="button"]):not(.btn).bg-slate-50\/50 {
+  background-color: #020617 !important;
+}
+
+/* Borders */
+.dark .border,
+.dark .border-t,
+.dark .border-b,
+.dark .border-l,
+.dark .border-r,
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-350,
+.dark .border-neutral-100,
+.dark .border-neutral-200,
+.dark .border-gray-200 {
+  border-color: #1e293b !important;
+}
+
+/* Text Colors */
+.dark h1:not([class*="text-"]),
+.dark h2:not([class*="text-"]),
+.dark h3:not([class*="text-"]),
+.dark h4:not([class*="text-"]),
+.dark h5:not([class*="text-"]),
+.dark h6:not([class*="text-"]),
+.dark p:not([class*="text-"]),
+.dark span:not([class*="text-"]),
+.dark li:not([class*="text-"]),
+.dark label:not([class*="text-"]) {
+  color: #f1f5f9;
+}
+
+.dark .text-slate-900,
+.dark .text-neutral-900,
+.dark .text-slate-800,
+.dark .text-neutral-800,
+.dark .text-gray-900,
+.dark .text-gray-800 {
+  color: #f1f5f9 !important;
+}
+.dark .text-slate-700,
+.dark .text-neutral-700,
+.dark .text-gray-700 {
+  color: #e2e8f0 !important; /* slate-200 for excellent primary text contrast */
+}
+.dark .text-slate-650,
+.dark .text-slate-600,
+.dark .text-neutral-600,
+.dark .text-gray-600 {
+  color: #cbd5e1 !important; /* slate-300 for readable secondary text */
+}
+.dark .text-slate-500,
+.dark .text-neutral-500,
+.dark .text-gray-500 {
+  color: #94a3b8 !important; /* slate-400 for readable captions and hints */
+}
+.dark .text-slate-400,
+.dark .text-neutral-400,
+.dark .text-gray-400 {
+  color: #cbd5e1 !important; /* slate-300 for high-contrast labels */
+}
+
+/* Rating review stars and custom elements overrides */
+.dark .text-emerald-700 {
+  color: #34d399 !important; /* emerald-400 */
+}
+.dark .text-amber-700 {
+  color: #fbbf24 !important; /* amber-400 */
+}
+.dark .text-rose-700 {
+  color: #fb7185 !important; /* rose-400 */
+}
+.dark .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
+}
+
+/* Category absolute badge on image */
+.dark .bg-white\/90 {
+  background-color: rgba(15, 23, 42, 0.85) !important;
+  border-color: rgba(30, 41, 59, 0.5) !important;
+}
+
+/* Size selector buttons */
+.dark button.min-w-\[60px\],
+.dark button.w-16.h-14 {
+  background-color: #0f172a !important; /* slate-900 */
+  border-color: #1e293b !important; /* slate-800 */
+}
+.dark button.min-w-\[60px\] span,
+.dark button.w-16.h-14 span {
+  color: #f1f5f9 !important;
+}
+.dark button.min-w-\[60px\] span.text-amber-500,
+.dark button.w-16.h-14 span.text-amber-500 {
+  color: #f59e0b !important; /* Keep amber stock count */
+}
+.dark button.min-w-\[60px\].bg-kora,
+.dark button.w-16.h-14.bg-kora {
+  background-color: #5E0683 !important; /* brand purple */
+  border-color: #5E0683 !important;
+}
+.dark button.min-w-\[60px\].bg-kora span,
+.dark button.w-16.h-14.bg-kora span {
+  color: #ffffff !important;
+}
+.dark button.min-w-\[60px\].opacity-35,
+.dark button.w-16.h-14.opacity-35 {
+  background-color: #0b0f19 !important;
+  border-color: #1e293b !important;
+  opacity: 0.35 !important;
+}
+.dark button.min-w-\[60px\].opacity-35 span,
+.dark button.w-16.h-14.opacity-35 span {
+  color: #475569 !important;
+}
+
+/* Mobile Bottom Sheet Filter Override */
+.dark .mobile-bottom-sheet {
+  background-color: #020617 !important;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.45);
+}
+.dark .mobile-bottom-sheet-handle {
+  background-color: #334155 !important;
+}
+.dark .mobile-filter-fab {
+  background-color: #5E0683 !important;
+}
+
+/* Rating review stars and custom elements */
+.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+.dark .text-emerald-800 {
+  color: #a7f3d0 !important;
+}
+.dark .bg-rose-50 {
+  background-color: rgba(244, 63, 94, 0.1) !important;
+}
+.dark .text-rose-800 {
+  color: #fecdd3 !important;
+}
+
+/* Custom Select Dropdowns in Dark Mode */
+.dark button.w-full.min-w-0.bg-white,
+.dark div.absolute.z-50.bg-white {
+  background-color: #0f172a !important; /* slate-900 */
+  border-color: #1e293b !important; /* slate-800 */
+}
+.dark button.w-full.min-w-0.bg-white span,
+.dark button.w-full.min-w-0.bg-white svg {
+  color: #cbd5e1 !important; /* silver text */
+}
+
+/* Personalization Tab buttons */
+.dark button.flex-1.flex.items-center.justify-center.bg-white {
+  background-color: #0f172a !important; /* slate-900 */
+  border-color: #1e293b !important; /* slate-800 */
+}
+.dark button.flex-1.flex.items-center.justify-center.bg-white span {
+  color: #cbd5e1 !important; /* silver text */
+}
+
+/* Custom Select Dropdown menu options list items */
+.dark button.w-full.text-left {
+  background-color: #0f172a !important; /* slate-900 */
+  color: #cbd5e1 !important; /* silver text */
+}
+.dark button.w-full.text-left:hover {
+  background-color: #1e293b !important; /* slate-800 */
+  color: #f1f5f9 !important;
+}
+.dark button.w-full.text-left.bg-kora {
+  background-color: #5E0683 !important; /* Keep brand purple for selected */
+  color: #ffffff !important;
+}
+
+/* Disabled/Slate Buttons & Inputs (like Select Size / Add to Cart when not selected) */
+.dark button.bg-slate-100,
+.dark button.bg-slate-50,
+.dark button.cursor-not-allowed,
+.dark .btn.bg-slate-100 {
+  background-color: #1e293b !important; /* slate-800 */
+  border-color: #334155 !important;
+  color: #64748b !important; /* slate-500 for disabled text */
+}
+.dark button.bg-slate-100 span,
+.dark button.bg-slate-50 span,
+.dark button.cursor-not-allowed span {
+  color: #64748b !important;
 }

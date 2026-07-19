@@ -75,11 +75,11 @@ export function ProductCard({ product }: { product: Product }) {
       href={`/shop/${product.id}`} 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative bg-white rounded-2xl border border-slate-200 hover:border-kora transition-all duration-300 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(107,0,255,0.3)] hover:-translate-y-1 overflow-hidden flex flex-col h-[300px] sm:h-[380px] active:scale-[0.98] md:active:scale-100"
+      className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-kora dark:hover:border-kora transition-all duration-300 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(107,0,255,0.3)] hover:-translate-y-1 overflow-hidden flex flex-col h-[300px] sm:h-[380px] active:scale-[0.98] md:active:scale-100"
     >
-      <div className="relative flex-1 bg-slate-50 flex items-center justify-center overflow-hidden">
+      <div className="relative flex-1 bg-slate-50 dark:bg-slate-950 flex items-center justify-center overflow-hidden">
         {product.stock === 0 ? (
-          <div className="absolute top-3 left-3 md:top-4 md:left-4 px-2.5 md:px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest z-20 shadow-sm bg-rose-100 text-rose-800 border border-rose-200">
+          <div className="absolute top-3 left-3 md:top-4 md:left-4 px-2.5 md:px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest z-20 shadow-sm bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-900/50">
             {t("sold_out")}
           </div>
         ) : product.tag ? (
@@ -94,7 +94,7 @@ export function ProductCard({ product }: { product: Product }) {
             </div>
           ) : (
             <div className={`absolute top-3 left-3 md:top-4 md:left-4 px-2.5 md:px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest z-20 shadow-sm ${
-              product.tag === 'Latest' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-rose-100 text-rose-800 border border-rose-200'
+              product.tag === 'Latest' ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-900/50' : 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-900/50'
             }`}>
               {t(product.tag.toLowerCase()) || product.tag}
             </div>
@@ -119,7 +119,7 @@ export function ProductCard({ product }: { product: Product }) {
             />
           ))
         ) : (
-          <div className="text-slate-300 text-xs">{t("no_image")}</div>
+          <div className="text-slate-350 dark:text-slate-650 text-xs">{t("no_image")}</div>
         )}
 
         {/* Dot indicators — always visible on mobile, hover-only on desktop */}
@@ -137,7 +137,7 @@ export function ProductCard({ product }: { product: Product }) {
         )}
       </div>
 
-      <div className="p-3 sm:p-5 border-t border-slate-100 relative z-20 bg-white">
+      <div className="p-3 sm:p-5 border-t border-slate-100 dark:border-slate-800 relative z-20 bg-white dark:bg-slate-900">
         <div className="flex justify-between items-start mb-2 md:mb-3">
           <div className="min-w-0 flex-1">
             <p className="text-kora text-[10px] font-bold uppercase tracking-widest mb-1">
@@ -147,7 +147,7 @@ export function ProductCard({ product }: { product: Product }) {
                 ? t("category_accessories") 
                 : (t(`category_${product.category.toLowerCase().replace(" ", "_")}`) || product.category)}
             </p>
-            <h3 className="text-sm md:text-base font-bold text-slate-900 leading-tight line-clamp-1 font-sans">
+            <h3 className="text-sm md:text-base font-bold text-slate-900 dark:text-slate-100 leading-tight line-clamp-1 font-sans">
               {t(product.id) !== product.id 
                 ? t(product.id) 
                 : (language === "ar" && product.nameAr ? product.nameAr : product.name)}
@@ -157,28 +157,28 @@ export function ProductCard({ product }: { product: Product }) {
               return (
                 <div className="flex items-center gap-1 mt-1">
                   {[1,2,3,4,5].map(s => (
-                    <FaStar key={s} className={`text-[9px] ${s <= Math.round(avg) ? 'text-yellow-400' : 'text-slate-200'}`} />
+                    <FaStar key={s} className={`text-[9px] ${s <= Math.round(avg) ? 'text-yellow-400' : 'text-slate-700'}`} />
                   ))}
-                  <span className="text-[9px] text-slate-400 font-bold ml-0.5">{avg.toFixed(1)}</span>
+                  <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold ml-0.5">{avg.toFixed(1)}</span>
                 </div>
               );
             })()}
           </div>
           <div className="flex items-center gap-1.5 ml-2 shrink-0 whitespace-nowrap font-sans">
             {product.originalPrice && (
-              <span className="text-xs text-slate-400 line-through font-medium">
+              <span className="text-xs text-slate-400 dark:text-slate-500 line-through font-medium">
                 {t("aed")}{parseFloat(product.originalPrice).toFixed(0)}
               </span>
             )}
-            <span className="text-base md:text-lg font-bold text-slate-900">
+            <span className="text-base md:text-lg font-bold text-slate-900 dark:text-slate-100">
               {t("aed")}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
             </span>
           </div>
         </div>
         <div className={`w-full text-center font-bold text-xs md:text-sm py-2 md:py-2.5 rounded-lg transition-colors border ${
           product.stock === 0 
-            ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed" 
-            : "bg-slate-100 group-hover:bg-kora text-slate-700 group-hover:text-white border-slate-200 group-hover:border-kora"
+            ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-700 cursor-not-allowed" 
+            : "bg-slate-100 dark:bg-slate-800 group-hover:bg-kora dark:group-hover:bg-kora text-slate-700 dark:text-slate-350 group-hover:text-white dark:group-hover:text-white border-slate-200 dark:border-slate-700 group-hover:border-kora dark:group-hover:border-kora"
         }`}>
           {product.stock === 0 ? t("sold_out") : t("view_gear")}
         </div>
@@ -189,19 +189,19 @@ export function ProductCard({ product }: { product: Product }) {
 
 export function ProductSkeletonCard() {
   return (
-    <div className="group relative bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[300px] sm:h-[380px] animate-pulse">
-      <div className="relative flex-1 bg-slate-50 flex items-center justify-center p-8">
-        <div className="w-32 h-32 bg-slate-200 rounded-full blur-xl"></div>
+    <div className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[300px] sm:h-[380px] animate-pulse">
+      <div className="relative flex-1 bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-8">
+        <div className="w-32 h-32 bg-slate-200 dark:bg-slate-800 rounded-full blur-xl"></div>
       </div>
-      <div className="p-4 sm:p-5 border-t border-slate-100 relative z-20 bg-white">
+      <div className="p-4 sm:p-5 border-t border-slate-100 dark:border-slate-800 relative z-20 bg-white dark:bg-slate-900">
         <div className="flex justify-between items-start mb-4">
           <div className="space-y-2 flex-1">
-            <div className="h-3 bg-slate-200 rounded w-16"></div>
-            <div className="h-4 bg-slate-200 rounded w-3/4"></div>
+            <div className="h-3 bg-slate-200 dark:bg-slate-800 rounded w-16"></div>
+            <div className="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
           </div>
-          <div className="h-6 bg-slate-200 rounded w-12 ml-4"></div>
+          <div className="h-6 bg-slate-200 dark:bg-slate-800 rounded w-12 ml-4"></div>
         </div>
-        <div className="w-full h-10 bg-slate-100 rounded-lg"></div>
+        <div className="w-full h-10 bg-slate-100 dark:bg-slate-800 rounded-lg"></div>
       </div>
     </div>
   );

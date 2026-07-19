@@ -9,6 +9,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { CartProvider } from "@/context/CartContext";
 import { LanguageProvider, Language } from "@/context/LanguageContext";
 import { cookies, headers } from "next/headers";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -228,25 +229,44 @@ export default async function RootLayout({
               data-host-url="/api/stats-send"
             />
           )}
+          {/* Prevent dark mode layout flash on reload */}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function() {
+                  try {
+                    var theme = localStorage.getItem('theme');
+                    if (theme === 'dark') {
+                      document.documentElement.classList.add('dark');
+                    } else {
+                      document.documentElement.classList.remove('dark');
+                    }
+                  } catch (e) {}
+                })();
+              `
+            }}
+          />
         </head>
         {/* Added flexbox magic here to push the footer to the bottom */}
-        <body className={`${inter.variable} ${outfit.variable} ${inter.className} bg-white text-slate-900 antialiased flex flex-col min-h-screen selection:bg-kora selection:text-white`}>
-          <LanguageProvider initialLang={(lang === "ar" ? "ar" : "en") as Language}>
-            <CartProvider>
-              <PageTransitionLoader />
-              <Navbar />
-              <SaleToast />
+        <body className={`${inter.variable} ${outfit.variable} ${inter.className} bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased flex flex-col min-h-screen selection:bg-kora selection:text-white transition-colors duration-300`}>
+          <ThemeProvider>
+            <LanguageProvider initialLang={(lang === "ar" ? "ar" : "en") as Language}>
+              <CartProvider>
+                <PageTransitionLoader />
+                <Navbar />
+                <SaleToast />
 
-              {/* flex-grow makes the main content take up all available space */}
-              <main className="flex-grow">
-                {children}
-              </main>
+                {/* flex-grow makes the main content take up all available space */}
+                <main className="flex-grow">
+                  {children}
+                </main>
 
-              {/* 2. RENDER THE FOOTER AT THE VERY BOTTOM */}
-              <Footer />
+                {/* 2. RENDER THE FOOTER AT THE VERY BOTTOM */}
+                <Footer />
 
-            </CartProvider>
-          </LanguageProvider>
+              </CartProvider>
+            </LanguageProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

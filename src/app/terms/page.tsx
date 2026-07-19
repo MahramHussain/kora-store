@@ -8,7 +8,7 @@ export default async function TermsPage() {
   const isAr = lang === "ar";
 
   return (
-    <main className="min-h-screen bg-slate-50/50 text-slate-900 font-sans pt-32 pb-24 px-4 sm:px-6 selection:bg-kora selection:text-white">
+    <main className="min-h-screen bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pt-32 pb-24 px-4 sm:px-6 selection:bg-kora selection:text-white transition-colors duration-300">
       <div className="max-w-3xl mx-auto">
         
         {/* Back Link */}
@@ -23,7 +23,7 @@ export default async function TermsPage() {
         </div>
 
         {/* Article Container */}
-        <div className="bg-white border border-slate-200/80 rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden text-start">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden text-start">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-kora via-purple-500 to-pink-500" />
           
           {isAr ? (

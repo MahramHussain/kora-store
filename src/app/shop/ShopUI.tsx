@@ -269,7 +269,7 @@ export default function ShopUI({ products }: { products: any[] }) {
   };
 
   return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans pt-4 md:pt-8 pb-20 px-4 md:px-6">
+    <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pt-4 md:pt-8 pb-20 px-4 md:px-6 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         
         {/* ═══ MOBILE ONLY: Top Search Bar ═══ */}
@@ -283,7 +283,7 @@ export default function ShopUI({ products }: { products: any[] }) {
               placeholder={t("search_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3.5 ltr:pl-11 ltr:pr-10 rtl:pr-11 rtl:pl-10 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors font-sans text-sm shadow-sm text-start"
+              className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl py-3.5 ltr:pl-11 ltr:pr-10 rtl:pr-11 rtl:pl-10 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors font-sans text-sm shadow-sm text-start"
             />
             {searchQuery && (
               <button
@@ -300,7 +300,7 @@ export default function ShopUI({ products }: { products: any[] }) {
         <div className="w-full hidden sm:flex lg:hidden gap-3 mb-6">
           <button 
             onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-            className="flex-1 flex items-center justify-center gap-2 bg-slate-50 border border-slate-200 rounded-xl py-3 text-sm font-bold text-slate-800 active:bg-slate-100 transition-colors shadow-sm"
+            className="flex-1 flex items-center justify-center gap-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-3 text-sm font-bold text-slate-800 dark:text-slate-200 active:bg-slate-100 dark:active:bg-slate-800 transition-colors shadow-sm"
           >
             <FaFilter className="text-kora text-xs" /> {isFiltersOpen ? t("hide_filters") : t("show_filters")}
           </button>
@@ -314,7 +314,7 @@ export default function ShopUI({ products }: { products: any[] }) {
               isFiltersOpen ? "sm:block" : "sm:hidden lg:block"
             }`}
           >
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 shadow-sm space-y-6 text-start">
+            <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6 text-start">
               
               {/* Search Field */}
               <div>
@@ -327,7 +327,7 @@ export default function ShopUI({ products }: { products: any[] }) {
                     placeholder={t("search_placeholder")}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl py-2.5 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all font-sans text-sm shadow-sm text-start"
+                    className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 px-4 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-all font-sans text-sm shadow-sm text-start"
                   />
                 </div>
               </div>
@@ -341,13 +341,13 @@ export default function ShopUI({ products }: { products: any[] }) {
                 <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible pb-2 lg:pb-0 scrollbar-hide">
                   {CATEGORIES.map((category) => (
                     <button
-                      key={category}
-                      type="button"
-                      onClick={() => setActiveCategory(category)}
-                      className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-start whitespace-nowrap lg:w-full border ${
+                       key={category}
+                       type="button"
+                       onClick={() => setActiveCategory(category)}
+                       className={`px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all text-start whitespace-nowrap lg:w-full border ${
                         activeCategory === category
                           ? "bg-kora border-kora text-white shadow-md shadow-kora/30"
-                          : "bg-white text-slate-600 border-slate-200 hover:text-kora hover:border-kora"
+                          : "bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-450 border-slate-200 dark:border-slate-800 hover:text-kora dark:hover:text-purple-400 hover:border-kora dark:hover:border-purple-500"
                       }`}
                     >
                       {getCategoryLabel(category)}
@@ -369,11 +369,11 @@ export default function ShopUI({ products }: { products: any[] }) {
                 
                 <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
                   {searchQuery && (
-                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold uppercase tracking-wider">
                       {t("search")}: &quot;{searchQuery}&quot;
                       <button 
                         onClick={() => setSearchQuery("")} 
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-150 active:bg-slate-200 transition-colors"
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-650 hover:bg-slate-150 active:bg-slate-200 transition-colors"
                         aria-label="Clear Search"
                       >
                         <FaXmark className="text-xs" />
@@ -382,11 +382,11 @@ export default function ShopUI({ products }: { products: any[] }) {
                   )}
 
                   {activeCategory !== "All" && (
-                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold uppercase tracking-wider">
                       {getCategoryLabel(activeCategory)}
                       <button 
                         onClick={() => setActiveCategory("All")} 
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-150 active:bg-slate-200 transition-colors"
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-650 hover:bg-slate-150 active:bg-slate-200 transition-colors"
                         aria-label="Clear Category"
                       >
                         <FaXmark className="text-xs" />
@@ -395,11 +395,11 @@ export default function ShopUI({ products }: { products: any[] }) {
                   )}
 
                   {activeTeam !== "All Teams" && (
-                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold uppercase tracking-wider">
                       {t("team_label")}: {getTeamLabel(activeTeam)}
                       <button 
                         onClick={() => setActiveTeam("All Teams")} 
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-150 active:bg-slate-200 transition-colors"
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-655 hover:bg-slate-150 active:bg-slate-200 transition-colors"
                         aria-label="Clear Team"
                       >
                         <FaXmark className="text-xs" />
@@ -408,11 +408,11 @@ export default function ShopUI({ products }: { products: any[] }) {
                   )}
 
                   {activeTag !== "All" && (
-                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1.5 pl-3 pr-1 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-xs font-semibold uppercase tracking-wider">
                       {activeTag}
                       <button 
                         onClick={() => setActiveTag("All")} 
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-150 active:bg-slate-200 transition-colors"
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-650 hover:bg-slate-150 active:bg-slate-200 transition-colors"
                         aria-label="Clear Tag"
                       >
                         <FaXmark className="text-xs" />
@@ -427,7 +427,7 @@ export default function ShopUI({ products }: { products: any[] }) {
                       setActiveTeam("All Teams");
                       setActiveTag("All");
                     }}
-                    className="text-xs font-bold text-kora hover:text-purple-700 underline underline-offset-4 uppercase tracking-wider ml-1 shrink-0 py-1"
+                    className="text-xs font-bold text-kora dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 underline underline-offset-4 uppercase tracking-wider ml-1 shrink-0 py-1"
                   >
                     {t("clear_all")}
                   </button>
@@ -447,17 +447,17 @@ export default function ShopUI({ products }: { products: any[] }) {
                   <Link 
                     href={`/shop/${product.id}`} 
                     key={product.id}
-                    className="flex gap-3 p-2.5 bg-white border border-slate-200 active:border-kora rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.99] overflow-hidden text-start"
+                    className="flex gap-3 p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 active:border-kora rounded-2xl shadow-sm hover:shadow-md transition-all active:scale-[0.99] overflow-hidden text-start"
                   >
                     {/* Left: Product Image Carousel */}
-                    <div className="w-28 h-28 shrink-0 bg-slate-50 border border-slate-100 rounded-xl overflow-hidden flex items-center justify-center relative">
+                    <div className="w-28 h-28 shrink-0 bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-850 rounded-xl overflow-hidden flex items-center justify-center relative">
                       {product.stock === 0 ? (
-                        <div className="absolute top-1.5 ltr:left-1.5 rtl:right-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest z-10 bg-rose-100 text-rose-800 border border-rose-200">
+                        <div className="absolute top-1.5 ltr:left-1.5 rtl:right-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest z-10 bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-900/50">
                           {t("sold_out")}
                         </div>
                       ) : product.tag ? (
                         <div className={`absolute top-1.5 ltr:left-1.5 rtl:right-1.5 px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest z-10 ${
-                          product.tag === 'Latest' ? 'bg-purple-100 text-purple-800 border border-purple-200' : 'bg-rose-100 text-rose-800 border border-rose-200'
+                          product.tag === 'Latest' ? 'bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-900/50' : 'bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-200 border border-rose-200 dark:border-rose-900/50'
                         }`}>
                           {t(product.tag.toLowerCase()) || product.tag}
                         </div>
@@ -472,8 +472,8 @@ export default function ShopUI({ products }: { products: any[] }) {
                     {/* Right: Product Info */}
                     <div className="flex-1 flex flex-col justify-between py-0.5 font-sans text-start">
                       <div>
-                        <p className="text-kora text-[9px] font-bold uppercase tracking-widest mb-1">{product.category === "Boots" ? t("category_shoes") : product.category === "Flags" ? t("category_accessories") : getCategoryLabel(product.category)}</p>
-                        <h3 className="text-sm font-bold text-slate-900 leading-tight line-clamp-2">
+                        <p className="text-kora dark:text-purple-400 text-[9px] font-bold uppercase tracking-widest mb-1">{product.category === "Boots" ? t("category_shoes") : product.category === "Flags" ? t("category_accessories") : getCategoryLabel(product.category)}</p>
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight line-clamp-2">
                           {t(product.id) !== product.id 
                             ? t(product.id) 
                             : (language === "ar" && product.nameAr ? product.nameAr : product.name)}
@@ -482,21 +482,21 @@ export default function ShopUI({ products }: { products: any[] }) {
                       
                       <div className="flex items-end justify-between mt-2">
                         <div>
-                          <span className="text-[10px] text-slate-400 font-bold block uppercase tracking-wide">{t("price_label")}</span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold block uppercase tracking-wide">{t("price_label")}</span>
                           <div className="flex items-baseline gap-1">
                             {product.originalPrice && (
-                              <span className="text-xs text-slate-400 line-through leading-none font-medium">
+                              <span className="text-xs text-slate-400 dark:text-slate-500 line-through leading-none font-medium">
                                 {t("aed")}{parseFloat(product.originalPrice).toFixed(0)}
                               </span>
                             )}
-                            <span className="text-base font-black text-slate-900 leading-none">
+                            <span className="text-base font-black text-slate-900 dark:text-slate-100 leading-none">
                               {t("aed")}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
                             </span>
                           </div>
                         </div>
                         <div className={`text-[10px] font-bold px-3 py-1.5 rounded-lg border ${
                           product.stock === 0 
-                            ? "bg-slate-100 text-slate-400 border-slate-200" 
+                            ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-550 border-slate-200 dark:border-slate-700" 
                             : "bg-kora text-white border-kora shadow-sm"
                         }`}>
                           {product.stock === 0 ? t("sold_out") : t("view_gear")}

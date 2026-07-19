@@ -14,10 +14,10 @@ export default async function AboutPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white">
+    <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans selection:bg-kora selection:text-white transition-colors duration-300">
 
       {/* ── Hero Section ── */}
-      <section className="relative overflow-hidden bg-white pt-32 pb-24 px-6 border-b border-slate-100">
+      <section className="relative overflow-hidden bg-white dark:bg-slate-950 pt-32 pb-24 px-6 border-b border-slate-100 dark:border-slate-800">
         {/* Ambient glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[400px] rounded-full bg-kora/[0.04] blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full bg-purple-500/[0.03] blur-[100px] pointer-events-none" />
@@ -51,7 +51,7 @@ export default async function AboutPage() {
             </Link>
             <Link
               href="/faq"
-              className="px-8 py-4 rounded-full border border-slate-200 text-slate-800 font-bold text-sm uppercase tracking-widest hover:bg-slate-50 transition-all"
+              className="px-8 py-4 rounded-full border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 font-bold text-sm uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-900 transition-all"
             >
               {t("about_faq_btn")}
             </Link>
@@ -60,7 +60,7 @@ export default async function AboutPage() {
       </section>
 
       {/* ── Stats Strip ── */}
-      <section className="bg-slate-50 border-b border-slate-200">
+      <section className="bg-slate-50 dark:bg-slate-900/40 border-b border-slate-200 dark:border-slate-850">
         <div className="max-w-5xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           {[
             { value: "500+", label: t("orders_delivered") },
@@ -68,27 +68,27 @@ export default async function AboutPage() {
             { value: "100%", label: t("quality_checked") },
             { value: "UAE", label: t("uae_exclusive") },
           ].map((stat) => (
-            <div key={stat.label} className="border-e border-slate-200 last:border-0">
-              <div className="text-3xl md:text-4xl font-black text-slate-900 mb-1">{stat.value}</div>
-              <div className="text-xs text-slate-500 font-bold uppercase tracking-widest">{stat.label}</div>
+            <div key={stat.label} className="border-e border-slate-200 dark:border-slate-800 last:border-0">
+              <div className="text-3xl md:text-4xl font-black text-slate-900 dark:text-slate-100 mb-1">{stat.value}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">{stat.label}</div>
             </div>
           ))}
         </div>
       </section>
 
       {/* ── Values Grid ── */}
-      <section className="py-24 px-6 bg-slate-50">
+      <section className="py-24 px-6 bg-slate-50 dark:bg-slate-900/20">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <span className="section-label mb-4 inline-flex">{t("our_principles")}</span>
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 uppercase mt-4">
+            <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 dark:text-slate-100 uppercase mt-4">
               {t("why_kora_store")}
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Card 1 */}
-            <div className="group relative bg-white rounded-3xl p-8 border border-slate-200 hover:border-kora/40 transition-all hover:shadow-[0_20px_60px_-10px_rgba(107,0,255,0.15)] overflow-hidden text-start">
+            <div className="group relative bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 hover:border-kora/40 dark:hover:border-kora/40 transition-all hover:shadow-[0_20px_60px_-10px_rgba(107,0,255,0.15)] overflow-hidden text-start">
               <div className="absolute inset-0 bg-gradient-to-br from-kora/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative z-10">
                 <div className="w-14 h-14 rounded-2xl bg-kora/10 flex items-center justify-center text-kora text-2xl mb-6 group-hover:bg-kora group-hover:text-white group-hover:scale-110 transition-all">
@@ -102,28 +102,28 @@ export default async function AboutPage() {
             </div>
 
             {/* Card 2 */}
-            <div className="group relative bg-white rounded-3xl p-8 border border-slate-200 hover:border-fuchsia-400/40 transition-all hover:shadow-[0_20px_60px_-10px_rgba(217,70,239,0.15)] overflow-hidden text-start">
+            <div className="group relative bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 hover:border-fuchsia-400/40 dark:hover:border-fuchsia-400/40 transition-all hover:shadow-[0_20px_60px_-10px_rgba(217,70,239,0.15)] overflow-hidden text-start">
               <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative z-10">
                 <div className="w-14 h-14 rounded-2xl bg-fuchsia-500/10 flex items-center justify-center text-fuchsia-600 text-2xl mb-6 group-hover:bg-fuchsia-500 group-hover:text-white group-hover:scale-110 transition-all">
                   <FaHandshake />
                 </div>
-                <h3 className="text-xl font-black text-slate-900 mb-3 uppercase tracking-wide">{t("pillar_2_title")}</h3>
-                <p className="text-slate-500 leading-relaxed text-sm">
+                <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-3 uppercase tracking-wide">{t("pillar_2_title")}</h3>
+                <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm">
                   {t("pillar_2_desc")}
                 </p>
               </div>
             </div>
 
             {/* Card 3 */}
-            <div className="group relative bg-white rounded-3xl p-8 border border-slate-200 hover:border-pink-400/40 transition-all hover:shadow-[0_20px_60px_-10px_rgba(236,72,153,0.15)] overflow-hidden text-start">
+            <div className="group relative bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 hover:border-pink-400/40 dark:hover:border-pink-400/40 transition-all hover:shadow-[0_20px_60px_-10px_rgba(236,72,153,0.15)] overflow-hidden text-start">
               <div className="absolute inset-0 bg-gradient-to-br from-pink-500/3 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="relative z-10">
                 <div className="w-14 h-14 rounded-2xl bg-pink-500/10 flex items-center justify-center text-pink-600 text-2xl mb-6 group-hover:bg-pink-500 group-hover:text-white group-hover:scale-110 transition-all">
                   <FaMapMarkerAlt />
                 </div>
-                <h3 className="text-xl font-black text-slate-900 mb-3 uppercase tracking-wide">{t("uae_exclusive")}</h3>
-                <p className="text-slate-500 leading-relaxed text-sm">
+                <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-3 uppercase tracking-wide">{t("uae_exclusive")}</h3>
+                <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm">
                   {t("uae_exclusive_desc")}
                 </p>
               </div>
@@ -133,7 +133,7 @@ export default async function AboutPage() {
       </section>
 
       {/* ── Story Timeline ── */}
-      <section className="py-24 px-6 bg-white">
+      <section className="py-24 px-6 bg-white dark:bg-slate-950">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <span className="section-label mb-4 inline-flex">{t("origin_story")}</span>
@@ -181,14 +181,14 @@ export default async function AboutPage() {
                   {/* Content */}
                   <div className="flex-1 ltr:md:text-right rtl:md:text-left last:ltr:md:text-left last:rtl:md:text-right">
                     <div className={`${item.side === "right" ? "ltr:md:text-left rtl:md:text-right" : "ltr:md:text-right rtl:md:text-left"}`}>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-kora mb-2 block">{item.year}</span>
-                      <h3 className="text-2xl font-black text-slate-900 mb-3">{item.title}</h3>
-                      <p className="text-slate-500 leading-relaxed text-sm max-w-sm ltr:ml-auto rtl:mr-auto">{item.desc}</p>
+                      <span className="text-[10px] font-black uppercase tracking-widest text-kora dark:text-purple-400 mb-2 block">{item.year}</span>
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 mb-3">{item.title}</h3>
+                      <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm max-w-sm ltr:ml-auto rtl:mr-auto">{item.desc}</p>
                     </div>
                   </div>
 
                   {/* Center icon */}
-                  <div className="hidden md:flex shrink-0 w-12 h-12 rounded-full bg-white border-2 border-slate-200 items-center justify-center text-lg z-10 shadow-sm">
+                  <div className="hidden md:flex shrink-0 w-12 h-12 rounded-full bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 items-center justify-center text-lg z-10 shadow-sm">
                     {item.icon}
                   </div>
 
@@ -229,11 +229,11 @@ export default async function AboutPage() {
       </section>
 
       {/* ── Final CTA ── */}
-      <section className="py-24 px-6 bg-slate-50 text-center">
-        <h2 className="text-4xl md:text-5xl font-black text-slate-900 uppercase tracking-tighter mb-4">
+      <section className="py-24 px-6 bg-slate-50 dark:bg-slate-900/30 text-center border-t border-slate-200 dark:border-slate-800/80">
+        <h2 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tighter mb-4">
           {t("local_hustle_title")}
         </h2>
-        <p className="text-slate-500 mb-10 max-w-xl mx-auto">
+        <p className="text-slate-500 dark:text-slate-400 mb-10 max-w-xl mx-auto">
           {t("local_hustle_desc")}
         </p>
         <Link

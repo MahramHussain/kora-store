@@ -559,7 +559,7 @@ export default function CheckoutPage() {
                       <p className="text-[11px] text-slate-400 mt-0.5">{t("qty")}: {item.quantity}</p>
                     </div>
                     <div className="font-bold text-kora text-sm flex items-center">
-                      {item.price}
+                      {t("aed")}{parseFloat(item.price.toString().replace(CURRENCY.trim(), '').replace('$', '')).toFixed(2)}
                     </div>
                   </div>
                 ))}

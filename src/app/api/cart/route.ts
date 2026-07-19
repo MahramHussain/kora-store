@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       return {
         id: item.productId,
         name: item.product.name,
-        price: `$${finalPrice.toFixed(2)}`,
+        price: finalPrice.toFixed(2),
         image: item.image || item.product.images[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png",
         size: item.size,
         quantity: item.quantity,

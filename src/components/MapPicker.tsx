@@ -137,15 +137,15 @@ export default function MapPicker({ onLocationSelected }: MapPickerProps) {
 
       <div
         ref={mapContainerRef}
-        className="w-full h-48 rounded-2xl border border-slate-200 shadow-sm relative overflow-hidden z-10 bg-slate-50"
+        className="w-full h-48 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden z-10 bg-slate-50 dark:bg-slate-900"
       >
-        <div className="absolute inset-0 flex items-center justify-center text-xs font-bold uppercase text-slate-400 tracking-wider">
+        <div className="absolute inset-0 flex items-center justify-center text-xs font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider">
           Loading Delivery Map...
         </div>
       </div>
 
       {coordinates && (
-        <p className="text-[10px] text-slate-400 font-mono">
+        <p className="text-[10px] text-slate-400 dark:text-slate-500 font-mono">
           Coordinates: {coordinates.lat.toFixed(6)}, {coordinates.lng.toFixed(6)} (Google Maps compatible)
         </p>
       )}
