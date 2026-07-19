@@ -118,7 +118,7 @@ export default function AdminInventoryPage() {
 
     const updatedData = {
       name: productToEdit.name,
-      price: parseFloat(productToEdit.price),
+      price: parseFloat(productToEdit.price) || 0,
       category: productToEdit.category,
       team: productToEdit.team || null,
       tag: productToEdit.tag || null,
@@ -129,7 +129,7 @@ export default function AdminInventoryPage() {
       playerStocks: productToEdit.playerStocks || [],
       isWorldCup: !!productToEdit.isWorldCup,
       originalPrice: productToEdit.isSale && productToEdit.originalPrice
-        ? parseFloat(productToEdit.originalPrice)
+        ? (parseFloat(productToEdit.originalPrice) || null)
         : null,
       brand: productToEdit.brand || null,
       gender: productToEdit.gender || null,
