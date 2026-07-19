@@ -1219,11 +1219,72 @@ html:not(.dark) * {
 }
 .dark .bg-purple-50,
 .dark .bg-purple-50\/50 {
-  background-color: rgba(94, 6, 131, 0.1) !important;
-  border-color: rgba(94, 6, 131, 0.25) !important;
+  background-color: rgba(94, 6, 131, 0.15) !important;
+  border-color: rgba(94, 6, 131, 0.3) !important;
+  color: #c084fc !important; /* purple-400 */
+}
+.dark .text-purple-700 {
+  color: #c084fc !important;
+}
+.dark .bg-blue-50,
+.dark .bg-blue-50\/50 {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+  color: #60a5fa !important; /* blue-400 */
+}
+.dark .text-blue-700 {
+  color: #60a5fa !important;
+}
+.dark .bg-amber-50,
+.dark .bg-amber-50\/50 {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  color: #fbbf24 !important; /* amber-400 */
+}
+.dark .text-amber-700 {
+  color: #fbbf24 !important;
 }
 .dark .text-amber-800 {
-  color: #f59e0b !important; /* amber-500 */
+  color: #fbbf24 !important;
+}
+
+/* Admin Panel Command Center Form Control Overrides in Dark Mode */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: #0f172a !important; /* slate-900 */
+  border-color: #1e293b !important; /* slate-800 */
+  color: #f1f5f9 !important; /* silver text */
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b !important; /* slate-500 */
+}
+
+.dark select option {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+/* All slate backgrounds with opacities in dark mode */
+.dark .bg-slate-50\/80,
+.dark .bg-slate-100\/60,
+.dark .bg-slate-50\/20,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-50\/30 {
+  background-color: #0f172a !important; /* slate-900 */
+  border-color: #1e293b !important; /* slate-800 */
+}
+.dark .hover\:bg-slate-100\/60:hover {
+  background-color: #1e293b !important;
+}
+
+/* Subtle dark mode borders */
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-200\/80 {
+  border-color: #1e293b !important;
 }
 
 /* Trust badge mobile labels in dark mode */
@@ -1233,4 +1294,22 @@ html:not(.dark) * {
 }
 .dark .pdp-trust-badge span {
   color: #cbd5e1 !important; /* silver text */
+}
+
+/* Ingest status card overrides */
+.dark .bg-rose-50 {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+  color: #f87171 !important; /* rose-400 */
+}
+.dark .text-rose-600 {
+  color: #f87171 !important;
+}
+.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+  color: #34d399 !important; /* emerald-400 */
+}
+.dark .text-emerald-600 {
+  color: #34d399 !important;
 }
