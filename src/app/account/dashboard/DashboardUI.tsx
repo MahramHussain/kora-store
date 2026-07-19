@@ -621,14 +621,14 @@ export default function DashboardUI({ user, orders }: { user: any; orders: any[]
                 {(user.email === "mahramh40@gmail.com" || user.email === "korastore.ae@gmail.com") && (
                   <Link
                     href="/admin"
-                    className="flex items-center gap-3.5 w-full px-4 py-3.5 rounded-2xl text-left text-kora border border-dashed border-kora/20 hover:bg-kora/5 transition-all mt-3 font-bold text-start"
+                    className="flex items-center gap-3.5 w-full px-4 py-3.5 rounded-2xl text-left text-kora dark:text-purple-300 border border-dashed border-kora/20 dark:border-kora/40 hover:bg-kora/5 dark:hover:bg-kora/15 transition-all mt-3 font-bold text-start"
                   >
-                    <div className="p-1.5 rounded-lg bg-kora/10 text-kora">
+                    <div className="p-1.5 rounded-lg bg-kora/10 dark:bg-kora/20 text-kora dark:text-purple-300">
                       <FiShield className="w-5 h-5" />
                     </div>
                     <div className="text-start">
                       <p className="text-sm leading-none">{t("command_center")}</p>
-                      <p className="text-[10px] text-kora/70 mt-1 font-normal">{t("admin_portal_desc")}</p>
+                      <p className="text-[10px] text-kora/70 dark:text-purple-400/85 mt-1 font-normal">{t("admin_portal_desc")}</p>
                     </div>
                   </Link>
                 )}
