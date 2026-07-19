@@ -25,6 +25,7 @@ interface SendOrderEmailParams {
   total: string;
   shippingAddress: string;
   sellerNote?: string;
+  isAdminAlert?: boolean;
 }
 
 export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
@@ -66,7 +67,7 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
     )
     .join("");
 
-  const isAdmin = params.toEmail === "mahramh40@gmail.com" || params.toEmail === "korastore.ae@gmail.com";
+  const isAdmin = params.isAdminAlert || false;
 
   // Build the WhatsApp query URL for the customer email
   const whatsappPhone = "971564245926";
@@ -201,7 +202,10 @@ export async function sendOrderConfirmationEmail(params: SendOrderEmailParams) {
         </div>
 
         <!-- Footer -->
-        <div style="background-color: #f8fafc; padding: 24px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; font-weight: 500;">
+        <div style="background-color: #f8fafc; padding: 32px 24px; text-align: center; border-top: 1px solid #e2e8f0; font-size: 11px; color: #94a3b8; font-weight: 500;">
+          <div style="margin-bottom: 16px;">
+            <img src="https://korastore.ae/assets/logo.png" alt="KoraStore Logo" style="height: 32px; width: auto; display: inline-block; object-fit: contain;" />
+          </div>
           <p style="margin: 0 0 8px 0;">This email was sent to ${params.toEmail}</p>
           <p style="margin: 0;">&copy; ${new Date().getFullYear()} KoraStore. All rights reserved.</p>
         </div>

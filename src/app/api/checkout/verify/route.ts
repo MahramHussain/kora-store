@@ -126,15 +126,23 @@ export async function POST(req: NextRequest) {
       await sendOrderConfirmationEmail({
         ...emailParams,
         toEmail: order.user.email,
+        isAdminAlert: false,
       });
 
-      // B. Send notification alert to store admins
+      // B. Build map pinpoint link only for store admin notification
+      let adminShippingAddress = `${order.shippingStreet}, ${order.shippingCity}, UAE`;
+      if (order.latitude !== null && order.longitude !== null) {
+        adminShippingAddress += `<br/><br/>📍 <strong>Google Maps Location Pinpoint</strong>:<br/><a href="https://www.google.com/maps?q=${order.latitude},${order.longitude}" style="color: #6b00ff; font-weight: bold; text-decoration: underline;">Open Google Maps Link</a><br/>(Coords: ${order.latitude.toFixed(6)}, ${order.longitude.toFixed(6)})`;
+      }
+
+      // C. Send notification alert to store admins
       const adminEmails = ["korastore.ae@gmail.com"];
       for (const email of adminEmails) {
         await sendOrderConfirmationEmail({
           ...emailParams,
-          shippingAddress: `${order.shippingStreet}, ${order.shippingCity}, UAE`,
+          shippingAddress: adminShippingAddress,
           toEmail: email,
+          isAdminAlert: true,
         });
       }
 

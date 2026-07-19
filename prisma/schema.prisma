@@ -96,6 +96,8 @@ model Order {
   trackingId      String?
   createdAt       DateTime @default(now())
   sellerNote      String   @default("")
+  latitude        Float?
+  longitude       Float?
   
   // An order can have multiple different shirts/boots inside it
   items       OrderItem[]

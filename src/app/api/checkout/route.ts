@@ -231,6 +231,8 @@ export async function POST(req: Request) {
           tax: new Prisma.Decimal(tax || 0),
           referenceNumber: referenceNumber,
           sellerNote: sellerNote || "",
+          latitude: coordinates && typeof coordinates.lat === "number" ? coordinates.lat : null,
+          longitude: coordinates && typeof coordinates.lng === "number" ? coordinates.lng : null,
           items: {
             create: items.map((item: any) => ({
               productId: item.id,
@@ -352,6 +354,7 @@ export async function POST(req: Request) {
       await sendOrderConfirmationEmail({
         ...emailParams,
         toEmail: clerkUser.emailAddresses[0].emailAddress,
+        isAdminAlert: false,
       });
 
       // B. Build map pinpoint link only for store admin notification
@@ -367,6 +370,7 @@ export async function POST(req: Request) {
           ...emailParams,
           shippingAddress: adminShippingAddress,
           toEmail: email,
+          isAdminAlert: true,
         });
       }
 
