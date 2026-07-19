@@ -80,19 +80,35 @@ export async function POST(req: NextRequest) {
     }
 
     // Payment is verified! Update order status and clear user cart
-    await prisma.$transaction(async (tx) => {
-      await tx.order.update({
-        where: { id: order.id },
-        data: {
-          status: "Processing",
-          paymentIntentId
-        }
-      });
+    try {
+      await prisma.$transaction(async (tx) => {
+        const updateResult = await tx.order.updateMany({
+          where: {
+            id: order.id,
+            status: "Pending"
+          },
+          data: {
+            status: "Processing",
+            paymentIntentId
+          }
+        });
 
-      await tx.cartItem.deleteMany({
-        where: { userId: order.userId }
+        if (updateResult.count === 0) {
+          throw new Error("ALREADY_PROCESSED");
+        }
+
+        await tx.cartItem.deleteMany({
+          where: { userId: order.userId }
+        });
       });
-    });
+    } catch (transactionError: any) {
+      if (transactionError.message === "ALREADY_PROCESSED") {
+        console.log(`ℹ️ Order KORA-${referenceNumber} already verified/processed by another request.`);
+        return NextResponse.json({ success: true, alreadyProcessed: true });
+      }
+      console.error("Verification transaction error:", transactionError);
+      return NextResponse.json({ success: false, error: "Verification transaction failed" }, { status: 500 });
+    }
 
     // Send confirmation emails
     try {
