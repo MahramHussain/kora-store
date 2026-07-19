@@ -25,16 +25,13 @@ function SuccessContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [order, setOrder] = useState<any>(null);
+  const [verified, setVerified] = useState(false);
 
   useEffect(() => {
-    if (!rawRef) {
-      setLoading(false);
-      return;
-    }
+    if (!rawRef || verified) return;
 
     const loadOrderAndVerify = async () => {
       try {
-        setLoading(true);
         // 1. Verify payment if paymentIntentId is present
         if (paymentIntentId) {
           const res = await fetch("/api/checkout/verify", {
@@ -67,6 +64,7 @@ function SuccessContent() {
             setOrder(detailsData.order);
           }
         }
+        setVerified(true);
       } catch (err: any) {
         console.error("Order load/verification error:", err);
         setError(err.message || t("checkout_verify_error"));
@@ -76,7 +74,7 @@ function SuccessContent() {
     };
 
     loadOrderAndVerify();
-  }, [paymentIntentId, rawRef, clearCart]);
+  }, [paymentIntentId, rawRef, clearCart, verified, t]);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(trackingNumber);
