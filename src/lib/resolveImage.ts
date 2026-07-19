@@ -62,8 +62,8 @@ export function resolveImageFilename(filename: string): string {
   let trimmed = filename.trim();
   if (!trimmed) return "";
   
-  // If it's an external URL (http/https), return it as-is
-  if (trimmed.startsWith("http")) {
+  // If it's an external URL (http/https) or Base64 Data URL, return it as-is
+  if (trimmed.startsWith("http") || trimmed.startsWith("data:")) {
     return trimmed;
   }
 

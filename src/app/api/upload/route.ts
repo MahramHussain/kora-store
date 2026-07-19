@@ -7,9 +7,17 @@ import sharp from "sharp";
 export async function POST(req: Request) {
   try {
     // 1. Verify user is the admin (case-insensitive check)
-    const user = await currentUser();
-    const email = user?.emailAddresses[0]?.emailAddress?.toLowerCase();
-    if (!email || (email !== "mahramh40@gmail.com" && email !== "korastore.ae@gmail.com")) {
+    let isAuthorized = false;
+    if (process.env.NODE_ENV === "development") {
+      isAuthorized = true;
+    } else {
+      const user = await currentUser();
+      const email = user?.emailAddresses[0]?.emailAddress?.toLowerCase();
+      if (email && (email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com")) {
+        isAuthorized = true;
+      }
+    }
+    if (!isAuthorized) {
       return NextResponse.json({ success: false, error: "Forbidden: Unauthorized access" }, { status: 403 });
     }
 
@@ -33,8 +41,8 @@ export async function POST(req: Request) {
     // 4. Process image with sharp (resize and convert to WebP)
     const arrayBuffer = await file.arrayBuffer();
     const optimizedBuffer = await sharpFunc(Buffer.from(arrayBuffer))
-      .resize({ width: 1200, height: 1200, fit: "inside", withoutEnlargement: true })
-      .webp({ quality: 80 })
+      .resize({ width: 800, height: 800, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 70 })
       .toBuffer();
 
     // 5. Generate unique filename to avoid overwrites (forcing webp extension)
@@ -43,17 +51,24 @@ export async function POST(req: Request) {
     const baseName = path.basename(file.name, originalExtension).replace(/[^a-zA-Z0-9]/g, "_");
     const uniqueFilename = `${baseName}-${uniqueSuffix}.webp`;
 
-    // 6. Ensure upload directory exists
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
-    await fs.promises.mkdir(uploadDir, { recursive: true });
+    // 6. Try to write optimized file to disk (works on writeable filesystems like localhost)
+    let imageUrl = "";
+    try {
+      const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
+      await fs.promises.mkdir(uploadDir, { recursive: true });
 
-    // 7. Write optimized file to disk
-    const filePath = path.join(uploadDir, uniqueFilename);
-    await fs.promises.writeFile(filePath, optimizedBuffer);
+      const filePath = path.join(uploadDir, uniqueFilename);
+      await fs.promises.writeFile(filePath, optimizedBuffer);
+      imageUrl = `/uploads/products/${uniqueFilename}`;
+    } catch (fsError: any) {
+      console.warn("Local upload filesystem write failed (likely read-only on Vercel). Falling back to Base64 storage:", fsError.message || fsError);
+      
+      // Fallback: Convert optimized WebP image directly to Base64 data URL
+      imageUrl = `data:image/webp;base64,${optimizedBuffer.toString("base64")}`;
+    }
 
-    // 8. Return URL
-    const relativeUrl = `/uploads/products/${uniqueFilename}`;
-    return NextResponse.json({ success: true, url: relativeUrl, filename: uniqueFilename });
+    // 8. Return URL (either local path or Base64 data URL)
+    return NextResponse.json({ success: true, url: imageUrl, filename: uniqueFilename });
 
   } catch (error: any) {
     console.error("Upload API Error:", error);

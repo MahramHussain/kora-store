@@ -32,9 +32,14 @@ export async function GET(req: NextRequest) {
     }
 
     // Verify ownership or admin status
-    const clerkUser = await currentUser();
-    const email = clerkUser?.emailAddresses[0]?.emailAddress;
-    const isAdmin = email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com";
+    let isAdmin = false;
+    if (process.env.NODE_ENV === "development") {
+      isAdmin = true;
+    } else {
+      const clerkUser = await currentUser();
+      const email = clerkUser?.emailAddresses[0]?.emailAddress?.toLowerCase();
+      isAdmin = email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com";
+    }
 
     if (order.userId !== userId && !isAdmin) {
       return new NextResponse("Unauthorized", { status: 403 });

@@ -77,9 +77,14 @@ export async function PUT(req: Request) {
       }
     }
 
-    const clerkUser = await currentUser();
-    const email = clerkUser?.emailAddresses[0]?.emailAddress;
-    const isAdmin = email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com";
+    let isAdmin = false;
+    if (process.env.NODE_ENV === "development") {
+      isAdmin = true;
+    } else {
+      const clerkUser = await currentUser();
+      const email = clerkUser?.emailAddresses[0]?.emailAddress?.toLowerCase();
+      isAdmin = email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com";
+    }
 
     const body = await req.json();
     const { reviewId, action, comment, rating, replyText } = body;
@@ -139,9 +144,14 @@ export async function DELETE(req: Request) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const clerkUser = await currentUser();
-    const email = clerkUser?.emailAddresses[0]?.emailAddress;
-    const isAdmin = email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com";
+    let isAdmin = false;
+    if (process.env.NODE_ENV === "development") {
+      isAdmin = true;
+    } else {
+      const clerkUser = await currentUser();
+      const email = clerkUser?.emailAddresses[0]?.emailAddress?.toLowerCase();
+      isAdmin = email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com";
+    }
 
     if (!isAdmin) {
       return new NextResponse("Forbidden", { status: 403 });

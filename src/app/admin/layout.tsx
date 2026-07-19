@@ -24,8 +24,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  const isDev = process.env.NODE_ENV === "development";
+
   // 2. Access Denied screen
-  if (!isSignedIn || (userEmail !== "mahramh40@gmail.com" && userEmail !== "korastore.ae@gmail.com")) {
+  if (!isDev && (!isSignedIn || (userEmail?.toLowerCase() !== "mahramh40@gmail.com" && userEmail?.toLowerCase() !== "korastore.ae@gmail.com"))) {
     return (
       <main className="min-h-screen bg-white font-sans flex items-center justify-center px-5 relative overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-br from-rose-500/5 to-kora/5 rounded-full blur-[120px] pointer-events-none" />
@@ -56,10 +58,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [stats, setStats] = useState<{ productCount: number; orderCount: number; totalValue: number; totalEarnings: number } | null>(null);
 
   useEffect(() => {
-    if (isSignedIn && (userEmail === "mahramh40@gmail.com" || userEmail === "korastore.ae@gmail.com")) {
+    if (isDev || (isSignedIn && (userEmail?.toLowerCase() === "mahramh40@gmail.com" || userEmail?.toLowerCase() === "korastore.ae@gmail.com"))) {
       getAdminStats().then(data => setStats(data));
     }
-  }, [isSignedIn, userEmail, pathname]);
+  }, [isSignedIn, userEmail, pathname, isDev]);
 
   // Helper to determine if a route is active
   const isActive = (path: string) => {

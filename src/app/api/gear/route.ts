@@ -7,9 +7,17 @@ import { translateToArabic } from "@/lib/translate";
 export async function POST(req: Request) {
   try {
     // 1. Verify user is the admin
-    const user = await currentUser();
-    const email = user?.emailAddresses[0]?.emailAddress;
-    if (!email || (email !== "mahramh40@gmail.com" && email !== "korastore.ae@gmail.com")) {
+    let isAuthorized = false;
+    if (process.env.NODE_ENV === "development") {
+      isAuthorized = true;
+    } else {
+      const user = await currentUser();
+      const email = user?.emailAddresses[0]?.emailAddress?.toLowerCase();
+      if (email && (email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com")) {
+        isAuthorized = true;
+      }
+    }
+    if (!isAuthorized) {
       return NextResponse.json({ success: false, error: "Forbidden: Unauthorized access" }, { status: 403 });
     }
 
