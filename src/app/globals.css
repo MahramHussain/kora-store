@@ -1188,4 +1188,40 @@ html:not(.dark) * {
 .dark button.bg-slate-50 span,
 .dark button.cursor-not-allowed span {
   color: #64748b !important;
+}
+
+/* Product details card & components overrides in dark mode */
+.dark .pdp-info-card {
+  background-color: #020617 !important; /* slate-950/primary backdrop */
+}
+.dark .pdp-sticky-cta {
+  background-color: #020617 !important; /* slate-950 */
+  border-top-color: #1e293b !important; /* slate-800 */
+}
+.dark .pdp-size-pill {
+  background-color: #0f172a !important; /* slate-900 */
+  border-color: #1e293b !important; /* slate-800 */
+  color: #f1f5f9 !important; /* silver text */
+}
+.dark .pdp-dot {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+.dark .pdp-dot-active {
+  background: #5E0683 !important;
+}
+
+/* Caution alert overrides in dark mode */
+.dark .bg-amber-50\/50,
+.dark .bg-amber-50\/60,
+.dark .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  border-color: rgba(245, 158, 11, 0.2) !important;
+}
+.dark .bg-purple-50,
+.dark .bg-purple-50\/50 {
+  background-color: rgba(94, 6, 131, 0.1) !important;
+  border-color: rgba(94, 6, 131, 0.25) !important;
+}
+.dark .text-amber-800 {
+  color: #f59e0b !important; /* amber-500 */
 }

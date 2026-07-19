@@ -129,7 +129,7 @@ export default async function Home() {
             <p className="text-slate-300 md:text-slate-200 text-xs md:text-sm mb-5 md:mb-6 max-w-[320px] md:max-w-md font-sans font-medium leading-relaxed drop-shadow-sm">
               {t("hero_desc")}
             </p>
-            <Link href="/shop" className="mobile-cta-full md:inline-block bg-white text-slate-900 px-6 md:px-8 py-3.5 md:py-3 rounded-xl md:rounded-none font-bold text-sm md:text-sm hover:bg-kora hover:text-white hover:scale-105 transition-all shadow-lg uppercase tracking-wider">
+            <Link href="/shop" className="mobile-cta-full md:inline-block bg-[#ffffff] dark:bg-[#ffffff] text-[#020617] dark:text-[#020617] px-6 md:px-8 py-3.5 md:py-3 rounded-xl md:rounded-none font-bold text-sm md:text-sm hover:bg-kora hover:text-white hover:scale-105 transition-all shadow-lg uppercase tracking-wider">
               {t("shop_now")}
             </Link>
           </div>
