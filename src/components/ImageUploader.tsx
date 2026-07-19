@@ -139,7 +139,7 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
 
   // Helper to resolve local image display paths
   const getDisplayUrl = (url: string) => {
-    if (url.startsWith("http") || url.startsWith("/")) {
+    if (url.startsWith("http") || url.startsWith("/") || url.startsWith("data:")) {
       return url;
     }
     // Fallback if it's just a filename
