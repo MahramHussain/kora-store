@@ -736,18 +736,48 @@ export default function AdminPage() {
                             />
                           </div>
                           <div className="flex-1 flex gap-2 items-center">
-                            <input
-                              required
-                              type="text"
-                              placeholder="IMAGE URL or filename (e.g. /assets/Patches/...)"
-                              value={patch.image}
-                              onChange={(e) => {
-                                const newList = [...customPatches];
-                                newList[idx].image = e.target.value;
-                                setCustomPatches(newList);
-                              }}
-                              className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-purple-500"
-                            />
+                            <div className="flex-1 flex gap-1.5 items-center min-w-0">
+                              <input
+                                required
+                                type="text"
+                                placeholder="IMAGE URL or filename"
+                                value={patch.image}
+                                onChange={(e) => {
+                                  const newList = [...customPatches];
+                                  newList[idx].image = e.target.value;
+                                  setCustomPatches(newList);
+                                }}
+                                className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-purple-500"
+                              />
+                              <label className="py-2 px-3 bg-purple-100 hover:bg-purple-200 text-purple-800 font-black text-xs rounded-lg cursor-pointer transition-colors shrink-0 flex items-center gap-1 shadow-2xs">
+                                <span>📁 Upload</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (!file) return;
+                                    const formData = new FormData();
+                                    formData.append("file", file);
+                                    try {
+                                      const res = await fetch("/api/upload", { method: "POST", body: formData });
+                                      const data = await res.json();
+                                      if (data.success && data.url) {
+                                        const newList = [...customPatches];
+                                        newList[idx].image = data.url;
+                                        setCustomPatches(newList);
+                                      } else {
+                                        alert(data.error || "Failed to upload patch image.");
+                                      }
+                                    } catch (err) {
+                                      console.error(err);
+                                      alert("Image upload failed.");
+                                    }
+                                  }}
+                                />
+                              </label>
+                            </div>
                             {patch.image && (
                               <div className="w-9 h-9 rounded-lg border border-slate-200 bg-white overflow-hidden shrink-0 p-0.5">
                                 <img src={patch.image} alt="Preview" className="w-full h-full object-contain" />

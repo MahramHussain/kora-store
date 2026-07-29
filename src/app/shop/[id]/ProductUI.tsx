@@ -406,6 +406,7 @@ export default function ProductUI({ product }: { product: any }) {
   const [leftSleevePatch, setLeftSleevePatch] = useState("");
   const [rightSleevePatch, setRightSleevePatch] = useState("");
   const [selectedCustomPatch, setSelectedCustomPatch] = useState("");
+  const [activePatchGallery, setActivePatchGallery] = useState<"right" | "left" | "custom" | null>(null);
   const [previewModalPatch, setPreviewModalPatch] = useState<{ name: string; image: string } | null>(null);
   const hasFifaPatch = leftSleevePatch !== "" || rightSleevePatch !== "" || selectedCustomPatch !== "";
   const [selectedPresetPlayer, setSelectedPresetPlayer] = useState<{ name: string; number: string } | null>(null);
@@ -436,6 +437,138 @@ export default function ProductUI({ product }: { product: any }) {
     const x = ((e.clientX - left) / width) * 100;
     const y = ((e.clientY - top) / height) * 100;
     setZoomPos({ x, y });
+  };
+
+  const renderSleevePatchBox = () => {
+    if (!isKit) return null;
+    const hasCustomPatches = product.patches && Array.isArray(product.patches) && product.patches.length > 0;
+    if (!product.isWorldCup && !hasCustomPatches) return null;
+
+    return (
+      <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-5 font-sans shadow-xs text-start mt-5">
+        <div className="flex items-center justify-between gap-4 text-start mb-4">
+          <div className="flex items-center gap-3.5 text-start">
+            <div className="w-11 h-11 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-xs shrink-0">
+              <SleevePatchIcon className="w-6 h-6 text-kora" />
+            </div>
+            <div className="text-start">
+              <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">{t("sleeve_patches")}</h3>
+              <p className="text-slate-400 text-xs mt-0.5 text-start">{t("sleeve_patches_desc")}</p>
+            </div>
+          </div>
+          <div className="bg-white border border-slate-200/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 shadow-xs shrink-0">
+            {t("plus_10").replace("{currency}", t("aed"))}
+          </div>
+        </div>
+
+        {/* Custom Patches Trigger */}
+        {hasCustomPatches ? (
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center shrink-0 overflow-hidden p-1">
+                {selectedCustomPatch ? (
+                  (() => {
+                    const found = product.patches.find((p: any) => p.name === selectedCustomPatch);
+                    return found?.image ? (
+                      <img src={found.image} alt={found.name} className="w-full h-full object-contain" />
+                    ) : (
+                      <span className="text-lg">🛡️</span>
+                    );
+                  })()
+                ) : (
+                  <span className="text-xl">🚫</span>
+                )}
+              </div>
+              <div className="min-w-0 text-start">
+                <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Sleeve Badge</p>
+                <p className="text-xs font-black text-slate-800 truncate">
+                  {selectedCustomPatch || "No Patch Selected"}
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setActivePatchGallery("custom")}
+              className="px-4 py-2 bg-kora hover:bg-kora/90 text-white rounded-xl font-extrabold text-xs tracking-wide transition-all shadow-xs shrink-0 cursor-pointer"
+            >
+              Select
+            </button>
+          </div>
+        ) : product.isWorldCup ? (
+          /* World Cup Patches Triggers (Right & Left Sleeve) */
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Right Sleeve Trigger Card */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-11 h-11 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center shrink-0 overflow-hidden p-1">
+                  {rightSleevePatch ? (
+                    (() => {
+                      const found = RIGHT_SLEEVE_PATCH_OPTIONS.find((p) => p.value === rightSleevePatch);
+                      return found?.image ? (
+                        <img src={found.image} alt={found.label} className="w-full h-full object-contain" />
+                      ) : (
+                        <span className="text-lg">🛡️</span>
+                      );
+                    })()
+                  ) : (
+                    <span className="text-lg">🚫</span>
+                  )}
+                </div>
+                <div className="min-w-0 text-start">
+                  <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Right Sleeve</p>
+                  <p className="text-xs font-black text-slate-800 truncate">
+                    {rightSleevePatch ? RIGHT_SLEEVE_PATCH_OPTIONS.find(p => p.value === rightSleevePatch)?.label : "No Patch"}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setActivePatchGallery("right")}
+                className="px-4 py-2 bg-slate-900 hover:bg-kora text-white rounded-xl font-extrabold text-xs transition-colors shrink-0 cursor-pointer shadow-xs"
+              >
+                Select
+              </button>
+            </div>
+
+            {/* Left Sleeve Trigger Card */}
+            <div className="bg-white border border-slate-200/80 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-11 h-11 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center shrink-0 overflow-hidden p-1">
+                  {leftSleevePatch ? (
+                    (() => {
+                      const found = LEFT_SLEEVE_PATCH_OPTIONS.find((p) => p.value === leftSleevePatch);
+                      return found?.image ? (
+                        <img src={found.image} alt={found.label} className="w-full h-full object-contain" />
+                      ) : (
+                        <span className="text-lg">🛡️</span>
+                      );
+                    })()
+                  ) : (
+                    <span className="text-lg">🚫</span>
+                  )}
+                </div>
+                <div className="min-w-0 text-start">
+                  <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">Left Sleeve</p>
+                  <p className="text-xs font-black text-slate-800 truncate">
+                    {leftSleevePatch ? LEFT_SLEEVE_PATCH_OPTIONS.find(p => p.value === leftSleevePatch)?.label : "No Patch"}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setActivePatchGallery("left")}
+                className="px-4 py-2 bg-slate-900 hover:bg-kora text-white rounded-xl font-extrabold text-xs transition-colors shrink-0 cursor-pointer shadow-xs"
+              >
+                Select
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </div>
+    );
   };
 
   const renderDesktopPersonalizationBox = () => {
@@ -576,42 +709,7 @@ export default function ProductUI({ product }: { product: any }) {
         </div>
 
         {/* Sleeve Patches Box */}
-        <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-6 font-sans shadow-sm text-start">
-          <div className="flex items-center justify-between gap-4 text-start">
-            <div className="flex items-center gap-4 text-start">
-              <div className="w-12 h-12 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-sm shrink-0">
-                <SleevePatchIcon className="w-7 h-7 text-kora" />
-              </div>
-              <div className="text-start">
-                <h3 className="text-slate-900 font-extrabold text-base leading-tight">{t("sleeve_patches")}</h3>
-                <p className="text-slate-400 text-xs mt-0.5">{t("sleeve_patches_desc")}</p>
-              </div>
-            </div>
-            <div className="bg-white border border-slate-200/80 rounded-xl px-3.5 py-1.5 text-xs font-bold text-slate-900 shadow-xs">
-              {t("plus_10").replace("{currency}", t("aed"))}
-            </div>
-          </div>
-
-          <div className="flex gap-3 mt-5 text-start">
-            {/* Right Sleeve Dropdown */}
-            <CustomSelect
-              value={rightSleevePatch}
-              onChange={setRightSleevePatch}
-              options={RIGHT_SLEEVE_PATCH_OPTIONS}
-              placeholder={t("right_patch")}
-              className="flex-1 min-w-0 text-start"
-            />
-
-            {/* Left Sleeve Dropdown */}
-            <CustomSelect
-              value={leftSleevePatch}
-              onChange={setLeftSleevePatch}
-              options={LEFT_SLEEVE_PATCH_OPTIONS}
-              placeholder={t("left_patch")}
-              className="flex-1 min-w-0 text-start"
-            />
-          </div>
-        </div>
+        {renderSleevePatchBox()}
       </div>
     );
   };
@@ -753,107 +851,8 @@ export default function ProductUI({ product }: { product: any }) {
           )}
         </div>
 
-        {/* Sleeve Patches Box (Exclusive to World Cup jerseys or jerseys with custom patches) */}
-        {isKit && (product.isWorldCup || (product.patches && Array.isArray(product.patches) && product.patches.length > 0)) && (
-          <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-5 font-sans shadow-xs text-start mt-5">
-            <div className="flex items-center justify-between gap-4 text-start mb-4">
-              <div className="flex items-center gap-3.5 text-start">
-                <div className="w-11 h-11 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-xs shrink-0">
-                  <SleevePatchIcon className="w-6 h-6 text-kora" />
-                </div>
-                <div className="text-start">
-                  <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">{t("sleeve_patches")}</h3>
-                  <p className="text-slate-400 text-xs mt-0.5 text-start">{t("sleeve_patches_desc")}</p>
-                </div>
-              </div>
-              <div className="bg-white border border-slate-200/80 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 shadow-xs shrink-0">
-                {t("plus_10").replace("{currency}", t("aed"))}
-              </div>
-            </div>
-
-            {/* Custom Patches Visual Gallery */}
-            {product.patches && Array.isArray(product.patches) && product.patches.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {/* No Patch Option Card */}
-                <button
-                  type="button"
-                  onClick={() => setSelectedCustomPatch("")}
-                  className={`p-3 rounded-2xl border flex flex-col items-center justify-center text-center transition-all duration-300 min-h-[120px] select-none cursor-pointer ${
-                    selectedCustomPatch === ""
-                      ? "border-kora bg-purple-50/70 text-kora ring-2 ring-kora/20 shadow-sm"
-                      : "border-slate-200/80 bg-white hover:border-slate-300 text-slate-700 hover:bg-slate-50/50"
-                  }`}
-                >
-                  <div className="w-12 h-12 rounded-xl bg-slate-100/80 flex items-center justify-center text-xl mb-2">
-                    🚫
-                  </div>
-                  <span className="text-xs font-bold leading-tight">No Sleeve Patch</span>
-                </button>
-
-                {/* Custom Patch Option Cards */}
-                {product.patches.map((patch: any, idx: number) => {
-                  const isSelected = selectedCustomPatch === patch.name;
-                  return (
-                    <div
-                      key={idx}
-                      onClick={() => setSelectedCustomPatch(patch.name)}
-                      className={`relative p-3 rounded-2xl border flex flex-col items-center justify-between text-center transition-all duration-300 min-h-[120px] cursor-pointer select-none group ${
-                        isSelected
-                          ? "border-kora bg-purple-50/70 text-slate-900 ring-2 ring-kora/20 shadow-md"
-                          : "border-slate-200/80 bg-white hover:border-slate-300 text-slate-800 hover:shadow-xs"
-                      }`}
-                    >
-                      {isSelected && (
-                        <div className="absolute top-2 right-2 w-5 h-5 bg-kora text-white rounded-full flex items-center justify-center text-[10px] font-bold shadow-xs z-10">
-                          ✓
-                        </div>
-                      )}
-                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 bg-slate-50 border border-slate-100 rounded-xl overflow-hidden p-1.5 flex items-center justify-center mb-2 shrink-0">
-                        {patch.image ? (
-                          <img src={patch.image} alt={patch.name} className="w-full h-full object-contain group-hover:scale-105 transition-transform" />
-                        ) : (
-                          <span className="text-xl">🛡️</span>
-                        )}
-                        {patch.image && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPreviewModalPatch(patch);
-                            }}
-                            className="absolute bottom-1 right-1 p-1 bg-slate-900/70 hover:bg-slate-900 text-white rounded-md text-[9px] opacity-80 hover:opacity-100 transition-opacity"
-                            title="Inspect Image"
-                          >
-                            🔍
-                          </button>
-                        )}
-                      </div>
-                      <span className="text-xs font-extrabold leading-tight line-clamp-2">{patch.name}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : product.isWorldCup ? (
-              /* World Cup Sleeve Patch Dropdowns */
-              <div className="flex gap-3 text-start">
-                <CustomSelect
-                  value={rightSleevePatch}
-                  onChange={setRightSleevePatch}
-                  options={RIGHT_SLEEVE_PATCH_OPTIONS}
-                  placeholder={t("right_patch")}
-                  className="flex-1 min-w-0 text-start"
-                />
-                <CustomSelect
-                  value={leftSleevePatch}
-                  onChange={setLeftSleevePatch}
-                  options={LEFT_SLEEVE_PATCH_OPTIONS}
-                  placeholder={t("left_patch")}
-                  className="flex-1 min-w-0 text-start"
-                />
-              </div>
-            ) : null}
-          </div>
-        )}
+        {/* Sleeve Patches Box */}
+        {renderSleevePatchBox()}
       </div>
     );
   };
@@ -966,6 +965,11 @@ export default function ProductUI({ product }: { product: any }) {
     if (customNumber.trim()) {
       finalNumber = customNumber.trim();
     }
+
+    const basePrice = parseFloat(product.price);
+    const hasCustomPrint = finalName !== "" || finalNumber !== "";
+    const isPreset = selectedPresetPlayer !== null;
+    const printUpcharge = isKit && hasCustomPrint ? (isPreset ? 15 : 25) : 0;
 
     const hasPatch = (isKit && product.isWorldCup && (leftSleevePatch !== "" || rightSleevePatch !== "")) || (isKit && selectedCustomPatch !== "");
     const patchUpcharge = hasPatch ? 10 : 0;
@@ -2826,6 +2830,146 @@ export default function ProductUI({ product }: { product: any }) {
             {/* Footer info */}
             <div className="mt-5 p-4 bg-slate-50 border border-slate-200/50 rounded-2xl text-[11px] text-slate-500 leading-relaxed text-start">
               <strong className="text-slate-800">{t("note_label")}:</strong> {t("size_chart_footer_note")}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Visual Patch Gallery Modal (Works on PC & Mobile) */}
+      {activePatchGallery && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-xs p-4 animate-fade-in"
+          onClick={() => setActivePatchGallery(null)}
+        >
+          <div
+            className="bg-white border border-slate-200/80 rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl relative overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">
+                  {activePatchGallery === "right"
+                    ? "Choose Right Sleeve Badge"
+                    : activePatchGallery === "left"
+                    ? "Choose Left Sleeve Badge"
+                    : "Choose Sleeve Patch"}
+                </h3>
+                <p className="text-xs font-bold text-slate-400 mt-0.5">
+                  Select an official patch to add to your jersey (+10 AED)
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setActivePatchGallery(null)}
+                className="w-9 h-9 bg-white border border-slate-200 text-slate-400 hover:text-slate-900 rounded-full flex items-center justify-center transition-colors font-bold shadow-xs cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body - Visual Patch Gallery Cards */}
+            <div className="p-5 overflow-y-auto flex-1 space-y-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
+                {/* Clear / No Patch Card */}
+                <div
+                  onClick={() => {
+                    if (activePatchGallery === "right") setRightSleevePatch("");
+                    else if (activePatchGallery === "left") setLeftSleevePatch("");
+                    else setSelectedCustomPatch("");
+                    setActivePatchGallery(null);
+                  }}
+                  className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-center text-center transition-all cursor-pointer min-h-[140px] select-none ${
+                    (activePatchGallery === "right" && rightSleevePatch === "") ||
+                    (activePatchGallery === "left" && leftSleevePatch === "") ||
+                    (activePatchGallery === "custom" && selectedCustomPatch === "")
+                      ? "border-kora bg-purple-50/80 ring-2 ring-kora/20 shadow-md"
+                      : "border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50/50"
+                  }`}
+                >
+                  <div className="w-14 h-14 rounded-2xl bg-slate-100/90 flex items-center justify-center text-2xl mb-2">
+                    🚫
+                  </div>
+                  <span className="text-xs font-extrabold text-slate-800 leading-tight">No Sleeve Patch</span>
+                </div>
+
+                {/* Gallery Items */}
+                {(activePatchGallery === "right"
+                  ? RIGHT_SLEEVE_PATCH_OPTIONS.filter((o) => o.value)
+                  : activePatchGallery === "left"
+                  ? LEFT_SLEEVE_PATCH_OPTIONS.filter((o) => o.value)
+                  : (product.patches || []).map((p: any) => ({ label: p.name, value: p.name, image: p.image }))
+                ).map((opt: any) => {
+                  const isSelected =
+                    activePatchGallery === "right"
+                      ? rightSleevePatch === opt.value
+                      : activePatchGallery === "left"
+                      ? leftSleevePatch === opt.value
+                      : selectedCustomPatch === opt.value;
+
+                  return (
+                    <div
+                      key={opt.value}
+                      onClick={() => {
+                        if (activePatchGallery === "right") setRightSleevePatch(opt.value);
+                        else if (activePatchGallery === "left") setLeftSleevePatch(opt.value);
+                        else setSelectedCustomPatch(opt.value);
+                        setActivePatchGallery(null);
+                      }}
+                      className={`relative p-4 rounded-2xl border-2 flex flex-col items-center justify-between text-center transition-all cursor-pointer min-h-[140px] select-none group ${
+                        isSelected
+                          ? "border-kora bg-purple-50/80 ring-2 ring-kora/20 shadow-md"
+                          : "border-slate-200/80 bg-white hover:border-slate-300 hover:shadow-xs"
+                      }`}
+                    >
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 w-6 h-6 bg-kora text-white rounded-full flex items-center justify-center text-xs font-bold shadow-xs z-10">
+                          ✓
+                        </div>
+                      )}
+
+                      <div className="relative w-20 h-20 bg-slate-50 border border-slate-100 rounded-2xl p-2 flex items-center justify-center mb-2.5 shrink-0 overflow-hidden">
+                        {opt.image ? (
+                          <img
+                            src={opt.image}
+                            alt={opt.label}
+                            className="w-full h-full object-contain group-hover:scale-105 transition-transform"
+                          />
+                        ) : (
+                          <span className="text-2xl">🛡️</span>
+                        )}
+                        {opt.image && (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPreviewModalPatch({ name: opt.label, image: opt.image });
+                            }}
+                            className="absolute bottom-1 right-1 p-1.5 bg-slate-900/80 hover:bg-slate-900 text-white rounded-lg text-[10px] opacity-80 hover:opacity-100 transition-opacity"
+                            title="Inspect Image"
+                          >
+                            🔍
+                          </button>
+                        )}
+                      </div>
+
+                      <span className="text-xs font-black text-slate-900 leading-tight line-clamp-2">{opt.label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-slate-100 bg-slate-50/80 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-500">Click any patch card to apply</span>
+              <button
+                type="button"
+                onClick={() => setActivePatchGallery(null)}
+                className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black transition-colors cursor-pointer"
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>

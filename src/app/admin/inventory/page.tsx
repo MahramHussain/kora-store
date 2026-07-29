@@ -750,17 +750,47 @@ export default function AdminInventoryPage() {
                                 }}
                                 className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs font-bold text-slate-800"
                               />
-                              <input
-                                type="text"
-                                placeholder="Image Path"
-                                value={patch.image || ""}
-                                onChange={(e) => {
-                                  const updated = [...productToEdit.patches];
-                                  updated[idx] = { ...updated[idx], image: e.target.value };
-                                  setProductToEdit({ ...productToEdit, patches: updated });
-                                }}
-                                className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs font-mono font-bold text-slate-800"
-                              />
+                              <div className="flex-1 flex gap-1 items-center min-w-0">
+                                <input
+                                  type="text"
+                                  placeholder="Image Path / URL"
+                                  value={patch.image || ""}
+                                  onChange={(e) => {
+                                    const updated = [...productToEdit.patches];
+                                    updated[idx] = { ...updated[idx], image: e.target.value };
+                                    setProductToEdit({ ...productToEdit, patches: updated });
+                                  }}
+                                  className="w-full bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs font-mono font-bold text-slate-800"
+                                />
+                                <label className="py-1 px-2 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold text-[10px] rounded-lg cursor-pointer transition-colors shrink-0 flex items-center gap-0.5">
+                                  <span>📁 Upload</span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={async (e) => {
+                                      const file = e.target.files?.[0];
+                                      if (!file) return;
+                                      const formData = new FormData();
+                                      formData.append("file", file);
+                                      try {
+                                        const res = await fetch("/api/upload", { method: "POST", body: formData });
+                                        const data = await res.json();
+                                        if (data.success && data.url) {
+                                          const updated = [...productToEdit.patches];
+                                          updated[idx] = { ...updated[idx], image: data.url };
+                                          setProductToEdit({ ...productToEdit, patches: updated });
+                                        } else {
+                                          alert(data.error || "Failed to upload patch image.");
+                                        }
+                                      } catch (err) {
+                                        console.error(err);
+                                        alert("Image upload failed.");
+                                      }
+                                    }}
+                                  />
+                                </label>
+                              </div>
                               <button
                                 type="button"
                                 onClick={() => {
