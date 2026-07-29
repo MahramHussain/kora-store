@@ -38,7 +38,7 @@ async function WorldCupJerseySlider() {
 
 async function ShoesSlider() {
   const products = await prisma.product.findMany({
-    where: { category: "Boots" },
+    where: { category: { in: ["Boots", "Casual Shoes"] } },
     orderBy: { createdAt: "desc" },
     take: 6,
   });
@@ -56,7 +56,7 @@ async function ShoesSlider() {
 
 async function StreetwearAndGearSlider() {
   const products = await prisma.product.findMany({
-    where: { isWorldCup: false, category: { not: "Boots" } },
+    where: { isWorldCup: false, category: { notIn: ["Boots", "Casual Shoes"] } },
     orderBy: { createdAt: "desc" },
     take: 6,
   });
@@ -351,7 +351,7 @@ export default async function Home() {
             <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1 md:mt-2">{t("shoes_sub")}</p>
           </div>
           <Link 
-            href="/shop?category=Shoes" 
+            href="/shop?category=Casual Shoes" 
             className="text-[10px] md:text-xs font-bold text-kora dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/20 dark:border-purple-800/40 md:border-0 rounded-full px-3 py-1.5 md:p-0 shrink-0"
           >
             {t("see_all")} 

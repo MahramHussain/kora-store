@@ -22,6 +22,7 @@ export default function AdminInventoryPage() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("All");
+  const [selectedTeamFilter, setSelectedTeamFilter] = useState("All");
 
   const openEditModal = (product: any) => {
     const sizeStocksMap: Record<string, number> = {};
@@ -66,6 +67,7 @@ export default function AdminInventoryPage() {
       ...product,
       sizeStocksMap,
       playerStocks: playerStocksList,
+      patches: Array.isArray(product.patches) ? product.patches : [],
       isSale: product.originalPrice !== null && product.originalPrice !== undefined && product.originalPrice !== ""
     });
     setEditModalOpen(true);
@@ -127,6 +129,7 @@ export default function AdminInventoryPage() {
       images: formattedImages,
       sizeStocks,
       playerStocks: productToEdit.playerStocks || [],
+      patches: productToEdit.patches || [],
       isWorldCup: !!productToEdit.isWorldCup,
       originalPrice: productToEdit.isSale && productToEdit.originalPrice
         ? (parseFloat(productToEdit.originalPrice) || null)
@@ -149,11 +152,17 @@ export default function AdminInventoryPage() {
     }
   };
 
+  // Extract unique team names dynamically from inventory
+  const availableTeams = Array.from(
+    new Set(products.map(p => p.team?.trim()).filter(Boolean))
+  ).sort() as string[];
+
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           (product.team && product.team.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesCategory = selectedCategoryFilter === "All" || product.category === selectedCategoryFilter;
-    return matchesSearch && matchesCategory;
+    const matchesTeam = selectedTeamFilter === "All" || (product.team && product.team.toLowerCase() === selectedTeamFilter.toLowerCase());
+    return matchesSearch && matchesCategory && matchesTeam;
   });
 
   // Stock badge renderer (reused for both table and card views)
@@ -212,9 +221,20 @@ export default function AdminInventoryPage() {
             >
               <option value="All">All Categories</option>
               <option value="Shirts">Shirts</option>
-              <option value="Boots">Shoes / Boots</option>
+              <option value="Boots">Boots</option>
+              <option value="Casual Shoes">Casual Shoes</option>
               <option value="Retro Kits">Retro Kits</option>
               <option value="Accessories">Accessories</option>
+            </select>
+            <select 
+              value={selectedTeamFilter}
+              onChange={(e) => setSelectedTeamFilter(e.target.value)}
+              className="bg-slate-50/80 border border-slate-200 rounded-xl py-2.5 px-4 text-xs font-bold text-slate-700 outline-none focus:bg-white focus:border-kora cursor-pointer transition-all"
+            >
+              <option value="All">All Teams</option>
+              {availableTeams.map((team) => (
+                <option key={team} value={team}>{team}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -266,7 +286,7 @@ export default function AdminInventoryPage() {
                         </td>
 
                         <td className="p-4 text-slate-600 font-bold">
-                          {product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}
+                          {product.category === "Flags" ? "Accessories" : product.category}
                         </td>
 
                         {/* Stock indicator badge */}
@@ -342,7 +362,7 @@ export default function AdminInventoryPage() {
                       
                       <div className="flex flex-wrap items-center gap-2 mt-2.5">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600 border border-slate-200/60">
-                          {product.category === "Boots" ? "Shoes" : product.category === "Flags" ? "Accessories" : product.category}
+                          {product.category === "Flags" ? "Accessories" : product.category}
                         </span>
                         <StockBadge stockCount={stockCount} />
                       </div>
@@ -450,7 +470,8 @@ export default function AdminInventoryPage() {
                       className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora outline-none text-xs cursor-pointer font-bold transition-all"
                     >
                       <option value="Shirts">Shirts</option>
-                      <option value="Boots">Shoes / Boots</option>
+                      <option value="Boots">Boots</option>
+                      <option value="Casual Shoes">Casual Shoes</option>
                       <option value="Retro Kits">Retro Kits</option>
                       <option value="Accessories">Accessories</option>
                     </select>
@@ -684,19 +705,81 @@ export default function AdminInventoryPage() {
 
                 {/* Category specific attributes */}
                 {(productToEdit.category === "Shirts" || productToEdit.category === "Retro Kits") && (
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Club / National Team</label>
-                    <input 
-                      type="text" 
-                      value={productToEdit.team || ""} 
-                      onChange={e => setProductToEdit({...productToEdit, team: e.target.value || null})} 
-                      className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
-                      placeholder="e.g., Real Madrid"
-                    />
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Club / National Team</label>
+                      <input 
+                        type="text" 
+                        value={productToEdit.team || ""} 
+                        onChange={e => setProductToEdit({...productToEdit, team: e.target.value || null})} 
+                        className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
+                        placeholder="e.g., Real Madrid"
+                      />
+                    </div>
+
+                    {/* Sleeve Patches Management in Edit Modal */}
+                    <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest font-sans">Custom Sleeve Patches</label>
+                        <button
+                          type="button"
+                          onClick={() => setProductToEdit({
+                            ...productToEdit,
+                            patches: [...(productToEdit.patches || []), { name: "", image: "" }]
+                          })}
+                          className="py-1 px-2 bg-purple-50 hover:bg-purple-100 text-purple-700 font-extrabold text-[9px] uppercase tracking-wider rounded-lg transition-colors border border-purple-200/50"
+                        >
+                          + Add Patch
+                        </button>
+                      </div>
+
+                      {(!productToEdit.patches || productToEdit.patches.length === 0) ? (
+                        <p className="text-[10px] text-slate-400 italic text-center">No custom patches attached.</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {productToEdit.patches.map((patch: any, idx: number) => (
+                            <div key={idx} className="flex gap-2 items-center bg-white p-2 border border-slate-200 rounded-xl">
+                              <input
+                                type="text"
+                                placeholder="Patch Name"
+                                value={patch.name || ""}
+                                onChange={(e) => {
+                                  const updated = [...productToEdit.patches];
+                                  updated[idx] = { ...updated[idx], name: e.target.value };
+                                  setProductToEdit({ ...productToEdit, patches: updated });
+                                }}
+                                className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs font-bold text-slate-800"
+                              />
+                              <input
+                                type="text"
+                                placeholder="Image Path"
+                                value={patch.image || ""}
+                                onChange={(e) => {
+                                  const updated = [...productToEdit.patches];
+                                  updated[idx] = { ...updated[idx], image: e.target.value };
+                                  setProductToEdit({ ...productToEdit, patches: updated });
+                                }}
+                                className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs font-mono font-bold text-slate-800"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const updated = productToEdit.patches.filter((_: any, i: number) => i !== idx);
+                                  setProductToEdit({ ...productToEdit, patches: updated });
+                                }}
+                                className="p-1.5 text-rose-600 bg-rose-50 rounded-lg hover:bg-rose-100 font-bold text-xs"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
-                {productToEdit.category === "Boots" && (
+                {(productToEdit.category === "Boots" || productToEdit.category === "Casual Shoes") && (
                   <div className="grid grid-cols-3 gap-2">
                     <div>
                       <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Brand</label>

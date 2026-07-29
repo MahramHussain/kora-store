@@ -36,6 +36,8 @@ export default function AdminPage() {
 
   // Player stocks state
   const [playerStocks, setPlayerStocks] = useState<Array<{ name: string; number: string; stock: number }>>([]);
+  // Custom sleeve patches state for shirts
+  const [customPatches, setCustomPatches] = useState<Array<{ name: string; image: string }>>([]);
 
   // Sync default player stocks when name changes
   useEffect(() => {
@@ -54,6 +56,7 @@ export default function AdminPage() {
   }, [name]);
 
   // Tab 2: Shoes Specifics
+  const [shoeCategory, setShoeCategory] = useState("Casual Shoes"); // "Casual Shoes" or "Boots"
   const [brand, setBrand] = useState("");
   const [soleplate, setSoleplate] = useState("FG"); // FG, SG, AG, TF, IN, Casual
   const [colorway, setColorway] = useState("");
@@ -157,7 +160,7 @@ export default function AdminPage() {
 
     const category =
       activeTab === "shirts" ? shirtCategory :
-      activeTab === "shoes" ? "Boots" :
+      activeTab === "shoes" ? shoeCategory :
       accessoryCategory;
 
     setStatus("Dropping into Vault...");
@@ -177,6 +180,7 @@ export default function AdminPage() {
           sizes: selectedSizes,
           sizeStocks,
           playerStocks,
+          patches: activeTab === "shirts" ? customPatches : [],
           isWorldCup,
           gender,
           // Tab-specific details
@@ -198,10 +202,12 @@ export default function AdminPage() {
         setTag("Latest");
         setImages([]);
         setPlayerStocks([]);
+        setCustomPatches([]);
         setIsWorldCup(false);
         setGender("Unisex");
         setTeam("");
         setBrand("");
+        setShoeCategory("Casual Shoes");
         setSoleplate("FG");
         setColorway("");
         setAccessoryCategory("Accessories");
@@ -416,7 +422,18 @@ export default function AdminPage() {
 
             {/* TAB 2: SHOE ATTRIBUTES */}
             {activeTab === "shoes" && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Shoe Category</label>
+                  <select
+                    value={shoeCategory}
+                    onChange={e => setShoeCategory(e.target.value)}
+                    className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3.5 text-slate-900 focus:bg-white focus:border-blue-500 outline-none text-sm cursor-pointer font-bold transition-all"
+                  >
+                    <option value="Casual Shoes">Casual Shoes</option>
+                    <option value="Boots">Boots / Football Cleats</option>
+                  </select>
+                </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Brand</label>
                   <input
@@ -681,6 +698,77 @@ export default function AdminPage() {
                     ))}
                   </div>
                 )}
+
+                {/* Custom Sleeve Patches Section */}
+                <div className="space-y-4 border-t border-slate-100 pt-5">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest">Custom Sleeve Patches</label>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Add custom sleeve patches (e.g. UCL Badge, Federation Badge) with image and title</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setCustomPatches([...customPatches, { name: "", image: "" }])}
+                      className="py-1.5 px-3 bg-purple-50 hover:bg-purple-100/80 text-purple-700 font-extrabold text-[10px] uppercase tracking-wider rounded-lg transition-colors border border-purple-200/50 flex items-center gap-1 cursor-pointer"
+                    >
+                      <span>➕ Add Patch</span>
+                    </button>
+                  </div>
+
+                  {customPatches.length === 0 ? (
+                    <p className="text-[10px] text-slate-400 italic bg-slate-50/50 border border-slate-200/40 rounded-xl p-3 text-center">No custom patches added. Default World Cup patches will apply if marked as World Cup campaign.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {customPatches.map((patch, idx) => (
+                        <div key={idx} className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center bg-slate-50/50 border border-slate-200/60 rounded-xl p-3">
+                          <div className="flex-1">
+                            <input
+                              required
+                              type="text"
+                              placeholder="PATCH NAME (e.g. UEFA Champions League Starball)"
+                              value={patch.name}
+                              onChange={(e) => {
+                                const newList = [...customPatches];
+                                newList[idx].name = e.target.value;
+                                setCustomPatches(newList);
+                              }}
+                              className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-purple-500"
+                            />
+                          </div>
+                          <div className="flex-1 flex gap-2 items-center">
+                            <input
+                              required
+                              type="text"
+                              placeholder="IMAGE URL or filename (e.g. /assets/Patches/...)"
+                              value={patch.image}
+                              onChange={(e) => {
+                                const newList = [...customPatches];
+                                newList[idx].image = e.target.value;
+                                setCustomPatches(newList);
+                              }}
+                              className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-purple-500"
+                            />
+                            {patch.image && (
+                              <div className="w-9 h-9 rounded-lg border border-slate-200 bg-white overflow-hidden shrink-0 p-0.5">
+                                <img src={patch.image} alt="Preview" className="w-full h-full object-contain" />
+                              </div>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCustomPatches(customPatches.filter((_, i) => i !== idx));
+                              }}
+                              className="p-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg border border-rose-200/40 transition-colors cursor-pointer shrink-0 font-bold text-xs h-[38px] flex items-center justify-center"
+                              title="Remove Patch"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

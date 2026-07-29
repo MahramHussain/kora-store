@@ -55,6 +55,7 @@ model Product {
   subCategory   String?
   soleplate     String?
   colorway      String?
+  patches       Json?
   createdAt   DateTime @default(now())
   
   // Links to order history and carts

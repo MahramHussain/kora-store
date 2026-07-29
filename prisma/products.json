@@ -280,7 +280,7 @@
   {
     "id": "nike-lv-airforce",
     "name": "Nike LV Airforce",
-    "category": "Boots",
+    "category": "Casual Shoes",
     "team": null,
     "price": 350,
     "description": "Exclusive streetwear collaboration. Combining classic Air Force silhouette with luxury craftsmanship and custom leather finishes.",
@@ -306,7 +306,7 @@
   {
     "id": "nike-womens-casual",
     "name": "Nike Womens Casual",
-    "category": "Boots",
+    "category": "Casual Shoes",
     "team": null,
     "price": 110,
     "description": "Modern casual comfort for daily lifestyle wear. Cushioned footbed and iconic styling crafted specifically for her.",
@@ -332,7 +332,7 @@
   {
     "id": "nike-airforce1-highcut",
     "name": "Nike Air Force 1 Highcut",
-    "category": "Boots",
+    "category": "Casual Shoes",
     "team": null,
     "price": 150,
     "description": "The classic high-top hoops icon. Iconic strap closure, premium leather overlays, and durable rubber traction.",

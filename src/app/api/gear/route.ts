@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     
     // 2. Grab all the data sent from your Admin Dashboard
-    const { name, category, team, price, description, tag, images, sizes, sizeStocks, playerStocks, isWorldCup, originalPrice, brand, gender, subCategory, soleplate, colorway } = body;
+    const { name, category, team, price, description, tag, images, sizes, sizeStocks, playerStocks, patches, isWorldCup, originalPrice, brand, gender, subCategory, soleplate, colorway } = body;
 
     // Run Arabic translations in parallel for maximum performance
     const [nameAr, descriptionAr] = await Promise.all([
@@ -36,6 +36,13 @@ export async function POST(req: Request) {
     const resolvedImages = (Array.isArray(images) ? images : [])
       .map((img: string) => resolveImageFilename(img))
       .filter(Boolean);
+
+    const resolvedPatches = Array.isArray(patches)
+      ? patches.map((p: any) => ({
+          name: p.name?.trim() || "",
+          image: p.image ? resolveImageFilename(p.image) : ""
+        })).filter(p => p.name)
+      : null;
 
     // Calculate total stock as the sum of all size stocks
     const totalStock = sizeStocks && typeof sizeStocks === "object"
@@ -63,6 +70,7 @@ export async function POST(req: Request) {
         subCategory: subCategory || null,
         soleplate: soleplate || null,
         colorway: colorway || null,
+        patches: resolvedPatches && resolvedPatches.length > 0 ? (resolvedPatches as any) : null,
         sizeStocks: sizeStocks && typeof sizeStocks === "object" ? {
           create: Object.entries(sizeStocks).map(([size, quantity]) => ({
             size,

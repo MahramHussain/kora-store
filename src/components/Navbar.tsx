@@ -623,7 +623,7 @@ export default function Navbar() {
           <div className="max-w-7xl mx-auto px-6 relative flex justify-center items-center gap-8 text-xs font-bold uppercase tracking-wider text-purple-100/90 py-3">
             
             <Link href="/shop" onClick={(e) => handleFilterClick(e, { resetAll: true })} className="hover:text-white transition-colors">{t("shop")}</Link>
-            <Link href="/shop?category=World Cup" onClick={(e) => handleFilterClick(e, { category: "World Cup" })} className="hover:text-white transition-colors">{t("world_cup")}</Link>
+            <Link href="/shop?category=Boots" onClick={(e) => handleFilterClick(e, { category: "Boots" })} className="hover:text-white transition-colors">{t("boots")}</Link>
             
             {/* Clubs Dropdown Menu */}
             <div 
@@ -768,7 +768,7 @@ export default function Navbar() {
               </div>
             </div>
 
-            <Link href="/shop?category=Shoes" onClick={(e) => handleFilterClick(e, { category: "Shoes" })} className="hover:text-white transition-colors">{t("shoes")}</Link>
+            <Link href="/shop?category=Casual Shoes" onClick={(e) => handleFilterClick(e, { category: "Casual Shoes" })} className="hover:text-white transition-colors">{t("casual_shoes")}</Link>
             <Link href="/shop?category=Accessories" onClick={(e) => handleFilterClick(e, { category: "Accessories" })} className="hover:text-white transition-colors">{t("accessories")}</Link>
             <Link href="/shop?category=Retro Kits" onClick={(e) => handleFilterClick(e, { category: "Retro Kits" })} className="hover:text-white transition-colors">{t("retro")}</Link>
           </div>
@@ -815,13 +815,13 @@ export default function Navbar() {
             {t("shop")}
           </Link>
           
-          {/* World Cup */}
+          {/* Boots */}
           <Link 
-            href="/shop?category=World Cup" 
+            href="/shop?category=Boots" 
             onClick={() => setIsMobileMenuOpen(false)} 
             className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
           >
-            {t("world_cup")}
+            {t("boots")}
           </Link>
 
           {/* Club Accordion */}
@@ -950,13 +950,13 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Shoes */}
+          {/* Casual Shoes */}
           <Link 
-            href="/shop?category=Shoes" 
+            href="/shop?category=Casual Shoes" 
             onClick={() => setIsMobileMenuOpen(false)} 
             className="px-6 py-5 border-b border-neutral-200 text-slate-900 font-display font-extrabold text-base hover:bg-neutral-50 flex items-center justify-between transition-colors"
           >
-            {t("shoes")}
+            {t("casual_shoes")}
           </Link>
 
           {/* Accessories */}

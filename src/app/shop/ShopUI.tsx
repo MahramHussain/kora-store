@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 import { useTranslation } from "@/context/LanguageContext";
 import { translations } from "@/lib/translations";
 
-const CATEGORIES = ["All", "World Cup", "Shoes", "Shirts", "Retro Kits", "Accessories"];
+const CATEGORIES = ["All", "Boots", "Casual Shoes", "Shirts", "Retro Kits", "Accessories"];
 const TEAMS = ["All Teams", "Argentina", "Brazil", "France", "Germany", "Portugal", "Spain", "Uruguay", "Arsenal", "Barcelona", "Real Madrid", "Manchester City", "Paris Saint-Germain", "Manchester United"];
 
 // ─── Mini Image Carousel (pure CSS scroll-snap, no JS animation) ───
@@ -198,8 +198,6 @@ export default function ShopUI({ products }: { products: any[] }) {
              categoryEn.includes(query);
     })();
     const matchesCategory = activeCategory === "All" || 
-      (activeCategory === "Shoes" && product.category === "Boots") ||
-      (activeCategory === "World Cup" && product.isWorldCup) ||
       (activeCategory === "Accessories" && (product.category === "Flags" || product.category === "Accessories")) ||
       product.category === activeCategory;
     const matchesTag = activeTag === "All" || product.tag === activeTag;
@@ -215,8 +213,9 @@ export default function ShopUI({ products }: { products: any[] }) {
   const categoryPriority = (cat: string) => {
     if (cat === "Shirts") return 1;
     if (cat === "Boots") return 2;
-    if (cat === "Accessories" || cat === "Flags") return 3;
-    return 4;
+    if (cat === "Casual Shoes") return 3;
+    if (cat === "Accessories" || cat === "Flags") return 4;
+    return 5;
   };
 
   const tagPriority = (tag: string | null) => {
@@ -254,8 +253,9 @@ export default function ShopUI({ products }: { products: any[] }) {
   const getCategoryLabel = (cat: string) => {
     switch (cat) {
       case "All": return t("all");
-      case "World Cup": return t("category_world_cup");
-      case "Shoes": return t("category_shoes");
+      case "Boots": return t("category_boots");
+      case "Casual Shoes": return t("category_casual_shoes");
+      case "Shoes": return t("category_casual_shoes");
       case "Shirts": return t("category_shirts");
       case "Retro Kits": return t("category_retro");
       case "Accessories": return t("category_accessories");
@@ -472,7 +472,7 @@ export default function ShopUI({ products }: { products: any[] }) {
                     {/* Right: Product Info */}
                     <div className="flex-1 flex flex-col justify-between py-0.5 font-sans text-start">
                       <div>
-                        <p className="text-kora dark:text-purple-400 text-[9px] font-bold uppercase tracking-widest mb-1">{product.category === "Boots" ? t("category_shoes") : product.category === "Flags" ? t("category_accessories") : getCategoryLabel(product.category)}</p>
+                        <p className="text-kora dark:text-purple-400 text-[9px] font-bold uppercase tracking-widest mb-1">{product.category === "Flags" ? t("category_accessories") : getCategoryLabel(product.category)}</p>
                         <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight line-clamp-2">
                           {t(product.id) !== product.id 
                             ? t(product.id) 

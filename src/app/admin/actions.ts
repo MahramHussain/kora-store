@@ -148,6 +148,7 @@ export async function updateProduct(
     soleplate?: string | null;
     colorway?: string | null;
     playerStocks?: Array<{ name: string; number: string; stock: number }>;
+    patches?: Array<{ name: string; image: string }>;
   }
 ) {
   try {
@@ -157,6 +158,13 @@ export async function updateProduct(
     const resolvedImages = data.images
       .map((img: string) => resolveImageFilename(img))
       .filter(Boolean);
+
+    const resolvedPatches = Array.isArray(data.patches)
+      ? data.patches.map((p: any) => ({
+          name: p.name?.trim() || "",
+          image: p.image ? resolveImageFilename(p.image) : ""
+        })).filter(p => p.name)
+      : null;
 
     // Calculate total stock if sizeStocks is provided
     let totalStock = data.stock;
@@ -218,6 +226,7 @@ export async function updateProduct(
           subCategory: data.subCategory || null,
           soleplate: data.soleplate || null,
           colorway: data.colorway || null,
+          patches: resolvedPatches && resolvedPatches.length > 0 ? (resolvedPatches as any) : null,
         },
       });
 

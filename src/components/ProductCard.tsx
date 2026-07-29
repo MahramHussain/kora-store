@@ -142,7 +142,9 @@ export function ProductCard({ product }: { product: Product }) {
           <div className="min-w-0 flex-1">
             <p className="text-kora text-[10px] font-bold uppercase tracking-widest mb-1">
               {product.category === "Boots" 
-                ? t("category_shoes") 
+                ? t("category_boots") 
+                : product.category === "Casual Shoes"
+                ? t("category_casual_shoes")
                 : product.category === "Flags" 
                 ? t("category_accessories") 
                 : (t(`category_${product.category.toLowerCase().replace(" ", "_")}`) || product.category)}
