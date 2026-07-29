@@ -38,12 +38,26 @@ export async function POST(req: Request) {
       throw new Error("Failed to load sharp builder function: sharp is not a function.");
     }
 
-    // 4. Process image with sharp (resize and convert to WebP)
+    // 4. Process image with sharp (auto-orient EXIF metadata for 4:3 camera photos & convert to WebP)
     const arrayBuffer = await file.arrayBuffer();
-    const optimizedBuffer = await sharpFunc(Buffer.from(arrayBuffer))
-      .resize({ width: 800, height: 800, fit: "inside", withoutEnlargement: true })
-      .webp({ quality: 70 })
-      .toBuffer();
+    const rawBuffer = Buffer.from(arrayBuffer);
+    let optimizedBuffer: Buffer;
+
+    try {
+      optimizedBuffer = await sharpFunc(rawBuffer)
+        .rotate() // Auto-orient photo using EXIF orientation tags (critical for 4:3 / camera shots)
+        .resize({
+          width: 1000,
+          height: 1000,
+          fit: "inside",
+          withoutEnlargement: true
+        })
+        .webp({ quality: 80 })
+        .toBuffer();
+    } catch (sharpErr: any) {
+      console.warn("Sharp image processing skipped, preserving original raw buffer for 4:3 file:", sharpErr?.message || sharpErr);
+      optimizedBuffer = rawBuffer;
+    }
 
     // 5. Generate unique filename to avoid overwrites (forcing webp extension)
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
