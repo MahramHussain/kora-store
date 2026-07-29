@@ -750,6 +750,19 @@ export default function AdminInventoryPage() {
                                 }}
                                 className="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-xs font-bold text-slate-800"
                               />
+                              <select
+                                value={patch.sleeve || "both"}
+                                onChange={(e) => {
+                                  const updated = [...productToEdit.patches];
+                                  updated[idx] = { ...updated[idx], sleeve: e.target.value as any };
+                                  setProductToEdit({ ...productToEdit, patches: updated });
+                                }}
+                                className="bg-slate-50 border border-slate-200 rounded-lg p-1.5 text-[11px] font-bold text-slate-800 shrink-0"
+                              >
+                                <option value="both">Both Sleeves</option>
+                                <option value="right">Right Sleeve</option>
+                                <option value="left">Left Sleeve</option>
+                              </select>
                               <div className="flex-1 flex gap-1 items-center min-w-0">
                                 <input
                                   type="text"

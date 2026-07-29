@@ -40,7 +40,8 @@ export async function POST(req: Request) {
     const resolvedPatches = Array.isArray(patches)
       ? patches.map((p: any) => ({
           name: p.name?.trim() || "",
-          image: p.image ? resolveImageFilename(p.image) : ""
+          image: p.image ? resolveImageFilename(p.image) : "",
+          sleeve: p.sleeve || "both"
         })).filter(p => p.name)
       : null;
 

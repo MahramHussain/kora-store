@@ -148,7 +148,7 @@ export async function updateProduct(
     soleplate?: string | null;
     colorway?: string | null;
     playerStocks?: Array<{ name: string; number: string; stock: number }>;
-    patches?: Array<{ name: string; image: string }>;
+    patches?: Array<{ name: string; image: string; sleeve?: "right" | "left" | "both" }>;
   }
 ) {
   try {
@@ -162,7 +162,8 @@ export async function updateProduct(
     const resolvedPatches = Array.isArray(data.patches)
       ? data.patches.map((p: any) => ({
           name: p.name?.trim() || "",
-          image: p.image ? resolveImageFilename(p.image) : ""
+          image: p.image ? resolveImageFilename(p.image) : "",
+          sleeve: p.sleeve || "both"
         })).filter(p => p.name)
       : null;
 

@@ -37,7 +37,7 @@ export default function AdminPage() {
   // Player stocks state
   const [playerStocks, setPlayerStocks] = useState<Array<{ name: string; number: string; stock: number }>>([]);
   // Custom sleeve patches state for shirts
-  const [customPatches, setCustomPatches] = useState<Array<{ name: string; image: string }>>([]);
+  const [customPatches, setCustomPatches] = useState<Array<{ name: string; image: string; sleeve: "right" | "left" | "both" }>>([]);
 
   // Sync default player stocks when name changes
   useEffect(() => {
@@ -708,7 +708,7 @@ export default function AdminPage() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => setCustomPatches([...customPatches, { name: "", image: "" }])}
+                      onClick={() => setCustomPatches([...customPatches, { name: "", image: "", sleeve: "both" }])}
                       className="py-1.5 px-3 bg-purple-50 hover:bg-purple-100/80 text-purple-700 font-extrabold text-[10px] uppercase tracking-wider rounded-lg transition-colors border border-purple-200/50 flex items-center gap-1 cursor-pointer"
                     >
                       <span>➕ Add Patch</span>
@@ -725,7 +725,7 @@ export default function AdminPage() {
                             <input
                               required
                               type="text"
-                              placeholder="PATCH NAME (e.g. UEFA Champions League Starball)"
+                              placeholder="PATCH NAME (e.g. UEFA Champions League Badge)"
                               value={patch.name}
                               onChange={(e) => {
                                 const newList = [...customPatches];
@@ -734,6 +734,21 @@ export default function AdminPage() {
                               }}
                               className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs font-bold text-slate-800 focus:outline-none focus:border-purple-500"
                             />
+                          </div>
+                          <div className="w-full sm:w-auto">
+                            <select
+                              value={patch.sleeve || "both"}
+                              onChange={(e) => {
+                                const newList = [...customPatches];
+                                newList[idx].sleeve = e.target.value as "right" | "left" | "both";
+                                setCustomPatches(newList);
+                              }}
+                              className="w-full sm:w-auto bg-white border border-slate-200 rounded-lg py-2 px-2.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-purple-500 cursor-pointer"
+                            >
+                              <option value="both">Both Sleeves</option>
+                              <option value="right">Right Sleeve Only</option>
+                              <option value="left">Left Sleeve Only</option>
+                            </select>
                           </div>
                           <div className="flex-1 flex gap-2 items-center">
                             <div className="flex-1 flex gap-1.5 items-center min-w-0">

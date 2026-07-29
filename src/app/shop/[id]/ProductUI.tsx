@@ -2895,9 +2895,19 @@ export default function ProductUI({ product }: { product: any }) {
 
                 {/* Gallery Items */}
                 {(activePatchGallery === "right"
-                  ? RIGHT_SLEEVE_PATCH_OPTIONS.filter((o) => o.value)
+                  ? [
+                      ...RIGHT_SLEEVE_PATCH_OPTIONS.filter((o) => o.value),
+                      ...(product.patches || [])
+                        .filter((p: any) => !p.sleeve || p.sleeve === "both" || p.sleeve === "right")
+                        .map((p: any) => ({ label: p.name, value: p.name, image: p.image }))
+                    ]
                   : activePatchGallery === "left"
-                  ? LEFT_SLEEVE_PATCH_OPTIONS.filter((o) => o.value)
+                  ? [
+                      ...LEFT_SLEEVE_PATCH_OPTIONS.filter((o) => o.value),
+                      ...(product.patches || [])
+                        .filter((p: any) => !p.sleeve || p.sleeve === "both" || p.sleeve === "left")
+                        .map((p: any) => ({ label: p.name, value: p.name, image: p.image }))
+                    ]
                   : (product.patches || []).map((p: any) => ({ label: p.name, value: p.name, image: p.image }))
                 ).map((opt: any) => {
                   const isSelected =
