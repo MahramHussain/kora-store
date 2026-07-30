@@ -73,8 +73,8 @@ export const translations = {
   "promo_code_text": { en: "Use code KORA10 for 10% off your entire order", ar: "استخدم كود KORA10 للحصول على خصم 10% على كامل طلبك" },
 
   // Hero Section
-  "hero_title": { en: "World Cup 26 is here", ar: "كأس العالم 26 هنا" },
-  "hero_desc": { en: "Official national jerseys, elite training apparel, and exclusive federation gear. Sourced direct.", ar: "القمصان الوطنية الرسمية، ملابس التدريب الفاخرة، ومعدات المنتخبات الحصرية. مستوردة مباشرة." },
+  "hero_title": { en: "FC BARCELONA KITS ARE OUT NOW", ar: "أطقم برشلونة الأساسية والاحتياطية وصلت" },
+  "hero_desc": { en: "Wear the iconic Blaugrana colors with pride. Official Home & Away kits with custom player printing available now.", ar: "ارتدِ ألوان البلاوغرانا الأسطورية بكل فخر. الأطقم الأساسية والاحتياطية متوفرة الآن مع إمكانية طباعة أسماء اللاعبين." },
   "shop_now": { en: "Shop Now", ar: "تسوق الآن" },
 
   // Home Showcase
@@ -95,11 +95,11 @@ export const translations = {
   "shop_national_kit": { en: "Shop The National Kit", ar: "تسوق طقم المنتخب" },
 
   // Home Headers
+  "club_jerseys": { en: "Club Jerseys", ar: "قمصان الأندية" },
+  "club_jerseys_sub": { en: "Official club kits from top leagues worldwide.", ar: "قمصان الأندية الرسمية من أفضل الدوريات العالمية." },
   "national_jerseys": { en: "National Jerseys", ar: "القمصان الوطنية" },
   "national_jerseys_sub": { en: "The latest World Cup 2026 kit releases.", ar: "أحدث إصدارات أطقم كأس العالم 2026." },
   "shoes": { en: "Casual Shoes", ar: "أحذية كاجوال" },
-  "casual_shoes": { en: "Casual Shoes", ar: "أحذية كاجوال" },
-  "boots": { en: "Boots", ar: "أحذية رياضة" },
   "shoes_sub": { en: "Elite pitch boots and luxury streetwear sneakers.", ar: "أحذية الملاعب الممتازة والأحذية الرياضية الفاخرة." },
   "streetwear_gear": { en: "Streetwear & Gear", ar: "ملابس الشارع والمعدات" },
   "streetwear_gear_sub": { en: "Premium performance socks and official club flags.", ar: "جوارب الأداء الفاخر وأعلام الأندية الرسمية." },
