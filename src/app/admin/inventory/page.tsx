@@ -241,12 +241,46 @@ export default function AdminInventoryPage() {
       }
 
       if (isSuccess) {
-        // Re-fetch list to capture the formatted updates
-        const productsData = await getProducts();
-        setProducts(productsData);
+        // 1. Immediately update local product list so UI reflects changes instantly
+        setProducts((prevProducts) =>
+          prevProducts.map((p) => {
+            if (p.id !== productToEdit.id) return p;
+            return {
+              ...p,
+              ...updatedData,
+              price: String(updatedData.price),
+              originalPrice: updatedData.originalPrice ? String(updatedData.originalPrice) : null,
+              stock: Object.values(updatedData.sizeStocks).reduce((a: number, b: any) => a + (Number(b) || 0), 0),
+              sizeStocks: Object.entries(updatedData.sizeStocks).map(([size, quantity]) => ({
+                id: `${p.id}-${size}`,
+                productId: p.id,
+                size,
+                quantity: Number(quantity) || 0
+              })),
+              playerStocks: updatedData.playerStocks.map((pl: any) => ({
+                id: `${p.id}-${pl.name}`,
+                productId: p.id,
+                playerName: pl.name,
+                playerNumber: pl.number,
+                quantity: pl.stock
+              }))
+            };
+          })
+        );
+        
         setEditModalOpen(false);
         setToastMessage({ text: "Gear updated successfully!", type: "success" });
         setTimeout(() => setToastMessage(null), 4000);
+
+        // 2. Also re-fetch in background to sync server state
+        try {
+          const freshData = await getProducts();
+          if (Array.isArray(freshData) && freshData.length > 0) {
+            setProducts(freshData);
+          }
+        } catch (e) {
+          console.warn("Background re-fetch skipped", e);
+        }
       } else {
         setSaveError(errorDetail || "Failed to update product.");
       }

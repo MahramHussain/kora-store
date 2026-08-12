@@ -1,22 +1,53 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs/server";
+import { currentUser, auth, clerkClient } from "@clerk/nextjs/server";
 import { resolveImageFilename } from "@/lib/resolveImage";
 import { translateToArabic } from "@/lib/translate";
+import { revalidatePath } from "next/cache";
+
+async function checkIsAdmin(): Promise<boolean> {
+  if (process.env.NODE_ENV === "development") {
+    return true;
+  }
+  let emails: string[] = [];
+  try {
+    const user = await currentUser();
+    if (user?.emailAddresses) {
+      emails = user.emailAddresses.map(e => e.emailAddress?.toLowerCase()).filter(Boolean);
+    }
+  } catch (e) {}
+
+  if (emails.length === 0) {
+    try {
+      const { userId } = await auth();
+      if (userId) {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        if (user?.emailAddresses) {
+          emails = user.emailAddresses.map(e => e.emailAddress?.toLowerCase()).filter(Boolean);
+        }
+      }
+    } catch (e) {}
+  }
+
+  if (emails.length === 0) {
+    try {
+      const { userId } = await auth();
+      if (userId) {
+        const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+        if (dbUser?.email) {
+          emails.push(dbUser.email.toLowerCase());
+        }
+      }
+    } catch (e) {}
+  }
+
+  return emails.includes("mahramh40@gmail.com") || emails.includes("korastore.ae@gmail.com");
+}
 
 export async function POST(req: Request) {
   try {
-    // 1. Verify user is the admin
-    let isAuthorized = false;
-    if (process.env.NODE_ENV === "development") {
-      isAuthorized = true;
-    } else {
-      const user = await currentUser();
-      const emails = user?.emailAddresses?.map(e => e.emailAddress?.toLowerCase()).filter(Boolean) || [];
-      if (emails.includes("mahramh40@gmail.com") || emails.includes("korastore.ae@gmail.com")) {
-        isAuthorized = true;
-      }
-    }
+    const isAuthorized = await checkIsAdmin();
     if (!isAuthorized) {
       return NextResponse.json({ success: false, error: "Forbidden: Unauthorized access" }, { status: 403 });
     }
@@ -100,23 +131,7 @@ export async function POST(req: Request) {
 
 export async function PUT(req: Request) {
   try {
-    // 1. Verify user is the admin
-    let isAuthorized = false;
-    if (process.env.NODE_ENV === "development") {
-      isAuthorized = true;
-    } else {
-      let emails: string[] = [];
-      try {
-        const user = await currentUser();
-        if (user?.emailAddresses) {
-          emails = user.emailAddresses.map(e => e.emailAddress?.toLowerCase()).filter(Boolean);
-        }
-      } catch (e) {}
-
-      if (emails.includes("mahramh40@gmail.com") || emails.includes("korastore.ae@gmail.com")) {
-        isAuthorized = true;
-      }
-    }
+    const isAuthorized = await checkIsAdmin();
     if (!isAuthorized) {
       return NextResponse.json({ success: false, error: "Forbidden: Unauthorized access" }, { status: 403 });
     }
@@ -247,6 +262,14 @@ export async function PUT(req: Request) {
 
       return updatedProduct;
     });
+
+    try {
+      revalidatePath("/admin/inventory");
+      revalidatePath("/admin");
+      revalidatePath("/shop");
+      revalidatePath(`/shop/${id}`);
+      revalidatePath("/", "layout");
+    } catch (e) {}
 
     return NextResponse.json({
       success: true,

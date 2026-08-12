@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { currentUser, auth, clerkClient } from "@clerk/nextjs/server";
 import { resolveImageFilename } from "@/lib/resolveImage";
+import { revalidatePath } from "next/cache";
 
 // Helper to guarantee only the admin can call protected operations
 async function ensureAdmin() {
@@ -19,7 +20,7 @@ async function ensureAdmin() {
     console.error("ensureAdmin currentUser error:", err);
   }
 
-  // Fallback: Check auth() userId via clerkClient if currentUser() didn't get emails
+  // Fallback 1: Check auth() userId via clerkClient if currentUser() didn't get emails
   if (emails.length === 0) {
     try {
       const { userId } = await auth();
@@ -35,9 +36,24 @@ async function ensureAdmin() {
     }
   }
 
+  // Fallback 2: Check Prisma user record for admin email
+  if (emails.length === 0) {
+    try {
+      const { userId } = await auth();
+      if (userId) {
+        const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+        if (dbUser?.email) {
+          emails.push(dbUser.email.toLowerCase());
+        }
+      }
+    } catch (err) {
+      console.error("ensureAdmin dbUser fallback error:", err);
+    }
+  }
+
   const isAuthorized = emails.includes("mahramh40@gmail.com") || emails.includes("korastore.ae@gmail.com");
   if (!isAuthorized) {
-    throw new Error("Access Denied: Unauthorized");
+    throw new Error("Access Denied: Unauthorized admin access");
   }
 }
 
@@ -300,6 +316,14 @@ export async function updateProduct(
 
       return updatedProduct;
     });
+
+    try {
+      revalidatePath("/admin/inventory");
+      revalidatePath("/admin");
+      revalidatePath("/shop");
+      revalidatePath(`/shop/${productId}`);
+      revalidatePath("/", "layout");
+    } catch (e) {}
 
     return { 
       success: true, 
