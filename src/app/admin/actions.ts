@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs/server";
+import { currentUser, auth, clerkClient } from "@clerk/nextjs/server";
 import { resolveImageFilename } from "@/lib/resolveImage";
 
 // Helper to guarantee only the admin can call protected operations
@@ -9,9 +9,34 @@ async function ensureAdmin() {
   if (process.env.NODE_ENV === "development") {
     return;
   }
-  const user = await currentUser();
-  const emails = user?.emailAddresses?.map(e => e.emailAddress?.toLowerCase()).filter(Boolean) || [];
-  if (!emails.includes("mahramh40@gmail.com") && !emails.includes("korastore.ae@gmail.com")) {
+  let emails: string[] = [];
+  try {
+    const user = await currentUser();
+    if (user?.emailAddresses) {
+      emails = user.emailAddresses.map(e => e.emailAddress?.toLowerCase()).filter(Boolean);
+    }
+  } catch (err) {
+    console.error("ensureAdmin currentUser error:", err);
+  }
+
+  // Fallback: Check auth() userId via clerkClient if currentUser() didn't get emails
+  if (emails.length === 0) {
+    try {
+      const { userId } = await auth();
+      if (userId) {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        if (user?.emailAddresses) {
+          emails = user.emailAddresses.map(e => e.emailAddress?.toLowerCase()).filter(Boolean);
+        }
+      }
+    } catch (err) {
+      console.error("ensureAdmin auth fallback error:", err);
+    }
+  }
+
+  const isAuthorized = emails.includes("mahramh40@gmail.com") || emails.includes("korastore.ae@gmail.com");
+  if (!isAuthorized) {
     throw new Error("Access Denied: Unauthorized");
   }
 }

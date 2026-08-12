@@ -35,8 +35,8 @@ export function proxy(req: any, event: any) {
       try {
         const client = await clerkClient();
         const user = await client.users.getUser(userId);
-        const email = user.emailAddresses[0]?.emailAddress;
-        if (email !== "mahramh40@gmail.com" && email !== "korastore.ae@gmail.com") {
+        const emails = user.emailAddresses?.map(e => e.emailAddress?.toLowerCase()).filter(Boolean) || [];
+        if (!emails.includes("mahramh40@gmail.com") && !emails.includes("korastore.ae@gmail.com")) {
           return NextResponse.redirect(new URL('/', req.url));
         }
       } catch (err) {

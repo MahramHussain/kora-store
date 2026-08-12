@@ -203,8 +203,44 @@ export default function AdminInventoryPage() {
         colorway: productToEdit.colorway ? String(productToEdit.colorway).trim() : null
       };
 
-      const res = await updateProduct(productToEdit.id, updatedData);
-      if (res.success) {
+      let isSuccess = false;
+      let errorDetail = "";
+
+      try {
+        const response = await fetch("/api/gear", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: productToEdit.id,
+            ...updatedData
+          })
+        });
+
+        if (response.ok) {
+          const apiData = await response.json();
+          if (apiData.success) {
+            isSuccess = true;
+          } else {
+            errorDetail = apiData.error || "Failed to update product";
+          }
+        } else {
+          const errRes = await response.json().catch(() => ({}));
+          errorDetail = errRes.error || `Server responded with status ${response.status}`;
+        }
+      } catch (fetchErr: any) {
+        console.warn("API PUT fetch failed, trying server action fallback...", fetchErr);
+      }
+
+      if (!isSuccess) {
+        const serverActionRes = await updateProduct(productToEdit.id, updatedData);
+        if (serverActionRes.success) {
+          isSuccess = true;
+        } else {
+          errorDetail = serverActionRes.error || errorDetail || "Failed to update product.";
+        }
+      }
+
+      if (isSuccess) {
         // Re-fetch list to capture the formatted updates
         const productsData = await getProducts();
         setProducts(productsData);
@@ -212,8 +248,7 @@ export default function AdminInventoryPage() {
         setToastMessage({ text: "Gear updated successfully!", type: "success" });
         setTimeout(() => setToastMessage(null), 4000);
       } else {
-        const errorMsg = res.error || "Failed to update product.";
-        setSaveError(errorMsg);
+        setSaveError(errorDetail || "Failed to update product.");
       }
     } catch (err: any) {
       console.error("Save error:", err);

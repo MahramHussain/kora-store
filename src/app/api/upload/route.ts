@@ -12,8 +12,8 @@ export async function POST(req: Request) {
       isAuthorized = true;
     } else {
       const user = await currentUser();
-      const email = user?.emailAddresses[0]?.emailAddress?.toLowerCase();
-      if (email && (email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com")) {
+      const emails = user?.emailAddresses?.map(e => e.emailAddress?.toLowerCase()).filter(Boolean) || [];
+      if (emails.includes("mahramh40@gmail.com") || emails.includes("korastore.ae@gmail.com")) {
         isAuthorized = true;
       }
     }

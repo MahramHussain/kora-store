@@ -97,3 +97,167 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: "Failed to add gear to Vault" }, { status: 500 });
   }
 }
+
+export async function PUT(req: Request) {
+  try {
+    // 1. Verify user is the admin
+    let isAuthorized = false;
+    if (process.env.NODE_ENV === "development") {
+      isAuthorized = true;
+    } else {
+      let emails: string[] = [];
+      try {
+        const user = await currentUser();
+        if (user?.emailAddresses) {
+          emails = user.emailAddresses.map(e => e.emailAddress?.toLowerCase()).filter(Boolean);
+        }
+      } catch (e) {}
+
+      if (emails.includes("mahramh40@gmail.com") || emails.includes("korastore.ae@gmail.com")) {
+        isAuthorized = true;
+      }
+    }
+    if (!isAuthorized) {
+      return NextResponse.json({ success: false, error: "Forbidden: Unauthorized access" }, { status: 403 });
+    }
+
+    const body = await req.json();
+    const { id, name, category, team, price, description, tag, images, sizes, sizeStocks, playerStocks, patches, isWorldCup, originalPrice, brand, gender, subCategory, soleplate, colorway } = body;
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: "Product ID is required" }, { status: 400 });
+    }
+
+    // Resolve images
+    const resolvedImages = (Array.isArray(images) ? images : [])
+      .map((img: string) => {
+        try {
+          return resolveImageFilename(img);
+        } catch {
+          return img;
+        }
+      })
+      .filter(Boolean);
+
+    const resolvedPatches = Array.isArray(patches)
+      ? patches
+          .map((p: any) => {
+            const patchName = String(p?.name || "").trim();
+            let patchImg = String(p?.image || "").trim();
+            if (patchImg) {
+              try {
+                patchImg = resolveImageFilename(patchImg);
+              } catch {}
+            }
+            return {
+              name: patchName,
+              image: patchImg,
+              sleeve: p?.sleeve || "both"
+            };
+          })
+          .filter(p => p.name)
+      : null;
+
+    let totalStock = body.stock;
+    if (sizeStocks && typeof sizeStocks === "object") {
+      totalStock = Object.values(sizeStocks).reduce((acc: number, val: any) => acc + Math.max(0, parseInt(val as any) || 0), 0);
+    }
+
+    const cleanSizes: string[] = Array.from(new Set<string>((Array.isArray(sizes) ? sizes : []).map((s: any) => String(s).trim()).filter(Boolean)));
+
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Per-size stock
+      if (sizeStocks && typeof sizeStocks === "object") {
+        await tx.sizeStock.deleteMany({
+          where: { productId: id }
+        });
+
+        const sizeStockEntries = Object.entries(sizeStocks)
+          .filter(([size]) => size && size.trim())
+          .map(([size, quantity]) => ({
+            productId: id,
+            size: size.trim(),
+            quantity: Math.max(0, parseInt(quantity as any) || 0)
+          }));
+
+        if (sizeStockEntries.length > 0) {
+          await tx.sizeStock.createMany({
+            data: sizeStockEntries,
+            skipDuplicates: true
+          });
+        }
+      }
+
+      // 2. Player stocks
+      if (playerStocks && Array.isArray(playerStocks)) {
+        await tx.playerStock.deleteMany({
+          where: { productId: id }
+        });
+
+        const seenPlayerNames = new Set<string>();
+        const playerStockEntries = [];
+
+        for (const p of playerStocks) {
+          const pName = String(p?.name || "").toUpperCase().trim();
+          const pNum = String(p?.number ?? "").trim();
+          const pQty = Math.max(0, parseInt(p?.stock as any) || 0);
+
+          if (pName && !seenPlayerNames.has(pName)) {
+            seenPlayerNames.add(pName);
+            playerStockEntries.push({
+              productId: id,
+              playerName: pName,
+              playerNumber: pNum,
+              quantity: pQty
+            });
+          }
+        }
+
+        if (playerStockEntries.length > 0) {
+          await tx.playerStock.createMany({
+            data: playerStockEntries,
+            skipDuplicates: true
+          });
+        }
+      }
+
+      // 3. Update the product
+      const updatedProduct = await tx.product.update({
+        where: { id },
+        data: {
+          name: String(name || "").trim(),
+          price: parseFloat(String(price || "0")) || 0,
+          category: category || "Shirts",
+          team: team ? String(team).trim() : null,
+          tag: tag ? String(tag).trim() : null,
+          sizes: cleanSizes,
+          description: description !== undefined ? description : undefined,
+          images: resolvedImages,
+          stock: totalStock !== undefined ? totalStock : undefined,
+          isWorldCup: isWorldCup !== undefined ? !!isWorldCup : undefined,
+          originalPrice: originalPrice !== undefined && originalPrice !== null && String(originalPrice).trim() !== "" ? (parseFloat(String(originalPrice)) || null) : null,
+          brand: brand ? String(brand).trim() : null,
+          gender: gender ? String(gender).trim() : null,
+          subCategory: subCategory ? String(subCategory).trim() : null,
+          soleplate: soleplate ? String(soleplate).trim() : null,
+          colorway: colorway ? String(colorway).trim() : null,
+          patches: resolvedPatches && resolvedPatches.length > 0 ? (resolvedPatches as any) : null,
+        },
+      });
+
+      return updatedProduct;
+    });
+
+    return NextResponse.json({
+      success: true,
+      product: {
+        ...result,
+        price: result.price ? result.price.toString() : "0",
+        originalPrice: result.originalPrice ? result.originalPrice.toString() : null
+      }
+    });
+  } catch (error: any) {
+    console.error("API Error updating gear:", error);
+    return NextResponse.json({ success: false, error: error?.message || "Failed to update gear" }, { status: 500 });
+  }
+}
