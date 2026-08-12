@@ -19,56 +19,90 @@ export default function AdminInventoryPage() {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<any>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState("All");
   const [selectedTeamFilter, setSelectedTeamFilter] = useState("All");
 
   const openEditModal = (product: any) => {
+    setSaveError(null);
+    setIsSaving(false);
+
     const sizeStocksMap: Record<string, number> = {};
-    if (product.sizeStocks) {
+    if (product.sizeStocks && Array.isArray(product.sizeStocks)) {
       product.sizeStocks.forEach((s: any) => {
-        sizeStocksMap[s.size] = s.quantity;
+        if (s && s.size) {
+          sizeStocksMap[s.size] = typeof s.quantity === "number" ? s.quantity : (parseInt(s.quantity) || 0);
+        }
       });
     }
-    const sizes = Array.isArray(product.sizes) 
+    const sizes: string[] = (Array.isArray(product.sizes) 
       ? product.sizes 
       : typeof product.sizes === "string" 
         ? product.sizes.split(",").map((s: string) => s.trim()).filter(Boolean)
-        : [];
+        : []
+    ).map((s: any) => String(s).trim()).filter(Boolean);
+
     sizes.forEach((size: string) => {
       if (sizeStocksMap[size] === undefined) {
-        sizeStocksMap[size] = product.stock;
+        sizeStocksMap[size] = typeof product.stock === "number" ? product.stock : 10;
       }
     });
 
     // Load playerStocks
     const playerStocksList: Array<{ name: string; number: string; stock: number }> = [];
-    if (product.playerStocks && product.playerStocks.length > 0) {
+    if (product.playerStocks && Array.isArray(product.playerStocks) && product.playerStocks.length > 0) {
       product.playerStocks.forEach((p: any) => {
-        playerStocksList.push({
-          name: p.playerName,
-          number: p.playerNumber,
-          stock: p.quantity
-        });
+        if (p && p.playerName) {
+          playerStocksList.push({
+            name: String(p.playerName || ""),
+            number: String(p.playerNumber ?? ""),
+            stock: typeof p.quantity === "number" ? p.quantity : (parseInt(p.quantity) || 0)
+          });
+        }
       });
     } else {
-      const presets = getPresetPlayersForProduct(product.name);
+      const presets = getPresetPlayersForProduct(product.name || "");
       presets.forEach((p: any) => {
         playerStocksList.push({
-          name: p.name,
-          number: p.number,
+          name: String(p.name || ""),
+          number: String(p.number ?? ""),
           stock: 10
         });
       });
     }
 
+    // Load patches
+    let loadedPatches: Array<{ name: string; image: string; sleeve?: string }> = [];
+    if (Array.isArray(product.patches)) {
+      loadedPatches = product.patches;
+    } else if (typeof product.patches === "string") {
+      try {
+        const parsed = JSON.parse(product.patches);
+        if (Array.isArray(parsed)) loadedPatches = parsed;
+      } catch (e) {}
+    }
+
+    const hasOriginalPrice = product.originalPrice !== null && product.originalPrice !== undefined && String(product.originalPrice).trim() !== "";
+
     setProductToEdit({
       ...product,
+      name: product.name || "",
+      price: product.price !== undefined && product.price !== null ? String(product.price) : "0",
+      category: product.category || "Shirts",
+      team: product.team || "",
+      tag: product.tag || "",
+      sizes: sizes,
+      description: product.description || "",
+      images: Array.isArray(product.images) ? product.images : [],
       sizeStocksMap,
       playerStocks: playerStocksList,
-      patches: Array.isArray(product.patches) ? product.patches : [],
-      isSale: product.originalPrice !== null && product.originalPrice !== undefined && product.originalPrice !== ""
+      patches: loadedPatches,
+      originalPrice: hasOriginalPrice ? String(product.originalPrice) : "",
+      isSale: hasOriginalPrice
     });
     setEditModalOpen(true);
   };
@@ -95,60 +129,98 @@ export default function AdminInventoryPage() {
 
   const handleUpdateProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!productToEdit) return;
+    if (!productToEdit || isSaving) return;
 
-    // Process image entries
-    const formattedImages = (Array.isArray(productToEdit.images)
-      ? productToEdit.images.map((img: string) => img.trim())
-      : typeof productToEdit.images === "string"
-        ? productToEdit.images.split(",").map((img: string) => img.trim())
-        : []
-    ).filter(Boolean);
+    setIsSaving(true);
+    setSaveError(null);
 
-    const currentSizes = Array.isArray(productToEdit.sizes) 
-      ? productToEdit.sizes 
-      : typeof productToEdit.sizes === "string" 
-        ? productToEdit.sizes.split(",").map((s: string) => s.trim()).filter(Boolean)
-        : [];
+    try {
+      // Process image entries
+      const formattedImages = (Array.isArray(productToEdit.images)
+        ? productToEdit.images.map((img: string) => String(img || "").trim())
+        : typeof productToEdit.images === "string"
+          ? productToEdit.images.split(",").map((img: string) => img.trim())
+          : []
+      ).filter(Boolean);
 
-    const sizeStocks: Record<string, number> = {};
-    currentSizes.forEach((size: string) => {
-      sizeStocks[size] = productToEdit.sizeStocksMap?.[size] !== undefined 
-        ? parseInt(productToEdit.sizeStocksMap[size] as any) || 0 
-        : 10;
-    });
+      const currentSizes: string[] = (Array.isArray(productToEdit.sizes) 
+        ? productToEdit.sizes 
+        : typeof productToEdit.sizes === "string" 
+          ? productToEdit.sizes.split(",").map((s: string) => s.trim()).filter(Boolean)
+          : []
+      ).map((s: any) => String(s).trim()).filter(Boolean);
 
-    const updatedData = {
-      name: productToEdit.name,
-      price: parseFloat(productToEdit.price) || 0,
-      category: productToEdit.category,
-      team: productToEdit.team || null,
-      tag: productToEdit.tag || null,
-      sizes: currentSizes,
-      description: productToEdit.description || "",
-      images: formattedImages,
-      sizeStocks,
-      playerStocks: productToEdit.playerStocks || [],
-      patches: productToEdit.patches || [],
-      isWorldCup: !!productToEdit.isWorldCup,
-      originalPrice: productToEdit.isSale && productToEdit.originalPrice
-        ? (parseFloat(productToEdit.originalPrice) || null)
-        : null,
-      brand: productToEdit.brand || null,
-      gender: productToEdit.gender || null,
-      subCategory: productToEdit.subCategory || null,
-      soleplate: productToEdit.soleplate || null,
-      colorway: productToEdit.colorway || null
-    };
+      const uniqueSizes: string[] = Array.from(new Set<string>(currentSizes));
 
-    const res = await updateProduct(productToEdit.id, updatedData);
-    if (res.success) {
-      // Re-fetch list to capture the formatted updates
-      const productsData = await getProducts();
-      setProducts(productsData);
-      setEditModalOpen(false);
-    } else {
-      alert("Failed to update product.");
+      const sizeStocks: Record<string, number> = {};
+      uniqueSizes.forEach((size: string) => {
+        sizeStocks[size] = productToEdit.sizeStocksMap?.[size] !== undefined 
+          ? Math.max(0, parseInt(productToEdit.sizeStocksMap[size] as any) || 0) 
+          : 10;
+      });
+
+      // Filter and sanitize playerStocks so empty entries don't break anything
+      const sanitizedPlayerStocks = (productToEdit.playerStocks || [])
+        .filter((p: any) => p && String(p.name || "").trim().length > 0)
+        .map((p: any) => ({
+          name: String(p.name || "").toUpperCase().trim(),
+          number: String(p.number ?? "").replace(/[^0-9]/g, "").trim(),
+          stock: Math.max(0, parseInt(p.stock as any) || 0)
+        }));
+
+      // Filter and sanitize patches
+      const sanitizedPatches = (productToEdit.patches || [])
+        .filter((p: any) => p && String(p.name || "").trim().length > 0)
+        .map((p: any) => ({
+          name: String(p.name || "").trim(),
+          image: String(p.image || "").trim(),
+          sleeve: p.sleeve || "both"
+        }));
+
+      const parsedPrice = parseFloat(String(productToEdit.price || "0")) || 0;
+      const parsedOriginalPrice = productToEdit.isSale && productToEdit.originalPrice
+        ? (parseFloat(String(productToEdit.originalPrice)) || null)
+        : null;
+
+      const updatedData = {
+        name: String(productToEdit.name || "").trim(),
+        price: parsedPrice,
+        category: productToEdit.category || "Shirts",
+        team: productToEdit.team ? String(productToEdit.team).trim() : null,
+        tag: productToEdit.tag ? String(productToEdit.tag).trim() : null,
+        sizes: uniqueSizes,
+        description: productToEdit.description ? String(productToEdit.description) : "",
+        images: formattedImages,
+        sizeStocks,
+        playerStocks: sanitizedPlayerStocks,
+        patches: sanitizedPatches,
+        isWorldCup: !!productToEdit.isWorldCup,
+        originalPrice: parsedOriginalPrice,
+        brand: productToEdit.brand ? String(productToEdit.brand).trim() : null,
+        gender: productToEdit.gender ? String(productToEdit.gender).trim() : null,
+        subCategory: productToEdit.subCategory ? String(productToEdit.subCategory).trim() : null,
+        soleplate: productToEdit.soleplate ? String(productToEdit.soleplate).trim() : null,
+        colorway: productToEdit.colorway ? String(productToEdit.colorway).trim() : null
+      };
+
+      const res = await updateProduct(productToEdit.id, updatedData);
+      if (res.success) {
+        // Re-fetch list to capture the formatted updates
+        const productsData = await getProducts();
+        setProducts(productsData);
+        setEditModalOpen(false);
+        setToastMessage({ text: "Gear updated successfully!", type: "success" });
+        setTimeout(() => setToastMessage(null), 4000);
+      } else {
+        const errorMsg = res.error || "Failed to update product.";
+        setSaveError(errorMsg);
+      }
+    } catch (err: any) {
+      console.error("Save error:", err);
+      const errorMsg = err?.message || "An unexpected error occurred while saving.";
+      setSaveError(errorMsg);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -425,6 +497,18 @@ export default function AdminInventoryPage() {
         </div>
       )}
 
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className={`fixed top-5 right-5 z-50 px-5 py-3 rounded-2xl shadow-xl border font-bold text-xs flex items-center gap-2 animate-fade-in-up ${
+          toastMessage.type === "success" 
+            ? "bg-emerald-600 text-white border-emerald-500 shadow-emerald-600/20" 
+            : "bg-rose-600 text-white border-rose-500 shadow-rose-600/20"
+        }`}>
+          <span>{toastMessage.type === "success" ? "✅" : "⚠️"}</span>
+          <span>{toastMessage.text}</span>
+        </div>
+      )}
+
       {/* Edit Form Modal */}
       {editModalOpen && productToEdit && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/40 backdrop-blur-sm p-0 sm:p-4 overflow-y-auto">
@@ -442,11 +526,18 @@ export default function AdminInventoryPage() {
             <form onSubmit={handleUpdateProductSubmit} className="flex flex-col flex-1 min-h-0">
               <div className="space-y-4 overflow-y-auto px-5 sm:px-6 flex-1 my-4 scrollbar-hide">
                 
+                {saveError && (
+                  <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2">
+                    <span className="shrink-0">⚠️</span>
+                    <span>{saveError}</span>
+                  </div>
+                )}
+                
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Name</label>
                   <input 
                     required type="text" 
-                    value={productToEdit.name} 
+                    value={productToEdit.name || ""} 
                     onChange={e => setProductToEdit({...productToEdit, name: e.target.value})} 
                     className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-bold transition-all" 
                   />
@@ -457,7 +548,7 @@ export default function AdminInventoryPage() {
                     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Price ({CURRENCY.trim()})</label>
                     <input 
                       required type="number" step="0.01" 
-                      value={productToEdit.price} 
+                      value={productToEdit.price || ""} 
                       onChange={e => setProductToEdit({...productToEdit, price: e.target.value})} 
                       className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-mono font-bold transition-all" 
                     />
@@ -465,7 +556,7 @@ export default function AdminInventoryPage() {
                   <div>
                     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Category</label>
                     <select 
-                      value={productToEdit.category} 
+                      value={productToEdit.category || "Shirts"} 
                       onChange={e => setProductToEdit({...productToEdit, category: e.target.value})} 
                       className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora outline-none text-xs cursor-pointer font-bold transition-all"
                     >
@@ -489,7 +580,7 @@ export default function AdminInventoryPage() {
                         setProductToEdit({
                           ...productToEdit,
                           isSale: checked,
-                          originalPrice: checked ? (productToEdit.originalPrice || productToEdit.price || "75") : null,
+                          originalPrice: checked ? (productToEdit.originalPrice || productToEdit.price || "75") : "",
                           tag: checked ? "On Sale" : (productToEdit.tag === "On Sale" ? null : productToEdit.tag)
                         });
                       }}
@@ -503,7 +594,7 @@ export default function AdminInventoryPage() {
                       <div>
                         <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">Striked Price ({CURRENCY.trim()})</label>
                         <input 
-                          required type="number" step="0.01" 
+                          type="number" step="0.01" 
                           value={productToEdit.originalPrice || ""} 
                           onChange={e => setProductToEdit({...productToEdit, originalPrice: e.target.value})} 
                           className="w-full bg-white border border-slate-200 rounded-xl p-3 text-slate-900 focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-mono font-bold transition-all" 
@@ -513,7 +604,7 @@ export default function AdminInventoryPage() {
                       <div>
                         <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 font-sans">New Sale Price ({CURRENCY.trim()})</label>
                         <input 
-                          required type="number" step="0.01" 
+                          type="number" step="0.01" 
                           value={productToEdit.price || ""} 
                           onChange={e => setProductToEdit({...productToEdit, price: e.target.value})} 
                           className="w-full bg-white border border-slate-200 rounded-xl p-3 text-slate-900 focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none text-xs font-mono font-bold transition-all" 
@@ -554,7 +645,7 @@ export default function AdminInventoryPage() {
                             min="0"
                             value={qty}
                             onChange={(e) => {
-                              const val = parseInt(e.target.value) || 0;
+                              const val = Math.max(0, parseInt(e.target.value) || 0);
                               setProductToEdit({
                                 ...productToEdit,
                                 sizeStocksMap: {
@@ -599,10 +690,9 @@ export default function AdminInventoryPage() {
                           <div key={idx} className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center bg-white border border-slate-200/80 rounded-xl p-2 shadow-xs">
                             <div className="flex-1">
                               <input
-                                required
                                 type="text"
                                 placeholder="NAME"
-                                value={player.name}
+                                value={player.name || ""}
                                 onChange={(e) => {
                                   const newList = [...productToEdit.playerStocks];
                                   newList[idx].name = e.target.value.toUpperCase();
@@ -614,10 +704,9 @@ export default function AdminInventoryPage() {
                             <div className="flex gap-2 items-center">
                               <div className="w-14">
                                 <input
-                                  required
                                   type="text"
                                   placeholder="NO."
-                                  value={player.number}
+                                  value={player.number || ""}
                                   onChange={(e) => {
                                     const newList = [...productToEdit.playerStocks];
                                     newList[idx].number = e.target.value.replace(/[^0-9]/g, "");
@@ -628,14 +717,13 @@ export default function AdminInventoryPage() {
                               </div>
                               <div className="w-16">
                                 <input
-                                  required
                                   type="number"
                                   min="0"
                                   placeholder="STOCK"
-                                  value={player.stock}
+                                  value={player.stock !== undefined ? player.stock : 10}
                                   onChange={(e) => {
                                     const newList = [...productToEdit.playerStocks];
-                                    newList[idx].stock = parseInt(e.target.value) || 0;
+                                    newList[idx].stock = Math.max(0, parseInt(e.target.value) || 0);
                                     setProductToEdit({ ...productToEdit, playerStocks: newList });
                                   }}
                                   className="w-full bg-slate-50 border border-slate-200 rounded-lg py-1.5 px-2 text-xs font-mono font-bold text-center text-slate-800 focus:outline-none focus:border-purple-500"
@@ -912,8 +1000,8 @@ export default function AdminInventoryPage() {
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Available Sizes (Comma separated)</label>
                   <input 
-                    required type="text" 
-                    value={Array.isArray(productToEdit.sizes) ? productToEdit.sizes.join(", ") : productToEdit.sizes} 
+                    type="text" 
+                    value={Array.isArray(productToEdit.sizes) ? productToEdit.sizes.join(", ") : (productToEdit.sizes || "")} 
                     onChange={e => setProductToEdit({...productToEdit, sizes: e.target.value})} 
                     className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none font-mono text-xs transition-all" 
                     placeholder="S, M, L, XL"
@@ -921,9 +1009,8 @@ export default function AdminInventoryPage() {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Description</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5">Description (Optional)</label>
                   <textarea 
-                    required 
                     value={productToEdit.description || ""} 
                     onChange={e => setProductToEdit({...productToEdit, description: e.target.value})} 
                     className="w-full bg-slate-50/80 border border-slate-200 rounded-xl p-3 text-slate-900 focus:bg-white focus:border-kora focus:ring-2 focus:ring-kora/10 outline-none h-20 resize-none text-xs transition-all" 
@@ -933,8 +1020,28 @@ export default function AdminInventoryPage() {
               </div>
               
               <div className="flex gap-3 px-5 sm:px-6 py-4 border-t border-slate-100 bg-slate-50/30 shrink-0 rounded-b-3xl">
-                <button type="button" onClick={() => setEditModalOpen(false)} className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition-colors text-xs uppercase tracking-wider">Cancel</button>
-                <button type="submit" className="flex-1 py-3.5 bg-gradient-to-r from-kora to-purple-600 hover:from-purple-700 hover:to-kora text-white font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-kora/20 text-xs">Save Changes</button>
+                <button 
+                  type="button" 
+                  disabled={isSaving}
+                  onClick={() => setEditModalOpen(false)} 
+                  className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-2xl transition-colors text-xs uppercase tracking-wider disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  disabled={isSaving}
+                  className="flex-1 py-3.5 bg-gradient-to-r from-kora to-purple-600 hover:from-purple-700 hover:to-kora text-white font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-kora/20 text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </button>
               </div>
             </form>
           </div>

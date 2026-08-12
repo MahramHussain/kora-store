@@ -12,8 +12,8 @@ export async function POST(req: Request) {
       isAuthorized = true;
     } else {
       const user = await currentUser();
-      const email = user?.emailAddresses[0]?.emailAddress?.toLowerCase();
-      if (email && (email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com")) {
+      const emails = user?.emailAddresses?.map(e => e.emailAddress?.toLowerCase()).filter(Boolean) || [];
+      if (emails.includes("mahramh40@gmail.com") || emails.includes("korastore.ae@gmail.com")) {
         isAuthorized = true;
       }
     }
@@ -79,11 +79,13 @@ export async function POST(req: Request) {
           }))
         } : undefined,
         playerStocks: playerStocks && Array.isArray(playerStocks) ? {
-          create: playerStocks.map((p: any) => ({
-            playerName: p.name.toUpperCase().trim(),
-            playerNumber: p.number.trim(),
-            quantity: parseInt(p.stock as string) || 0
-          }))
+          create: playerStocks
+            .filter((p: any) => p && String(p.name || "").trim())
+            .map((p: any) => ({
+              playerName: String(p.name || "").toUpperCase().trim(),
+              playerNumber: String(p.number ?? "").trim(),
+              quantity: Math.max(0, parseInt(p.stock as string) || 0)
+            }))
         } : undefined
       }
     });

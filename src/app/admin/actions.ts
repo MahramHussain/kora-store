@@ -10,8 +10,8 @@ async function ensureAdmin() {
     return;
   }
   const user = await currentUser();
-  const email = user?.emailAddresses[0]?.emailAddress?.toLowerCase();
-  if (!email || (email !== "mahramh40@gmail.com" && email !== "korastore.ae@gmail.com")) {
+  const emails = user?.emailAddresses?.map(e => e.emailAddress?.toLowerCase()).filter(Boolean) || [];
+  if (!emails.includes("mahramh40@gmail.com") && !emails.includes("korastore.ae@gmail.com")) {
     throw new Error("Access Denied: Unauthorized");
   }
 }
@@ -136,7 +136,7 @@ export async function updateProduct(
     team: string | null; 
     tag: string | null; 
     sizes: string[]; 
-    description: string; 
+    description?: string | null; 
     images: string[]; 
     stock?: number;
     sizeStocks?: Record<string, number>;
@@ -154,57 +154,99 @@ export async function updateProduct(
   try {
     await ensureAdmin();
     
-    // Resolve short filenames to exact paths recursively on the server
-    const resolvedImages = data.images
-      .map((img: string) => resolveImageFilename(img))
+    // Resolve short filenames to exact paths recursively on the server safely
+    const resolvedImages = (Array.isArray(data.images) ? data.images : [])
+      .map((img: string) => {
+        try {
+          return resolveImageFilename(img);
+        } catch {
+          return img;
+        }
+      })
       .filter(Boolean);
 
     const resolvedPatches = Array.isArray(data.patches)
-      ? data.patches.map((p: any) => ({
-          name: p.name?.trim() || "",
-          image: p.image ? resolveImageFilename(p.image) : "",
-          sleeve: p.sleeve || "both"
-        })).filter(p => p.name)
+      ? data.patches
+          .map((p: any) => {
+            const name = String(p?.name || "").trim();
+            let image = String(p?.image || "").trim();
+            if (image) {
+              try {
+                image = resolveImageFilename(image);
+              } catch {}
+            }
+            return {
+              name,
+              image,
+              sleeve: p?.sleeve || "both"
+            };
+          })
+          .filter(p => p.name)
       : null;
 
     // Calculate total stock if sizeStocks is provided
     let totalStock = data.stock;
     if (data.sizeStocks && typeof data.sizeStocks === "object") {
-      totalStock = Object.values(data.sizeStocks).reduce((acc: number, val: any) => acc + (parseInt(val as any) || 0), 0);
+      totalStock = Object.values(data.sizeStocks).reduce((acc: number, val: any) => acc + Math.max(0, parseInt(val as any) || 0), 0);
     }
+
+    const cleanSizes = Array.from(new Set((data.sizes || []).map(s => String(s).trim()).filter(Boolean)));
 
     // Run updates in transaction
     const result = await prisma.$transaction(async (tx) => {
-      // 1. Delete old sizeStocks
+      // 1. Delete old sizeStocks and create new sanitized entries
       if (data.sizeStocks && typeof data.sizeStocks === "object") {
         await tx.sizeStock.deleteMany({
           where: { productId }
         });
         
-        // 2. Create new sizeStocks
-        await tx.sizeStock.createMany({
-          data: Object.entries(data.sizeStocks).map(([size, quantity]) => ({
+        const sizeStockEntries = Object.entries(data.sizeStocks)
+          .filter(([size]) => size && size.trim())
+          .map(([size, quantity]) => ({
             productId,
-            size,
-            quantity: parseInt(quantity as any) || 0
-          }))
-        });
+            size: size.trim(),
+            quantity: Math.max(0, parseInt(quantity as any) || 0)
+          }));
+
+        if (sizeStockEntries.length > 0) {
+          await tx.sizeStock.createMany({
+            data: sizeStockEntries,
+            skipDuplicates: true
+          });
+        }
       }
 
-      // 2.5. Update playerStocks
+      // 2. Update playerStocks safely
       if (data.playerStocks && Array.isArray(data.playerStocks)) {
         await tx.playerStock.deleteMany({
           where: { productId }
         });
         
-        await tx.playerStock.createMany({
-          data: data.playerStocks.map((p) => ({
-            productId,
-            playerName: p.name.toUpperCase().trim(),
-            playerNumber: p.number.trim(),
-            quantity: parseInt(p.stock as any) || 0
-          }))
-        });
+        const seenPlayerNames = new Set<string>();
+        const playerStockEntries = [];
+
+        for (const p of data.playerStocks) {
+          const pName = String(p?.name || "").toUpperCase().trim();
+          const pNum = String(p?.number ?? "").trim();
+          const pQty = Math.max(0, parseInt(p?.stock as any) || 0);
+
+          if (pName && !seenPlayerNames.has(pName)) {
+            seenPlayerNames.add(pName);
+            playerStockEntries.push({
+              productId,
+              playerName: pName,
+              playerNumber: pNum,
+              quantity: pQty
+            });
+          }
+        }
+
+        if (playerStockEntries.length > 0) {
+          await tx.playerStock.createMany({
+            data: playerStockEntries,
+            skipDuplicates: true
+          });
+        }
       }
 
       // 3. Update the product
@@ -216,12 +258,12 @@ export async function updateProduct(
           category: data.category,
           team: data.team || null,
           tag: data.tag || null,
-          sizes: data.sizes,
-          description: data.description,
+          sizes: cleanSizes,
+          description: data.description !== undefined ? data.description : undefined,
           images: resolvedImages,
           stock: totalStock !== undefined ? totalStock : undefined,
           isWorldCup: data.isWorldCup !== undefined ? data.isWorldCup : undefined,
-          originalPrice: data.originalPrice,
+          originalPrice: data.originalPrice !== undefined ? data.originalPrice : null,
           brand: data.brand || null,
           gender: data.gender || null,
           subCategory: data.subCategory || null,
@@ -234,10 +276,17 @@ export async function updateProduct(
       return updatedProduct;
     });
 
-    return { success: true, product: { ...result, price: result.price.toString(), originalPrice: result.originalPrice ? result.originalPrice.toString() : null } };
-  } catch (error) {
+    return { 
+      success: true, 
+      product: { 
+        ...result, 
+        price: result.price ? result.price.toString() : "0", 
+        originalPrice: result.originalPrice ? result.originalPrice.toString() : null 
+      } 
+    };
+  } catch (error: any) {
     console.error("Failed to update product:", error);
-    return { success: false, error: "Failed to save product changes" };
+    return { success: false, error: error?.message || "Failed to save product changes" };
   }
 }
 
