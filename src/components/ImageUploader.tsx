@@ -8,6 +8,73 @@ interface ImageUploaderProps {
   onChange: (images: string[]) => void;
 }
 
+// Client-side helper to ensure large photos / high-res PNGs are optimized before network transmission
+async function prepareImageForUpload(file: File): Promise<Blob | File> {
+  // If file is SVG or smaller than 1.5MB, upload directly
+  if (typeof window === "undefined" || file.type === "image/svg+xml" || file.size < 1.5 * 1024 * 1024) {
+    return file;
+  }
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      img.onload = () => {
+        const MAX_DIMENSION = 1800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_DIMENSION) {
+            height = Math.round((height * MAX_DIMENSION) / width);
+            width = MAX_DIMENSION;
+          }
+        } else {
+          if (height > MAX_DIMENSION) {
+            width = Math.round((width * MAX_DIMENSION) / height);
+            height = MAX_DIMENSION;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) {
+          return resolve(file);
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const isPng = file.type === "image/png" || file.name.toLowerCase().endsWith(".png");
+        const outputMime = isPng ? "image/png" : "image/jpeg";
+        const quality = 0.85;
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob && blob.size < file.size) {
+              const newFile = new File([blob], file.name, { type: outputMime });
+              resolve(newFile);
+            } else {
+              resolve(file);
+            }
+          },
+          outputMime,
+          quality
+        );
+      };
+
+      img.onerror = () => resolve(file);
+      img.src = e.target?.result as string;
+    };
+
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function ImageUploader({ images, onChange }: ImageUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [uploadingFiles, setUploadingFiles] = useState<{ id: string; name: string }[]>([]);
@@ -59,7 +126,12 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
   };
 
   const handleFiles = async (files: FileList) => {
-    const validFiles = Array.from(files).filter(file => file.type.startsWith("image/"));
+    // Support file detection by MIME type OR file extension for PNG, JPG, WEBP, etc.
+    const imageExtensionRegex = /\.(png|jpe?g|webp|gif|svg|avif|heic|bmp)$/i;
+    const validFiles = Array.from(files).filter(
+      file => (file.type && file.type.startsWith("image/")) || imageExtensionRegex.test(file.name)
+    );
+
     if (validFiles.length === 0) return;
 
     // Add files to uploading state
@@ -72,13 +144,14 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
     let currentImages = [...images];
 
     for (let i = 0; i < validFiles.length; i++) {
-      const file = validFiles[i];
+      const originalFile = validFiles[i];
       const targetUploadingId = newUploading[i].id;
       
-      const formData = new FormData();
-      formData.append("file", file);
-
       try {
+        const fileToUpload = await prepareImageForUpload(originalFile);
+        const formData = new FormData();
+        formData.append("file", fileToUpload, originalFile.name);
+
         const res = await fetch("/api/upload", {
           method: "POST",
           body: formData,
@@ -92,11 +165,11 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
         } else {
           const errorMsg = data?.error || `Upload failed (${res.status}): ${res.statusText}`;
           console.error("Upload error:", errorMsg);
-          alert(`Failed to upload ${file.name}: ${errorMsg}`);
+          alert(`Failed to upload ${originalFile.name}: ${errorMsg}`);
         }
       } catch (err: any) {
         console.error("Error uploading file:", err);
-        alert(`Failed to upload ${file.name}: ${err?.message || "Network error"}`);
+        alert(`Failed to upload ${originalFile.name}: ${err?.message || "Network error"}`);
       } finally {
         // Remove from uploading state
         setUploadingFiles(prev => prev.filter(f => f.id !== targetUploadingId));
@@ -168,7 +241,7 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
           ref={fileInputRef}
           onChange={handleFileSelect}
           multiple
-          accept="image/*"
+          accept="image/*,.png,.jpg,.jpeg,.webp,.gif"
           className="hidden"
         />
         

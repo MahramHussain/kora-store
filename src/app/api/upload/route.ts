@@ -70,9 +70,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "No file provided" }, { status: 400 });
     }
 
-    // 2. Validate file type (image only)
-    if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ success: false, error: "Invalid file type. Only images are allowed." }, { status: 400 });
+    // 2. Validate file type (flexible check by mime type or image file extension)
+    const fileName = file.name || "image.png";
+    const isImageMime = file.type && (file.type.startsWith("image/") || file.type === "application/octet-stream");
+    const isImageExt = /\.(png|jpe?g|webp|gif|svg|avif|heic|bmp)$/i.test(fileName);
+
+    if (!isImageMime && !isImageExt) {
+      return NextResponse.json({ success: false, error: "Invalid file type. Only images (PNG, JPG, WEBP, etc.) are allowed." }, { status: 400 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
@@ -81,39 +85,47 @@ export async function POST(req: Request) {
     let outputExtension = ".webp";
     let mimeType = "image/webp";
 
-    // 3. Process image with sharp if available, with full graceful fallback
+    // 3. Process image with sharp (handles PNG, JPG, and converts to compact WebP)
     try {
       const sharpModule = await import("sharp");
       const sharpFunc = typeof sharpModule === "function" ? sharpModule : (sharpModule as any)?.default;
       if (typeof sharpFunc === "function") {
-        optimizedBuffer = await sharpFunc(rawBuffer)
-          .rotate() // Auto-orient photo using EXIF metadata
+        let pipeline = sharpFunc(rawBuffer);
+        
+        try {
+          pipeline = pipeline.rotate();
+        } catch (_) {
+          // Ignore rotate error for image types without EXIF
+        }
+
+        optimizedBuffer = await pipeline
           .resize({
-            width: 1200,
-            height: 1200,
+            width: 1400,
+            height: 1400,
             fit: "inside",
             withoutEnlargement: true
           })
-          .webp({ quality: 85 })
+          .toFormat("webp", { quality: 85, effort: 4 })
           .toBuffer();
+
         outputExtension = ".webp";
         mimeType = "image/webp";
       }
     } catch (sharpErr: any) {
       console.warn("Sharp image processing skipped, saving original buffer:", sharpErr?.message || sharpErr);
       optimizedBuffer = rawBuffer;
-      const origExt = path.extname(file.name) || ".png";
+      const origExt = path.extname(fileName) || ".png";
       outputExtension = origExt.toLowerCase();
       mimeType = file.type || "image/png";
     }
 
     // 4. Generate unique filename to avoid overwrites
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const originalExtension = path.extname(file.name) || ".png";
-    const baseName = path.basename(file.name, originalExtension).replace(/[^a-zA-Z0-9]/g, "_");
+    const originalExtension = path.extname(fileName) || ".png";
+    const baseName = path.basename(fileName, originalExtension).replace(/[^a-zA-Z0-9]/g, "_");
     const uniqueFilename = `${baseName}-${uniqueSuffix}${outputExtension}`;
 
-    // 5. Try writing file to disk (localhost / persistent server)
+    // 5. Try writing file to disk (localhost / persistent filesystem)
     let imageUrl = "";
     try {
       const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
@@ -125,7 +137,7 @@ export async function POST(req: Request) {
     } catch (fsError: any) {
       console.warn("Local upload filesystem write failed (read-only environment). Falling back to Base64 data URL:", fsError.message || fsError);
       
-      // Fallback: Convert image directly to Base64 data URL
+      // Fallback: Convert optimized image to Base64 data URL
       imageUrl = `data:${mimeType};base64,${optimizedBuffer.toString("base64")}`;
     }
 
