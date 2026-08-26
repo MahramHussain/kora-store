@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { CURRENCY, isCustomJersey } from "@/lib/constants";
-import { useAuth, useUser, SignIn, SignUp } from "@clerk/nextjs";
-import { FaLock, FaCreditCard, FaPaypal, FaMoneyBillWave, FaArrowRight, FaUserCheck, FaEnvelope } from "react-icons/fa6";
-import { FaShieldAlt, FaUser } from "react-icons/fa";
+import { useAuth, useUser, SignInButton } from "@clerk/nextjs";
+import { FaLock, FaCreditCard, FaPaypal, FaMoneyBillWave, FaEnvelope } from "react-icons/fa6";
+import { FaShieldAlt, FaUserCheck, FaSignInAlt } from "react-icons/fa";
 import dynamic from "next/dynamic";
 import { useTranslation } from "@/context/LanguageContext";
 
@@ -39,7 +39,6 @@ export default function CheckoutPage() {
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
 
   // Guest checkout state
-  const [guestMode, setGuestMode] = useState(false);
   const [guestEmail, setGuestEmail] = useState("");
 
   const hasPersonalizedItem = cart.some(
@@ -53,8 +52,7 @@ export default function CheckoutPage() {
   }, [hasPersonalizedItem, paymentMethod]);
   
   // Auth state from Clerk
-  const { isSignedIn, isLoaded } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  const { isSignedIn } = useAuth();
 
   useEffect(() => {
     if (isSignedIn) {
@@ -133,119 +131,6 @@ export default function CheckoutPage() {
   const discountAmount = subtotal * discountPercent;
   const shippingCharge = (subtotal - discountAmount) > 200 ? 0 : 25;
   const finalTotal = subtotal - discountAmount + shippingCharge;
-
-  // Render Sign-in vs Guest Choice Wall if not authenticated and guestMode is false
-  if (isLoaded && !isSignedIn && !guestMode) {
-    return (
-      <main className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-kora selection:text-white pt-28 pb-24 px-4 sm:px-6 flex items-center justify-center relative overflow-hidden text-start">
-        {/* Background radial accent */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-kora/5 rounded-full blur-[120px] pointer-events-none"></div>
-
-        <div className="max-w-xl w-full relative z-10 text-center">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-kora/10 text-kora text-xs font-black uppercase tracking-widest mb-4">
-              <FaLock className="text-xs" /> {t("secure_checkout_title")}
-            </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter uppercase font-sans">
-              {t("secure_checkout_btn")}
-            </h1>
-            <p className="text-slate-500 font-medium font-sans text-sm mt-1">
-              {t("authenticate_prompt")}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6">
-            {/* FAST GUEST CHECKOUT CARD */}
-            <div className="bg-white border-2 border-kora/30 hover:border-kora rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden text-start transition-all hover:shadow-2xl hover:shadow-kora/10">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-black uppercase tracking-wider mb-2">
-                    ⚡ {t("guest_checkout_title")}
-                  </div>
-                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                    {t("continue_as_guest")}
-                  </h2>
-                  <p className="text-slate-500 text-xs font-medium mt-1">
-                    {t("guest_checkout_subtitle")}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setGuestMode(true)}
-                  className="w-full sm:w-auto bg-kora hover:bg-purple-700 text-white font-black uppercase tracking-widest text-xs py-4 px-6 rounded-2xl flex items-center justify-center gap-3 transition-all hover:scale-[1.03] shadow-md shadow-kora/25 shrink-0"
-                >
-                  {t("continue_as_guest")} <FaArrowRight className="rtl:rotate-180" />
-                </button>
-              </div>
-            </div>
-
-            {/* DIVIDER */}
-            <div className="relative flex py-1 items-center">
-              <div className="flex-grow border-t border-slate-200"></div>
-              <span className="flex-shrink mx-4 text-slate-400 font-black text-xs uppercase tracking-widest">{t("or_divider")}</span>
-              <div className="flex-grow border-t border-slate-200"></div>
-            </div>
-
-            {/* SIGN IN / REGISTER FORM CONTAINER */}
-            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden text-start">
-              <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <FaUser className="text-kora text-sm" />
-                  <h3 className="font-black text-slate-900 uppercase text-xs tracking-wider">
-                    {isLogin ? t("sign_in") : t("register")}
-                  </h3>
-                </div>
-                <button 
-                  type="button"
-                  onClick={() => setIsLogin(!isLogin)} 
-                  className="text-xs text-kora font-bold hover:underline"
-                >
-                  {isLogin ? t("register") : t("sign_in")}
-                </button>
-              </div>
-
-              <div className="flex justify-center min-h-[360px]">
-                {isLogin ? (
-                  <SignIn fallbackRedirectUrl="/checkout" appearance={{
-                    elements: {
-                      rootBox: "w-full",
-                      card: "bg-transparent shadow-none p-0 m-0 w-full",
-                      header: "hidden", 
-                      footer: "hidden", 
-                      formButtonPrimary: "bg-slate-900 hover:bg-kora text-white font-black uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md shadow-kora/15",
-                      formFieldInput: "bg-white border border-slate-200 text-slate-900 py-3 rounded-xl focus:border-kora focus:ring-1 focus:ring-kora",
-                      formFieldLabel: "text-slate-500 font-bold text-xs uppercase tracking-wider",
-                      dividerText: "text-slate-400 font-bold uppercase tracking-wider",
-                      socialButtonsBlockButton: "border border-slate-200 text-slate-700 hover:bg-slate-50 py-3 rounded-xl font-bold transition-all shadow-sm",
-                      socialButtonsBlockButtonText: "font-bold",
-                      identityPreviewText: "text-kora",
-                      identityPreviewEditButton: "text-slate-400 hover:text-slate-950"
-                    }
-                  }} />
-                ) : (
-                  <SignUp fallbackRedirectUrl="/checkout" appearance={{
-                    elements: {
-                      rootBox: "w-full",
-                      card: "bg-transparent shadow-none p-0 m-0 w-full",
-                      header: "hidden",
-                      footer: "hidden",
-                      formButtonPrimary: "bg-slate-900 hover:bg-kora text-white font-black uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md shadow-kora/15",
-                      formFieldInput: "bg-white border border-slate-200 text-slate-900 py-3 rounded-xl focus:border-kora focus:ring-1 focus:ring-kora",
-                      formFieldLabel: "text-slate-500 font-bold text-xs uppercase tracking-wider",
-                      dividerText: "text-slate-400 font-bold uppercase tracking-wider",
-                      socialButtonsBlockButton: "border border-slate-200 text-slate-700 hover:bg-slate-50 py-3 rounded-xl font-bold transition-all shadow-sm",
-                      socialButtonsBlockButtonText: "font-bold",
-                    }
-                  }} />
-                )}
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </main>
-    );
-  }
 
   // Redirect to cart if empty
   if (cartCount === 0 && !isProcessing) {
@@ -377,25 +262,29 @@ export default function CheckoutPage() {
     <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-20 pb-16 px-4 sm:px-6 md:pt-24 md:pb-24 text-start">
       <div className="max-w-6xl mx-auto">
         
-        {/* Header with Guest Mode indicator */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 border-b border-slate-200 pb-6 text-start">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-slate-200 pb-6 text-start">
           <div className="flex items-center gap-3">
             <FaLock className="text-2xl text-kora" />
             <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase">{t("secure_checkout_btn")}</h1>
           </div>
 
-          {!isSignedIn && (
-            <div className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-4 py-2 rounded-full text-xs font-bold text-slate-700 transition-colors">
+          {/* Account Status / Sign In prompt */}
+          {isSignedIn ? (
+            <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-full text-xs font-bold text-emerald-800">
+              <FaUserCheck className="text-emerald-600" />
+              <span className="truncate max-w-[200px]">{userEmail}</span>
+            </div>
+          ) : (
+            <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-2 rounded-full text-xs font-bold text-slate-700 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>{t("checking_out_as_guest")}</span>
               <span className="text-slate-300">•</span>
-              <button
-                type="button"
-                onClick={() => setGuestMode(false)}
-                className="text-kora hover:underline font-extrabold"
-              >
-                {t("sign_in_save_account")}
-              </button>
+              <SignInButton mode="modal">
+                <button type="button" className="text-kora hover:text-purple-700 font-black uppercase tracking-wider underline flex items-center gap-1">
+                  <FaSignInAlt className="text-[10px]" /> {t("sign_in")}
+                </button>
+              </SignInButton>
             </div>
           )}
         </div>
