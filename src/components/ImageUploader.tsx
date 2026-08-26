@@ -69,7 +69,7 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
     }));
     setUploadingFiles(prev => [...prev, ...newUploading]);
 
-    const uploadedUrls: string[] = [];
+    let currentImages = [...images];
 
     for (let i = 0; i < validFiles.length; i++) {
       const file = validFiles[i];
@@ -84,24 +84,27 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
           body: formData,
         });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.url) {
-            uploadedUrls.push(data.url);
-          }
+        const data = await res.json().catch(() => null);
+
+        if (res.ok && data?.success && data?.url) {
+          currentImages = [...currentImages, data.url];
+          onChange(currentImages);
         } else {
-          console.error("Upload failed for file:", file.name);
+          const errorMsg = data?.error || `Upload failed (${res.status}): ${res.statusText}`;
+          console.error("Upload error:", errorMsg);
+          alert(`Failed to upload ${file.name}: ${errorMsg}`);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error uploading file:", err);
+        alert(`Failed to upload ${file.name}: ${err?.message || "Network error"}`);
       } finally {
         // Remove from uploading state
         setUploadingFiles(prev => prev.filter(f => f.id !== targetUploadingId));
       }
     }
 
-    if (uploadedUrls.length > 0) {
-      onChange([...images, ...uploadedUrls]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -139,10 +142,10 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
 
   // Helper to resolve local image display paths
   const getDisplayUrl = (url: string) => {
+    if (!url) return "";
     if (url.startsWith("http") || url.startsWith("/") || url.startsWith("data:")) {
       return url;
     }
-    // Fallback if it's just a filename
     return `/uploads/products/${url}`;
   };
 

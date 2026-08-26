@@ -1,22 +1,65 @@
 import { NextResponse } from "next/server";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser, clerkClient } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
 import fs from "fs";
 import path from "path";
-import sharp from "sharp";
+
+async function checkIsAdmin(): Promise<boolean> {
+  if (process.env.NODE_ENV === "development") {
+    return true;
+  }
+
+  let emails: string[] = [];
+
+  // Method 1: currentUser
+  try {
+    const user = await currentUser();
+    if (user?.emailAddresses) {
+      emails = user.emailAddresses.map(e => e.emailAddress?.toLowerCase()).filter(Boolean);
+    }
+  } catch (e) {
+    console.warn("currentUser check failed in upload:", e);
+  }
+
+  // Method 2: clerkClient via auth() userId
+  if (emails.length === 0) {
+    try {
+      const { userId } = await auth();
+      if (userId) {
+        const client = await clerkClient();
+        const user = await client.users.getUser(userId);
+        if (user?.emailAddresses) {
+          emails = user.emailAddresses.map(e => e.emailAddress?.toLowerCase()).filter(Boolean);
+        }
+      }
+    } catch (e) {
+      console.warn("clerkClient check failed in upload:", e);
+    }
+  }
+
+  // Method 3: Prisma DB lookup via auth() userId
+  if (emails.length === 0) {
+    try {
+      const { userId } = await auth();
+      if (userId) {
+        const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+        if (dbUser?.email) {
+          emails.push(dbUser.email.toLowerCase());
+        }
+      }
+    } catch (e) {
+      console.warn("prisma user check failed in upload:", e);
+    }
+  }
+
+  const authorizedEmails = ["mahramh40@gmail.com", "korastore.ae@gmail.com"];
+  return emails.some(email => authorizedEmails.includes(email));
+}
 
 export async function POST(req: Request) {
   try {
-    // 1. Verify user is the admin (case-insensitive check)
-    let isAuthorized = false;
-    if (process.env.NODE_ENV === "development") {
-      isAuthorized = true;
-    } else {
-      const user = await currentUser();
-      const emails = user?.emailAddresses?.map(e => e.emailAddress?.toLowerCase()).filter(Boolean) || [];
-      if (emails.includes("mahramh40@gmail.com") || emails.includes("korastore.ae@gmail.com")) {
-        isAuthorized = true;
-      }
-    }
+    // 1. Verify user is the admin
+    const isAuthorized = await checkIsAdmin();
     if (!isAuthorized) {
       return NextResponse.json({ success: false, error: "Forbidden: Unauthorized access" }, { status: 403 });
     }
@@ -32,40 +75,45 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Invalid file type. Only images are allowed." }, { status: 400 });
     }
 
-    // 3. Resolve sharp function correctly to handle ESM/CJS default export wrapping
-    const sharpFunc = typeof sharp === "function" ? sharp : (sharp as any).default;
-    if (typeof sharpFunc !== "function") {
-      throw new Error("Failed to load sharp builder function: sharp is not a function.");
-    }
-
-    // 4. Process image with sharp (auto-orient EXIF metadata for 4:3 camera photos & convert to WebP)
     const arrayBuffer = await file.arrayBuffer();
     const rawBuffer = Buffer.from(arrayBuffer);
-    let optimizedBuffer: Buffer;
+    let optimizedBuffer: Buffer = rawBuffer;
+    let outputExtension = ".webp";
+    let mimeType = "image/webp";
 
+    // 3. Process image with sharp if available, with full graceful fallback
     try {
-      optimizedBuffer = await sharpFunc(rawBuffer)
-        .rotate() // Auto-orient photo using EXIF orientation tags (critical for 4:3 / camera shots)
-        .resize({
-          width: 1000,
-          height: 1000,
-          fit: "inside",
-          withoutEnlargement: true
-        })
-        .webp({ quality: 80 })
-        .toBuffer();
+      const sharpModule = await import("sharp");
+      const sharpFunc = typeof sharpModule === "function" ? sharpModule : (sharpModule as any)?.default;
+      if (typeof sharpFunc === "function") {
+        optimizedBuffer = await sharpFunc(rawBuffer)
+          .rotate() // Auto-orient photo using EXIF metadata
+          .resize({
+            width: 1200,
+            height: 1200,
+            fit: "inside",
+            withoutEnlargement: true
+          })
+          .webp({ quality: 85 })
+          .toBuffer();
+        outputExtension = ".webp";
+        mimeType = "image/webp";
+      }
     } catch (sharpErr: any) {
-      console.warn("Sharp image processing skipped, preserving original raw buffer for 4:3 file:", sharpErr?.message || sharpErr);
+      console.warn("Sharp image processing skipped, saving original buffer:", sharpErr?.message || sharpErr);
       optimizedBuffer = rawBuffer;
+      const origExt = path.extname(file.name) || ".png";
+      outputExtension = origExt.toLowerCase();
+      mimeType = file.type || "image/png";
     }
 
-    // 5. Generate unique filename to avoid overwrites (forcing webp extension)
+    // 4. Generate unique filename to avoid overwrites
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     const originalExtension = path.extname(file.name) || ".png";
     const baseName = path.basename(file.name, originalExtension).replace(/[^a-zA-Z0-9]/g, "_");
-    const uniqueFilename = `${baseName}-${uniqueSuffix}.webp`;
+    const uniqueFilename = `${baseName}-${uniqueSuffix}${outputExtension}`;
 
-    // 6. Try to write optimized file to disk (works on writeable filesystems like localhost)
+    // 5. Try writing file to disk (localhost / persistent server)
     let imageUrl = "";
     try {
       const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
@@ -75,13 +123,12 @@ export async function POST(req: Request) {
       await fs.promises.writeFile(filePath, optimizedBuffer);
       imageUrl = `/uploads/products/${uniqueFilename}`;
     } catch (fsError: any) {
-      console.warn("Local upload filesystem write failed (likely read-only on Vercel). Falling back to Base64 storage:", fsError.message || fsError);
+      console.warn("Local upload filesystem write failed (read-only environment). Falling back to Base64 data URL:", fsError.message || fsError);
       
-      // Fallback: Convert optimized WebP image directly to Base64 data URL
-      imageUrl = `data:image/webp;base64,${optimizedBuffer.toString("base64")}`;
+      // Fallback: Convert image directly to Base64 data URL
+      imageUrl = `data:${mimeType};base64,${optimizedBuffer.toString("base64")}`;
     }
 
-    // 8. Return URL (either local path or Base64 data URL)
     return NextResponse.json({ success: true, url: imageUrl, filename: uniqueFilename });
 
   } catch (error: any) {
@@ -89,4 +136,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, error: `Failed to upload image: ${error.message || error}` }, { status: 500 });
   }
 }
-
