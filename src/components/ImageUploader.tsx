@@ -2,77 +2,11 @@
 
 import { useState, useRef } from "react";
 import { FiUploadCloud, FiTrash2, FiLoader, FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { prepareImageForUpload } from "@/lib/image-client";
 
 interface ImageUploaderProps {
   images: string[];
   onChange: (images: string[]) => void;
-}
-
-// Client-side helper to ensure large photos / high-res PNGs are optimized before network transmission
-async function prepareImageForUpload(file: File): Promise<Blob | File> {
-  // If file is SVG or smaller than 1.5MB, upload directly
-  if (typeof window === "undefined" || file.type === "image/svg+xml" || file.size < 1.5 * 1024 * 1024) {
-    return file;
-  }
-
-  return new Promise((resolve) => {
-    const img = new Image();
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      img.onload = () => {
-        const MAX_DIMENSION = 1800;
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > MAX_DIMENSION) {
-            height = Math.round((height * MAX_DIMENSION) / width);
-            width = MAX_DIMENSION;
-          }
-        } else {
-          if (height > MAX_DIMENSION) {
-            width = Math.round((width * MAX_DIMENSION) / height);
-            height = MAX_DIMENSION;
-          }
-        }
-
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-
-        if (!ctx) {
-          return resolve(file);
-        }
-
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const isPng = file.type === "image/png" || file.name.toLowerCase().endsWith(".png");
-        const outputMime = isPng ? "image/png" : "image/jpeg";
-        const quality = 0.85;
-
-        canvas.toBlob(
-          (blob) => {
-            if (blob && blob.size < file.size) {
-              const newFile = new File([blob], file.name, { type: outputMime });
-              resolve(newFile);
-            } else {
-              resolve(file);
-            }
-          },
-          outputMime,
-          quality
-        );
-      };
-
-      img.onerror = () => resolve(file);
-      img.src = e.target?.result as string;
-    };
-
-    reader.onerror = () => resolve(file);
-    reader.readAsDataURL(file);
-  });
 }
 
 export default function ImageUploader({ images, onChange }: ImageUploaderProps) {
@@ -148,9 +82,10 @@ export default function ImageUploader({ images, onChange }: ImageUploaderProps) 
       const targetUploadingId = newUploading[i].id;
       
       try {
+        // Compress PNG / large image to lightweight WebP client-side
         const fileToUpload = await prepareImageForUpload(originalFile);
         const formData = new FormData();
-        formData.append("file", fileToUpload, originalFile.name);
+        formData.append("file", fileToUpload, fileToUpload.name);
 
         const res = await fetch("/api/upload", {
           method: "POST",

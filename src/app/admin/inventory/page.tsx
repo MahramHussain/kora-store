@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { CURRENCY, PRESET_PLAYERS } from "@/lib/constants";
 import { getProducts, deleteProduct, updateProduct } from "../actions";
 import ImageUploader from "@/components/ImageUploader";
+import { prepareImageForUpload } from "@/lib/image-client";
 
 const getPresetPlayersForProduct = (productName: string) => {
   const normalized = productName.toUpperCase().replace(/\s+KIT.*$/i, "").trim();
@@ -941,9 +942,10 @@ export default function AdminInventoryPage() {
                                     onChange={async (e) => {
                                       const file = e.target.files?.[0];
                                       if (!file) return;
-                                      const formData = new FormData();
-                                      formData.append("file", file);
                                       try {
+                                        const fileToUpload = await prepareImageForUpload(file);
+                                        const formData = new FormData();
+                                        formData.append("file", fileToUpload, fileToUpload.name);
                                         const res = await fetch("/api/upload", { method: "POST", body: formData });
                                         const data = await res.json();
                                         if (data.success && data.url) {
