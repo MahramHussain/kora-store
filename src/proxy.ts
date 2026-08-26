@@ -3,9 +3,7 @@ import { NextResponse } from "next/server";
 
 const isAdminRoute = createRouteMatcher(['/admin(.*)']);
 const isProtectedRoute = createRouteMatcher([
-  '/account(.*)',
-  '/checkout(.*)',
-  '/success(.*)'
+  '/account(.*)'
 ]);
 
 export function proxy(req: any, event: any) {

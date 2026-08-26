@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 import { CURRENCY, isCustomJersey } from "@/lib/constants";
 import { useAuth, useUser, SignIn, SignUp } from "@clerk/nextjs";
-import { FaLock, FaCreditCard, FaPaypal, FaMoneyBillWave } from "react-icons/fa6";
-import { FaShieldAlt } from "react-icons/fa";
+import { FaLock, FaCreditCard, FaPaypal, FaMoneyBillWave, FaArrowRight, FaUserCheck, FaEnvelope } from "react-icons/fa6";
+import { FaShieldAlt, FaUser } from "react-icons/fa";
 import dynamic from "next/dynamic";
 import { useTranslation } from "@/context/LanguageContext";
 
@@ -37,6 +37,10 @@ export default function CheckoutPage() {
   const [bypassPayment, setBypassPayment] = useState(false);
   const [globalSellerNote, setGlobalSellerNote] = useState("");
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
+
+  // Guest checkout state
+  const [guestMode, setGuestMode] = useState(false);
+  const [guestEmail, setGuestEmail] = useState("");
 
   const hasPersonalizedItem = cart.some(
     (item) => isCustomJersey(item)
@@ -130,69 +134,112 @@ export default function CheckoutPage() {
   const shippingCharge = (subtotal - discountAmount) > 200 ? 0 : 25;
   const finalTotal = subtotal - discountAmount + shippingCharge;
 
-  // Render Sign-in Wall if not authenticated
-  if (isLoaded && !isSignedIn) {
+  // Render Sign-in vs Guest Choice Wall if not authenticated and guestMode is false
+  if (isLoaded && !isSignedIn && !guestMode) {
     return (
-      <main className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-kora selection:text-white pt-32 pb-24 px-6 flex items-center justify-center relative overflow-hidden text-start">
+      <main className="min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-kora selection:text-white pt-28 pb-24 px-4 sm:px-6 flex items-center justify-center relative overflow-hidden text-start">
         {/* Background radial accent */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-kora/5 rounded-full blur-[120px] pointer-events-none"></div>
 
-        <div className="max-w-md w-full relative z-10 text-center">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-black text-slate-900 tracking-tighter mb-2 uppercase font-sans">
+        <div className="max-w-xl w-full relative z-10 text-center">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-kora/10 text-kora text-xs font-black uppercase tracking-widest mb-4">
+              <FaLock className="text-xs" /> {t("secure_checkout_title")}
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter uppercase font-sans">
               {t("secure_checkout_btn")}
             </h1>
-            <p className="text-slate-500 font-medium font-sans">
-              {isLogin ? t("authenticate_prompt") : t("create_account_shop")}
+            <p className="text-slate-500 font-medium font-sans text-sm mt-1">
+              {t("authenticate_prompt")}
             </p>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl relative overflow-hidden flex justify-center min-h-[400px]">
-            {isLogin ? (
-              <SignIn fallbackRedirectUrl="/checkout" appearance={{
-                elements: {
-                  rootBox: "w-full",
-                  card: "bg-transparent shadow-none p-0 m-0",
-                  header: "hidden", 
-                  footer: "hidden", 
-                  formButtonPrimary: "bg-kora hover:bg-purple-700 text-white font-black uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md shadow-kora/15",
-                  formFieldInput: "bg-white border border-slate-200 text-slate-900 py-3 rounded-xl focus:border-kora focus:ring-1 focus:ring-kora",
-                  formFieldLabel: "text-slate-500 font-bold",
-                  dividerText: "text-slate-400 font-bold uppercase tracking-wider",
-                  socialButtonsBlockButton: "border border-slate-200 text-slate-700 hover:bg-slate-50 py-3 rounded-xl font-bold transition-all shadow-sm",
-                  socialButtonsBlockButtonText: "font-bold",
-                  identityPreviewText: "text-kora",
-                  identityPreviewEditButton: "text-slate-400 hover:text-slate-950"
-                }
-              }} />
-            ) : (
-              <SignUp fallbackRedirectUrl="/checkout" appearance={{
-                elements: {
-                  rootBox: "w-full",
-                  card: "bg-transparent shadow-none p-0 m-0",
-                  header: "hidden",
-                  footer: "hidden",
-                  formButtonPrimary: "bg-kora hover:bg-purple-700 text-white font-black uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md shadow-kora/15",
-                  formFieldInput: "bg-white border border-slate-200 text-slate-900 py-3 rounded-xl focus:border-kora focus:ring-1 focus:ring-kora",
-                  formFieldLabel: "text-slate-500 font-bold",
-                  dividerText: "text-slate-400 font-bold uppercase tracking-wider",
-                  socialButtonsBlockButton: "border border-slate-200 text-slate-700 hover:bg-slate-50 py-3 rounded-xl font-bold transition-all shadow-sm",
-                  socialButtonsBlockButtonText: "font-bold",
-                }
-              }} />
-            )}
-          </div>
+          <div className="grid grid-cols-1 gap-6">
+            {/* FAST GUEST CHECKOUT CARD */}
+            <div className="bg-white border-2 border-kora/30 hover:border-kora rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden text-start transition-all hover:shadow-2xl hover:shadow-kora/10">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-black uppercase tracking-wider mb-2">
+                    ⚡ {t("guest_checkout_title")}
+                  </div>
+                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
+                    {t("continue_as_guest")}
+                  </h2>
+                  <p className="text-slate-500 text-xs font-medium mt-1">
+                    {t("guest_checkout_subtitle")}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setGuestMode(true)}
+                  className="w-full sm:w-auto bg-kora hover:bg-purple-700 text-white font-black uppercase tracking-widest text-xs py-4 px-6 rounded-2xl flex items-center justify-center gap-3 transition-all hover:scale-[1.03] shadow-md shadow-kora/25 shrink-0"
+                >
+                  {t("continue_as_guest")} <FaArrowRight className="rtl:rotate-180" />
+                </button>
+              </div>
+            </div>
 
-          <div className="text-center mt-8 relative z-10 font-sans">
-            <p className="text-slate-500 font-semibold">
-              {isLogin ? t("need_account") : t("already_secured_spot")}
-              <button 
-                onClick={() => setIsLogin(!isLogin)} 
-                className="ml-2 text-slate-800 font-bold hover:text-kora transition-colors underline underline-offset-4"
-              >
-                {isLogin ? t("register") : t("sign_in")}
-              </button>
-            </p>
+            {/* DIVIDER */}
+            <div className="relative flex py-1 items-center">
+              <div className="flex-grow border-t border-slate-200"></div>
+              <span className="flex-shrink mx-4 text-slate-400 font-black text-xs uppercase tracking-widest">{t("or_divider")}</span>
+              <div className="flex-grow border-t border-slate-200"></div>
+            </div>
+
+            {/* SIGN IN / REGISTER FORM CONTAINER */}
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden text-start">
+              <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <FaUser className="text-kora text-sm" />
+                  <h3 className="font-black text-slate-900 uppercase text-xs tracking-wider">
+                    {isLogin ? t("sign_in") : t("register")}
+                  </h3>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => setIsLogin(!isLogin)} 
+                  className="text-xs text-kora font-bold hover:underline"
+                >
+                  {isLogin ? t("register") : t("sign_in")}
+                </button>
+              </div>
+
+              <div className="flex justify-center min-h-[360px]">
+                {isLogin ? (
+                  <SignIn fallbackRedirectUrl="/checkout" appearance={{
+                    elements: {
+                      rootBox: "w-full",
+                      card: "bg-transparent shadow-none p-0 m-0 w-full",
+                      header: "hidden", 
+                      footer: "hidden", 
+                      formButtonPrimary: "bg-slate-900 hover:bg-kora text-white font-black uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md shadow-kora/15",
+                      formFieldInput: "bg-white border border-slate-200 text-slate-900 py-3 rounded-xl focus:border-kora focus:ring-1 focus:ring-kora",
+                      formFieldLabel: "text-slate-500 font-bold text-xs uppercase tracking-wider",
+                      dividerText: "text-slate-400 font-bold uppercase tracking-wider",
+                      socialButtonsBlockButton: "border border-slate-200 text-slate-700 hover:bg-slate-50 py-3 rounded-xl font-bold transition-all shadow-sm",
+                      socialButtonsBlockButtonText: "font-bold",
+                      identityPreviewText: "text-kora",
+                      identityPreviewEditButton: "text-slate-400 hover:text-slate-950"
+                    }
+                  }} />
+                ) : (
+                  <SignUp fallbackRedirectUrl="/checkout" appearance={{
+                    elements: {
+                      rootBox: "w-full",
+                      card: "bg-transparent shadow-none p-0 m-0 w-full",
+                      header: "hidden",
+                      footer: "hidden",
+                      formButtonPrimary: "bg-slate-900 hover:bg-kora text-white font-black uppercase tracking-widest py-3.5 rounded-xl transition-all shadow-md shadow-kora/15",
+                      formFieldInput: "bg-white border border-slate-200 text-slate-900 py-3 rounded-xl focus:border-kora focus:ring-1 focus:ring-kora",
+                      formFieldLabel: "text-slate-500 font-bold text-xs uppercase tracking-wider",
+                      dividerText: "text-slate-400 font-bold uppercase tracking-wider",
+                      socialButtonsBlockButton: "border border-slate-200 text-slate-700 hover:bg-slate-50 py-3 rounded-xl font-bold transition-all shadow-sm",
+                      socialButtonsBlockButtonText: "font-bold",
+                    }
+                  }} />
+                )}
+              </div>
+            </div>
           </div>
 
         </div>
@@ -215,6 +262,19 @@ export default function CheckoutPage() {
     
     setIsProcessing(true);
     setError("");
+
+    // 0. Validate Guest Email if not signed in
+    if (!isSignedIn) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!guestEmail.trim() || !emailRegex.test(guestEmail.trim())) {
+        setError(t("guest_email_validation_error") || "Please enter a valid email address.");
+        setIsProcessing(false);
+        if (typeof window !== "undefined") {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        return;
+      }
+    }
 
     // 1. Validate First Name and Last Name (Only letters, spaces, hyphens, and apostrophes)
     const nameRegex = /^[a-zA-Z\s'-]+$/;
@@ -266,6 +326,7 @@ export default function CheckoutPage() {
           items: cart,
           cartTotal: finalTotal,
           shippingDetails: {
+            email: isSignedIn ? userEmail : guestEmail.trim(),
             firstName: shippingFirstName.trim(),
             lastName: shippingLastName.trim(),
             streetAddress: shippingStreetAddress.trim(),
@@ -316,10 +377,27 @@ export default function CheckoutPage() {
     <main className="min-h-screen bg-white text-slate-900 font-sans selection:bg-kora selection:text-white pt-20 pb-16 px-4 sm:px-6 md:pt-24 md:pb-24 text-start">
       <div className="max-w-6xl mx-auto">
         
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-10 border-b border-slate-200 pb-6 text-start">
-          <FaLock className="text-2xl text-kora" />
-          <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase">{t("secure_checkout_btn")}</h1>
+        {/* Header with Guest Mode indicator */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10 border-b border-slate-200 pb-6 text-start">
+          <div className="flex items-center gap-3">
+            <FaLock className="text-2xl text-kora" />
+            <h1 className="text-3xl md:text-4xl font-black tracking-tighter uppercase">{t("secure_checkout_btn")}</h1>
+          </div>
+
+          {!isSignedIn && (
+            <div className="inline-flex items-center gap-2 bg-slate-100 hover:bg-slate-200 border border-slate-200 px-4 py-2 rounded-full text-xs font-bold text-slate-700 transition-colors">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>{t("checking_out_as_guest")}</span>
+              <span className="text-slate-300">•</span>
+              <button
+                type="button"
+                onClick={() => setGuestMode(false)}
+                className="text-kora hover:underline font-extrabold"
+              >
+                {t("sign_in_save_account")}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Error Banner */}
@@ -351,7 +429,7 @@ export default function CheckoutPage() {
                 />
               </div>
 
-              {/* 1. Payment Method (Moved to Top) */}
+              {/* 1. Payment Method */}
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm text-start">
                 <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider">{t("payment_method_title")}</h2>
                 
@@ -455,10 +533,31 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {/* 2. Shipping Information (Moved to Bottom) */}
+              {/* 2. Contact & Shipping Information */}
               <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm text-start">
                 <h2 className="text-xl font-bold text-slate-900 mb-6 uppercase tracking-wider">{t("shipping_location_details")}</h2>
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Guest Email Field */}
+                  {!isSignedIn && (
+                    <div className="md:col-span-2 mb-2 p-4 bg-purple-50/50 border border-purple-100 rounded-2xl">
+                      <label className="block text-slate-700 text-xs font-black uppercase tracking-wider mb-1.5 flex items-center gap-2">
+                        <FaEnvelope className="text-kora text-xs" /> {t("guest_email_label")} <span className="text-rose-500">*</span>
+                      </label>
+                      <input 
+                        type="email" 
+                        required 
+                        value={guestEmail}
+                        onChange={(e) => setGuestEmail(e.target.value)}
+                        className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-kora focus:ring-1 focus:ring-kora transition-colors shadow-sm" 
+                        placeholder={t("guest_email_placeholder")} 
+                      />
+                      <p className="text-[11px] text-slate-500 font-medium mt-1.5">
+                        {t("guest_email_desc")}
+                      </p>
+                    </div>
+                  )}
+
                   <div>
                     <label className="block text-slate-500 text-xs font-bold uppercase tracking-wider mb-2">{t("first_name")}</label>
                     <input 

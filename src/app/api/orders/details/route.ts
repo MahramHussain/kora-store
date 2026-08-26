@@ -11,9 +11,6 @@ export async function GET(req: NextRequest) {
     }
 
     const { userId } = await auth();
-    if (!userId) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
 
     const order = await prisma.order.findUnique({
       where: { referenceNumber: ref },
@@ -31,17 +28,26 @@ export async function GET(req: NextRequest) {
       return new NextResponse("Order not found", { status: 404 });
     }
 
-    // Verify ownership or admin status
-    let isAdmin = false;
+    // Verify ownership or guest access or admin status
+    let isAllowed = false;
+
     if (process.env.NODE_ENV === "development") {
-      isAdmin = true;
+      isAllowed = true;
+    } else if (order.userId.startsWith("guest_")) {
+      // Allow guest order receipt display by unguessable reference number
+      isAllowed = true;
+    } else if (userId && order.userId === userId) {
+      isAllowed = true;
     } else {
       const clerkUser = await currentUser();
       const email = clerkUser?.emailAddresses[0]?.emailAddress?.toLowerCase();
-      isAdmin = email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com";
+      const isAdmin = email === "mahramh40@gmail.com" || email === "korastore.ae@gmail.com";
+      if (isAdmin) {
+        isAllowed = true;
+      }
     }
 
-    if (order.userId !== userId && !isAdmin) {
+    if (!isAllowed) {
       return new NextResponse("Unauthorized", { status: 403 });
     }
 

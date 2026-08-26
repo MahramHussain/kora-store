@@ -8,22 +8,9 @@ import { getPromoDiscount } from "@/lib/promo";
 
 export async function POST(req: Request) {
   try {
-    // 1. Authenticate user
+    // 1. Authenticate user or handle Guest checkout
     const { userId } = await auth();
     const clerkUser = await currentUser();
-
-    if (!userId || !clerkUser) {
-      return new NextResponse("Unauthorized. Please log in.", { status: 401 });
-    }
-
-    const dbUser = await prisma.user.findUnique({ where: { id: userId } });
-    if (dbUser) {
-      const isBanned = dbUser.isBanned || (dbUser.bannedUntil && new Date() < new Date(dbUser.bannedUntil));
-      const isShadowBanned = dbUser.isShadowBanned && (!dbUser.shadowBanExpiresAt || new Date() < new Date(dbUser.shadowBanExpiresAt));
-      if (isBanned || isShadowBanned) {
-        return new NextResponse("Forbidden: Your account is restricted. Checkout blocked.", { status: 403 });
-      }
-    }
 
     // 2. Parse checkout data from request body
     const body = await req.json();
@@ -64,41 +51,97 @@ export async function POST(req: Request) {
       return new NextResponse("Please enter a valid UAE phone number.", { status: 400 });
     }
 
+    // C. Determine User Account and Order Email
+    let orderUserId = "";
+    let targetEmail = "";
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (userId && clerkUser) {
+      // Authenticated Clerk User
+      const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+      if (dbUser) {
+        const isBanned = dbUser.isBanned || (dbUser.bannedUntil && new Date() < new Date(dbUser.bannedUntil));
+        const isShadowBanned = dbUser.isShadowBanned && (!dbUser.shadowBanExpiresAt || new Date() < new Date(dbUser.shadowBanExpiresAt));
+        if (isBanned || isShadowBanned) {
+          return new NextResponse("Forbidden: Your account is restricted. Checkout blocked.", { status: 403 });
+        }
+      }
+
+      targetEmail = clerkUser.emailAddresses[0].emailAddress.toLowerCase().trim();
+
+      // Check if user already exists by email (with different ID)
+      const existingUser = await prisma.user.findUnique({
+        where: { email: targetEmail }
+      });
+
+      if (existingUser && existingUser.id !== userId) {
+        // Clean up or transition old duplicate placeholder
+        await prisma.$transaction([
+          prisma.cartItem.deleteMany({ where: { userId: existingUser.id } }),
+          prisma.review.deleteMany({ where: { userId: existingUser.id } }),
+          prisma.orderItem.deleteMany({ where: { order: { userId: existingUser.id } } }),
+          prisma.order.deleteMany({ where: { userId: existingUser.id } }),
+          prisma.user.delete({ where: { id: existingUser.id } })
+        ]);
+      }
+
+      // Ensure Clerk user is registered locally in DB
+      await prisma.user.upsert({
+        where: { id: userId },
+        update: {},
+        create: {
+          id: userId,
+          email: targetEmail,
+          firstName: clerkUser.firstName || shippingDetails.firstName.trim() || "Kora",
+          lastName: clerkUser.lastName || shippingDetails.lastName.trim() || "Shopper",
+          phone: cleanPhone
+        }
+      });
+
+      orderUserId = userId;
+    } else {
+      // Guest Checkout Flow
+      const guestEmail = (shippingDetails.email || body.email || "").toLowerCase().trim();
+      if (!guestEmail || !emailRegex.test(guestEmail)) {
+        return new NextResponse("Please enter a valid email address for guest checkout.", { status: 400 });
+      }
+
+      targetEmail = guestEmail;
+
+      // Check if user record already exists for this email
+      const existingUser = await prisma.user.findUnique({
+        where: { email: targetEmail }
+      });
+
+      if (existingUser) {
+        const isBanned = existingUser.isBanned || (existingUser.bannedUntil && new Date() < new Date(existingUser.bannedUntil));
+        const isShadowBanned = existingUser.isShadowBanned && (!existingUser.shadowBanExpiresAt || new Date() < new Date(existingUser.shadowBanExpiresAt));
+        if (isBanned || isShadowBanned) {
+          return new NextResponse("Forbidden: Your account is restricted. Checkout blocked.", { status: 403 });
+        }
+        orderUserId = existingUser.id;
+      } else {
+        // Create new guest user record
+        const guestId = `guest_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+        const newGuestUser = await prisma.user.create({
+          data: {
+            id: guestId,
+            email: targetEmail,
+            firstName: shippingDetails.firstName.trim() || "Guest",
+            lastName: shippingDetails.lastName.trim() || "Shopper",
+            phone: cleanPhone
+          }
+        });
+        orderUserId = newGuestUser.id;
+      }
+    }
+
     // Validate that custom-named items do not use COD
     const hasCustomPrint = items.some((item: any) => isCustomJersey(item));
     if (hasCustomPrint && paymentMethod === "cod") {
       return new NextResponse("Cash on Delivery is unavailable for custom-named shirts. Please pay by Card.", { status: 400 });
     }
-
-    const userEmail = clerkUser.emailAddresses[0].emailAddress;
-
-    // Check if user already exists by email (with different ID)
-    const existingUser = await prisma.user.findUnique({
-      where: { email: userEmail }
-    });
-
-    if (existingUser && existingUser.id !== userId) {
-      // Clean up old relations for this email (since the user is transitioning Clerk instances)
-      await prisma.$transaction([
-        prisma.cartItem.deleteMany({ where: { userId: existingUser.id } }),
-        prisma.review.deleteMany({ where: { userId: existingUser.id } }),
-        prisma.orderItem.deleteMany({ where: { order: { userId: existingUser.id } } }),
-        prisma.order.deleteMany({ where: { userId: existingUser.id } }),
-        prisma.user.delete({ where: { id: existingUser.id } })
-      ]);
-    }
-
-    // Ensure Clerk user is registered locally in DB
-    await prisma.user.upsert({
-      where: { id: userId },
-      update: {},
-      create: {
-        id: userId,
-        email: userEmail,
-        firstName: clerkUser.firstName || "Kora",
-        lastName: clerkUser.lastName || "Shopper",
-      }
-    });
 
     // Calculate and validate amounts on the backend
     const calculatedSubtotal = items.reduce((acc: number, item: any) => {
@@ -154,7 +197,7 @@ export async function POST(req: Request) {
             }
           });
         } else {
-          // Fallback to old global stock check
+          // Fallback to global stock check
           if (dbProduct.stock < item.quantity) {
             throw new Error(`Insufficient stock for product ${dbProduct.name}`);
           }
@@ -210,14 +253,13 @@ export async function POST(req: Request) {
       }
 
       if (!isUnique) {
-        // Fallback to timestamp prefix if randomly generating fails
         referenceNumber = `KORA-${Date.now().toString().slice(-4)}`;
       }
 
       // D. Create the Order
       const newOrder = await tx.order.create({
         data: {
-          userId: userId,
+          userId: orderUserId,
           total: new Prisma.Decimal(computedTotal),
           status: paymentMethod === "card" ? "Pending" : "Processing",
           shippingStreet: shippingDetails.streetAddress,
@@ -250,8 +292,8 @@ export async function POST(req: Request) {
         },
       });
 
-      // E. Clear Database Synced Cart Items (Only if NOT card payment!)
-      if (paymentMethod !== "card") {
+      // E. Clear Database Synced Cart Items (Only if logged in user and NOT card payment)
+      if (userId && paymentMethod !== "card") {
         await tx.cartItem.deleteMany({
           where: { userId }
         });
@@ -264,7 +306,7 @@ export async function POST(req: Request) {
     if (paymentMethod === "card") {
       const baseUrl = new URL(req.url).origin;
 
-      const userEmail = clerkUser.emailAddresses[0]?.emailAddress;
+      const userEmail = clerkUser?.emailAddresses[0]?.emailAddress;
       const isUserAdmin = userEmail === "mahramh40@gmail.com" || userEmail === "korastore.ae@gmail.com";
       const executeBypass = bypassPayment === true && isUserAdmin;
 
@@ -350,12 +392,14 @@ export async function POST(req: Request) {
         sellerNote: order.sellerNote || "",
       };
 
-      // A. Send confirmation to customer
-      await sendOrderConfirmationEmail({
-        ...emailParams,
-        toEmail: clerkUser.emailAddresses[0].emailAddress,
-        isAdminAlert: false,
-      });
+      // A. Send confirmation to customer (Guest or Logged in)
+      if (targetEmail) {
+        await sendOrderConfirmationEmail({
+          ...emailParams,
+          toEmail: targetEmail,
+          isAdminAlert: false,
+        });
+      }
 
       // B. Build map pinpoint link only for store admin notification
       let adminShippingAddress = `${shippingDetails.streetAddress}, ${shippingDetails.city}, UAE`;
@@ -374,7 +418,7 @@ export async function POST(req: Request) {
         });
       }
 
-      console.log(`📬 [EMAIL SUCCESS] - Direct COD Order emails sent to customer and admin for KORA-${order.referenceNumber}`);
+      console.log(`📬 [EMAIL SUCCESS] - Direct COD Order emails sent to customer (${targetEmail}) and admin for KORA-${order.referenceNumber}`);
     } catch (emailErr) {
       console.error("⚠️ Order confirmation emails failed to transmit:", emailErr);
     }

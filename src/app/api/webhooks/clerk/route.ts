@@ -55,28 +55,59 @@ export async function POST(req: Request) {
     const { id, email_addresses, first_name, last_name } = evt.data
 
     // Grab their primary email
-    const primaryEmail = email_addresses[0].email_address
+    const primaryEmail = email_addresses[0]?.email_address?.toLowerCase()?.trim()
+    if (!primaryEmail) {
+      return new Response('No email address provided', { status: 400 })
+    }
 
-    // Check if user already exists by email (with different ID)
+    // Check if user already exists by email (with different ID, e.g. guest checkout user)
     const existingUser = await prisma.user.findUnique({
       where: { email: primaryEmail }
     });
 
     if (existingUser) {
-      if (existingUser.id !== id) {
-        // Clean up old relations for this email (since the user is transitioning Clerk instances)
-        await prisma.$transaction([
-          prisma.cartItem.deleteMany({ where: { userId: existingUser.id } }),
-          prisma.review.deleteMany({ where: { userId: existingUser.id } }),
-          prisma.orderItem.deleteMany({ where: { order: { userId: existingUser.id } } }),
-          prisma.order.deleteMany({ where: { userId: existingUser.id } }),
-          prisma.user.delete({ where: { id: existingUser.id } })
-        ]);
-      } else {
-        // User already exists with the correct ID, we're done
-        console.log(`User already exists for: ${primaryEmail}`);
+      if (existingUser.id === id) {
+        console.log(`User already exists with exact matching ID: ${primaryEmail}`);
         return new Response('', { status: 200 });
       }
+
+      // If previous user was a guest or previous instance, transfer orders and reviews safely
+      await prisma.$transaction(async (tx) => {
+        // 1. Temporarily release unique email constraint on the old user record
+        await tx.user.update({
+          where: { id: existingUser.id },
+          data: { email: `${primaryEmail}_old_${Date.now()}` }
+        });
+
+        // 2. Create the new official Clerk user record
+        await tx.user.create({
+          data: {
+            id: id,
+            email: primaryEmail,
+            firstName: first_name || existingUser.firstName || '',
+            lastName: last_name || existingUser.lastName || '',
+            phone: existingUser.phone || null
+          }
+        });
+
+        // 3. Reassign orders & reviews to new Clerk user ID
+        await tx.order.updateMany({
+          where: { userId: existingUser.id },
+          data: { userId: id }
+        });
+
+        await tx.review.updateMany({
+          where: { userId: existingUser.id },
+          data: { userId: id }
+        });
+
+        // 4. Clean up old cart and old user placeholder
+        await tx.cartItem.deleteMany({ where: { userId: existingUser.id } });
+        await tx.user.delete({ where: { id: existingUser.id } });
+      });
+
+      console.log(`Successfully migrated user history from guest to Clerk account: ${primaryEmail}`);
+      return new Response('', { status: 200 });
     }
 
     // Tell Prisma to create a permanent row for them in our Database
