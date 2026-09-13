@@ -10,26 +10,35 @@ async function FeaturedSectionGrid({ sectionId }: { sectionId: SectionId }) {
   const products = await getFeaturedProductsForSection(sectionId);
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 w-full">
-      {products.map((product) => (
-        <ProductCard
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 w-full">
+      {products.map((product, index) => (
+        <div
           key={product.id}
-          product={{
-            ...product,
-            price: product.price.toString(),
-            originalPrice: product.originalPrice ? product.originalPrice.toString() : null,
-          }}
-        />
+          className={index >= 4 ? "hidden md:block" : ""}
+        >
+          <ProductCard
+            product={{
+              ...product,
+              price: product.price.toString(),
+              originalPrice: product.originalPrice ? product.originalPrice.toString() : null,
+            }}
+          />
+        </div>
       ))}
     </div>
   );
 }
 
-function SectionGridSkeleton() {
+function SectionGridSkeleton({ count = 6 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6 w-full">
-      {[1, 2, 3, 4].map((n) => (
-        <ProductSkeletonCard key={n} />
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 md:gap-6 w-full">
+      {Array.from({ length: count }).map((_, index) => (
+        <div
+          key={index}
+          className={index >= 4 ? "hidden md:block" : ""}
+        >
+          <ProductSkeletonCard />
+        </div>
       ))}
     </div>
   );
@@ -52,11 +61,36 @@ export default async function Home() {
         <span className="block md:inline md:ms-1 mt-0.5 md:mt-0">{t("promo_code_text")}</span>
       </div>
 
+      {/* 1. BEST SELLERS (12 Products: 3/row on desktop, 2 rows on mobile) */}
+      <section className="px-3 sm:px-6 my-8 sm:my-10 md:my-12 max-w-6xl mx-auto w-full">
+        <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
+          <div>
+            <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
+              {t("best_sellers")}
+            </h2>
+            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1 md:mt-2">
+              {t("best_sellers_sub")}
+            </p>
+          </div>
+          <Link 
+            href="/shop" 
+            className="text-xs sm:text-sm font-bold text-kora dark:text-purple-400 hover:text-white hover:bg-kora dark:hover:bg-purple-600 dark:hover:text-white transition-all uppercase tracking-wider flex items-center gap-1.5 md:gap-2 group border border-kora/25 dark:border-purple-800/40 rounded-full px-3.5 py-1.5 shrink-0 shadow-xs"
+          >
+            <span>{t("view_all")}</span>
+            <span className="group-hover:translate-x-1 transition-transform rtl:rotate-180">→</span>
+          </Link>
+        </div>
+
+        <Suspense fallback={<SectionGridSkeleton count={12} />}>
+          <FeaturedSectionGrid sectionId="best_sellers" />
+        </Suspense>
+      </section>
+
       {/* DYNAMIC HERO BANNER CAROUSEL */}
       <HeroBanner />
 
-      {/* 1. CLUB JERSEYS (2x2 Grid) */}
-      <section className="px-3 sm:px-4 md:px-6 my-8 sm:my-12 md:my-16 max-w-5xl mx-auto w-full">
+      {/* 2. CLUB JERSEYS (6 Products: 3/row on desktop, 2 rows on mobile) */}
+      <section className="px-3 sm:px-6 my-8 sm:my-12 md:my-16 max-w-6xl mx-auto w-full">
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
@@ -75,13 +109,13 @@ export default async function Home() {
           </Link>
         </div>
 
-        <Suspense fallback={<SectionGridSkeleton />}>
+        <Suspense fallback={<SectionGridSkeleton count={6} />}>
           <FeaturedSectionGrid sectionId="club" />
         </Suspense>
       </section>
 
-      {/* 2. WORLD CUP & NATIONAL JERSEYS (2x2 Grid) */}
-      <section className="px-3 sm:px-4 md:px-6 mb-8 sm:mb-12 md:mb-16 max-w-5xl mx-auto w-full">
+      {/* 3. WORLD CUP & NATIONAL JERSEYS (6 Products: 3/row on desktop, 2 rows on mobile) */}
+      <section className="px-3 sm:px-6 mb-8 sm:mb-12 md:mb-16 max-w-6xl mx-auto w-full">
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
@@ -100,13 +134,13 @@ export default async function Home() {
           </Link>
         </div>
 
-        <Suspense fallback={<SectionGridSkeleton />}>
+        <Suspense fallback={<SectionGridSkeleton count={6} />}>
           <FeaturedSectionGrid sectionId="national" />
         </Suspense>
       </section>
 
-      {/* 3. SHOES & BOOTS (2x2 Grid) */}
-      <section className="px-3 sm:px-4 md:px-6 mb-8 sm:mb-12 md:mb-16 max-w-5xl mx-auto w-full">
+      {/* 4. SHOES & BOOTS (6 Products: 3/row on desktop, 2 rows on mobile) */}
+      <section className="px-3 sm:px-6 mb-8 sm:mb-12 md:mb-16 max-w-6xl mx-auto w-full">
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
@@ -125,13 +159,13 @@ export default async function Home() {
           </Link>
         </div>
 
-        <Suspense fallback={<SectionGridSkeleton />}>
+        <Suspense fallback={<SectionGridSkeleton count={6} />}>
           <FeaturedSectionGrid sectionId="shoes" />
         </Suspense>
       </section>
 
-      {/* 4. STREETWEAR, ACCESSORIES & GEAR (2x2 Grid) */}
-      <section className="px-3 sm:px-4 md:px-6 mb-16 md:mb-24 max-w-5xl mx-auto w-full">
+      {/* 5. STREETWEAR, ACCESSORIES & GEAR (6 Products: 3/row on desktop, 2 rows mobile) */}
+      <section className="px-3 sm:px-6 mb-16 md:mb-24 max-w-6xl mx-auto w-full">
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
             <h2 className="text-xl md:text-2xl font-bold uppercase tracking-wider flex items-center gap-2">
@@ -150,7 +184,7 @@ export default async function Home() {
           </Link>
         </div>
 
-        <Suspense fallback={<SectionGridSkeleton />}>
+        <Suspense fallback={<SectionGridSkeleton count={6} />}>
           <FeaturedSectionGrid sectionId="gear" />
         </Suspense>
       </section>

@@ -20,6 +20,8 @@ export const translations = {
   "club": { en: "Club", ar: "الأندية" },
   "national": { en: "National", ar: "المنتخبات" },
   "retro": { en: "Retro", ar: "كلاسيك" },
+  "best_sellers": { en: "Best Sellers", ar: "الأكثر مبيعاً" },
+  "best_sellers_sub": { en: "The most demanded kits, boots, and streetwear right now.", ar: "أكثر القمصان والأحذية والمعدات طلباً في الإمارات حالياً." },
   "view_all": { en: "View All", ar: "عرض الكل" },
   "world_leagues": { en: "World Leagues", ar: "الدوريات العالمية" },
   "az_club_teams": { en: "A-Z Club Teams", ar: "أندية من الألف إلى الياء" },

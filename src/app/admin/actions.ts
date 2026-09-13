@@ -449,7 +449,11 @@ export async function getFeaturedSectionsAdminData() {
   await ensureAdmin();
   const config = await getFeaturedSectionsConfig();
 
-  const [clubProducts, nationalProducts, shoeProducts, gearProducts] = await Promise.all([
+  const [allProducts, clubProducts, nationalProducts, shoeProducts, gearProducts] = await Promise.all([
+    prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+      select: { id: true, name: true, category: true, team: true, price: true, tag: true, images: true, stock: true }
+    }),
     prisma.product.findMany({
       where: getSectionCriteria("club"),
       orderBy: { createdAt: "desc" },
@@ -480,6 +484,7 @@ export async function getFeaturedSectionsAdminData() {
   return {
     config,
     categoryProducts: {
+      best_sellers: allProducts.map(serializeProduct),
       club: clubProducts.map(serializeProduct),
       national: nationalProducts.map(serializeProduct),
       shoes: shoeProducts.map(serializeProduct),

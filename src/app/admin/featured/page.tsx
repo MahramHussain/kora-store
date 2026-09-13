@@ -5,7 +5,7 @@ import { getFeaturedSectionsAdminData, saveFeaturedSectionsAdmin } from "../acti
 import { CURRENCY } from "@/lib/constants";
 import { FaSearch, FaTimes, FaCheck, FaPlus, FaExchangeAlt, FaTrashAlt } from "react-icons/fa";
 
-type SectionId = "club" | "national" | "shoes" | "gear";
+type SectionId = "best_sellers" | "club" | "national" | "shoes" | "gear";
 
 interface ProductSummary {
   id: string;
@@ -20,12 +20,14 @@ interface ProductSummary {
 
 interface FeaturedData {
   config: {
+    best_sellers: string[];
     club: string[];
     national: string[];
     shoes: string[];
     gear: string[];
   };
   categoryProducts: {
+    best_sellers: ProductSummary[];
     club: ProductSummary[];
     national: ProductSummary[];
     shoes: ProductSummary[];
@@ -33,28 +35,31 @@ interface FeaturedData {
   };
 }
 
-const SECTIONS: { id: SectionId; label: string; desc: string; icon: string }[] = [
-  { id: "club", label: "Club Jerseys", desc: "Top league match shirts", icon: "⚽" },
-  { id: "national", label: "National Jerseys", desc: "World Cup & international kits", icon: "🌍" },
-  { id: "shoes", label: "Shoes", desc: "Firm ground boots & casual footwear", icon: "👟" },
-  { id: "gear", label: "Streetwear & Gear", desc: "Accessories, flags & training gear", icon: "🎒" },
+const SECTIONS: { id: SectionId; label: string; desc: string; icon: string; maxSlots: number }[] = [
+  { id: "best_sellers", label: "Best Sellers", desc: "12 Slots - All Categories", icon: "🏆", maxSlots: 12 },
+  { id: "club", label: "Club Jerseys", desc: "6 Slots - Match shirts", icon: "⚽", maxSlots: 6 },
+  { id: "national", label: "National Jerseys", desc: "6 Slots - International", icon: "🌍", maxSlots: 6 },
+  { id: "shoes", label: "Shoes", desc: "6 Slots - Boots & Footwear", icon: "👟", maxSlots: 6 },
+  { id: "gear", label: "Streetwear & Gear", desc: "6 Slots - Accessories & Gear", icon: "🎒", maxSlots: 6 },
 ];
 
 export default function FeaturedSectionsAdminPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [data, setData] = useState<FeaturedData | null>(null);
-  const [activeSection, setActiveSection] = useState<SectionId>("club");
+  const [activeSection, setActiveSection] = useState<SectionId>("best_sellers");
   const [selectedSlots, setSelectedSlots] = useState<Record<SectionId, (string | null)[]>>({
-    club: [null, null, null, null],
-    national: [null, null, null, null],
-    shoes: [null, null, null, null],
-    gear: [null, null, null, null],
+    best_sellers: Array(12).fill(null),
+    club: Array(6).fill(null),
+    national: Array(6).fill(null),
+    shoes: Array(6).fill(null),
+    gear: Array(6).fill(null),
   });
 
   // Modal for selecting a product for a slot
   const [pickerSlotIndex, setPickerSlotIndex] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [modalCategoryFilter, setModalCategoryFilter] = useState("All");
   const [statusMessage, setStatusMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   // Load initial data
@@ -62,20 +67,20 @@ export default function FeaturedSectionsAdminPage() {
     setLoading(true);
     try {
       const res = await getFeaturedSectionsAdminData();
-      setData(res);
+      setData(res as any);
 
-      // Pad slot arrays to exactly 4 items
-      const padToFour = (arr?: string[]) => {
+      const padSlots = (arr?: string[], count: number = 6) => {
         const safe = Array.isArray(arr) ? [...arr] : [];
-        while (safe.length < 4) safe.push(null as any);
-        return safe.slice(0, 4);
+        while (safe.length < count) safe.push(null as any);
+        return safe.slice(0, count);
       };
 
       setSelectedSlots({
-        club: padToFour(res.config.club),
-        national: padToFour(res.config.national),
-        shoes: padToFour(res.config.shoes),
-        gear: padToFour(res.config.gear),
+        best_sellers: padSlots((res.config as any).best_sellers, 12),
+        club: padSlots(res.config.club, 6),
+        national: padSlots(res.config.national, 6),
+        shoes: padSlots(res.config.shoes, 6),
+        gear: padSlots(res.config.gear, 6),
       });
     } catch (err) {
       console.error("Failed to load featured data:", err);
@@ -94,6 +99,7 @@ export default function FeaturedSectionsAdminPage() {
     setStatusMessage(null);
     try {
       const configToSave = {
+        best_sellers: selectedSlots.best_sellers.filter(Boolean) as string[],
         club: selectedSlots.club.filter(Boolean) as string[],
         national: selectedSlots.national.filter(Boolean) as string[],
         shoes: selectedSlots.shoes.filter(Boolean) as string[],
@@ -140,10 +146,14 @@ export default function FeaturedSectionsAdminPage() {
     });
   };
 
+  const currentSectionMeta = SECTIONS.find((s) => s.id === activeSection) || SECTIONS[0];
+  const maxSlots = currentSectionMeta.maxSlots;
+
   // Find product object by ID across all categories
   const getProductById = (id: string | null): ProductSummary | null => {
     if (!id || !data) return null;
     const allProducts = [
+      ...data.categoryProducts.best_sellers,
       ...data.categoryProducts.club,
       ...data.categoryProducts.national,
       ...data.categoryProducts.shoes,
@@ -165,6 +175,9 @@ export default function FeaturedSectionsAdminPage() {
 
   const currentCategoryProducts = data?.categoryProducts[activeSection] || [];
   const filteredCategoryProducts = currentCategoryProducts.filter((p) => {
+    if (modalCategoryFilter !== "All" && p.category !== modalCategoryFilter) {
+      return false;
+    }
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase().trim();
     return p.name.toLowerCase().includes(q) || (p.team && p.team.toLowerCase().includes(q));
@@ -183,7 +196,7 @@ export default function FeaturedSectionsAdminPage() {
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-2xl">
-              Curate the exact 4 products displayed on the homepage for each section. Any empty slot will automatically fall back to the top items in that category.
+              Curate the exact products displayed on the homepage. Best Sellers supports 12 products across all categories; other sections support 6 products. Empty slots automatically fill with top items.
             </p>
           </div>
           <button
@@ -223,7 +236,7 @@ export default function FeaturedSectionsAdminPage() {
       </div>
 
       {/* Category Tabs */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {SECTIONS.map((sec) => {
           const isActive = activeSection === sec.id;
           const assignedCount = selectedSlots[sec.id].filter(Boolean).length;
@@ -246,7 +259,7 @@ export default function FeaturedSectionsAdminPage() {
                       : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
                   }`}
                 >
-                  {assignedCount}/4 Assigned
+                  {assignedCount}/{sec.maxSlots}
                 </span>
               </div>
               <h3 className="font-bold text-sm leading-tight">{sec.label}</h3>
@@ -258,36 +271,38 @@ export default function FeaturedSectionsAdminPage() {
         })}
       </div>
 
-      {/* 4 Slots Grid for Active Section */}
+      {/* Slots Grid for Active Section */}
       <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-2">
-              <span>{SECTIONS.find((s) => s.id === activeSection)?.label}</span>
+              <span>{currentSectionMeta.label}</span>
               <span className="text-xs text-slate-400 font-normal">
-                (4 Slot Layout)
+                ({maxSlots} Slot Grid)
               </span>
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Click &quot;Select Product&quot; to pick an existing item from your catalog for each slot.
+              {activeSection === "best_sellers"
+                ? "Select up to 12 products from any category across your store database."
+                : `Select up to 6 products from the ${currentSectionMeta.label} catalog.`}
             </p>
           </div>
           <button
             onClick={() => {
               setSelectedSlots((prev) => ({
                 ...prev,
-                [activeSection]: [null, null, null, null],
+                [activeSection]: Array(maxSlots).fill(null),
               }));
             }}
             className="text-xs text-slate-400 hover:text-rose-500 font-semibold transition-colors flex items-center gap-1"
           >
             <FaTrashAlt className="text-[10px]" />
-            <span>Clear All 4 Slots</span>
+            <span>Clear All Slots</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[0, 1, 2, 3].map((slotIdx) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: maxSlots }).map((_, slotIdx) => {
             const assignedId = selectedSlots[activeSection][slotIdx];
             const product = getProductById(assignedId);
 
@@ -297,7 +312,7 @@ export default function FeaturedSectionsAdminPage() {
                 className={`relative rounded-2xl border flex flex-col justify-between overflow-hidden transition-all ${
                   product
                     ? "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 shadow-sm"
-                    : "border-dashed border-slate-300 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 p-6 flex flex-col items-center justify-center min-h-[280px]"
+                    : "border-dashed border-slate-300 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/30 p-6 flex flex-col items-center justify-center min-h-[260px]"
                 }`}
               >
                 {/* Slot Badge */}
@@ -328,7 +343,7 @@ export default function FeaturedSectionsAdminPage() {
                     {/* Product Info */}
                     <div className="p-4 flex-1 flex flex-col justify-between">
                       <div>
-                        <p className="text-[10px] font-bold text-kora uppercase tracking-wider">
+                        <p className="text-[10px] font-bold text-kora uppercase tracking-wider truncate">
                           {product.category} {product.team ? `• ${product.team}` : ""}
                         </p>
                         <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white line-clamp-1 mt-0.5">
@@ -342,7 +357,10 @@ export default function FeaturedSectionsAdminPage() {
                       {/* Action Buttons */}
                       <div className="flex gap-2 mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
                         <button
-                          onClick={() => setPickerSlotIndex(slotIdx)}
+                          onClick={() => {
+                            setPickerSlotIndex(slotIdx);
+                            setModalCategoryFilter("All");
+                          }}
                           className="flex-1 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-xl py-2 text-[11px] font-bold transition-all flex items-center justify-center gap-1.5"
                         >
                           <FaExchangeAlt className="text-[10px]" />
@@ -367,10 +385,13 @@ export default function FeaturedSectionsAdminPage() {
                       Auto-filled Slot {slotIdx + 1}
                     </p>
                     <p className="text-[10px] text-slate-400 text-center mt-1 mb-4">
-                      Shows newest product by default. Click below to pin a specific item.
+                      Shows top product by default. Click below to pin a specific item.
                     </p>
                     <button
-                      onClick={() => setPickerSlotIndex(slotIdx)}
+                      onClick={() => {
+                        setPickerSlotIndex(slotIdx);
+                        setModalCategoryFilter("All");
+                      }}
                       className="bg-kora hover:bg-purple-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all flex items-center gap-1.5 shadow-md shadow-kora/20"
                     >
                       <FaPlus className="text-[10px]" />
@@ -395,7 +416,9 @@ export default function FeaturedSectionsAdminPage() {
                   Assign Product to Slot {pickerSlotIndex + 1}
                 </h3>
                 <p className="text-xs text-slate-500">
-                  Select a product from {SECTIONS.find((s) => s.id === activeSection)?.label}
+                  {activeSection === "best_sellers"
+                    ? "Select any product from the entire store catalog"
+                    : `Select a product from ${currentSectionMeta.label}`}
                 </p>
               </div>
               <button
@@ -409,19 +432,37 @@ export default function FeaturedSectionsAdminPage() {
               </button>
             </div>
 
-            {/* Search Bar */}
-            <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950">
+            {/* Search Bar & Category Filter Pills (if Best Sellers) */}
+            <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 space-y-2.5">
               <div className="relative">
                 <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products by title or team..."
+                  placeholder="Search products by title, team or category..."
                   className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-kora"
                   autoFocus
                 />
               </div>
+
+              {activeSection === "best_sellers" && (
+                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide text-[11px]">
+                  {["All", "Shirts", "Boots", "Casual Shoes", "Retro Kits", "Accessories"].map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setModalCategoryFilter(cat)}
+                      className={`px-3 py-1 rounded-full whitespace-nowrap font-bold transition-all ${
+                        modalCategoryFilter === cat
+                          ? "bg-kora text-white"
+                          : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Product List */}
@@ -449,7 +490,7 @@ export default function FeaturedSectionsAdminPage() {
                             {p.name}
                           </h5>
                           <p className="text-[10px] text-slate-500 truncate">
-                            {p.team || p.category} • {CURRENCY} {p.price}
+                            <span className="font-semibold text-kora">{p.category}</span> {p.team ? `• ${p.team}` : ""} • {CURRENCY} {p.price}
                           </p>
                         </div>
                       </div>
