@@ -73,6 +73,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navItems = [
     { href: "/admin", label: "Add New Gear", desc: "Register product", icon: "✚" },
+    { href: "/admin/featured", label: "Featured Sections", desc: "Homepage 4-slot layout", icon: "⭐" },
     { href: "/admin/analytics", label: "Site Analytics", desc: "Traffic & engagement", icon: "📈" },
     { href: "/admin/orders", label: "Order Fulfillment", desc: "Manage shipments", icon: "📦" },
     { href: "/admin/inventory", label: "Product Inventory", desc: "Stock management", icon: "📋" },

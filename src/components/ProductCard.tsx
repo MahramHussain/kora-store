@@ -140,7 +140,7 @@ export function ProductCard({ product }: { product: Product }) {
       <div className="p-3 sm:p-5 border-t border-slate-100 dark:border-slate-800 relative z-20 bg-white dark:bg-slate-900">
         <div className="flex justify-between items-start mb-2 md:mb-3">
           <div className="min-w-0 flex-1">
-            <p className="text-kora text-[10px] font-bold uppercase tracking-widest mb-1">
+            <p className="text-kora text-[10px] font-bold uppercase tracking-widest mb-1 truncate">
               {product.category === "Boots" 
                 ? t("category_boots") 
                 : product.category === "Casual Shoes"
@@ -166,13 +166,13 @@ export function ProductCard({ product }: { product: Product }) {
               );
             })()}
           </div>
-          <div className="flex items-center gap-1.5 ml-2 shrink-0 whitespace-nowrap font-sans">
+          <div className="flex flex-col sm:flex-row items-end sm:items-baseline gap-0.5 sm:gap-1.5 ml-2 shrink-0 whitespace-nowrap font-sans text-end">
             {product.originalPrice && (
-              <span className="text-xs text-slate-400 dark:text-slate-500 line-through font-medium">
+              <span className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 line-through font-medium">
                 {t("aed")}{parseFloat(product.originalPrice).toFixed(0)}
               </span>
             )}
-            <span className="text-base md:text-lg font-bold text-slate-900 dark:text-slate-100">
+            <span className="text-sm sm:text-base md:text-lg font-bold text-slate-900 dark:text-slate-100">
               {t("aed")}{String(product.price).replace(CURRENCY.trim(), '').replace('$', '').trim()}
             </span>
           </div>

@@ -12,9 +12,9 @@ const globalForPrisma = global as unknown as {
 if (!globalForPrisma.pgPool) {
   globalForPrisma.pgPool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
-    max: 2, // Limit pool size in serverless to prevent connection exhaustion
+    max: 10, // Increased pool size to support concurrent server component queries
     idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
-    connectionTimeoutMillis: 5000, // Return an error after 5 seconds if connection fails
+    connectionTimeoutMillis: 25000, // Increased from 5s to 25s to comfortably handle Neon cold starts
   });
 }
 

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { currentUser, auth, clerkClient } from "@clerk/nextjs/server";
 import { resolveImageFilename } from "@/lib/resolveImage";
 import { revalidatePath } from "next/cache";
+import { getFeaturedSectionsConfig, saveFeaturedSectionsConfig, getSectionCriteria, FeaturedSectionsConfig } from "@/lib/featuredSections";
 
 // Helper to guarantee only the admin can call protected operations
 async function ensureAdmin() {
@@ -442,4 +443,53 @@ export async function updateUserBanStatus(
     console.error("Failed to update user ban status:", error);
     return { success: false, error: "Failed to update ban configuration" };
   }
+}
+
+export async function getFeaturedSectionsAdminData() {
+  await ensureAdmin();
+  const config = await getFeaturedSectionsConfig();
+
+  const [clubProducts, nationalProducts, shoeProducts, gearProducts] = await Promise.all([
+    prisma.product.findMany({
+      where: getSectionCriteria("club"),
+      orderBy: { createdAt: "desc" },
+      select: { id: true, name: true, category: true, team: true, price: true, tag: true, images: true, stock: true }
+    }),
+    prisma.product.findMany({
+      where: getSectionCriteria("national"),
+      orderBy: { createdAt: "desc" },
+      select: { id: true, name: true, category: true, team: true, price: true, tag: true, images: true, stock: true }
+    }),
+    prisma.product.findMany({
+      where: getSectionCriteria("shoes"),
+      orderBy: { createdAt: "desc" },
+      select: { id: true, name: true, category: true, team: true, price: true, tag: true, images: true, stock: true }
+    }),
+    prisma.product.findMany({
+      where: getSectionCriteria("gear"),
+      orderBy: { createdAt: "desc" },
+      select: { id: true, name: true, category: true, team: true, price: true, tag: true, images: true, stock: true }
+    }),
+  ]);
+
+  const serializeProduct = (p: any) => ({
+    ...p,
+    price: p.price.toString(),
+  });
+
+  return {
+    config,
+    categoryProducts: {
+      club: clubProducts.map(serializeProduct),
+      national: nationalProducts.map(serializeProduct),
+      shoes: shoeProducts.map(serializeProduct),
+      gear: gearProducts.map(serializeProduct),
+    }
+  };
+}
+
+export async function saveFeaturedSectionsAdmin(config: FeaturedSectionsConfig) {
+  await ensureAdmin();
+  const success = await saveFeaturedSectionsConfig(config);
+  return { success };
 }
