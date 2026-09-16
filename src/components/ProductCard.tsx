@@ -75,7 +75,7 @@ export function ProductCard({ product }: { product: Product }) {
       href={`/shop/${product.id}`} 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-kora dark:hover:border-kora transition-all duration-300 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(107,0,255,0.3)] hover:-translate-y-1 overflow-hidden flex flex-col h-[300px] sm:h-[380px] active:scale-[0.98] md:active:scale-100"
+      className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-kora dark:hover:border-kora transition-all duration-300 shadow-sm hover:shadow-[0_10px_30px_-10px_rgba(107,0,255,0.3)] hover:-translate-y-1 overflow-hidden flex flex-col h-[350px] sm:h-[420px] md:h-[450px] active:scale-[0.98] md:active:scale-100"
     >
       <div className="relative flex-1 bg-slate-50 dark:bg-slate-950 flex items-center justify-center overflow-hidden">
         {product.stock === 0 ? (
@@ -191,7 +191,7 @@ export function ProductCard({ product }: { product: Product }) {
 
 export function ProductSkeletonCard() {
   return (
-    <div className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[300px] sm:h-[380px] animate-pulse">
+    <div className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[350px] sm:h-[420px] md:h-[450px] animate-pulse">
       <div className="relative flex-1 bg-slate-50 dark:bg-slate-950 flex items-center justify-center p-8">
         <div className="w-32 h-32 bg-slate-200 dark:bg-slate-800 rounded-full blur-xl"></div>
       </div>

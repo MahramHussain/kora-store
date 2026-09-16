@@ -26,6 +26,7 @@ interface FeaturedData {
     shoes: string[];
     gear: string[];
   };
+  allProducts: ProductSummary[];
   categoryProducts: {
     best_sellers: ProductSummary[];
     club: ProductSummary[];
@@ -37,10 +38,10 @@ interface FeaturedData {
 
 const SECTIONS: { id: SectionId; label: string; desc: string; icon: string; maxSlots: number }[] = [
   { id: "best_sellers", label: "Best Sellers", desc: "12 Slots - All Categories", icon: "🏆", maxSlots: 12 },
-  { id: "club", label: "Club Jerseys", desc: "6 Slots - Match shirts", icon: "⚽", maxSlots: 6 },
-  { id: "national", label: "National Jerseys", desc: "6 Slots - International", icon: "🌍", maxSlots: 6 },
-  { id: "shoes", label: "Shoes", desc: "6 Slots - Boots & Footwear", icon: "👟", maxSlots: 6 },
-  { id: "gear", label: "Streetwear & Gear", desc: "6 Slots - Accessories & Gear", icon: "🎒", maxSlots: 6 },
+  { id: "club", label: "Club Jerseys", desc: "8 Slots - Match shirts", icon: "⚽", maxSlots: 8 },
+  { id: "national", label: "National Jerseys", desc: "8 Slots - International", icon: "🌍", maxSlots: 8 },
+  { id: "shoes", label: "Shoes", desc: "8 Slots - Boots & Footwear", icon: "👟", maxSlots: 8 },
+  { id: "gear", label: "Streetwear & Gear", desc: "8 Slots - Accessories & Gear", icon: "🎒", maxSlots: 8 },
 ];
 
 export default function FeaturedSectionsAdminPage() {
@@ -50,10 +51,10 @@ export default function FeaturedSectionsAdminPage() {
   const [activeSection, setActiveSection] = useState<SectionId>("best_sellers");
   const [selectedSlots, setSelectedSlots] = useState<Record<SectionId, (string | null)[]>>({
     best_sellers: Array(12).fill(null),
-    club: Array(6).fill(null),
-    national: Array(6).fill(null),
-    shoes: Array(6).fill(null),
-    gear: Array(6).fill(null),
+    club: Array(8).fill(null),
+    national: Array(8).fill(null),
+    shoes: Array(8).fill(null),
+    gear: Array(8).fill(null),
   });
 
   // Modal for selecting a product for a slot
@@ -69,7 +70,7 @@ export default function FeaturedSectionsAdminPage() {
       const res = await getFeaturedSectionsAdminData();
       setData(res as any);
 
-      const padSlots = (arr?: string[], count: number = 6) => {
+      const padSlots = (arr?: string[], count: number = 8) => {
         const safe = Array.isArray(arr) ? [...arr] : [];
         while (safe.length < count) safe.push(null as any);
         return safe.slice(0, count);
@@ -77,10 +78,10 @@ export default function FeaturedSectionsAdminPage() {
 
       setSelectedSlots({
         best_sellers: padSlots((res.config as any).best_sellers, 12),
-        club: padSlots(res.config.club, 6),
-        national: padSlots(res.config.national, 6),
-        shoes: padSlots(res.config.shoes, 6),
-        gear: padSlots(res.config.gear, 6),
+        club: padSlots(res.config.club, 8),
+        national: padSlots(res.config.national, 8),
+        shoes: padSlots(res.config.shoes, 8),
+        gear: padSlots(res.config.gear, 8),
       });
     } catch (err) {
       console.error("Failed to load featured data:", err);
@@ -152,6 +153,9 @@ export default function FeaturedSectionsAdminPage() {
   // Find product object by ID across all categories
   const getProductById = (id: string | null): ProductSummary | null => {
     if (!id || !data) return null;
+    if (data.allProducts && data.allProducts.length > 0) {
+      return data.allProducts.find((p) => p.id === id) || null;
+    }
     const allProducts = [
       ...data.categoryProducts.best_sellers,
       ...data.categoryProducts.club,
@@ -174,8 +178,12 @@ export default function FeaturedSectionsAdminPage() {
   }
 
   const currentCategoryProducts = data?.categoryProducts[activeSection] || [];
-  const filteredCategoryProducts = currentCategoryProducts.filter((p) => {
-    if (modalCategoryFilter !== "All" && p.category !== modalCategoryFilter) {
+  const baseProductList = modalCategoryFilter === "All Products" || activeSection === "best_sellers"
+    ? (data?.allProducts || currentCategoryProducts)
+    : currentCategoryProducts;
+
+  const filteredCategoryProducts = baseProductList.filter((p) => {
+    if (modalCategoryFilter !== "All" && modalCategoryFilter !== "All Products" && p.category !== modalCategoryFilter) {
       return false;
     }
     if (!searchQuery) return true;
@@ -243,7 +251,11 @@ export default function FeaturedSectionsAdminPage() {
           return (
             <button
               key={sec.id}
-              onClick={() => setActiveSection(sec.id)}
+              onClick={() => {
+                setActiveSection(sec.id);
+                setModalCategoryFilter("All");
+                setSearchQuery("");
+              }}
               className={`p-4 rounded-2xl border text-start transition-all ${
                 isActive
                   ? "bg-kora text-white border-kora shadow-md shadow-kora/20 scale-[1.02]"
@@ -284,7 +296,7 @@ export default function FeaturedSectionsAdminPage() {
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {activeSection === "best_sellers"
                 ? "Select up to 12 products from any category across your store database."
-                : `Select up to 6 products from the ${currentSectionMeta.label} catalog.`}
+                : `Select up to 8 products from the ${currentSectionMeta.label} catalog.`}
             </p>
           </div>
           <button
@@ -301,7 +313,7 @@ export default function FeaturedSectionsAdminPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Array.from({ length: maxSlots }).map((_, slotIdx) => {
             const assignedId = selectedSlots[activeSection][slotIdx];
             const product = getProductById(assignedId);
@@ -446,23 +458,21 @@ export default function FeaturedSectionsAdminPage() {
                 />
               </div>
 
-              {activeSection === "best_sellers" && (
-                <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide text-[11px]">
-                  {["All", "Shirts", "Boots", "Casual Shoes", "Retro Kits", "Accessories"].map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setModalCategoryFilter(cat)}
-                      className={`px-3 py-1 rounded-full whitespace-nowrap font-bold transition-all ${
-                        modalCategoryFilter === cat
-                          ? "bg-kora text-white"
-                          : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide text-[11px]">
+                {["All", "Shirts", "Boots", "Casual Shoes", "Retro Kits", "Accessories", "All Products"].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setModalCategoryFilter(cat)}
+                    className={`px-3 py-1 rounded-full whitespace-nowrap font-bold transition-all ${
+                      modalCategoryFilter === cat
+                        ? "bg-kora text-white"
+                        : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Product List */}

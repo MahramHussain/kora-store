@@ -23,18 +23,28 @@ const DEFAULT_CONFIG: FeaturedSectionsConfig = {
   gear: [],
 };
 
+// Global in-memory cache to ensure instant reactivity across warm server actions
+const globalForFeatured = global as unknown as {
+  featuredConfig?: FeaturedSectionsConfig;
+};
+
 export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfig> {
   try {
     const raw = await fs.readFile(CONFIG_FILE_PATH, "utf-8");
     const parsed = JSON.parse(raw);
-    return {
+    const config: FeaturedSectionsConfig = {
       best_sellers: Array.isArray(parsed.best_sellers) ? parsed.best_sellers.slice(0, 12) : [],
-      club: Array.isArray(parsed.club) ? parsed.club.slice(0, 6) : [],
-      national: Array.isArray(parsed.national) ? parsed.national.slice(0, 6) : [],
-      shoes: Array.isArray(parsed.shoes) ? parsed.shoes.slice(0, 6) : [],
-      gear: Array.isArray(parsed.gear) ? parsed.gear.slice(0, 6) : [],
+      club: Array.isArray(parsed.club) ? parsed.club.slice(0, 8) : [],
+      national: Array.isArray(parsed.national) ? parsed.national.slice(0, 8) : [],
+      shoes: Array.isArray(parsed.shoes) ? parsed.shoes.slice(0, 8) : [],
+      gear: Array.isArray(parsed.gear) ? parsed.gear.slice(0, 8) : [],
     };
+    globalForFeatured.featuredConfig = config;
+    return config;
   } catch {
+    if (globalForFeatured.featuredConfig) {
+      return globalForFeatured.featuredConfig;
+    }
     return { ...DEFAULT_CONFIG };
   }
 }
@@ -43,21 +53,33 @@ export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig)
   try {
     const sanitized: FeaturedSectionsConfig = {
       best_sellers: Array.isArray(config.best_sellers) ? config.best_sellers.slice(0, 12) : [],
-      club: Array.isArray(config.club) ? config.club.slice(0, 6) : [],
-      national: Array.isArray(config.national) ? config.national.slice(0, 6) : [],
-      shoes: Array.isArray(config.shoes) ? config.shoes.slice(0, 6) : [],
-      gear: Array.isArray(config.gear) ? config.gear.slice(0, 6) : [],
+      club: Array.isArray(config.club) ? config.club.slice(0, 8) : [],
+      national: Array.isArray(config.national) ? config.national.slice(0, 8) : [],
+      shoes: Array.isArray(config.shoes) ? config.shoes.slice(0, 8) : [],
+      gear: Array.isArray(config.gear) ? config.gear.slice(0, 8) : [],
     };
+
+    globalForFeatured.featuredConfig = sanitized;
 
     const dir = path.dirname(CONFIG_FILE_PATH);
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(CONFIG_FILE_PATH, JSON.stringify(sanitized, null, 2), "utf-8");
     
-    // Revalidate home page cache so new selections appear immediately
-    revalidatePath("/");
+    // Revalidate home page and admin page cache so new selections appear immediately
+    try {
+      revalidatePath("/");
+      revalidatePath("/admin/featured");
+    } catch {
+      // revalidatePath may throw if called outside request context, ignore safely
+    }
+
     return true;
   } catch (err) {
     console.error("Failed to save featured sections config:", err);
+    // Even if disk write fails (e.g. read-only serverless), in-memory config is preserved
+    if (globalForFeatured.featuredConfig) {
+      return true;
+    }
     return false;
   }
 }
@@ -66,18 +88,21 @@ export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig)
 export function getSectionCriteria(sectionId: SectionId) {
   switch (sectionId) {
     case "best_sellers":
-      // Any category
       return {};
     case "club":
       return {
         OR: [
           { subCategory: "Club" },
-          { category: { in: ["Shirts", "Retro Kits"] }, isWorldCup: false }
+          { category: { in: ["Shirts", "Retro Kits"] }, isWorldCup: false },
+          { category: { in: ["Shirts", "Retro Kits"] } }
         ]
       };
     case "national":
       return {
-        isWorldCup: true
+        OR: [
+          { isWorldCup: true },
+          { team: { in: ["Argentina", "Brazil", "France", "Germany", "Portugal", "Spain", "Uruguay", "England", "Italy", "Netherlands"] } }
+        ]
       };
     case "shoes":
       return {
@@ -90,10 +115,10 @@ export function getSectionCriteria(sectionId: SectionId) {
   }
 }
 
-// Fetch products for a section (12 for best_sellers, 6 for category sections)
+// Fetch products for a section (12 for best_sellers, 8 for category sections)
 export async function getFeaturedProductsForSection(sectionId: SectionId) {
   try {
-    const targetCount = sectionId === "best_sellers" ? 12 : 6;
+    const targetCount = sectionId === "best_sellers" ? 12 : 8;
     const config = await getFeaturedSectionsConfig();
     const configuredIds = (config[sectionId] || []).filter(Boolean);
 
@@ -149,6 +174,23 @@ export async function getFeaturedProductsForSection(sectionId: SectionId) {
       });
 
       selectedProducts.push(...fallbacks.slice(0, needed));
+
+      // 3. Ultra-safe backup: If strict category criteria still didn't reach targetCount, fill from newest products
+      if (selectedProducts.length < targetCount) {
+        const stillNeeded = targetCount - selectedProducts.length;
+        const currentIds = selectedProducts.map((p) => p.id);
+        const ultraFallbacks = await prisma.product.findMany({
+          where: {
+            id: { notIn: currentIds }
+          },
+          take: stillNeeded,
+          orderBy: { createdAt: "desc" },
+          include: {
+            reviews: { select: { rating: true } }
+          }
+        });
+        selectedProducts.push(...ultraFallbacks);
+      }
     }
 
     return selectedProducts.slice(0, targetCount);
