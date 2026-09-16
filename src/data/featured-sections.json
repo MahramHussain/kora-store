@@ -1,6 +1,10 @@
 {
-  "best_sellers": [],
-  "club": [],
+  "best_sellers": [
+    "brazil-away-kit"
+  ],
+  "club": [
+    "brazil-away-kit"
+  ],
   "national": [],
   "shoes": [],
   "gear": []

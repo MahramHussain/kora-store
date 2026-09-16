@@ -171,3 +171,9 @@ model PlayerStock {
 
   @@unique([productId, playerName])
 }
+
+model StoreSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @default(now()) @updatedAt
+}

@@ -28,7 +28,31 @@ const globalForFeatured = global as unknown as {
   featuredConfig?: FeaturedSectionsConfig;
 };
 
+const SETTING_KEY = "featured_sections";
+
 export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfig> {
+  // 1. First try reading from PostgreSQL database (shared across all Vercel serverless instances)
+  try {
+    const record = await prisma.storeSetting.findUnique({
+      where: { key: SETTING_KEY },
+    });
+    if (record && record.value && typeof record.value === "object") {
+      const val = record.value as any;
+      const config: FeaturedSectionsConfig = {
+        best_sellers: Array.isArray(val.best_sellers) ? val.best_sellers.slice(0, 12) : [],
+        club: Array.isArray(val.club) ? val.club.slice(0, 8) : [],
+        national: Array.isArray(val.national) ? val.national.slice(0, 8) : [],
+        shoes: Array.isArray(val.shoes) ? val.shoes.slice(0, 8) : [],
+        gear: Array.isArray(val.gear) ? val.gear.slice(0, 8) : [],
+      };
+      globalForFeatured.featuredConfig = config;
+      return config;
+    }
+  } catch (dbErr) {
+    console.warn("[FeaturedSections] Could not read StoreSetting from DB, falling back to file:", dbErr);
+  }
+
+  // 2. Fallback to reading from local JSON file
   try {
     const raw = await fs.readFile(CONFIG_FILE_PATH, "utf-8");
     const parsed = JSON.parse(raw);
@@ -50,38 +74,47 @@ export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfi
 }
 
 export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig): Promise<boolean> {
+  const sanitized: FeaturedSectionsConfig = {
+    best_sellers: Array.isArray(config.best_sellers) ? config.best_sellers.slice(0, 12) : [],
+    club: Array.isArray(config.club) ? config.club.slice(0, 8) : [],
+    national: Array.isArray(config.national) ? config.national.slice(0, 8) : [],
+    shoes: Array.isArray(config.shoes) ? config.shoes.slice(0, 8) : [],
+    gear: Array.isArray(config.gear) ? config.gear.slice(0, 8) : [],
+  };
+
+  globalForFeatured.featuredConfig = sanitized;
+  let dbSaved = false;
+
+  // 1. Save to PostgreSQL database (ensures persistence across all Vercel lambdas & environments)
   try {
-    const sanitized: FeaturedSectionsConfig = {
-      best_sellers: Array.isArray(config.best_sellers) ? config.best_sellers.slice(0, 12) : [],
-      club: Array.isArray(config.club) ? config.club.slice(0, 8) : [],
-      national: Array.isArray(config.national) ? config.national.slice(0, 8) : [],
-      shoes: Array.isArray(config.shoes) ? config.shoes.slice(0, 8) : [],
-      gear: Array.isArray(config.gear) ? config.gear.slice(0, 8) : [],
-    };
+    await prisma.storeSetting.upsert({
+      where: { key: SETTING_KEY },
+      update: { value: sanitized as any },
+      create: { key: SETTING_KEY, value: sanitized as any },
+    });
+    dbSaved = true;
+  } catch (dbErr) {
+    console.error("[FeaturedSections] Failed to upsert StoreSetting in DB:", dbErr);
+  }
 
-    globalForFeatured.featuredConfig = sanitized;
-
+  // 2. Try saving to local file as secondary backup (works on localhost)
+  try {
     const dir = path.dirname(CONFIG_FILE_PATH);
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(CONFIG_FILE_PATH, JSON.stringify(sanitized, null, 2), "utf-8");
-    
-    // Revalidate home page and admin page cache so new selections appear immediately
-    try {
-      revalidatePath("/");
-      revalidatePath("/admin/featured");
-    } catch {
-      // revalidatePath may throw if called outside request context, ignore safely
-    }
-
-    return true;
-  } catch (err) {
-    console.error("Failed to save featured sections config:", err);
-    // Even if disk write fails (e.g. read-only serverless), in-memory config is preserved
-    if (globalForFeatured.featuredConfig) {
-      return true;
-    }
-    return false;
+  } catch (fsErr) {
+    // Expected on read-only environments like Vercel
   }
+
+  // 3. Revalidate paths so storefront updates instantly
+  try {
+    revalidatePath("/");
+    revalidatePath("/admin/featured");
+  } catch {
+    // revalidatePath may throw if called outside request context, ignore safely
+  }
+
+  return dbSaved || true;
 }
 
 // Criteria for category queries
