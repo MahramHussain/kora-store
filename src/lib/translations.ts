@@ -459,6 +459,11 @@ export const translations = {
   // ProductUI specific
   "sleeve_patches": { en: "Sleeve Patches", ar: "شارات الكم" },
   "sleeve_patches_desc": { en: "Add the official sleeve patch", ar: "إضافة شارة الكم الرسمية" },
+  "club_patch": { en: "Club patch", ar: "شارة النادي" },
+  "choose_suitable_patch": { en: "(Choose the suitable patch)", ar: "(اختر الشارة المناسبة)" },
+  "no_patch": { en: "No Sleeve Patch", ar: "بدون شارة" },
+  "right_sleeve_badge": { en: "Right Sleeve Badge", ar: "شارة الكم الأيمن" },
+  "left_sleeve_badge": { en: "Left Sleeve Badge", ar: "شارة الكم الأيسر" },
   "name_number_printing": { en: "Name & Number printing", ar: "طباعة الاسم والرقم" },
   "latest_active_drop": { en: "Latest Active Drop", ar: "آخر طلب نشط" },
   "total_value": { en: "Total Value", ar: "القيمة الإجمالية" },

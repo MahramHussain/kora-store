@@ -15,11 +15,8 @@ async function FeaturedSectionGrid({ sectionId }: { sectionId: SectionId }) {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 w-full">
-      {products.map((product, index) => (
-        <div
-          key={product.id}
-          className={index >= 4 ? "hidden md:block" : ""}
-        >
+      {products.map((product) => (
+        <div key={product.id}>
           <ProductCard
             product={{
               ...product,
@@ -37,10 +34,7 @@ function SectionGridSkeleton({ count = 8 }: { count?: number }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 w-full">
       {Array.from({ length: count }).map((_, index) => (
-        <div
-          key={index}
-          className={index >= 4 ? "hidden md:block" : ""}
-        >
+        <div key={index}>
           <ProductSkeletonCard />
         </div>
       ))}
