@@ -160,7 +160,7 @@ export async function POST(req: Request) {
     }
 
     const netSubtotal = calculatedSubtotal - actualDiscount;
-    const computedShippingFee = netSubtotal > 200 ? 0 : 25;
+    const computedShippingFee = netSubtotal >= 200 ? 0 : 25;
     const computedTotal = netSubtotal + computedShippingFee + parseFloat(tax || 0);
 
     // 3. Process checkout inside a robust transaction

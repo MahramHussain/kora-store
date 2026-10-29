@@ -129,7 +129,7 @@ export default function CheckoutPage() {
   };
 
   const discountAmount = subtotal * discountPercent;
-  const shippingCharge = (subtotal - discountAmount) > 200 ? 0 : 25;
+  const shippingCharge = (subtotal - discountAmount) >= 200 ? 0 : 25;
   const finalTotal = subtotal - discountAmount + shippingCharge;
 
   // Redirect to cart if empty

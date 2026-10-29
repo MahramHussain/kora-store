@@ -59,7 +59,7 @@ export default async function Home() {
         <span className="block md:inline md:ms-1 mt-0.5 md:mt-0">{t("promo_code_text")}</span>
       </div>
 
-      {/* 1. BEST SELLERS (12 Products: 4 in a row on desktop, 2 rows on mobile) */}
+      {/* 1. BEST SELLERS (16 Products: 4 in a row on desktop, 2 in a row on mobile) */}
       <section className="px-3 sm:px-6 my-8 sm:my-10 md:my-12 max-w-7xl mx-auto w-full">
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
@@ -79,7 +79,7 @@ export default async function Home() {
           </Link>
         </div>
 
-        <Suspense fallback={<SectionGridSkeleton count={12} />}>
+        <Suspense fallback={<SectionGridSkeleton count={16} />}>
           <FeaturedSectionGrid sectionId="best_sellers" />
         </Suspense>
       </section>
@@ -87,7 +87,7 @@ export default async function Home() {
       {/* DYNAMIC HERO BANNER CAROUSEL */}
       <HeroBanner />
 
-      {/* 2. CLUB JERSEYS (8 Products: 4 in a row on desktop, 2 rows on mobile) */}
+      {/* 2. CLUB JERSEYS (8 Products: 4 in a row on desktop, 2 in a row on mobile) */}
       <section className="px-3 sm:px-6 my-8 sm:my-12 md:my-16 max-w-7xl mx-auto w-full">
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
@@ -112,7 +112,7 @@ export default async function Home() {
         </Suspense>
       </section>
 
-      {/* 3. WORLD CUP & NATIONAL JERSEYS (8 Products: 4 in a row on desktop, 2 rows on mobile) */}
+      {/* 3. WORLD CUP & NATIONAL JERSEYS (12 Products: 4 in a row on desktop, 2 in a row on mobile) */}
       <section className="px-3 sm:px-6 mb-8 sm:mb-12 md:mb-16 max-w-7xl mx-auto w-full">
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
@@ -132,12 +132,12 @@ export default async function Home() {
           </Link>
         </div>
 
-        <Suspense fallback={<SectionGridSkeleton count={8} />}>
+        <Suspense fallback={<SectionGridSkeleton count={12} />}>
           <FeaturedSectionGrid sectionId="national" />
         </Suspense>
       </section>
 
-      {/* 4. SHOES & BOOTS (8 Products: 4 in a row on desktop, 2 rows on mobile) */}
+      {/* 4. SHOES & BOOTS (16 Products: 4 in a row on desktop, 2 in a row on mobile) */}
       <section className="px-3 sm:px-6 mb-8 sm:mb-12 md:mb-16 max-w-7xl mx-auto w-full">
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
@@ -157,12 +157,12 @@ export default async function Home() {
           </Link>
         </div>
 
-        <Suspense fallback={<SectionGridSkeleton count={8} />}>
+        <Suspense fallback={<SectionGridSkeleton count={16} />}>
           <FeaturedSectionGrid sectionId="shoes" />
         </Suspense>
       </section>
 
-      {/* 5. STREETWEAR, ACCESSORIES & GEAR (8 Products: 4 in a row on desktop, 2 rows on mobile) */}
+      {/* 5. STREETWEAR, ACCESSORIES & GEAR (12 Products: 4 in a row on desktop, 2 in a row on mobile) */}
       <section className="px-3 sm:px-6 mb-16 md:mb-24 max-w-7xl mx-auto w-full">
         <div className="flex justify-between items-end mb-4 md:mb-6 border-b border-slate-200 dark:border-slate-800 pb-3 md:pb-4">
           <div>
@@ -182,7 +182,7 @@ export default async function Home() {
           </Link>
         </div>
 
-        <Suspense fallback={<SectionGridSkeleton count={8} />}>
+        <Suspense fallback={<SectionGridSkeleton count={12} />}>
           <FeaturedSectionGrid sectionId="gear" />
         </Suspense>
       </section>

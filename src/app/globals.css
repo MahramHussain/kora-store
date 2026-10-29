@@ -1210,6 +1210,28 @@ html:not(.dark) * {
   background: #5E0683 !important;
 }
 
+/* Patch Carousel Navigation Buttons & Items in Dark Mode */
+.dark button[aria-label="Previous patches"],
+.dark button[aria-label="Next patches"] {
+  background-color: #1e293b !important; /* slate-800 */
+  border-color: #334155 !important; /* slate-700 */
+  color: #f1f5f9 !important; /* slate-100 */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4) !important;
+}
+.dark button[aria-label="Previous patches"]:hover:not(:disabled),
+.dark button[aria-label="Next patches"]:hover:not(:disabled) {
+  background-color: #334155 !important; /* slate-700 */
+  border-color: #475569 !important; /* slate-600 */
+  color: #c084fc !important; /* purple-400 */
+}
+.dark button[aria-label="Previous patches"]:disabled,
+.dark button[aria-label="Next patches"]:disabled {
+  background-color: #0f172a !important; /* slate-900 */
+  border-color: #1e293b !important; /* slate-800 */
+  color: #475569 !important; /* slate-600 */
+  opacity: 0.35 !important;
+}
+
 /* Caution alert overrides in dark mode */
 .dark .bg-amber-50\/50,
 .dark .bg-amber-50\/60,

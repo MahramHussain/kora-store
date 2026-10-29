@@ -5,7 +5,8 @@ import Link from "next/link";
 import { CURRENCY } from "@/lib/constants";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
-import { FaTrash, FaArrowRight, FaLock } from "react-icons/fa6";
+import { FaTrash, FaArrowRight, FaLock, FaCheck } from "react-icons/fa6";
+import FreeDeliveryBar from "@/components/FreeDeliveryBar";
 import { useTranslation } from "@/context/LanguageContext";
 
 export default function CartPage() {
@@ -23,7 +24,7 @@ export default function CartPage() {
     return total + (numericPrice * item.quantity);
   }, 0);
 
-  const shippingCharge = subtotal > 200 ? 0 : 25;
+  const shippingCharge = subtotal >= 200 ? 0 : 25;
 
   // --- THE GHOST CHECKOUT ENGINE ---
   const handleCheckout = async () => {
@@ -83,7 +84,11 @@ export default function CartPage() {
             </Link>
           </div>
         ) : (
-          // ACTIVE CART STATE
+          <div className="space-y-6 sm:space-y-8">
+            {/* FREE DELIVERY PROGRESS BAR */}
+            <FreeDeliveryBar subtotal={subtotal} />
+
+            {/* ACTIVE CART STATE */}
           <div className="flex flex-col lg:flex-row gap-12">
             
             {/* Left: Cart Items List */}
@@ -162,10 +167,30 @@ export default function CartPage() {
                   <div className="flex justify-between">
                     <span>{t("uae_delivery_label")}</span>
                     <span className="text-slate-900 font-bold">
-                      {shippingCharge === 0 ? t("free_label") : `${t("aed")}25.00`}
+                      {shippingCharge === 0 ? (
+                        <span className="text-emerald-600 font-extrabold flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full text-xs">
+                          <FaCheck className="text-[10px]" />
+                          <span>{t("free_label")}</span>
+                        </span>
+                      ) : (
+                        `${t("aed")}25.00`
+                      )}
                     </span>
                   </div>
                 </div>
+
+                {shippingCharge > 0 && (
+                  <div className="text-[11px] text-purple-700 dark:text-purple-300 font-semibold bg-purple-50 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/40 rounded-xl px-3 py-2 mb-6 flex items-center justify-between">
+                    <span>
+                      {language === "ar"
+                        ? `أضف ${(200 - subtotal).toFixed(2)} درهم للشحن المجاني`
+                        : `Add AED ${(200 - subtotal).toFixed(2)} for FREE delivery`}
+                    </span>
+                    <span className="font-extrabold text-kora dark:text-purple-400">
+                      {Math.min(100, Math.round((subtotal / 200) * 100))}%
+                    </span>
+                  </div>
+                )}
 
                 <div className="flex justify-between items-center border-t border-slate-200 pt-6 mb-8 font-sans">
                   <span className="font-bold text-slate-900 uppercase">{t("total_label")}</span>
@@ -182,8 +207,8 @@ export default function CartPage() {
                 <p className="text-center text-xs text-slate-500 mt-6 font-sans">{t("taxes_calculated_desc")}</p>
               </div>
             </div>
-
           </div>
+        </div>
         )}
       </div>
     </main>

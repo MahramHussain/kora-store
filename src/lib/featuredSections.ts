@@ -30,6 +30,22 @@ const globalForFeatured = global as unknown as {
 
 const SETTING_KEY = "featured_sections";
 
+export function getSectionTargetCount(sectionId: SectionId): number {
+  switch (sectionId) {
+    case "best_sellers":
+      return 16;
+    case "shoes":
+      return 16;
+    case "national":
+      return 12;
+    case "gear":
+      return 12;
+    case "club":
+    default:
+      return 8;
+  }
+}
+
 export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfig> {
   // 1. First try reading from PostgreSQL database (shared across all Vercel serverless instances)
   try {
@@ -39,11 +55,11 @@ export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfi
     if (record && record.value && typeof record.value === "object") {
       const val = record.value as any;
       const config: FeaturedSectionsConfig = {
-        best_sellers: Array.isArray(val.best_sellers) ? val.best_sellers.slice(0, 12) : [],
+        best_sellers: Array.isArray(val.best_sellers) ? val.best_sellers.slice(0, 16) : [],
         club: Array.isArray(val.club) ? val.club.slice(0, 8) : [],
-        national: Array.isArray(val.national) ? val.national.slice(0, 8) : [],
-        shoes: Array.isArray(val.shoes) ? val.shoes.slice(0, 8) : [],
-        gear: Array.isArray(val.gear) ? val.gear.slice(0, 8) : [],
+        national: Array.isArray(val.national) ? val.national.slice(0, 12) : [],
+        shoes: Array.isArray(val.shoes) ? val.shoes.slice(0, 16) : [],
+        gear: Array.isArray(val.gear) ? val.gear.slice(0, 12) : [],
       };
       globalForFeatured.featuredConfig = config;
       return config;
@@ -57,11 +73,11 @@ export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfi
     const raw = await fs.readFile(CONFIG_FILE_PATH, "utf-8");
     const parsed = JSON.parse(raw);
     const config: FeaturedSectionsConfig = {
-      best_sellers: Array.isArray(parsed.best_sellers) ? parsed.best_sellers.slice(0, 12) : [],
+      best_sellers: Array.isArray(parsed.best_sellers) ? parsed.best_sellers.slice(0, 16) : [],
       club: Array.isArray(parsed.club) ? parsed.club.slice(0, 8) : [],
-      national: Array.isArray(parsed.national) ? parsed.national.slice(0, 8) : [],
-      shoes: Array.isArray(parsed.shoes) ? parsed.shoes.slice(0, 8) : [],
-      gear: Array.isArray(parsed.gear) ? parsed.gear.slice(0, 8) : [],
+      national: Array.isArray(parsed.national) ? parsed.national.slice(0, 12) : [],
+      shoes: Array.isArray(parsed.shoes) ? parsed.shoes.slice(0, 16) : [],
+      gear: Array.isArray(parsed.gear) ? parsed.gear.slice(0, 12) : [],
     };
     globalForFeatured.featuredConfig = config;
     return config;
@@ -75,11 +91,11 @@ export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfi
 
 export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig): Promise<boolean> {
   const sanitized: FeaturedSectionsConfig = {
-    best_sellers: Array.isArray(config.best_sellers) ? config.best_sellers.slice(0, 12) : [],
+    best_sellers: Array.isArray(config.best_sellers) ? config.best_sellers.slice(0, 16) : [],
     club: Array.isArray(config.club) ? config.club.slice(0, 8) : [],
-    national: Array.isArray(config.national) ? config.national.slice(0, 8) : [],
-    shoes: Array.isArray(config.shoes) ? config.shoes.slice(0, 8) : [],
-    gear: Array.isArray(config.gear) ? config.gear.slice(0, 8) : [],
+    national: Array.isArray(config.national) ? config.national.slice(0, 12) : [],
+    shoes: Array.isArray(config.shoes) ? config.shoes.slice(0, 16) : [],
+    gear: Array.isArray(config.gear) ? config.gear.slice(0, 12) : [],
   };
 
   globalForFeatured.featuredConfig = sanitized;
@@ -148,10 +164,10 @@ export function getSectionCriteria(sectionId: SectionId) {
   }
 }
 
-// Fetch products for a section (12 for best_sellers, 8 for category sections)
+// Fetch products for a section (16 for best_sellers & shoes, 12 for national & gear, 8 for club)
 export async function getFeaturedProductsForSection(sectionId: SectionId) {
   try {
-    const targetCount = sectionId === "best_sellers" ? 12 : 8;
+    const targetCount = getSectionTargetCount(sectionId);
     const config = await getFeaturedSectionsConfig();
     const configuredIds = (config[sectionId] || []).filter(Boolean);
 
@@ -186,7 +202,7 @@ export async function getFeaturedProductsForSection(sectionId: SectionId) {
             { id: { notIn: existingIds } }
           ]
         },
-        take: 36,
+        take: 48,
         orderBy: { createdAt: "desc" },
         include: {
           reviews: { select: { rating: true } }

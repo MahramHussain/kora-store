@@ -51,7 +51,7 @@ export function ScrollSlider({ children }: { children: React.ReactNode }) {
         <button
           type="button"
           onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white text-slate-800 p-3 rounded-full shadow-lg border border-slate-200 hover:scale-110 transition-all hidden md:flex items-center justify-center -ml-5"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-30 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 p-3 rounded-full shadow-lg border border-slate-200 dark:border-slate-700 hover:scale-110 transition-all hidden md:flex items-center justify-center -ml-5"
           aria-label="Scroll left"
         >
           <FaChevronLeft className="text-sm font-bold" />
@@ -63,7 +63,7 @@ export function ScrollSlider({ children }: { children: React.ReactNode }) {
         <button
           type="button"
           onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-30 bg-white/90 hover:bg-white text-slate-800 p-3 rounded-full shadow-lg border border-slate-200 hover:scale-110 transition-all hidden md:flex items-center justify-center -mr-5"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-30 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 p-3 rounded-full shadow-lg border border-slate-200 dark:border-slate-700 hover:scale-110 transition-all hidden md:flex items-center justify-center -mr-5"
           aria-label="Scroll right"
         >
           <FaChevronRight className="text-sm font-bold" />

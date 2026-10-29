@@ -37,11 +37,11 @@ interface FeaturedData {
 }
 
 const SECTIONS: { id: SectionId; label: string; desc: string; icon: string; maxSlots: number }[] = [
-  { id: "best_sellers", label: "Best Sellers", desc: "12 Slots - All Categories", icon: "🏆", maxSlots: 12 },
+  { id: "best_sellers", label: "Best Sellers", desc: "16 Slots - All Categories", icon: "🏆", maxSlots: 16 },
   { id: "club", label: "Club Jerseys", desc: "8 Slots - Match shirts", icon: "⚽", maxSlots: 8 },
-  { id: "national", label: "National Jerseys", desc: "8 Slots - International", icon: "🌍", maxSlots: 8 },
-  { id: "shoes", label: "Shoes", desc: "8 Slots - Boots & Footwear", icon: "👟", maxSlots: 8 },
-  { id: "gear", label: "Streetwear & Gear", desc: "8 Slots - Accessories & Gear", icon: "🎒", maxSlots: 8 },
+  { id: "national", label: "National Jerseys", desc: "12 Slots - International", icon: "🌍", maxSlots: 12 },
+  { id: "shoes", label: "Shoes", desc: "16 Slots - Boots & Footwear", icon: "👟", maxSlots: 16 },
+  { id: "gear", label: "Streetwear & Gear", desc: "12 Slots - Accessories & Gear", icon: "🎒", maxSlots: 12 },
 ];
 
 export default function FeaturedSectionsAdminPage() {
@@ -50,11 +50,11 @@ export default function FeaturedSectionsAdminPage() {
   const [data, setData] = useState<FeaturedData | null>(null);
   const [activeSection, setActiveSection] = useState<SectionId>("best_sellers");
   const [selectedSlots, setSelectedSlots] = useState<Record<SectionId, (string | null)[]>>({
-    best_sellers: Array(12).fill(null),
+    best_sellers: Array(16).fill(null),
     club: Array(8).fill(null),
-    national: Array(8).fill(null),
-    shoes: Array(8).fill(null),
-    gear: Array(8).fill(null),
+    national: Array(12).fill(null),
+    shoes: Array(16).fill(null),
+    gear: Array(12).fill(null),
   });
 
   // Modal for selecting a product for a slot
@@ -77,11 +77,11 @@ export default function FeaturedSectionsAdminPage() {
       };
 
       setSelectedSlots({
-        best_sellers: padSlots((res.config as any).best_sellers, 12),
+        best_sellers: padSlots((res.config as any).best_sellers, 16),
         club: padSlots(res.config.club, 8),
-        national: padSlots(res.config.national, 8),
-        shoes: padSlots(res.config.shoes, 8),
-        gear: padSlots(res.config.gear, 8),
+        national: padSlots(res.config.national, 12),
+        shoes: padSlots(res.config.shoes, 16),
+        gear: padSlots(res.config.gear, 12),
       });
     } catch (err) {
       console.error("Failed to load featured data:", err);
@@ -204,7 +204,7 @@ export default function FeaturedSectionsAdminPage() {
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-2xl">
-              Curate the exact products displayed on the homepage. Best Sellers supports 12 products across all categories; other sections support 6 products. Empty slots automatically fill with top items.
+              Curate the exact products displayed on the homepage. Best Sellers and Shoes support 16 products; National and Streetwear &amp; Gear support 12 products; Club Jerseys supports 8 products. Empty slots automatically fill with top items.
             </p>
           </div>
           <button
@@ -295,8 +295,8 @@ export default function FeaturedSectionsAdminPage() {
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               {activeSection === "best_sellers"
-                ? "Select up to 12 products from any category across your store database."
-                : `Select up to 8 products from the ${currentSectionMeta.label} catalog.`}
+                ? "Select up to 16 products from any category across your store database."
+                : `Select up to ${maxSlots} products from the ${currentSectionMeta.label} catalog.`}
             </p>
           </div>
           <button

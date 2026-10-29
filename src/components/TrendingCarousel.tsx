@@ -104,14 +104,14 @@ export function TrendingCarousel({ products }: { products: any[] }) {
 
         <button 
           onClick={handlePrev}
-          className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 flex items-center justify-center bg-white/80 hover:bg-orange-500 text-slate-800 hover:text-white rounded-full backdrop-blur-md border border-slate-200 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 shadow-md"
+          className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 flex items-center justify-center bg-white/80 dark:bg-slate-800/80 hover:bg-orange-500 dark:hover:bg-orange-500 text-slate-800 dark:text-slate-100 hover:text-white rounded-full backdrop-blur-md border border-slate-200 dark:border-slate-700 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 shadow-md"
           aria-label="Previous Item"
         >
           <FaChevronLeft className="text-xl pr-1" />
         </button>
         <button 
           onClick={handleNext}
-          className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 flex items-center justify-center bg-white/80 hover:bg-orange-500 text-slate-800 hover:text-white rounded-full backdrop-blur-md border border-slate-200 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 shadow-md"
+          className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-30 w-12 h-12 flex items-center justify-center bg-white/80 dark:bg-slate-800/80 hover:bg-orange-500 dark:hover:bg-orange-500 text-slate-800 dark:text-slate-100 hover:text-white rounded-full backdrop-blur-md border border-slate-200 dark:border-slate-700 transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 shadow-md"
           aria-label="Next Item"
         >
           <FaChevronRight className="text-xl pl-1" />

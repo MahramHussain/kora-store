@@ -419,23 +419,23 @@ function PatchCarouselSelector({
   };
 
   return (
-    <div className="bg-slate-50 border border-slate-200/80 rounded-3xl p-5 font-sans shadow-xs text-start mt-5">
+    <div className="bg-slate-50 dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 rounded-3xl p-5 font-sans shadow-xs text-start mt-5">
       {/* Header: Section Title + Subtitle + Desktop Scroll Arrows */}
       <div className="flex items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-11 h-11 bg-white rounded-2xl border border-slate-200/60 flex items-center justify-center shadow-xs shrink-0">
+          <div className="w-11 h-11 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/60 dark:border-slate-700 flex items-center justify-center shadow-xs shrink-0">
             <SleevePatchIcon className="w-6 h-6 text-kora" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-slate-900 font-extrabold text-[15px] leading-tight">
+              <h3 className="text-slate-900 dark:text-white font-extrabold text-[15px] leading-tight">
                 {title}
               </h3>
-              <span className="bg-white border border-slate-200/80 rounded-lg px-2.5 py-0.5 text-[11px] font-bold text-slate-800 shadow-2xs">
+              <span className="bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 rounded-lg px-2.5 py-0.5 text-[11px] font-bold text-slate-800 dark:text-slate-200 shadow-2xs">
                 +{priceLabel}
               </span>
             </div>
-            <p className="text-slate-400 text-xs font-medium mt-0.5">
+            <p className="text-slate-400 dark:text-slate-400 text-xs font-medium mt-0.5">
               {subtitle}
             </p>
           </div>
@@ -447,8 +447,10 @@ function PatchCarouselSelector({
             type="button"
             onClick={() => handleScroll("left")}
             disabled={!canScrollLeft}
-            className={`w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-700 transition-all shadow-xs ${
-              !canScrollLeft ? "opacity-30 cursor-not-allowed" : "hover:bg-slate-100 hover:border-slate-300 active:scale-95 cursor-pointer"
+            className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all shadow-xs ${
+              !canScrollLeft
+                ? "border-slate-200 dark:border-slate-800 bg-slate-100/60 dark:bg-slate-800/40 text-slate-300 dark:text-slate-600 opacity-40 cursor-not-allowed"
+                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 active:scale-95 cursor-pointer hover:text-kora dark:hover:text-purple-400"
             }`}
             title="Previous"
             aria-label="Previous patches"
@@ -461,8 +463,10 @@ function PatchCarouselSelector({
             type="button"
             onClick={() => handleScroll("right")}
             disabled={!canScrollRight}
-            className={`w-8 h-8 rounded-full border border-slate-200 bg-white flex items-center justify-center text-slate-700 transition-all shadow-xs ${
-              !canScrollRight ? "opacity-30 cursor-not-allowed" : "hover:bg-slate-100 hover:border-slate-300 active:scale-95 cursor-pointer"
+            className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all shadow-xs ${
+              !canScrollRight
+                ? "border-slate-200 dark:border-slate-800 bg-slate-100/60 dark:bg-slate-800/40 text-slate-300 dark:text-slate-600 opacity-40 cursor-not-allowed"
+                : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 active:scale-95 cursor-pointer hover:text-kora dark:hover:text-purple-400"
             }`}
             title="Next"
             aria-label="Next patches"
@@ -487,14 +491,14 @@ function PatchCarouselSelector({
             <div
               key={patch.name}
               onClick={() => onSelect(isSelected ? "" : patch.name)}
-              className={`w-36 sm:w-40 shrink-0 snap-start flex flex-col rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none bg-white overflow-hidden group active:scale-98 transform-gpu ${
+              className={`w-36 sm:w-40 shrink-0 snap-start flex flex-col rounded-2xl border-2 transition-all duration-200 cursor-pointer select-none bg-white dark:bg-slate-900/90 overflow-hidden group active:scale-98 transform-gpu ${
                 isSelected
-                  ? "border-kora bg-purple-50/25 ring-2 ring-kora/20 shadow-md"
-                  : "border-slate-200/90 hover:border-slate-300 hover:shadow-xs"
+                  ? "border-kora dark:border-purple-500 bg-purple-50/25 dark:bg-purple-950/40 ring-2 ring-kora/20 dark:ring-purple-500/20 shadow-md"
+                  : "border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs"
               }`}
             >
               {/* Top: Image container */}
-              <div className="w-full h-28 sm:h-32 bg-slate-50/80 flex items-center justify-center p-3 relative border-b border-slate-100">
+              <div className="w-full h-28 sm:h-32 bg-slate-50/80 dark:bg-slate-950/60 flex items-center justify-center p-3 relative border-b border-slate-100 dark:border-slate-800">
                 {patch.image ? (
                   <img
                     src={patch.image}
@@ -514,7 +518,7 @@ function PatchCarouselSelector({
                       e.stopPropagation();
                       onInspectImage({ name: patch.name, image: patch.image });
                     }}
-                    className="absolute top-2 right-2 w-6 h-6 rounded-lg bg-white/90 backdrop-blur-xs border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-white flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shadow-xs cursor-pointer"
+                    className="absolute top-2 right-2 w-6 h-6 rounded-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-xs border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-700 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity shadow-xs cursor-pointer"
                     title="Inspect Badge"
                   >
                     🔍
@@ -526,25 +530,25 @@ function PatchCarouselSelector({
               <div className="p-3 flex flex-col justify-between flex-1 text-start">
                 <div className="flex items-start gap-2">
                   <div className={`w-4 h-4 rounded-full border-2 shrink-0 mt-0.5 flex items-center justify-center transition-all ${
-                    isSelected ? "border-kora bg-kora" : "border-slate-300 bg-white"
+                    isSelected ? "border-kora bg-kora" : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
                   }`}>
                     {isSelected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
                   </div>
                   <span className={`text-xs font-bold leading-tight line-clamp-2 min-h-[2rem] ${
-                    isSelected ? "text-slate-900" : "text-slate-700"
+                    isSelected ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"
                   }`}>
                     {patch.name}
                   </span>
                 </div>
 
-                <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-start">
+                <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-start">
                   <span className={`text-[11px] font-black ${
-                    isSelected ? "text-kora" : "text-slate-700"
+                    isSelected ? "text-kora dark:text-purple-400" : "text-slate-700 dark:text-slate-300"
                   }`}>
                     +{priceLabel}
                   </span>
                   {isSelected && (
-                    <span className="text-[10px] font-black text-kora uppercase tracking-wider">
+                    <span className="text-[10px] font-black text-kora dark:text-purple-400 uppercase tracking-wider">
                       ✓ Active
                     </span>
                   )}
@@ -2993,18 +2997,18 @@ export default function ProductUI({ product }: { product: any }) {
           onClick={() => setPreviewModalPatch(null)}
         >
           <div
-            className="bg-white border border-slate-200 p-6 rounded-3xl max-w-md w-full shadow-2xl relative text-center"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-3xl max-w-md w-full shadow-2xl relative text-center"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setPreviewModalPatch(null)}
-              className="absolute top-4 right-4 w-8 h-8 text-slate-400 hover:text-slate-800 rounded-full hover:bg-slate-100 flex items-center justify-center transition-colors font-bold"
+              className="absolute top-4 right-4 w-8 h-8 text-slate-400 hover:text-slate-800 dark:hover:text-white rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors font-bold"
             >
               ✕
             </button>
-            <h3 className="text-base font-black text-slate-900 mb-3 pr-6">{previewModalPatch.name}</h3>
-            <div className="w-64 h-64 mx-auto bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-center justify-center mb-3">
+            <h3 className="text-base font-black text-slate-900 dark:text-white mb-3 pr-6">{previewModalPatch.name}</h3>
+            <div className="w-64 h-64 mx-auto bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-center mb-3">
               <img src={previewModalPatch.image} alt={previewModalPatch.name} className="max-w-full max-h-full object-contain" />
             </div>
             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Official Sleeve Patch Preview</p>

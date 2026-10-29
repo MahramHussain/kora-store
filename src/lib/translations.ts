@@ -386,6 +386,16 @@ export const translations = {
   "total_label": { en: "Total", ar: "الإجمالي" },
   "taxes_calculated_desc": { en: "Taxes calculated at checkout. All UAE orders delivered within 48 hours.", ar: "يتم احتساب الرسوم والضرائب عند الدفع. يتم توصيل جميع طلبات الإمارات خلال 48 ساعة." },
 
+  // Free Delivery Progress Bar
+  "free_delivery_unlocked_title": { en: "You've unlocked FREE Delivery across UAE!", ar: "مبروك! لقد حصلت على توصيل مجاني في جميع أنحاء الإمارات!" },
+  "free_delivery_progress_title_prefix": { en: "Add", ar: "أضف" },
+  "free_delivery_progress_title_suffix": { en: "more to unlock FREE Delivery", ar: "إضافية للحصول على توصيل مجاني" },
+  "free_delivery_unlocked_desc": { en: "Complimentary 1-2 day priority shipping is unlocked for your order.", ar: "تم تفعيل الشحن السريع المجاني خلال 1-2 يوم لطلبك." },
+  "free_delivery_progress_desc": { en: "Orders of 200 AED or more qualify for free express delivery anywhere in the UAE.", ar: "الطلبات بقيمة 200 درهم أو أكثر مؤهلة للشحن السريع المجاني في جميع أنحاء الإمارات." },
+  "free_delivery_unlocked_pill": { en: "Free Delivery Unlocked", ar: "شحن مجاني مفعل" },
+  "free_delivery_away_pill": { en: "Away from Free Delivery", ar: "متبقي للشحن المجاني" },
+  "free_delivery_threshold_milestone": { en: "AED 200 Goal", ar: "هدف 200 درهم" },
+
   // Checkout page specific
   "securing_order": { en: "Securing Order...", ar: "تأمين الطلب..." },
   "place_order": { en: "Place Order", ar: "تأكيد الطلب" },
