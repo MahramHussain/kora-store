@@ -1,35 +1,54 @@
 import { prisma } from "@/lib/prisma";
 import ShopUI from "./ShopUI";
 import { Suspense } from "react";
+import { unstable_cache } from "next/cache";
 
-// Keeps the cache-buster so new Admin drops show up instantly!
-export const dynamic = 'force-dynamic';
+// Enable ISR caching at the edge (60s revalidation, instantly purged on admin updates via revalidatePath)
+export const revalidate = 60;
+
+// Cached fetcher for customer-facing shop products to eliminate repetitive Neon data transfers
+const getCachedShopProducts = unstable_cache(
+  async () => {
+    const rawProducts = await prisma.product.findMany({
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        name: true,
+        nameAr: true,
+        category: true,
+        team: true,
+        price: true,
+        originalPrice: true,
+        tag: true,
+        stock: true,
+        images: true,
+        description: true,
+        descriptionAr: true,
+        createdAt: true,
+        reviews: {
+          select: { rating: true }
+        }
+      }
+    });
+
+    return rawProducts.map((product) => ({
+      ...product,
+      // Only supply the primary image on the catalog grid to reduce heavy Base64 payload by 75%+
+      images: product.images && product.images.length > 0 ? [product.images[0]] : [],
+      price: product.price.toString(),
+      originalPrice: product.originalPrice ? product.originalPrice.toString() : null,
+      createdAt: product.createdAt.toISOString(),
+    }));
+  },
+  ["shop-page-products-cache"],
+  { revalidate: 60, tags: ["products", "shop-products"] }
+);
 
 export default async function ShopPage() {
-  
-  // 1. Fetch the fresh gear from the store
-  const rawProducts = await prisma.product.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      reviews: {
-        select: { rating: true }
-      }
-    }
-  });
+  const safeProducts = await getCachedShopProducts();
 
-  // 2. Clean the data for the Client UI
-  const safeProducts = rawProducts.map((product: any) => ({
-    ...product,
-    id: product.id, 
-    price: product.price.toString(),
-    originalPrice: product.originalPrice ? product.originalPrice.toString() : null,
-    createdAt: product.createdAt.toISOString(),
-  }));
-
-
-  // 3. Pass the data to the UI
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white text-slate-500 flex items-center justify-center font-sans text-sm">Loading the Shop...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white dark:bg-slate-950 text-slate-500 flex items-center justify-center font-sans text-sm">Loading the Shop...</div>}>
       <ShopUI products={safeProducts} />
     </Suspense>
   );

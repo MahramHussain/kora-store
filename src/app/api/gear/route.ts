@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { currentUser, auth, clerkClient } from "@clerk/nextjs/server";
 import { resolveImageFilename } from "@/lib/resolveImage";
 import { translateToArabic } from "@/lib/translate";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 async function checkIsAdmin(): Promise<boolean> {
   if (process.env.NODE_ENV === "development") {
@@ -121,6 +121,13 @@ export async function POST(req: Request) {
       }
     });
 
+    try {
+      (revalidateTag as any)("products");
+      (revalidateTag as any)("shop-products");
+      revalidatePath("/shop");
+      revalidatePath("/admin/inventory");
+      revalidatePath("/", "layout");
+    } catch (e) {}
     return NextResponse.json({ success: true, product: newProduct });
     
   } catch (error) {
@@ -264,6 +271,8 @@ export async function PUT(req: Request) {
     });
 
     try {
+      (revalidateTag as any)("products");
+      (revalidateTag as any)("shop-products");
       revalidatePath("/admin/inventory");
       revalidatePath("/admin");
       revalidatePath("/shop");

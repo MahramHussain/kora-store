@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { currentUser, auth, clerkClient } from "@clerk/nextjs/server";
 import { resolveImageFilename } from "@/lib/resolveImage";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { getFeaturedSectionsConfig, saveFeaturedSectionsConfig, getSectionCriteria, FeaturedSectionsConfig } from "@/lib/featuredSections";
 
 // Helper to guarantee only the admin can call protected operations
@@ -134,6 +134,15 @@ export async function deleteProduct(productId: string) {
     await prisma.product.delete({
       where: { id: productId },
     });
+    try {
+      (revalidateTag as any)("products");
+      (revalidateTag as any)("shop-products");
+      revalidatePath("/admin/inventory");
+      revalidatePath("/admin");
+      revalidatePath("/shop");
+      revalidatePath(`/shop/${productId}`);
+      revalidatePath("/", "layout");
+    } catch (e) {}
     return { success: true };
   } catch (error: any) {
     console.error("Failed to delete product:", error);
@@ -319,6 +328,8 @@ export async function updateProduct(
     });
 
     try {
+      (revalidateTag as any)("products");
+      (revalidateTag as any)("shop-products");
       revalidatePath("/admin/inventory");
       revalidatePath("/admin");
       revalidatePath("/shop");

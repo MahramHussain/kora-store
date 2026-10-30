@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { prisma } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 
 export type SectionId = "best_sellers" | "club" | "national" | "shoes" | "gear";
 
@@ -126,6 +126,8 @@ export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig)
   try {
     revalidatePath("/");
     revalidatePath("/admin/featured");
+    (revalidateTag as any)("featured-sections");
+    (revalidateTag as any)("products");
   } catch {
     // revalidatePath may throw if called outside request context, ignore safely
   }
@@ -165,86 +167,104 @@ export function getSectionCriteria(sectionId: SectionId) {
 }
 
 // Fetch products for a section (16 for best_sellers & shoes, 12 for national & gear, 8 for club)
-export async function getFeaturedProductsForSection(sectionId: SectionId) {
-  try {
-    const targetCount = getSectionTargetCount(sectionId);
-    const config = await getFeaturedSectionsConfig();
-    const configuredIds = (config[sectionId] || []).filter(Boolean);
+export const getFeaturedProductsForSection = unstable_cache(
+  async (sectionId: SectionId) => {
+    try {
+      const targetCount = getSectionTargetCount(sectionId);
+      const config = await getFeaturedSectionsConfig();
+      const configuredIds = (config[sectionId] || []).filter(Boolean);
 
-    let selectedProducts: any[] = [];
+      const cardSelect = {
+        id: true,
+        name: true,
+        nameAr: true,
+        category: true,
+        team: true,
+        price: true,
+        originalPrice: true,
+        tag: true,
+        stock: true,
+        images: true,
+        createdAt: true,
+        isWorldCup: true,
+        reviews: { select: { rating: true } }
+      };
 
-    // 1. Fetch explicitly configured products
-    if (configuredIds.length > 0) {
-      const fetched = await prisma.product.findMany({
-        where: { id: { in: configuredIds } },
-        include: {
-          reviews: { select: { rating: true } }
-        }
-      });
+      let selectedProducts: any[] = [];
 
-      // Preserve the exact slot ordering specified in the configuration
-      const idMap = new Map(fetched.map((p) => [p.id, p]));
-      selectedProducts = configuredIds
-        .map((id) => idMap.get(id))
-        .filter(Boolean);
-    }
-
-    // 2. If fewer than targetCount products, fill remaining slots
-    if (selectedProducts.length < targetCount) {
-      const needed = targetCount - selectedProducts.length;
-      const existingIds = selectedProducts.map((p) => p.id);
-      const criteria = getSectionCriteria(sectionId);
-
-      const fallbacks = await prisma.product.findMany({
-        where: {
-          AND: [
-            criteria,
-            { id: { notIn: existingIds } }
-          ]
-        },
-        take: 48,
-        orderBy: { createdAt: "desc" },
-        include: {
-          reviews: { select: { rating: true } }
-        }
-      });
-
-      // Sort: Trending & On Sale tags first, then newest
-      fallbacks.sort((a, b) => {
-        const priorityScore = (item: any) => {
-          if (item.tag === "Trending") return 2;
-          if (item.tag === "On Sale") return 1;
-          return 0;
-        };
-        const scoreA = priorityScore(a);
-        const scoreB = priorityScore(b);
-        if (scoreA !== scoreB) return scoreB - scoreA;
-        return b.createdAt.getTime() - a.createdAt.getTime();
-      });
-
-      selectedProducts.push(...fallbacks.slice(0, needed));
-
-      // 3. Ultra-safe backup: If strict category criteria still didn't reach targetCount, fill from newest products
-      if (selectedProducts.length < targetCount) {
-        const stillNeeded = targetCount - selectedProducts.length;
-        const currentIds = selectedProducts.map((p) => p.id);
-        const ultraFallbacks = await prisma.product.findMany({
-          where: {
-            id: { notIn: currentIds }
-          },
-          take: stillNeeded,
-          orderBy: { createdAt: "desc" },
-          include: {
-            reviews: { select: { rating: true } }
-          }
+      // 1. Fetch explicitly configured products
+      if (configuredIds.length > 0) {
+        const fetched = await prisma.product.findMany({
+          where: { id: { in: configuredIds } },
+          select: cardSelect
         });
-        selectedProducts.push(...ultraFallbacks);
-      }
-    }
 
-    return selectedProducts.slice(0, targetCount);
-  } catch (err) {
-    console.error(`[FeaturedSections] Database query error for ${sectionId}:`, err);
-    return [];
-  }
-}
+        // Preserve the exact slot ordering specified in the configuration
+        const idMap = new Map(fetched.map((p) => [p.id, p]));
+        selectedProducts = configuredIds
+          .map((id) => idMap.get(id))
+          .filter(Boolean);
+      }
+
+      // 2. If fewer than targetCount products, fill remaining slots
+      if (selectedProducts.length < targetCount) {
+        const needed = targetCount - selectedProducts.length;
+        const existingIds = selectedProducts.map((p) => p.id);
+        const criteria = getSectionCriteria(sectionId);
+
+        const fallbacks = await prisma.product.findMany({
+          where: {
+            AND: [
+              criteria,
+              { id: { notIn: existingIds } }
+            ]
+          },
+          take: 48,
+          orderBy: { createdAt: "desc" },
+          select: cardSelect
+        });
+
+        // Sort: Trending & On Sale tags first, then newest
+        fallbacks.sort((a, b) => {
+          const priorityScore = (item: any) => {
+            if (item.tag === "Trending") return 2;
+            if (item.tag === "On Sale") return 1;
+            return 0;
+          };
+          const scoreA = priorityScore(a);
+          const scoreB = priorityScore(b);
+          if (scoreA !== scoreB) return scoreB - scoreA;
+          return b.createdAt.getTime() - a.createdAt.getTime();
+        });
+
+        selectedProducts.push(...fallbacks.slice(0, needed));
+
+        // 3. Ultra-safe backup: If strict category criteria still didn't reach targetCount, fill from newest products
+        if (selectedProducts.length < targetCount) {
+          const stillNeeded = targetCount - selectedProducts.length;
+          const currentIds = selectedProducts.map((p) => p.id);
+          const ultraFallbacks = await prisma.product.findMany({
+            where: {
+              id: { notIn: currentIds }
+            },
+            take: stillNeeded,
+            orderBy: { createdAt: "desc" },
+            select: cardSelect
+          });
+          selectedProducts.push(...ultraFallbacks);
+        }
+      }
+
+      // Only pass primary image to prevent multi-megabyte Base64 transfers on grid
+      return selectedProducts.slice(0, targetCount).map((p) => ({
+        ...p,
+        images: p.images && p.images.length > 0 ? [p.images[0]] : [],
+      }));
+    } catch (err) {
+      console.error(`[FeaturedSections] Database query error for ${sectionId}:`, err);
+      return [];
+    }
+  },
+  ["featured-section-products-cache"],
+  { revalidate: 60, tags: ["featured-sections", "products"] }
+);

@@ -102,14 +102,16 @@ export function ProductCard({ product }: { product: Product }) {
         ) : null}
 
         
-        {/* Dynamic Images — absolute overlay transitioning opacity for smooth, flicker-free hover animation */}
-        {images.length > 0 ? (
+        {/* Dynamic Images with async decoding & lazy loading */}
+        {images.length > 1 ? (
           images.slice(0, 4).map((imgUrl, idx) => (
             <img 
               key={idx}
               src={imgUrl} 
               alt={`${product.name} View ${idx + 1}`} 
               referrerPolicy="no-referrer"
+              loading="lazy"
+              decoding="async"
               onClick={handleImageTap}
               className={`absolute inset-0 w-full h-full object-cover drop-shadow-md group-hover:scale-105 transition-all duration-700 ${
                 idx === activeIdx 
@@ -118,6 +120,17 @@ export function ProductCard({ product }: { product: Product }) {
               }`} 
             />
           ))
+        ) : images.length === 1 ? (
+          <img 
+            src={images[0]} 
+            alt={product.name} 
+            referrerPolicy="no-referrer"
+            loading="lazy"
+            decoding="async"
+            className={`absolute inset-0 w-full h-full object-cover drop-shadow-md group-hover:scale-105 transition-all duration-700 ${
+              product.stock === 0 ? 'opacity-40 grayscale' : 'opacity-100'
+            }`} 
+          />
         ) : (
           <div className="text-slate-350 dark:text-slate-650 text-xs">{t("no_image")}</div>
         )}

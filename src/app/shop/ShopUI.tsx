@@ -37,6 +37,7 @@ function MiniCarousel({ images, alt, soldOut }: { images: string[]; alt: string;
         alt={alt}
         referrerPolicy="no-referrer"
         loading="lazy"
+        decoding="async"
         className={`w-full h-full object-cover ${soldOut ? "opacity-40 grayscale" : ""}`}
       />
     );
@@ -52,6 +53,7 @@ function MiniCarousel({ images, alt, soldOut }: { images: string[]; alt: string;
             alt={`${alt} ${idx + 1}`}
             referrerPolicy="no-referrer"
             loading="lazy"
+            decoding="async"
             className={`mobile-mini-carousel-slide object-cover ${soldOut ? "opacity-40 grayscale" : ""}`}
           />
         ))}
@@ -82,6 +84,11 @@ export default function ShopUI({ products }: { products: any[] }) {
 
   const sidebarRef = useRef<HTMLDivElement>(null);
   const searchParams = useSearchParams();
+
+  // ─── Frontend Pagination / Infinite Scroll ───
+  const PAGE_SIZE = 16;
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const loadMoreSentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setSearchQuery(searchParams.get("q") || "");
@@ -268,6 +275,33 @@ export default function ShopUI({ products }: { products: any[] }) {
     return t(key) || teamName;
   };
 
+  // Reset pagination when filters or search change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [activeCategory, activeTeam, searchQuery, activeTag]);
+
+  const paginatedProducts = displayProducts.slice(0, visibleCount);
+  const hasMore = visibleCount < displayProducts.length;
+
+  // Infinite scroll observer: dynamically loads next batch when user scrolls near the bottom
+  useEffect(() => {
+    if (!hasMore) return;
+    const sentinel = loadMoreSentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, displayProducts.length));
+        }
+      },
+      { rootMargin: "350px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, displayProducts.length]);
+
   return (
     <main className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans pt-4 md:pt-8 pb-20 px-4 md:px-6 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
@@ -437,7 +471,7 @@ export default function ShopUI({ products }: { products: any[] }) {
 
             {/* Mobile View: List Layout with Image Slideshow */}
             <div className="block sm:hidden space-y-3">
-              {displayProducts.map((product) => {
+              {paginatedProducts.map((product) => {
                 const images = product.images && product.images.length > 0
                   ? product.images
                   : product.image
@@ -510,10 +544,49 @@ export default function ShopUI({ products }: { products: any[] }) {
 
             {/* Desktop View: Grid Layout */}
             <div className="hidden sm:grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {displayProducts.map((product) => (
+              {paginatedProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
+
+            {/* ═══ Progressive Infinite Scroll & Pagination Controls ═══ */}
+            {displayProducts.length > 0 && (
+              <div className="mt-10 pt-4 flex flex-col items-center justify-center gap-3">
+                <div className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                  {t("showing_products")
+                    ? t("showing_products")
+                        .replace("{count}", String(paginatedProducts.length))
+                        .replace("{total}", String(displayProducts.length))
+                    : `Showing ${paginatedProducts.length} of ${displayProducts.length} products`}
+                </div>
+
+                {/* Progress Bar */}
+                <div className="w-56 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-kora rounded-full transition-all duration-300"
+                    style={{ width: `${Math.min(100, (paginatedProducts.length / displayProducts.length) * 100)}%` }}
+                  />
+                </div>
+
+                {hasMore ? (
+                  <>
+                    {/* Sentinel target for automatic infinite scroll */}
+                    <div ref={loadMoreSentinelRef} className="h-4 w-full pointer-events-none" aria-hidden="true" />
+                    <button
+                      type="button"
+                      onClick={() => setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, displayProducts.length))}
+                      className="mt-1 px-6 py-2.5 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-xs transition-all shadow-xs active:scale-95"
+                    >
+                      {t("load_more") || "Load More Products"}
+                    </button>
+                  </>
+                ) : (
+                  <p className="text-xs text-slate-400 dark:text-slate-500 font-medium mt-1">
+                    {t("all_products_loaded") || "You've viewed all products"}
+                  </p>
+                )}
+              </div>
+            )}
 
             {displayProducts.length === 0 && (
               <div className="text-center py-16 md:py-24 border border-slate-200 rounded-2xl bg-slate-50 shadow-sm">

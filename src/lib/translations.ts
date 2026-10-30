@@ -813,6 +813,9 @@ export const translations = {
   "loading_shop": { en: "Loading the Shop...", ar: "جاري تحميل المتجر..." },
   "loading": { en: "Loading...", ar: "جاري التحميل..." },
   "loading_dashboard": { en: "Loading Dashboard...", ar: "جاري تحميل لوحة التحكم..." },
-  "loading_account": { en: "Loading Account...", ar: "جاري تحميل الحساب..." }
+  "loading_account": { en: "Loading Account...", ar: "جاري تحميل الحساب..." },
+  "load_more": { en: "Load More Products", ar: "عرض المزيد من المنتجات" },
+  "showing_products": { en: "Showing {count} of {total} products", ar: "عرض {count} من أصل {total} منتج" },
+  "all_products_loaded": { en: "You've viewed all products", ar: "لقد شاهدت جميع المنتجات" }
 };
 

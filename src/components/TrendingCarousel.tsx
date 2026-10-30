@@ -1,24 +1,36 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { CURRENCY } from "@/lib/constants";
 
-export function TrendingCarousel({ products }: { products: any[] }) {
+export interface TrendingProduct {
+  id: string | number;
+  name: string;
+  category?: string;
+  price: string | number;
+  originalPrice?: string | number | null;
+  image?: string;
+  images?: string[];
+}
+
+export function TrendingCarousel({ products }: { products: TrendingProduct[] }) {
   const [swapIndex, setSwapIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
-  // Fallback if no products are passed yet
-  if (!products || products.length === 0) return null;
+  // Fallback if no products are passed yet (handled below hooks)
 
-  const handleNext = () => {
+
+  const handleNext = useCallback(() => {
+    if (!products || products.length === 0) return;
     setSwapIndex((prev) => (prev + 1) % products.length);
-  };
+  }, [products]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
+    if (!products || products.length === 0) return;
     setSwapIndex((prev) => (prev === 0 ? products.length - 1 : prev - 1));
-  };
+  }, [products]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowRight") handleNext();
@@ -26,10 +38,15 @@ export function TrendingCarousel({ products }: { products: any[] }) {
   };
 
   useEffect(() => {
-    if (isHovered) return;
-    const timer = setInterval(handleNext, 3000);
+    if (isHovered || !products || products.length === 0) return;
+    const timer = setInterval(() => {
+      handleNext();
+    }, 3000);
+
     return () => clearInterval(timer);
-  }, [isHovered, products.length]);
+  }, [isHovered, handleNext, products]);
+
+  if (!products || products.length === 0) return null;
 
   return (
     <section className="px-6 mb-16">
@@ -75,7 +92,7 @@ export function TrendingCarousel({ products }: { products: any[] }) {
                 <p className="text-xl md:text-3xl font-bold text-slate-700 mb-4 md:mb-8 font-sans flex items-baseline gap-2 justify-center md:justify-start">
                   {item.originalPrice && (
                     <span className="text-sm md:text-lg text-slate-400 line-through font-normal">
-                      {CURRENCY}{parseFloat(item.originalPrice).toFixed(0)}
+                      {CURRENCY}{Number(item.originalPrice).toFixed(0)}
                     </span>
                   )}
                   <span>

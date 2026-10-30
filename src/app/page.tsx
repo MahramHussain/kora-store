@@ -6,9 +6,8 @@ import { cookies } from "next/headers";
 import { translations } from "@/lib/translations";
 import { getFeaturedProductsForSection, SectionId } from "@/lib/featuredSections";
 
-// Force dynamic rendering so admin featured changes appear immediately on homepage
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+// Cache homepage on Vercel CDN with ISR; revalidated automatically when admin updates featured sections
+export const revalidate = 60;
 
 async function FeaturedSectionGrid({ sectionId }: { sectionId: SectionId }) {
   const products = await getFeaturedProductsForSection(sectionId);
