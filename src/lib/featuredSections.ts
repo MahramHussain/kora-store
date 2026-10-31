@@ -14,6 +14,7 @@ export interface FeaturedSectionsConfig {
 }
 
 const CONFIG_FILE_PATH = path.join(process.cwd(), "src", "data", "featured-sections.json");
+const LOCAL_PRODUCTS_FILE = path.join(process.cwd(), "prisma", "products.json");
 
 const DEFAULT_CONFIG: FeaturedSectionsConfig = {
   best_sellers: [],
@@ -23,10 +24,22 @@ const DEFAULT_CONFIG: FeaturedSectionsConfig = {
   gear: [],
 };
 
-// Global in-memory cache to ensure instant reactivity across warm server actions
+// Global in-memory cache to ensure instant reactivity and avoid redundant DB hammering
 const globalForFeatured = global as unknown as {
   featuredConfig?: FeaturedSectionsConfig;
+  lastKnownProducts?: Record<SectionId, any[]>;
+  configFetchPromise?: Promise<FeaturedSectionsConfig> | null;
 };
+
+if (!globalForFeatured.lastKnownProducts) {
+  globalForFeatured.lastKnownProducts = {
+    best_sellers: [],
+    club: [],
+    national: [],
+    shoes: [],
+    gear: [],
+  };
+}
 
 const SETTING_KEY = "featured_sections";
 
@@ -46,47 +59,78 @@ export function getSectionTargetCount(sectionId: SectionId): number {
   }
 }
 
+// Resilient query wrapper that retries once on transient connection/cold-start drops
+async function queryWithRetry<T>(queryFn: () => Promise<T>, retries = 1, delayMs = 300): Promise<T> {
+  let lastErr: any;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await queryFn();
+    } catch (err: any) {
+      lastErr = err;
+      if (attempt < retries) {
+        await new Promise((res) => setTimeout(res, delayMs));
+      }
+    }
+  }
+  throw lastErr;
+}
+
 export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfig> {
-  // 1. First try reading from PostgreSQL database (shared across all Vercel serverless instances)
-  try {
-    const record = await prisma.storeSetting.findUnique({
-      where: { key: SETTING_KEY },
-    });
-    if (record && record.value && typeof record.value === "object") {
-      const val = record.value as any;
+  // 1. Fast in-memory cache check (avoids 5 concurrent queries to storeSetting on homepage)
+  if (globalForFeatured.featuredConfig) {
+    return globalForFeatured.featuredConfig;
+  }
+
+  // 2. Deduplicate in-flight promises so concurrent section queries share one single DB call
+  if (globalForFeatured.configFetchPromise) {
+    return globalForFeatured.configFetchPromise;
+  }
+
+  globalForFeatured.configFetchPromise = (async () => {
+    try {
+      const record = await queryWithRetry(() =>
+        prisma.storeSetting.findUnique({
+          where: { key: SETTING_KEY },
+        })
+      );
+
+      if (record && record.value && typeof record.value === "object") {
+        const val = record.value as any;
+        const config: FeaturedSectionsConfig = {
+          best_sellers: Array.isArray(val.best_sellers) ? val.best_sellers.slice(0, 16) : [],
+          club: Array.isArray(val.club) ? val.club.slice(0, 8) : [],
+          national: Array.isArray(val.national) ? val.national.slice(0, 12) : [],
+          shoes: Array.isArray(val.shoes) ? val.shoes.slice(0, 16) : [],
+          gear: Array.isArray(val.gear) ? val.gear.slice(0, 12) : [],
+        };
+        globalForFeatured.featuredConfig = config;
+        return config;
+      }
+    } catch (dbErr) {
+      console.warn("[FeaturedSections] Could not read StoreSetting from DB, falling back:", dbErr);
+    } finally {
+      globalForFeatured.configFetchPromise = null;
+    }
+
+    // 3. Fallback to reading from local JSON file
+    try {
+      const raw = await fs.readFile(CONFIG_FILE_PATH, "utf-8");
+      const parsed = JSON.parse(raw);
       const config: FeaturedSectionsConfig = {
-        best_sellers: Array.isArray(val.best_sellers) ? val.best_sellers.slice(0, 16) : [],
-        club: Array.isArray(val.club) ? val.club.slice(0, 8) : [],
-        national: Array.isArray(val.national) ? val.national.slice(0, 12) : [],
-        shoes: Array.isArray(val.shoes) ? val.shoes.slice(0, 16) : [],
-        gear: Array.isArray(val.gear) ? val.gear.slice(0, 12) : [],
+        best_sellers: Array.isArray(parsed.best_sellers) ? parsed.best_sellers.slice(0, 16) : [],
+        club: Array.isArray(parsed.club) ? parsed.club.slice(0, 8) : [],
+        national: Array.isArray(parsed.national) ? parsed.national.slice(0, 12) : [],
+        shoes: Array.isArray(parsed.shoes) ? parsed.shoes.slice(0, 16) : [],
+        gear: Array.isArray(parsed.gear) ? parsed.gear.slice(0, 12) : [],
       };
       globalForFeatured.featuredConfig = config;
       return config;
+    } catch {
+      return { ...DEFAULT_CONFIG };
     }
-  } catch (dbErr) {
-    console.warn("[FeaturedSections] Could not read StoreSetting from DB, falling back to file:", dbErr);
-  }
+  })();
 
-  // 2. Fallback to reading from local JSON file
-  try {
-    const raw = await fs.readFile(CONFIG_FILE_PATH, "utf-8");
-    const parsed = JSON.parse(raw);
-    const config: FeaturedSectionsConfig = {
-      best_sellers: Array.isArray(parsed.best_sellers) ? parsed.best_sellers.slice(0, 16) : [],
-      club: Array.isArray(parsed.club) ? parsed.club.slice(0, 8) : [],
-      national: Array.isArray(parsed.national) ? parsed.national.slice(0, 12) : [],
-      shoes: Array.isArray(parsed.shoes) ? parsed.shoes.slice(0, 16) : [],
-      gear: Array.isArray(parsed.gear) ? parsed.gear.slice(0, 12) : [],
-    };
-    globalForFeatured.featuredConfig = config;
-    return config;
-  } catch {
-    if (globalForFeatured.featuredConfig) {
-      return globalForFeatured.featuredConfig;
-    }
-    return { ...DEFAULT_CONFIG };
-  }
+  return globalForFeatured.configFetchPromise;
 }
 
 export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig): Promise<boolean> {
@@ -101,7 +145,7 @@ export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig)
   globalForFeatured.featuredConfig = sanitized;
   let dbSaved = false;
 
-  // 1. Save to PostgreSQL database (ensures persistence across all Vercel lambdas & environments)
+  // 1. Save to PostgreSQL database (ensures persistence across all instances)
   try {
     await prisma.storeSetting.upsert({
       where: { key: SETTING_KEY },
@@ -113,23 +157,23 @@ export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig)
     console.error("[FeaturedSections] Failed to upsert StoreSetting in DB:", dbErr);
   }
 
-  // 2. Try saving to local file as secondary backup (works on localhost)
+  // 2. Try saving to local file as secondary backup
   try {
     const dir = path.dirname(CONFIG_FILE_PATH);
     await fs.mkdir(dir, { recursive: true });
     await fs.writeFile(CONFIG_FILE_PATH, JSON.stringify(sanitized, null, 2), "utf-8");
   } catch (fsErr) {
-    // Expected on read-only environments like Vercel
+    // Expected on read-only environments
   }
 
-  // 3. Revalidate paths so storefront updates instantly
+  // 3. Invalidate caches so storefront updates instantly
   try {
     revalidatePath("/");
     revalidatePath("/admin/featured");
     (revalidateTag as any)("featured-sections");
     (revalidateTag as any)("products");
   } catch {
-    // revalidatePath may throw if called outside request context, ignore safely
+    // Ignore outside request context
   }
 
   return dbSaved || true;
@@ -166,103 +210,190 @@ export function getSectionCriteria(sectionId: SectionId) {
   }
 }
 
-// Fetch products for a section (16 for best_sellers & shoes, 12 for national & gear, 8 for club)
-export const getFeaturedProductsForSection = unstable_cache(
-  async (sectionId: SectionId) => {
-    try {
-      const targetCount = getSectionTargetCount(sectionId);
-      const config = await getFeaturedSectionsConfig();
-      const configuredIds = (config[sectionId] || []).filter(Boolean);
+// Emergency static fallback loader from prisma/products.json if DB is temporarily unreachable on cold start
+async function getLocalFallbackProducts(sectionId: SectionId): Promise<any[]> {
+  try {
+    const raw = await fs.readFile(LOCAL_PRODUCTS_FILE, "utf-8");
+    const all = JSON.parse(raw);
+    if (!Array.isArray(all) || all.length === 0) return [];
 
-      const cardSelect = {
-        id: true,
-        name: true,
-        nameAr: true,
-        category: true,
-        team: true,
-        price: true,
-        originalPrice: true,
-        tag: true,
-        stock: true,
-        images: true,
-        createdAt: true,
-        isWorldCup: true,
-        reviews: { select: { rating: true } }
-      };
+    const targetCount = getSectionTargetCount(sectionId);
 
-      let selectedProducts: any[] = [];
-
-      // 1. Fetch explicitly configured products
-      if (configuredIds.length > 0) {
-        const fetched = await prisma.product.findMany({
-          where: { id: { in: configuredIds } },
-          select: cardSelect
-        });
-
-        // Preserve the exact slot ordering specified in the configuration
-        const idMap = new Map(fetched.map((p) => [p.id, p]));
-        selectedProducts = configuredIds
-          .map((id) => idMap.get(id))
-          .filter(Boolean);
+    let filtered = all.filter((item: any) => {
+      switch (sectionId) {
+        case "best_sellers":
+          return true;
+        case "club":
+          return (item.category === "Shirts" || item.category === "Retro Kits") && !item.isWorldCup;
+        case "national":
+          return item.isWorldCup === true || ["Argentina", "Brazil", "France", "Germany", "Portugal", "Spain", "Uruguay"].includes(item.team);
+        case "shoes":
+          return item.category === "Boots" || item.category === "Casual Shoes";
+        case "gear":
+          return item.category === "Accessories" || item.category === "Flags" || item.category === "Gear";
+        default:
+          return true;
       }
+    });
 
-      // 2. If fewer than targetCount products, fill remaining slots
-      if (selectedProducts.length < targetCount) {
-        const needed = targetCount - selectedProducts.length;
-        const existingIds = selectedProducts.map((p) => p.id);
-        const criteria = getSectionCriteria(sectionId);
+    if (filtered.length === 0) {
+      filtered = all;
+    }
 
-        const fallbacks = await prisma.product.findMany({
+    return filtered.slice(0, targetCount).map((p: any) => ({
+      ...p,
+      price: String(p.price || "0"),
+      originalPrice: p.originalPrice ? String(p.originalPrice) : null,
+      images: p.images && p.images.length > 0 ? [p.images[0]] : [],
+      reviews: [{ rating: 5 }],
+    }));
+  } catch {
+    return [];
+  }
+}
+
+// Internal query function that executes the database selection and fallback hierarchy
+async function fetchFeaturedProductsRaw(sectionId: SectionId): Promise<any[]> {
+  const targetCount = getSectionTargetCount(sectionId);
+  const config = await getFeaturedSectionsConfig();
+  const configuredIds = (config[sectionId] || []).filter(Boolean);
+
+  const cardSelect = {
+    id: true,
+    name: true,
+    nameAr: true,
+    category: true,
+    team: true,
+    price: true,
+    originalPrice: true,
+    tag: true,
+    stock: true,
+    images: true,
+    createdAt: true,
+    isWorldCup: true,
+    reviews: { select: { rating: true } },
+  };
+
+  let selectedProducts: any[] = [];
+
+  // 1. Fetch explicitly configured products
+  if (configuredIds.length > 0) {
+    try {
+      const fetched = await queryWithRetry(() =>
+        prisma.product.findMany({
+          where: { id: { in: configuredIds } },
+          select: cardSelect,
+        })
+      );
+
+      const idMap = new Map(fetched.map((p) => [p.id, p]));
+      selectedProducts = configuredIds
+        .map((id) => idMap.get(id))
+        .filter(Boolean);
+    } catch (err) {
+      console.warn(`[FeaturedSections] Failed to fetch configured IDs for ${sectionId}:`, err);
+    }
+  }
+
+  // 2. If fewer than targetCount products, fill remaining slots
+  if (selectedProducts.length < targetCount) {
+    const needed = targetCount - selectedProducts.length;
+    const existingIds = selectedProducts.map((p) => p.id);
+    const criteria = getSectionCriteria(sectionId);
+
+    try {
+      const fallbacks = await queryWithRetry(() =>
+        prisma.product.findMany({
           where: {
-            AND: [
-              criteria,
-              { id: { notIn: existingIds } }
-            ]
+            AND: [criteria, { id: { notIn: existingIds } }],
           },
           take: 48,
           orderBy: { createdAt: "desc" },
-          select: cardSelect
-        });
+          select: cardSelect,
+        })
+      );
 
-        // Sort: Trending & On Sale tags first, then newest
-        fallbacks.sort((a, b) => {
-          const priorityScore = (item: any) => {
-            if (item.tag === "Trending") return 2;
-            if (item.tag === "On Sale") return 1;
-            return 0;
-          };
-          const scoreA = priorityScore(a);
-          const scoreB = priorityScore(b);
-          if (scoreA !== scoreB) return scoreB - scoreA;
-          return b.createdAt.getTime() - a.createdAt.getTime();
-        });
+      fallbacks.sort((a, b) => {
+        const priorityScore = (item: any) => {
+          if (item.tag === "Trending") return 2;
+          if (item.tag === "On Sale") return 1;
+          return 0;
+        };
+        const scoreA = priorityScore(a);
+        const scoreB = priorityScore(b);
+        if (scoreA !== scoreB) return scoreB - scoreA;
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
 
-        selectedProducts.push(...fallbacks.slice(0, needed));
+      selectedProducts.push(...fallbacks.slice(0, needed));
+    } catch (err) {
+      console.warn(`[FeaturedSections] Fallback query failed for ${sectionId}:`, err);
+    }
 
-        // 3. Ultra-safe backup: If strict category criteria still didn't reach targetCount, fill from newest products
-        if (selectedProducts.length < targetCount) {
-          const stillNeeded = targetCount - selectedProducts.length;
-          const currentIds = selectedProducts.map((p) => p.id);
-          const ultraFallbacks = await prisma.product.findMany({
+    // 3. Ultra-safe backup: If strict criteria didn't reach targetCount, fill from newest store products
+    if (selectedProducts.length < targetCount) {
+      const stillNeeded = targetCount - selectedProducts.length;
+      const currentIds = selectedProducts.map((p) => p.id);
+      try {
+        const ultraFallbacks = await queryWithRetry(() =>
+          prisma.product.findMany({
             where: {
-              id: { notIn: currentIds }
+              id: { notIn: currentIds },
             },
             take: stillNeeded,
             orderBy: { createdAt: "desc" },
-            select: cardSelect
-          });
-          selectedProducts.push(...ultraFallbacks);
-        }
+            select: cardSelect,
+          })
+        );
+        selectedProducts.push(...ultraFallbacks);
+      } catch (err) {
+        console.warn(`[FeaturedSections] Ultra-fallback query failed for ${sectionId}:`, err);
       }
+    }
+  }
 
-      // Only pass primary image to prevent multi-megabyte Base64 transfers on grid
-      return selectedProducts.slice(0, targetCount).map((p) => ({
-        ...p,
-        images: p.images && p.images.length > 0 ? [p.images[0]] : [],
-      }));
+  // Format products and keep only the primary image for fast rendering
+  const formatted = selectedProducts.slice(0, targetCount).map((p) => ({
+    ...p,
+    images: p.images && p.images.length > 0 ? [p.images[0]] : [],
+  }));
+
+  // Update in-memory last-known-good products cache whenever valid products are loaded
+  if (formatted.length > 0) {
+    if (globalForFeatured.lastKnownProducts) {
+      globalForFeatured.lastKnownProducts[sectionId] = formatted;
+    }
+    return formatted;
+  }
+
+  // If DB returned 0 products, try the in-memory last known good state
+  if (globalForFeatured.lastKnownProducts?.[sectionId]?.length) {
+    return globalForFeatured.lastKnownProducts[sectionId];
+  }
+
+  // Ultimate emergency fallback: load local static catalog products
+  return await getLocalFallbackProducts(sectionId);
+}
+
+// Cached export that guarantees non-empty resilient output for each section
+export const getFeaturedProductsForSection = unstable_cache(
+  async (sectionId: SectionId) => {
+    try {
+      const products = await fetchFeaturedProductsRaw(sectionId);
+      if (products && products.length > 0) {
+        return products;
+      }
+      // If still empty, return in-memory or local fallback
+      if (globalForFeatured.lastKnownProducts?.[sectionId]?.length) {
+        return globalForFeatured.lastKnownProducts[sectionId];
+      }
+      return await getLocalFallbackProducts(sectionId);
     } catch (err) {
-      console.error(`[FeaturedSections] Database query error for ${sectionId}:`, err);
-      return [];
+      console.error(`[FeaturedSections] Critical error fetching ${sectionId}:`, err);
+      if (globalForFeatured.lastKnownProducts?.[sectionId]?.length) {
+        return globalForFeatured.lastKnownProducts[sectionId];
+      }
+      return await getLocalFallbackProducts(sectionId);
     }
   },
   ["featured-section-products-cache"],

@@ -10,12 +10,20 @@ const globalForPrisma = global as unknown as {
 
 // Create a single pg Pool if it doesn't exist
 if (!globalForPrisma.pgPool) {
-  globalForPrisma.pgPool = new pg.Pool({
+  const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
-    max: 10, // Increased pool size to support concurrent server component queries
-    idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
-    connectionTimeoutMillis: 25000, // Increased from 5s to 25s to comfortably handle Neon cold starts
+    max: 15, // Allow enough pool connections for concurrent server component queries across sections
+    idleTimeoutMillis: 15000, // Close idle connections after 15 seconds to stay within Neon's pooler timeouts
+    connectionTimeoutMillis: 30000, // 30s to comfortably handle Neon cold starts without timing out
+    keepAlive: true,
   });
+
+  // Catch unexpected idle client errors so they do not crash or abort queries
+  pool.on('error', (err) => {
+    console.warn('[Prisma pgPool] Handled idle client error (pool will discard client and reconnect):', err.message);
+  });
+
+  globalForPrisma.pgPool = pool;
 }
 
 const pool = globalForPrisma.pgPool;
@@ -24,9 +32,9 @@ const adapter = new PrismaPg(pool);
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
-    adapter, // <-- We inject the adapter here!
+    adapter,
     // Avoid verbose query logging in production to save CPU/logging costs
-    log: process.env.NODE_ENV === 'production' ? [] : ['query', 'error'],
+    log: process.env.NODE_ENV === 'production' ? [] : ['error'],
   });
 
 // Always store it in global so it persists in warm lambda containers

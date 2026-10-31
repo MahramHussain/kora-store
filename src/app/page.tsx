@@ -4,13 +4,17 @@ import { ProductCard, ProductSkeletonCard } from "@/components/ProductCard";
 import HeroBanner from "@/components/HeroBanner";
 import { cookies } from "next/headers";
 import { translations } from "@/lib/translations";
-import { getFeaturedProductsForSection, SectionId } from "@/lib/featuredSections";
+import { getFeaturedProductsForSection, getSectionTargetCount, SectionId } from "@/lib/featuredSections";
 
 // Cache homepage on Vercel CDN with ISR; revalidated automatically when admin updates featured sections
 export const revalidate = 60;
 
 async function FeaturedSectionGrid({ sectionId }: { sectionId: SectionId }) {
   const products = await getFeaturedProductsForSection(sectionId);
+
+  if (!products || products.length === 0) {
+    return <SectionGridSkeleton count={getSectionTargetCount(sectionId)} />;
+  }
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 w-full">
@@ -19,7 +23,7 @@ async function FeaturedSectionGrid({ sectionId }: { sectionId: SectionId }) {
           <ProductCard
             product={{
               ...product,
-              price: product.price.toString(),
+              price: product.price ? product.price.toString() : "0",
               originalPrice: product.originalPrice ? product.originalPrice.toString() : null,
             }}
           />
