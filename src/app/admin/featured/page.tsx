@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { getFeaturedSectionsAdminData, saveFeaturedSectionsAdmin } from "../actions";
 import { CURRENCY } from "@/lib/constants";
-import { FaSearch, FaTimes, FaCheck, FaPlus, FaExchangeAlt, FaTrashAlt } from "react-icons/fa";
+import { FaSearch, FaTimes, FaCheck, FaPlus, FaExchangeAlt, FaTrashAlt, FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 type SectionId = "best_sellers" | "club" | "national" | "shoes" | "gear";
 
@@ -140,6 +140,20 @@ export default function FeaturedSectionsAdminPage() {
     setSelectedSlots((prev) => {
       const currentArr = [...prev[activeSection]];
       currentArr[slotIdx] = null;
+      return {
+        ...prev,
+        [activeSection]: currentArr,
+      };
+    });
+  };
+
+  const handleMoveSlot = (fromIdx: number, toIdx: number) => {
+    if (toIdx < 0 || toIdx >= maxSlots) return;
+    setSelectedSlots((prev) => {
+      const currentArr = [...prev[activeSection]];
+      const temp = currentArr[fromIdx];
+      currentArr[fromIdx] = currentArr[toIdx];
+      currentArr[toIdx] = temp;
       return {
         ...prev,
         [activeSection]: currentArr,
@@ -366,9 +380,33 @@ export default function FeaturedSectionsAdminPage() {
                         </p>
                       </div>
 
-                      {/* Action Buttons */}
-                      <div className="flex gap-2 mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
+                      {/* Action Buttons: Sort (Move Left/Right), Change, Clear */}
+                      <div className="flex items-center gap-1.5 mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
+                        {/* Move Earlier in Grid */}
                         <button
+                          type="button"
+                          onClick={() => handleMoveSlot(slotIdx, slotIdx - 1)}
+                          disabled={slotIdx === 0}
+                          title={slotIdx === 0 ? "First slot" : `Move to Slot ${slotIdx}`}
+                          className="w-8 h-8 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-all text-xs font-bold shrink-0"
+                        >
+                          <FaArrowLeft />
+                        </button>
+
+                        {/* Move Later in Grid */}
+                        <button
+                          type="button"
+                          onClick={() => handleMoveSlot(slotIdx, slotIdx + 1)}
+                          disabled={slotIdx === maxSlots - 1}
+                          title={slotIdx === maxSlots - 1 ? "Last slot" : `Move to Slot ${slotIdx + 2}`}
+                          className="w-8 h-8 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center transition-all text-xs font-bold shrink-0"
+                        >
+                          <FaArrowRight />
+                        </button>
+
+                        {/* Change Product */}
+                        <button
+                          type="button"
                           onClick={() => {
                             setPickerSlotIndex(slotIdx);
                             setModalCategoryFilter("All");
@@ -378,10 +416,13 @@ export default function FeaturedSectionsAdminPage() {
                           <FaExchangeAlt className="text-[10px]" />
                           <span>Change</span>
                         </button>
+
+                        {/* Clear slot */}
                         <button
+                          type="button"
                           onClick={() => handleClearSlot(slotIdx)}
-                          title="Clear slot (revert to auto-fallback)"
-                          className="px-3 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 rounded-xl py-2 text-[11px] font-bold transition-all"
+                          title="Clear slot"
+                          className="w-8 h-8 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/50 rounded-xl flex items-center justify-center text-xs font-bold transition-all shrink-0"
                         >
                           <FaTimes />
                         </button>

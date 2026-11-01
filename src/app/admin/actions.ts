@@ -504,8 +504,48 @@ export async function getFeaturedSectionsAdminData() {
     p.category === "Accessories" || p.category === "Flags" || p.category === "Gear"
   );
 
+  const resolveInitialSlots = (sectionId: "best_sellers" | "club" | "national" | "shoes" | "gear", targetCount: number, sectionProducts: any[]) => {
+    const rawConfigured = Array.isArray(config[sectionId]) ? config[sectionId].filter(Boolean) : [];
+    const validConfigured = rawConfigured.filter((id: string) => serialized.some((p: any) => p.id === id));
+
+    const result = [...validConfigured];
+    const seen = new Set(result);
+
+    // Pre-fill remaining slots with section products in priority order so every card is visible & editable
+    if (result.length < targetCount) {
+      for (const p of sectionProducts) {
+        if (!seen.has(p.id)) {
+          result.push(p.id);
+          seen.add(p.id);
+          if (result.length >= targetCount) break;
+        }
+      }
+    }
+
+    // Ultra fallback: fill from any available store products if section products were fewer than targetCount
+    if (result.length < targetCount) {
+      for (const p of serialized) {
+        if (!seen.has(p.id)) {
+          result.push(p.id);
+          seen.add(p.id);
+          if (result.length >= targetCount) break;
+        }
+      }
+    }
+
+    return result.slice(0, targetCount);
+  };
+
+  const resolvedConfig = {
+    best_sellers: resolveInitialSlots("best_sellers", 16, serialized),
+    club: resolveInitialSlots("club", 8, clubProducts.length > 0 ? clubProducts : serialized),
+    national: resolveInitialSlots("national", 12, nationalProducts.length > 0 ? nationalProducts : serialized),
+    shoes: resolveInitialSlots("shoes", 16, shoeProducts.length > 0 ? shoeProducts : serialized),
+    gear: resolveInitialSlots("gear", 12, gearProducts.length > 0 ? gearProducts : serialized),
+  };
+
   return {
-    config,
+    config: resolvedConfig,
     allProducts: serialized,
     categoryProducts: {
       best_sellers: serialized,

@@ -24,9 +24,10 @@ const DEFAULT_CONFIG: FeaturedSectionsConfig = {
   gear: [],
 };
 
-// Global in-memory cache to ensure instant reactivity and avoid redundant DB hammering
+// Global in-memory cache with TTL to ensure instant reactivity and avoid redundant DB hammering
 const globalForFeatured = global as unknown as {
   featuredConfig?: FeaturedSectionsConfig;
+  featuredConfigLoadedAt?: number;
   lastKnownProducts?: Record<SectionId, any[]>;
   configFetchPromise?: Promise<FeaturedSectionsConfig> | null;
 };
@@ -76,8 +77,13 @@ async function queryWithRetry<T>(queryFn: () => Promise<T>, retries = 1, delayMs
 }
 
 export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfig> {
-  // 1. Fast in-memory cache check (avoids 5 concurrent queries to storeSetting on homepage)
-  if (globalForFeatured.featuredConfig) {
+  // 1. Fast in-memory cache check with 15-second TTL (prevents stale configs while collapsing concurrent requests)
+  const isFresh =
+    globalForFeatured.featuredConfig &&
+    globalForFeatured.featuredConfigLoadedAt &&
+    Date.now() - globalForFeatured.featuredConfigLoadedAt < 15000;
+
+  if (isFresh && globalForFeatured.featuredConfig) {
     return globalForFeatured.featuredConfig;
   }
 
@@ -104,6 +110,7 @@ export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfi
           gear: Array.isArray(val.gear) ? val.gear.slice(0, 12) : [],
         };
         globalForFeatured.featuredConfig = config;
+        globalForFeatured.featuredConfigLoadedAt = Date.now();
         return config;
       }
     } catch (dbErr) {
@@ -124,11 +131,17 @@ export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfi
         gear: Array.isArray(parsed.gear) ? parsed.gear.slice(0, 12) : [],
       };
       globalForFeatured.featuredConfig = config;
+      globalForFeatured.featuredConfigLoadedAt = Date.now();
       return config;
     } catch {
+      if (globalForFeatured.featuredConfig) {
+        return globalForFeatured.featuredConfig;
+      }
       return { ...DEFAULT_CONFIG };
     }
   })();
+
+
 
   return globalForFeatured.configFetchPromise;
 }
@@ -142,16 +155,30 @@ export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig)
     gear: Array.isArray(config.gear) ? config.gear.slice(0, 12) : [],
   };
 
+  // Immediately update in-memory active config and reset loaded timestamp
   globalForFeatured.featuredConfig = sanitized;
+  globalForFeatured.featuredConfigLoadedAt = Date.now();
+
+  // Reset in-memory product cache so storefront immediately generates the newly curated sort order
+  globalForFeatured.lastKnownProducts = {
+    best_sellers: [],
+    club: [],
+    national: [],
+    shoes: [],
+    gear: [],
+  };
+
   let dbSaved = false;
 
-  // 1. Save to PostgreSQL database (ensures persistence across all instances)
+  // 1. Save to PostgreSQL database with retry (ensures persistence across all serverless lambdas)
   try {
-    await prisma.storeSetting.upsert({
-      where: { key: SETTING_KEY },
-      update: { value: sanitized as any },
-      create: { key: SETTING_KEY, value: sanitized as any },
-    });
+    await queryWithRetry(() =>
+      prisma.storeSetting.upsert({
+        where: { key: SETTING_KEY },
+        update: { value: sanitized as any },
+        create: { key: SETTING_KEY, value: sanitized as any },
+      })
+    );
     dbSaved = true;
   } catch (dbErr) {
     console.error("[FeaturedSections] Failed to upsert StoreSetting in DB:", dbErr);
@@ -166,12 +193,13 @@ export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig)
     // Expected on read-only environments
   }
 
-  // 3. Invalidate caches so storefront updates instantly
+  // 3. Invalidate caches so storefront updates instantly with the new sort order
   try {
+    revalidatePath("/", "layout");
     revalidatePath("/");
     revalidatePath("/admin/featured");
-    (revalidateTag as any)("featured-sections");
-    (revalidateTag as any)("products");
+    (revalidateTag as any)("featured-sections", { expire: 0 });
+    (revalidateTag as any)("products", { expire: 0 });
   } catch {
     // Ignore outside request context
   }
