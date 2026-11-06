@@ -1386,4 +1386,46 @@ html:not(.dark) * {
   color: #475569 !important;
   cursor: not-allowed !important;
 }
+
+/* ==========================================================================
+   Ultra-Refined Luxury Footer Link Hover Animation
+   ========================================================================== */
+.footer-link-premium {
+  position: relative;
+  display: inline-block;
+  color: rgba(243, 232, 255, 0.75);
+  text-decoration: none;
+  transition: color 0.22s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateY(0);
+}
+
+.footer-link-premium::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.75);
+  transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+[dir="rtl"] .footer-link-premium::after,
+html[lang="ar"] .footer-link-premium::after {
+  left: auto;
+  right: 0;
+}
+
+.footer-link-premium:hover,
+.footer-link-premium:focus-visible {
+  color: #ffffff !important;
+  transform: translateY(-2px);
+}
+
+.footer-link-premium:hover::after,
+.footer-link-premium:focus-visible::after {
+  width: 100%;
+}
+
 

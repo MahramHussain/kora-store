@@ -31,38 +31,20 @@ export default function Footer() {
           {/* About Us */}
           <div>
             <h4 className="text-white font-bold mb-4 uppercase tracking-wider text-sm">{t("about_us")}</h4>
-            <ul className="space-y-2 text-sm text-purple-100/90 font-semibold uppercase tracking-wider">
+            <ul className="space-y-2.5 text-sm font-semibold uppercase tracking-wider">
               <li>
-                <Link 
-                  href="/about" 
-                  className="group relative inline-flex items-center py-1 transition-all duration-300 ease-out hover:text-white hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
-                >
-                  <span className="relative transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">
-                    {t("our_story")}
-                    <span className="absolute left-0 rtl:left-auto rtl:right-0 -bottom-0.5 w-0 h-[2px] bg-white rounded-full transition-all duration-300 ease-out group-hover:w-full group-hover:shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
-                  </span>
+                <Link href="/about" className="footer-link-premium py-1">
+                  {t("our_story")}
                 </Link>
               </li>
               <li>
-                <Link 
-                  href="/faq" 
-                  className="group relative inline-flex items-center py-1 transition-all duration-300 ease-out hover:text-white hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
-                >
-                  <span className="relative transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">
-                    {t("faq")}
-                    <span className="absolute left-0 rtl:left-auto rtl:right-0 -bottom-0.5 w-0 h-[2px] bg-white rounded-full transition-all duration-300 ease-out group-hover:w-full group-hover:shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
-                  </span>
+                <Link href="/faq" className="footer-link-premium py-1">
+                  {t("faq")}
                 </Link>
               </li>
               <li>
-                <Link 
-                  href="/shipping" 
-                  className="group relative inline-flex items-center py-1 transition-all duration-300 ease-out hover:text-white hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
-                >
-                  <span className="relative transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">
-                    {t("shipping_returns")}
-                    <span className="absolute left-0 rtl:left-auto rtl:right-0 -bottom-0.5 w-0 h-[2px] bg-white rounded-full transition-all duration-300 ease-out group-hover:w-full group-hover:shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
-                  </span>
+                <Link href="/shipping" className="footer-link-premium py-1">
+                  {t("shipping_returns")}
                 </Link>
               </li>
             </ul>
@@ -128,38 +110,20 @@ export default function Footer() {
                 <FaChevronDown className={`text-purple-300 text-xs transition-transform duration-300 ${openSection === "about" ? "rotate-180" : ""}`} />
               </button>
               <div className={`mobile-accordion-content ${openSection === "about" ? "open" : ""}`}>
-                <ul className="pb-4 space-y-3 pl-1 text-xs font-bold uppercase tracking-wider text-purple-200/90">
+                <ul className="pb-4 space-y-3 pl-1 text-xs font-bold uppercase tracking-wider">
                   <li>
-                    <Link 
-                      href="/about" 
-                      className="group relative inline-flex items-center py-1 transition-all duration-300 ease-out hover:text-white active:text-white hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
-                    >
-                      <span className="relative transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">
-                        {t("our_story")}
-                        <span className="absolute left-0 rtl:left-auto rtl:right-0 -bottom-0.5 w-0 h-[2px] bg-white rounded-full transition-all duration-300 ease-out group-hover:w-full group-hover:shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
-                      </span>
+                    <Link href="/about" className="footer-link-premium py-1">
+                      {t("our_story")}
                     </Link>
                   </li>
                   <li>
-                    <Link 
-                      href="/faq" 
-                      className="group relative inline-flex items-center py-1 transition-all duration-300 ease-out hover:text-white active:text-white hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
-                    >
-                      <span className="relative transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">
-                        {t("faq")}
-                        <span className="absolute left-0 rtl:left-auto rtl:right-0 -bottom-0.5 w-0 h-[2px] bg-white rounded-full transition-all duration-300 ease-out group-hover:w-full group-hover:shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
-                      </span>
+                    <Link href="/faq" className="footer-link-premium py-1">
+                      {t("faq")}
                     </Link>
                   </li>
                   <li>
-                    <Link 
-                      href="/shipping" 
-                      className="group relative inline-flex items-center py-1 transition-all duration-300 ease-out hover:text-white active:text-white hover:translate-x-1.5 rtl:hover:-translate-x-1.5"
-                    >
-                      <span className="relative transition-all duration-300 group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">
-                        {t("shipping_returns")}
-                        <span className="absolute left-0 rtl:left-auto rtl:right-0 -bottom-0.5 w-0 h-[2px] bg-white rounded-full transition-all duration-300 ease-out group-hover:w-full group-hover:shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
-                      </span>
+                    <Link href="/shipping" className="footer-link-premium py-1">
+                      {t("shipping_returns")}
                     </Link>
                   </li>
                 </ul>
@@ -219,23 +183,11 @@ export default function Footer() {
         <div className="text-center text-xs text-purple-200/80 pt-8 border-t border-purple-900/40 flex flex-col md:flex-row justify-between items-center gap-4 font-medium">
           <p>&copy; {new Date().getFullYear()} Kora Store. {t("all_rights_reserved")}</p>
           <div className="flex gap-6">
-            <Link 
-              href="/terms" 
-              className="group relative inline-flex items-center py-0.5 transition-all duration-300 ease-out hover:text-white active:text-white hover:-translate-y-0.5"
-            >
-              <span className="relative">
-                {t("terms")}
-                <span className="absolute left-0 rtl:left-auto rtl:right-0 -bottom-0.5 w-0 h-[1.5px] bg-white rounded-full transition-all duration-300 ease-out group-hover:w-full group-hover:shadow-[0_0_6px_rgba(255,255,255,0.6)]" />
-              </span>
+            <Link href="/terms" className="footer-link-premium py-0.5">
+              {t("terms")}
             </Link>
-            <Link 
-              href="/privacy" 
-              className="group relative inline-flex items-center py-0.5 transition-all duration-300 ease-out hover:text-white active:text-white hover:-translate-y-0.5"
-            >
-              <span className="relative">
-                {t("privacy")}
-                <span className="absolute left-0 rtl:left-auto rtl:right-0 -bottom-0.5 w-0 h-[1.5px] bg-white rounded-full transition-all duration-300 ease-out group-hover:w-full group-hover:shadow-[0_0_6px_rgba(255,255,255,0.6)]" />
-              </span>
+            <Link href="/privacy" className="footer-link-premium py-0.5">
+              {t("privacy")}
             </Link>
           </div>
         </div>
