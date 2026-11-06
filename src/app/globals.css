@@ -1334,4 +1334,56 @@ html:not(.dark) * {
 }
 .dark .text-emerald-600 {
   color: #34d399 !important;
-}
+}
+
+/* ==========================================================================
+   Product Card 'View Item' Button - Light & Dark Mode Enhancements
+   ========================================================================== */
+.product-card-btn {
+  background-color: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #334155;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .product-card-btn {
+  background-color: #1e293b !important; /* solid slate-800 contrast against card */
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+/* Hover and active states (desktop hover + mobile touch tap) */
+.group:hover .product-card-btn:not(.sold-out),
+.group:active .product-card-btn:not(.sold-out),
+.product-card-btn:hover:not(.sold-out),
+.product-card-btn:active:not(.sold-out) {
+  background-color: #5E0683 !important;
+  border-color: #5E0683 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(94, 6, 131, 0.35) !important;
+}
+
+.dark .group:hover .product-card-btn:not(.sold-out),
+.dark .group:active .product-card-btn:not(.sold-out),
+.dark .product-card-btn:hover:not(.sold-out),
+.dark .product-card-btn:active:not(.sold-out) {
+  background-color: #5E0683 !important;
+  border-color: #7e22ce !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 16px rgba(126, 34, 206, 0.45) !important;
+}
+
+.product-card-btn.sold-out {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed !important;
+}
+
+.dark .product-card-btn.sold-out {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+  color: #475569 !important;
+  cursor: not-allowed !important;
+}
+

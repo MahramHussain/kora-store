@@ -26,11 +26,16 @@ const MapPicker = dynamic(() => import("@/components/MapPicker"), {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { cart, cartCount, clearCart } = useCart();
+  const { cart, cartCount, clearCart, syncCartStock } = useCart();
   const { t } = useTranslation();
   const { user } = useUser();
   const userEmail = user?.emailAddresses[0]?.emailAddress;
   const isUserAdmin = userEmail === "mahramh40@gmail.com" || userEmail === "korastore.ae@gmail.com";
+
+  // Validate and sync live stock with the database whenever checkout mounts
+  useEffect(() => {
+    syncCartStock();
+  }, [syncCartStock]);
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal" | "cod">("card");

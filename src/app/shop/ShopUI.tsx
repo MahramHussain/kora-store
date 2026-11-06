@@ -528,11 +528,14 @@ export default function ShopUI({ products }: { products: any[] }) {
                             </span>
                           </div>
                         </div>
-                        <div className={`text-[10px] font-bold px-3 py-1.5 rounded-lg border ${
-                          product.stock === 0 
-                            ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-550 border-slate-200 dark:border-slate-700" 
-                            : "bg-kora text-white border-kora shadow-sm"
-                        }`}>
+                        <div 
+                          role="button"
+                          className={`btn text-[10px] font-bold px-3 py-1.5 rounded-lg border ${
+                            product.stock === 0 
+                              ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-700 cursor-not-allowed" 
+                              : "bg-kora text-white border-kora shadow-sm"
+                          }`}
+                        >
                           {product.stock === 0 ? t("sold_out") : t("view_gear")}
                         </div>
                       </div>

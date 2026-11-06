@@ -12,11 +12,17 @@ export async function GET(req: NextRequest) {
 
     const cartItems = await prisma.cartItem.findMany({
       where: { userId },
-      include: { product: true }
+      include: {
+        product: {
+          include: {
+            sizeStocks: true,
+            playerStocks: true,
+          },
+        },
+      },
     });
 
-
-    const formattedCart = cartItems.map(item => {
+    const formattedCart = cartItems.map((item) => {
       const basePrice = parseFloat(item.product.price.toString());
       const hasCustomPrint = (item.customName && item.customName.trim() !== "") || (item.customNumber && item.customNumber.trim() !== "");
       
@@ -30,13 +36,33 @@ export async function GET(req: NextRequest) {
       const patchUpcharge = item.patch ? 10 : 0;
       const finalPrice = basePrice + printUpcharge + patchUpcharge;
 
+      let availableStock = item.product.stock ?? 0;
+      if (item.product.sizeStocks && item.product.sizeStocks.length > 0 && item.size) {
+        const sizeMatch = item.product.sizeStocks.find(
+          (s) => s.size.trim().toLowerCase() === item.size.trim().toLowerCase()
+        );
+        availableStock = sizeMatch ? Math.max(0, sizeMatch.quantity) : 0;
+      }
+      if (item.playerName && item.product.playerStocks && item.product.playerStocks.length > 0) {
+        const playerMatch = item.product.playerStocks.find(
+          (p) => p.playerName.trim().toLowerCase() === item.playerName?.trim().toLowerCase()
+        );
+        if (playerMatch) {
+          availableStock = Math.min(availableStock, Math.max(0, playerMatch.quantity));
+        }
+      }
+
+      const maxStock = Math.max(0, availableStock);
+      const clampedQuantity = Math.max(1, Math.min(item.quantity, maxStock > 0 ? maxStock : 1));
+
       return {
         id: item.productId,
         name: item.product.name,
         price: finalPrice.toFixed(2),
         image: item.image || item.product.images[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png",
         size: item.size,
-        quantity: item.quantity,
+        quantity: clampedQuantity,
+        maxStock,
         customName: item.customName || undefined,
         customNumber: item.customNumber || undefined,
         playerName: item.playerName || undefined,

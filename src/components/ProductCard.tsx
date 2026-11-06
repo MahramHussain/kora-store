@@ -190,11 +190,14 @@ export function ProductCard({ product }: { product: Product }) {
             </span>
           </div>
         </div>
-        <div className={`w-full text-center font-bold text-xs md:text-sm py-2 md:py-2.5 rounded-lg transition-colors border ${
-          product.stock === 0 
-            ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-700 cursor-not-allowed" 
-            : "bg-slate-100 dark:bg-slate-800 group-hover:bg-kora dark:group-hover:bg-kora text-slate-700 dark:text-slate-350 group-hover:text-white dark:group-hover:text-white border-slate-200 dark:border-slate-700 group-hover:border-kora dark:group-hover:border-kora"
-        }`}>
+        <div 
+          role="button"
+          className={`product-card-btn btn w-full text-center font-bold text-xs md:text-sm py-2 md:py-2.5 rounded-lg transition-all duration-200 border ${
+            product.stock === 0 
+              ? "sold-out bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-700 cursor-not-allowed" 
+              : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 group-hover:bg-kora dark:group-hover:bg-kora group-hover:text-white dark:group-hover:text-white group-hover:border-kora dark:group-hover:border-kora"
+          }`}
+        >
           {product.stock === 0 ? t("sold_out") : t("view_gear")}
         </div>
       </div>

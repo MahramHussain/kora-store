@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { useAuth } from "@clerk/nextjs";
 
 export type CartItem = {
@@ -15,14 +15,16 @@ export type CartItem = {
   playerName?: string;
   patch?: string;
   sellerNote?: string;
+  maxStock?: number;
 };
 
 type CartContextType = {
   cart: CartItem[];
-  addToCart: (item: CartItem) => void;
+  addToCart: (item: CartItem) => { success: boolean; message?: string };
   removeFromCart: (id: string | number, size: string, image: string, customName?: string, customNumber?: string, playerName?: string, patch?: string, sellerNote?: string) => void;
   updateQuantity: (id: string | number, size: string, image: string, customName: string | undefined, customNumber: string | undefined, newQuantity: number, playerName?: string, patch?: string, sellerNote?: string) => void;
   clearCart: () => void;
+  syncCartStock: () => Promise<void>;
   cartCount: number;
 };
 
@@ -85,6 +87,54 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [isLoaded, isSignedIn]);
 
+  // Synchronize cart with live inventory stock and clamp any quantities exceeding actual stock
+  const syncCartStock = useCallback(async () => {
+    if (cart.length === 0) return;
+    try {
+      const res = await fetch("/api/cart/stock", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: cart.map((i) => ({ id: i.id, size: i.size, playerName: i.playerName })),
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const stocks: Record<string, number> = data.stocks || {};
+
+        setCart((prevCart) => {
+          let hasChanged = false;
+          const nextCart = prevCart.map((item) => {
+            const key = `${item.id}___${item.size || ""}___${item.playerName || ""}`;
+            const liveStock = stocks[key] !== undefined ? stocks[key] : (item.maxStock ?? 999);
+            const clampedQty = liveStock > 0 ? Math.min(item.quantity, liveStock) : item.quantity;
+
+            if (item.maxStock !== liveStock || item.quantity !== clampedQty) {
+              hasChanged = true;
+              return {
+                ...item,
+                quantity: clampedQty,
+                maxStock: liveStock,
+              };
+            }
+            return item;
+          });
+          return hasChanged ? nextCart : prevCart;
+        });
+      }
+    } catch (err) {
+      console.error("Failed to sync cart stock:", err);
+    }
+  }, [cart]);
+
+  // Run stock validation on initial boot whenever cart items exist
+  useEffect(() => {
+    if (isInitialized && cart.length > 0) {
+      syncCartStock();
+    }
+  }, [isInitialized]);
+
   // 2. Automatically sync whatever they add/remove directly into their local storage AND database
   useEffect(() => {
     if (isInitialized) {
@@ -101,6 +151,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [cart, isInitialized, isSignedIn]);
 
   const addToCart = (newItem: CartItem) => {
+    let result = { success: true };
     setCart((prevCart) => {
       const existingItem = prevCart.find(
         (item) => 
@@ -114,7 +165,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
           (item.sellerNote || "") === (newItem.sellerNote || "")
       );
 
+      const maxLimit = newItem.maxStock ?? existingItem?.maxStock ?? 999;
+
       if (existingItem) {
+        const potentialQty = existingItem.quantity + newItem.quantity;
+        const clampedQty = Math.min(potentialQty, maxLimit);
+
         return prevCart.map((item) =>
           item.id === newItem.id && 
           item.size === newItem.size && 
@@ -124,12 +180,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
           (item.playerName || "") === (newItem.playerName || "") &&
           (item.patch || "") === (newItem.patch || "") &&
           (item.sellerNote || "") === (newItem.sellerNote || "")
-            ? { ...item, quantity: item.quantity + newItem.quantity }
+            ? { ...item, quantity: clampedQty, maxStock: maxLimit }
             : item
         );
       }
-      return [...prevCart, newItem];
+
+      const clampedQty = Math.min(newItem.quantity, maxLimit);
+      return [...prevCart, { ...newItem, quantity: clampedQty, maxStock: maxLimit }];
     });
+    return result;
   };
 
   const removeFromCart = (id: string | number, size: string, image: string, customName?: string, customNumber?: string, playerName?: string, patch?: string, sellerNote?: string) => {
@@ -146,26 +205,41 @@ export function CartProvider({ children }: { children: ReactNode }) {
     ));
   };
 
-  // THE NEW QUANTITY ENGINE
-  const updateQuantity = (id: string | number, size: string, image: string, customName: string | undefined, customNumber: string | undefined, newQuantity: number, playerName?: string, patch?: string, sellerNote?: string) => {
+  // The inventory-bounded quantity engine
+  const updateQuantity = (
+    id: string | number, 
+    size: string, 
+    image: string, 
+    customName: string | undefined, 
+    customNumber: string | undefined, 
+    newQuantity: number, 
+    playerName?: string, 
+    patch?: string, 
+    sellerNote?: string
+  ) => {
     if (newQuantity <= 0) {
       // If they drop the quantity to 0, just remove it entirely
       removeFromCart(id, size, image, customName, customNumber, playerName, patch, sellerNote);
       return;
     }
     setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.id === id && 
-        item.size === size && 
-        item.image === image &&
-        (item.customName || "") === (customName || "") &&
-        (item.customNumber || "") === (customNumber || "") &&
-        (item.playerName || "") === (playerName || "") &&
-        (item.patch || "") === (patch || "") &&
-        (item.sellerNote || "") === (sellerNote || "")
-          ? { ...item, quantity: newQuantity } 
-          : item
-      )
+      prevCart.map((item) => {
+        const isMatch =
+          item.id === id && 
+          item.size === size && 
+          item.image === image &&
+          (item.customName || "") === (customName || "") &&
+          (item.customNumber || "") === (customNumber || "") &&
+          (item.playerName || "") === (playerName || "") &&
+          (item.patch || "") === (patch || "") &&
+          (item.sellerNote || "") === (sellerNote || "");
+
+        if (!isMatch) return item;
+
+        const maxAllowed = item.maxStock !== undefined ? item.maxStock : 999;
+        const clampedQuantity = Math.min(newQuantity, maxAllowed);
+        return { ...item, quantity: clampedQuantity };
+      })
     );
   };
 
@@ -177,7 +251,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, cartCount }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, syncCartStock, cartCount }}>
       {children}
     </CartContext.Provider>
   );

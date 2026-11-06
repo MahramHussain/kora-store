@@ -596,7 +596,7 @@ export default function ProductUI({ product }: { product: any }) {
   const [customNumber, setCustomNumber] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [sellerNote, setSellerNote] = useState("");
-  const { addToCart } = useCart();
+  const { cart, addToCart } = useCart();
   const { user: clerkUser } = useUser();
   const currentUserId = clerkUser?.id;
   const clerkEmail = clerkUser?.emailAddresses[0]?.emailAddress;
@@ -612,6 +612,12 @@ export default function ProductUI({ product }: { product: any }) {
     return match ? match.quantity : 0;
   };
   const activeSizeStock = selectedSize ? getSizeStock(selectedSize) : product.stock;
+
+  const cartMatchingItem = cart.find(
+    (i) => String(i.id) === String(product.id) && i.size === selectedSize
+  );
+  const inCartQty = cartMatchingItem ? cartMatchingItem.quantity : 0;
+  const remainingStock = Math.max(0, activeSizeStock - inCartQty);
 
   // Personalization states
   const [personalizationTab, setPersonalizationTab] = useState<"none" | "custom" | "player">("none");
@@ -1069,15 +1075,19 @@ export default function ProductUI({ product }: { product: any }) {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // Limit quantity if selected size changes or activeSizeStock updates
+  // Limit quantity if selected size changes or activeSizeStock / cart updates
   useEffect(() => {
     if (selectedSize) {
       const maxStock = getSizeStock(selectedSize);
-      if (quantity > maxStock) {
-        setQuantity(Math.max(1, maxStock));
+      const inCart = cart.find((i) => String(i.id) === String(product.id) && i.size === selectedSize)?.quantity || 0;
+      const available = Math.max(0, maxStock - inCart);
+      if (quantity > available && available > 0) {
+        setQuantity(available);
+      } else if (available === 0) {
+        setQuantity(1);
       }
     }
-  }, [selectedSize]);
+  }, [selectedSize, cart]);
 
   // Sync gallery scroll to activeImageIndex (for thumbnail clicks on mobile)
   const scrollToSlide = useCallback((idx: number) => {
@@ -1138,6 +1148,17 @@ export default function ProductUI({ product }: { product: any }) {
             ].filter(Boolean).join(", ")
           : undefined);
 
+    const maxStockLimit = selectedSize ? getSizeStock(selectedSize) : product.stock;
+
+    if (inCartQty + quantity > maxStockLimit) {
+      alert(
+        language === "ar"
+          ? `لا يمكن إضافة المزيد. لديك بالفعل ${inCartQty} في السلة، والحد الأقصى المتوفر هو ${maxStockLimit}.`
+          : `Cannot add more. You already have ${inCartQty} in your cart, and only ${maxStockLimit} is available in stock.`
+      );
+      return;
+    }
+
     addToCart({
       id: product.id,
       name: product.name,
@@ -1145,6 +1166,7 @@ export default function ProductUI({ product }: { product: any }) {
       image: product.images?.[activeImageIndex] || product.images?.[0] || "https://a.espncdn.com/i/teamlogos/soccer/500/default.png",
       size: selectedSize,
       quantity: quantity,
+      maxStock: maxStockLimit,
       customName: finalName || undefined,
       customNumber: finalNumber || undefined,
       playerName: selectedPresetPlayer?.name || undefined,
@@ -1988,8 +2010,8 @@ export default function ProductUI({ product }: { product: any }) {
             </button>
             <span className="w-8 text-center font-black text-slate-900 text-sm">{product.stock === 0 ? 0 : quantity}</span>
             <button
-              onClick={() => setQuantity(Math.min(activeSizeStock, quantity + 1))}
-              disabled={product.stock === 0 || quantity >= activeSizeStock}
+              onClick={() => setQuantity(Math.min(remainingStock, quantity + 1))}
+              disabled={product.stock === 0 || remainingStock <= 0 || quantity >= remainingStock}
               className="w-10 h-12 flex items-center justify-center text-slate-500 text-lg font-bold active:bg-slate-50 transition-colors disabled:opacity-30"
             >
               +
@@ -1999,9 +2021,9 @@ export default function ProductUI({ product }: { product: any }) {
           {/* Add to cart button */}
           <button
             onClick={handleAddToCart}
-            disabled={product.stock === 0 || (product.sizes?.length > 0 && (!selectedSize || getSizeStock(selectedSize) === 0)) || isAdded}
+            disabled={product.stock === 0 || (selectedSize ? remainingStock <= 0 : false) || (product.sizes?.length > 0 && (!selectedSize || getSizeStock(selectedSize) === 0)) || isAdded}
             className={`flex-1 h-12 rounded-xl font-bold text-sm uppercase tracking-widest transition-all ${
-              product.stock === 0
+              product.stock === 0 || (selectedSize && remainingStock <= 0)
                 ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                 : isAdded
                 ? "bg-emerald-500 text-white"
@@ -2014,6 +2036,8 @@ export default function ProductUI({ product }: { product: any }) {
               ? t("sold_out")
               : (product.sizes?.length > 0 && !selectedSize)
               ? t("select_size")
+              : (selectedSize && remainingStock <= 0 && activeSizeStock > 0)
+              ? (language === "ar" ? "الكمية بالكامل في السلة" : "All in Cart")
               : isAdded
               ? `✓ ${t("added_to_cart")}`
               : t("add_to_cart")}
@@ -2333,8 +2357,8 @@ export default function ProductUI({ product }: { product: any }) {
                 </button>
                 <span className="font-bold text-slate-900 text-sm">{product.stock === 0 ? 0 : quantity}</span>
                 <button
-                  onClick={() => setQuantity(Math.min(activeSizeStock, quantity + 1))}
-                  disabled={product.stock === 0 || quantity >= activeSizeStock}
+                  onClick={() => setQuantity(Math.min(remainingStock, quantity + 1))}
+                  disabled={product.stock === 0 || remainingStock <= 0 || quantity >= remainingStock}
                   className="w-9 h-9 flex items-center justify-center text-slate-500 hover:text-slate-900 hover:bg-white rounded-xl transition-all text-lg font-bold disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   +
@@ -2344,9 +2368,9 @@ export default function ProductUI({ product }: { product: any }) {
               {/* Add to Cart button */}
               <button
                 onClick={handleAddToCart}
-                disabled={product.stock === 0 || (product.sizes?.length > 0 && (!selectedSize || getSizeStock(selectedSize) === 0)) || isAdded}
+                disabled={product.stock === 0 || (selectedSize ? remainingStock <= 0 : false) || (product.sizes?.length > 0 && (!selectedSize || getSizeStock(selectedSize) === 0)) || isAdded}
                 className={`flex-1 rounded-2xl font-bold text-xs uppercase tracking-widest transition-all duration-300 shadow-md h-full flex items-center justify-center gap-2 transform-gpu active:scale-98 ${
-                  product.stock === 0
+                  product.stock === 0 || (selectedSize && remainingStock <= 0)
                     ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed shadow-none"
                     : isAdded
                     ? "bg-emerald-500 text-white shadow-emerald-500/25"
@@ -2359,6 +2383,8 @@ export default function ProductUI({ product }: { product: any }) {
                   <span>{t("sold_out")}</span>
                 ) : !selectedSize && product.sizes?.length > 0 ? (
                   <span>{t("select_size")}</span>
+                ) : (selectedSize && remainingStock <= 0 && activeSizeStock > 0) ? (
+                  <span>{language === "ar" ? "الكمية بالكامل في السلة" : "All in Cart"}</span>
                 ) : isAdded ? (
                   <>
                     <svg className="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
