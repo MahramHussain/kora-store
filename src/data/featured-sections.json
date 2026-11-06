@@ -1,11 +1,76 @@
 {
   "best_sellers": [
-    "brazil-away-kit"
+    "cms6nrtpz000704jjmp0bisis",
+    "cmt70ui60000004lcfp53f6cz",
+    "brazil-home-kit",
+    "cmuhbmoxk000c04jmueipe35z",
+    "cmvkv96o6002o04l9do1zye0r",
+    "cms6nlktk000e04l5y86xr8br",
+    "cmsjfyhiv000g04l8zd72hru8",
+    "cmt6y1kyq000004ju24bv1u1b",
+    "cms8rtzdn000004jpijk6p0ep",
+    "uruguay-away-kit",
+    "cms8sasjz001y04l2ck87thyo",
+    "brazil-away-kit",
+    "cmuhbb9s2000604jmjyavo7e5",
+    "argentina-away-kit",
+    "portugal-away-kit",
+    "cmuhavvgm000m04jv3tn29dxe"
   ],
   "club": [
-    "brazil-away-kit"
+    "cmuhb59sk000004jmfdq11kzf",
+    "cmtn7coht000204l5tu93tl90",
+    "cmvktjj78000g04l90r4swb5p",
+    "cmuhaj493000g04jvr0hlkeol",
+    "cmvkub42s000m04l9emabaz6d",
+    "cmt711s7p000n04lch5idiv0t",
+    "cmta6w1ue002k04jlbf9odp1j",
+    "cmta6q0xm002h04jlh93vblaa"
   ],
-  "national": [],
-  "shoes": [],
-  "gear": []
+  "national": [
+    "france-home-kit",
+    "portugal-home-kit",
+    "germany-home-kit",
+    "argentina-home-kit",
+    "spain-home-kit",
+    "france-away-kit",
+    "brazil-home-kit",
+    "argentina-away-kit",
+    "portugal-away-kit",
+    "brazil-away-kit",
+    "spain-away-kit",
+    "uruguay-away-kit"
+  ],
+  "shoes": [
+    "cmt6y1kyq000004ju24bv1u1b",
+    "cmt8tozas000004ky0cnoy3ji",
+    "cmta5yi01001k04jliwxyzxvv",
+    "cmtxevlbw000w04lb0p8dsgr1",
+    "cmtjwezeu000i04l76bbwta2z",
+    "cmt8s7x3l000w04lfwozn8m7g",
+    "cmta5b3jg000704jl5jp51m7w",
+    "cmta58iy3000004jlvhxbtzbc",
+    "cmvwa7kf8001p08jrr5td2p1m",
+    "cmvw9y0hn001i08jrk43x9a9t",
+    "cmtjwc2i9000g04l7zdzvfd8j",
+    "cmta61bon001r04jlq8qfhw93",
+    "cmta5qxkk001d04jlk1t23iq7",
+    "cmta5p0b8001604jlqp50bxcy",
+    "cmta5mxks000z04jlq68krm0c",
+    "cmta5l6tn000s04jlyzdetwys"
+  ],
+  "gear": [
+    "nike-everyday-socks",
+    "grip-socks",
+    "fc-barcelona-flag",
+    "real-madrid-flag",
+    "manchester-united-flag",
+    "manchester-city-flag",
+    "cmvwa7kf8001p08jrr5td2p1m",
+    "cmvw9y0hn001i08jrk43x9a9t",
+    "cmvkv96o6002o04l9do1zye0r",
+    "cmvkub42s000m04l9emabaz6d",
+    "cmvktjj78000g04l90r4swb5p",
+    "cmuhbmoxk000c04jmueipe35z"
+  ]
 }

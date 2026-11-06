@@ -6,8 +6,8 @@ import { cookies } from "next/headers";
 import { translations } from "@/lib/translations";
 import { getFeaturedProductsForSection, getSectionTargetCount, SectionId } from "@/lib/featuredSections";
 
-// Cache homepage on Vercel CDN with ISR; revalidated automatically when admin updates featured sections
-export const revalidate = 60;
+// Cache homepage on Vercel CDN with ISR; revalidated automatically on-demand when admin updates featured sections
+export const revalidate = 3600;
 
 async function FeaturedSectionGrid({ sectionId }: { sectionId: SectionId }) {
   const products = await getFeaturedProductsForSection(sectionId);

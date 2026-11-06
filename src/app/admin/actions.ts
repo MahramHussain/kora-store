@@ -560,5 +560,14 @@ export async function getFeaturedSectionsAdminData() {
 export async function saveFeaturedSectionsAdmin(config: FeaturedSectionsConfig) {
   await ensureAdmin();
   const success = await saveFeaturedSectionsConfig(config);
+  try {
+    revalidatePath("/", "page");
+    revalidatePath("/", "layout");
+    revalidatePath("/admin/featured");
+    (revalidateTag as any)("featured-sections", "max");
+    (revalidateTag as any)("products", "max");
+  } catch (err) {
+    console.warn("Revalidation warning in saveFeaturedSectionsAdmin:", err);
+  }
   return { success };
 }

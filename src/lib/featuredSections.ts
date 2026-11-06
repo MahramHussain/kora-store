@@ -60,8 +60,12 @@ export function getSectionTargetCount(sectionId: SectionId): number {
   }
 }
 
-// Resilient query wrapper that retries once on transient connection/cold-start drops
-async function queryWithRetry<T>(queryFn: () => Promise<T>, retries = 1, delayMs = 300): Promise<T> {
+// Resilient query wrapper that retries on transient connection/cold-start drops with backoff
+async function queryWithRetry<T>(
+  queryFn: () => Promise<T>,
+  retries = 3,
+  delays = [500, 1200, 2500]
+): Promise<T> {
   let lastErr: any;
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
@@ -69,7 +73,8 @@ async function queryWithRetry<T>(queryFn: () => Promise<T>, retries = 1, delayMs
     } catch (err: any) {
       lastErr = err;
       if (attempt < retries) {
-        await new Promise((res) => setTimeout(res, delayMs));
+        const delay = delays[attempt] || 1500;
+        await new Promise((res) => setTimeout(res, delay));
       }
     }
   }
@@ -97,7 +102,8 @@ export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfi
       const record = await queryWithRetry(() =>
         prisma.storeSetting.findUnique({
           where: { key: SETTING_KEY },
-        })
+        }),
+        3
       );
 
       if (record && record.value && typeof record.value === "object") {
@@ -119,7 +125,7 @@ export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfi
       globalForFeatured.configFetchPromise = null;
     }
 
-    // 3. Fallback to reading from local JSON file
+    // 3. Fallback to reading from local JSON backup file
     try {
       const raw = await fs.readFile(CONFIG_FILE_PATH, "utf-8");
       const parsed = JSON.parse(raw);
@@ -130,8 +136,10 @@ export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfi
         shoes: Array.isArray(parsed.shoes) ? parsed.shoes.slice(0, 16) : [],
         gear: Array.isArray(parsed.gear) ? parsed.gear.slice(0, 12) : [],
       };
-      globalForFeatured.featuredConfig = config;
-      globalForFeatured.featuredConfigLoadedAt = Date.now();
+      if (config.best_sellers.length > 0 || config.club.length > 0) {
+        globalForFeatured.featuredConfig = config;
+        globalForFeatured.featuredConfigLoadedAt = Date.now();
+      }
       return config;
     } catch {
       if (globalForFeatured.featuredConfig) {
@@ -140,8 +148,6 @@ export async function getFeaturedSectionsConfig(): Promise<FeaturedSectionsConfi
       return { ...DEFAULT_CONFIG };
     }
   })();
-
-
 
   return globalForFeatured.configFetchPromise;
 }
@@ -177,7 +183,8 @@ export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig)
         where: { key: SETTING_KEY },
         update: { value: sanitized as any },
         create: { key: SETTING_KEY, value: sanitized as any },
-      })
+      }),
+      3
     );
     dbSaved = true;
   } catch (dbErr) {
@@ -195,11 +202,11 @@ export async function saveFeaturedSectionsConfig(config: FeaturedSectionsConfig)
 
   // 3. Invalidate caches so storefront updates instantly with the new sort order
   try {
+    revalidatePath("/", "page");
     revalidatePath("/", "layout");
-    revalidatePath("/");
     revalidatePath("/admin/featured");
-    (revalidateTag as any)("featured-sections", { expire: 0 });
-    (revalidateTag as any)("products", { expire: 0 });
+    (revalidateTag as any)("featured-sections", "max");
+    (revalidateTag as any)("products", "max");
   } catch {
     // Ignore outside request context
   }
@@ -303,6 +310,7 @@ async function fetchFeaturedProductsRaw(sectionId: SectionId): Promise<any[]> {
   };
 
   let selectedProducts: any[] = [];
+  let configuredQueryFailed = false;
 
   // 1. Fetch explicitly configured products
   if (configuredIds.length > 0) {
@@ -311,7 +319,8 @@ async function fetchFeaturedProductsRaw(sectionId: SectionId): Promise<any[]> {
         prisma.product.findMany({
           where: { id: { in: configuredIds } },
           select: cardSelect,
-        })
+        }),
+        3
       );
 
       const idMap = new Map(fetched.map((p) => [p.id, p]));
@@ -320,11 +329,20 @@ async function fetchFeaturedProductsRaw(sectionId: SectionId): Promise<any[]> {
         .filter(Boolean);
     } catch (err) {
       console.warn(`[FeaturedSections] Failed to fetch configured IDs for ${sectionId}:`, err);
+      configuredQueryFailed = true;
     }
   }
 
-  // 2. If fewer than targetCount products, fill remaining slots
-  if (selectedProducts.length < targetCount) {
+  // If DB query for configured IDs failed on transient cold start, do NOT corrupt the section with default sorting!
+  // Return in-memory last-known-good products instead.
+  if (configuredQueryFailed) {
+    if (globalForFeatured.lastKnownProducts?.[sectionId]?.length) {
+      return globalForFeatured.lastKnownProducts[sectionId];
+    }
+  }
+
+  // 2. If fewer than targetCount products (and configured query did NOT fail), fill remaining slots
+  if (!configuredQueryFailed && selectedProducts.length < targetCount) {
     const needed = targetCount - selectedProducts.length;
     const existingIds = selectedProducts.map((p) => p.id);
     const criteria = getSectionCriteria(sectionId);
@@ -338,7 +356,8 @@ async function fetchFeaturedProductsRaw(sectionId: SectionId): Promise<any[]> {
           take: 48,
           orderBy: { createdAt: "desc" },
           select: cardSelect,
-        })
+        }),
+        2
       );
 
       fallbacks.sort((a, b) => {
@@ -371,7 +390,8 @@ async function fetchFeaturedProductsRaw(sectionId: SectionId): Promise<any[]> {
             take: stillNeeded,
             orderBy: { createdAt: "desc" },
             select: cardSelect,
-          })
+          }),
+          2
         );
         selectedProducts.push(...ultraFallbacks);
       } catch (err) {
@@ -404,26 +424,35 @@ async function fetchFeaturedProductsRaw(sectionId: SectionId): Promise<any[]> {
 }
 
 // Cached export that guarantees non-empty resilient output for each section
-export const getFeaturedProductsForSection = unstable_cache(
-  async (sectionId: SectionId) => {
-    try {
-      const products = await fetchFeaturedProductsRaw(sectionId);
-      if (products && products.length > 0) {
-        return products;
+export async function getFeaturedProductsForSection(sectionId: SectionId): Promise<any[]> {
+  const cachedFn = unstable_cache(
+    async () => {
+      try {
+        const products = await fetchFeaturedProductsRaw(sectionId);
+        if (products && products.length > 0) {
+          return products;
+        }
+        if (globalForFeatured.lastKnownProducts?.[sectionId]?.length) {
+          return globalForFeatured.lastKnownProducts[sectionId];
+        }
+        return await getLocalFallbackProducts(sectionId);
+      } catch (err) {
+        console.error(`[FeaturedSections] Critical error fetching ${sectionId}:`, err);
+        if (globalForFeatured.lastKnownProducts?.[sectionId]?.length) {
+          return globalForFeatured.lastKnownProducts[sectionId];
+        }
+        return await getLocalFallbackProducts(sectionId);
       }
-      // If still empty, return in-memory or local fallback
-      if (globalForFeatured.lastKnownProducts?.[sectionId]?.length) {
-        return globalForFeatured.lastKnownProducts[sectionId];
-      }
-      return await getLocalFallbackProducts(sectionId);
-    } catch (err) {
-      console.error(`[FeaturedSections] Critical error fetching ${sectionId}:`, err);
-      if (globalForFeatured.lastKnownProducts?.[sectionId]?.length) {
-        return globalForFeatured.lastKnownProducts[sectionId];
-      }
-      return await getLocalFallbackProducts(sectionId);
+    },
+    ["featured-section-products-v4", sectionId],
+    {
+      // Cache indefinitely until tagged revalidation occurs (when admin saves or products change)
+      // or revalidate hourly (3600s). This prevents Next.js from expiring every 60s and triggering
+      // cold-start fallbacks during Stale-While-Revalidate!
+      revalidate: 3600,
+      tags: ["featured-sections", `featured-section-${sectionId}`, "products"],
     }
-  },
-  ["featured-section-products-cache"],
-  { revalidate: 60, tags: ["featured-sections", "products"] }
-);
+  );
+
+  return cachedFn();
+}
